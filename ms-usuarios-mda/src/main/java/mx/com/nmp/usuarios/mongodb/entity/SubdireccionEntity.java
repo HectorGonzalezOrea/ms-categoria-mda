@@ -1,0 +1,41 @@
+package mx.com.nmp.usuarios.mongodb.entity;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "subdireccion_TMP")
+public class SubdireccionEntity {
+	
+	@Id
+	private ObjectId _id;
+	private Integer idSubdireccion;
+	private String nombre;
+	private String descripcion;
+	
+	public ObjectId get_id() {
+		return _id;
+	}
+	public void set_id(ObjectId _id) {
+		this._id = _id;
+	}
+	public Integer getIdSubdireccion() {
+		return idSubdireccion;
+	}
+	public void setIdSubdireccion(Integer idSubdireccion) {
+		this.idSubdireccion = idSubdireccion;
+	}
+	public String getNombre() {
+		return nombre;
+	}
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+	public String getDescripcion() {
+		return descripcion;
+	}
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+	
+}
