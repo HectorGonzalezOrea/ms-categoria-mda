@@ -4,7 +4,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "gerencia_TMP")
+@Document(collection = "gerencia")
 public class GerenciaEntity {
 	
 	@Id

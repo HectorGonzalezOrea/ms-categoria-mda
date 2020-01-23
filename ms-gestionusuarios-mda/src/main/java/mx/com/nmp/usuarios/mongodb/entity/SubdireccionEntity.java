@@ -4,7 +4,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "subdireccion_TMP")
+@Document(collection = "subdireccion")
 public class SubdireccionEntity {
 	
 	@Id

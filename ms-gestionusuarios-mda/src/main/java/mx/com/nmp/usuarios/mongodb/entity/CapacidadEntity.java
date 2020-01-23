@@ -4,7 +4,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "capacidad_TMP")
+@Document(collection = "capacidad")
 public class CapacidadEntity {
 	@Id
 	private ObjectId _id;
