@@ -18,6 +18,8 @@ import mx.com.nmp.consolidados.model.NotFound;
 import org.springframework.core.io.Resource;
 import mx.com.nmp.consolidados.model.SuccessfulResponse;
 import io.swagger.annotations.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,8 +42,7 @@ public interface ConsolidadosApi {
 
     @ApiOperation(value = "Actualizar prioridad de ejecución del archivo", nickname = "actualizarPosicionArchivoPUT", notes = "Actualiza la prioridad de ejecución de los archivos.  ", response = InlineResponse200.class, authorizations = {
         @Authorization(value = "apiKey"),
-        @Authorization(value = "apiSecret")
-    }, tags={ "Consolidados", })
+        @Authorization(value = "apiSecret") }, tags={ "Consolidados", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Modificacion exitosa", response = InlineResponse200.class),
         @ApiResponse(code = 400, message = "Error en el mensaje de petición, verifique la información", response = BadRequest.class),
@@ -50,23 +51,18 @@ public interface ConsolidadosApi {
         @ApiResponse(code = 409, message = "Conflicto con el mensaje de petición, verifique la información", response = ConflictRequest.class),
         @ApiResponse(code = 500, message = "Error interno del servidor", response = InternalServerError.class) })
     @RequestMapping(value = "/consolidados/archivos/{idArchivo}/prioridad",
-        produces = { "application/json" }, 
-        method = RequestMethod.PUT)
-    default ResponseEntity<InlineResponse200> actualizarPosicionArchivoPUT(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Identificador del archivo",required=true) @PathVariable("idArchivo") String idArchivo,@ApiParam(value = "peticion para modificar la posicion de un archivo"  )  @Valid @RequestBody ModificarPrioridadArchivoConsolidadoReq modificarPosicionReq) {
-        if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
-            if (getAcceptHeader().get().contains("application/json")) {
-                try {
-                    return new ResponseEntity<>(getObjectMapper().get().readValue("{  \"nombreArchivo\" : \"nombreArchivo\",  \"idPosicion\" : 0}", InlineResponse200.class), HttpStatus.NOT_IMPLEMENTED);
-                } catch (Exception e) {
-                    log.error("Couldn't serialize response for content type application/json", e);
-                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-            }
-        } else {
-            log.warn("ObjectMapper or HttpServletRequest not configured in default ConsolidadosApi interface so no example is generated");
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-    }
+        produces = { "application/json" }, method = RequestMethod.PUT)
+    ResponseEntity<?> actualizarPosicionArchivoPUT(
+    		@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true)
+    		@RequestHeader(value="usuario", required=true) String usuario,
+    		@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") 
+    		@RequestHeader(value="origen", required=true) String origen,
+    		@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") 
+    		@RequestHeader(value="destino", required=true) String destino,
+    		@ApiParam(value = "Identificador del archivo",required=true) 
+    		@PathVariable("idArchivo") String idArchivo,
+    		@ApiParam(value = "peticion para modificar la posicion de un archivo"  )  
+    		@Valid @RequestBody ModificarPrioridadArchivoConsolidadoReq modificarPosicionReq);
 
 
     @ApiOperation(value = "Consulta los archivos por la fecha en la que estan programados", nickname = "consultaConsolidadosArchivosGET", notes = "El consumidor podrá consultar los archivos de acuerdo a la fecha en la que fue programada su ejecución. Como resultado el consumidor recibira la lista de archivos y la prioridad con la que se ejecutarán. ", response = ConsultarArchivoConsolidadoRes.class, authorizations = {
@@ -82,21 +78,15 @@ public interface ConsolidadosApi {
     @RequestMapping(value = "/consolidados/archivos",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    default ResponseEntity<ConsultarArchivoConsolidadoRes> consultaConsolidadosArchivosGET(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@NotNull @ApiParam(value = "Fecha de ejecución del proceso de consolidados", required = true) @Valid @RequestParam(value = "fechaAplicacion", required = true) LocalDate fechaAplicacion) {
-        if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
-            if (getAcceptHeader().get().contains("application/json")) {
-                try {
-                    return new ResponseEntity<>(getObjectMapper().get().readValue("{  \"nombreArchivo\" : \"nombreArchivo\",  \"nombreCliente\" : \"nombreCliente\",  \"fechaReporte\" : \"2000-01-23T04:56:07.000+00:00\",  \"producto\" : [ {    \"prestamoCosto\" : 1.4658129,    \"folio_Sku\" : 6,    \"precioFinal\" : 5.962134,    \"idProducto\" : 0,    \"ubicacionActual\" : \"ubicacionActual\"  }, {    \"prestamoCosto\" : 1.4658129,    \"folio_Sku\" : 6,    \"precioFinal\" : 5.962134,    \"idProducto\" : 0,    \"ubicacionActual\" : \"ubicacionActual\"  } ]}", ConsultarArchivoConsolidadoRes.class), HttpStatus.NOT_IMPLEMENTED);
-                } catch (IOException e) {
-                    log.error("Couldn't serialize response for content type application/json", e);
-                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-            }
-        } else {
-            log.warn("ObjectMapper or HttpServletRequest not configured in default ConsolidadosApi interface so no example is generated");
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-    }
+     ResponseEntity<?> consultaConsolidadosArchivosGET(
+    		@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) 
+    		@RequestHeader(value="usuario", required=true) String usuario,
+    		@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") 
+    		@RequestHeader(value="origen", required=true) String origen,
+    		@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") 
+    		@RequestHeader(value="destino", required=true) String destino,
+    		@NotNull @ApiParam(value = "Fecha de ejecución del proceso de consolidados", required = true) 
+    		@Valid @RequestParam(value = "fechaAplicacion", required = true) LocalDate fechaAplicacion);
 
 
     @ApiOperation(value = "Elimina archivo consolidados", nickname = "eliminarArchivoConsolidadoDELETE", notes = "Elimina archivo de consolidados. La eliminación del archivo solo se podrá realizar siempre y cuando el archivo este en estado inicial. ", response = SuccessfulResponse.class, authorizations = {
@@ -112,21 +102,14 @@ public interface ConsolidadosApi {
     @RequestMapping(value = "/consolidados/archivos/{idArchivo}",
         produces = { "application/json" }, 
         method = RequestMethod.DELETE)
-    default ResponseEntity<SuccessfulResponse> eliminarArchivoConsolidadoDELETE(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Identificador del archivo",required=true) @PathVariable("idArchivo") String idArchivo) {
-        if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
-            if (getAcceptHeader().get().contains("application/json")) {
-                try {
-                    return new ResponseEntity<>(getObjectMapper().get().readValue("{  \"codigo\" : \"NMP-MDA-000\",  \"mensaje\" : \"Operación ejecutada satisfactoriamente\"}", SuccessfulResponse.class), HttpStatus.NOT_IMPLEMENTED);
-                } catch (IOException e) {
-                    log.error("Couldn't serialize response for content type application/json", e);
-                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-            }
-        } else {
-            log.warn("ObjectMapper or HttpServletRequest not configured in default ConsolidadosApi interface so no example is generated");
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-    }
+    ResponseEntity<?> eliminarArchivoConsolidadoDELETE(
+    		@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) 
+    		@RequestHeader(value="usuario", required=true) String usuario,
+    		@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") 
+    		@RequestHeader(value="origen", required=true) String origen,
+    		@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") 
+    		@RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Identificador del archivo",required=true) 
+    		@PathVariable("idArchivo") String idArchivo);
 
 
     @ApiOperation(value = "Registrar archivo con información de consolidados", nickname = "procesarConsolidadoPOST", notes = "El consumidor enviará la fecha de los archivos que requiere se procesen. El proceso internamente buscará los archivos correspondientes y los ejecutará de acuerdo a la prioridad que tengan, en caso de no tener prioridad, estos se ejecutarán con la prioridad más baja. Esta operación asincrona actualizará los estados del archivo de acuerdo a la etapa interna en la que se encuentre del proceso de consolidados. El consumidor recibira como respuesta un mensaje de confrimación. ", response = SuccessfulResponse.class, authorizations = {
@@ -142,21 +125,15 @@ public interface ConsolidadosApi {
         produces = { "application/json" }, 
         consumes = { "application/json" },
         method = RequestMethod.POST)
-    default ResponseEntity<SuccessfulResponse> procesarConsolidadoPOST(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@NotNull @ApiParam(value = "Fecha de ejecución del proceso de consolidados", required = true) @Valid @RequestParam(value = "fechaAplicacion", required = true) LocalDate fechaAplicacion) {
-        if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
-            if (getAcceptHeader().get().contains("application/json")) {
-                try {
-                    return new ResponseEntity<>(getObjectMapper().get().readValue("{  \"codigo\" : \"NMP-MDA-000\",  \"mensaje\" : \"Operación ejecutada satisfactoriamente\"}", SuccessfulResponse.class), HttpStatus.NOT_IMPLEMENTED);
-                } catch (IOException e) {
-                    log.error("Couldn't serialize response for content type application/json", e);
-                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-            }
-        } else {
-            log.warn("ObjectMapper or HttpServletRequest not configured in default ConsolidadosApi interface so no example is generated");
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-    }
+     ResponseEntity<?> procesarConsolidadoPOST(
+    		@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) 
+    		@RequestHeader(value="usuario", required=true) String usuario,
+    		@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") 
+    		@RequestHeader(value="origen", required=true) String origen,
+    		@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") 
+    		@RequestHeader(value="destino", required=true) String destino,
+    		@NotNull @ApiParam(value = "Fecha de ejecución del proceso de consolidados", required = true) 
+    		@Valid @RequestParam(value = "fechaAplicacion", required = true) LocalDate fechaAplicacion);
 
 
     @ApiOperation(value = "Registrar archivo con información de consolidados", nickname = "registrarConsolidadoPOST", notes = "Se almacena el archivo que contiene la información de las partidas a consolidar. Cada registro tendrá un estado inicial para identificar que el archivo ha sido registrado y que aún no se procesa. ", response = GeneralResponse.class, authorizations = {
@@ -172,20 +149,20 @@ public interface ConsolidadosApi {
         produces = { "application/json" }, 
         consumes = { "multipart/form-data" },
         method = RequestMethod.POST)
-    default ResponseEntity<GeneralResponse> registrarConsolidadoPOST(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Archivo CSV de consolidados") @Valid @RequestPart(value="adjunto", required=true) MultipartFile adjunto,@ApiParam(value = "Fecha de vigencia para el ajuste" ,required=true) @RequestHeader(value="vigencia", required=true) LocalDate vigencia,@ApiParam(value = "Nombre del ajuste" ,required=true) @RequestHeader(value="nombreAjuste", required=true) String nombreAjuste,@ApiParam(value = "Flag para indicar si el ajuste es emergente" ,required=true) @RequestHeader(value="emergente", required=true) Boolean emergente) {
-        if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
-            if (getAcceptHeader().get().contains("application/json")) {
-                try {
-                    return new ResponseEntity<>(getObjectMapper().get().readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
-                } catch (IOException e) {
-                    log.error("Couldn't serialize response for content type application/json", e);
-                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-            }
-        } else {
-            log.warn("ObjectMapper or HttpServletRequest not configured in default ConsolidadosApi interface so no example is generated");
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-    }
+     ResponseEntity<?> registrarConsolidadoPOST(
+    		@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) 
+    		@RequestHeader(value="usuario", required=true) String usuario,
+    		@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") 
+    		@RequestHeader(value="origen", required=true) String origen,
+    		@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") 
+    		@RequestHeader(value="destino", required=true) String destino,
+    		@ApiParam(value = "Archivo CSV de consolidados") 
+    		@Valid @RequestPart(value="adjunto", required=true) MultipartFile adjunto,
+    		@ApiParam(value = "Fecha de vigencia para el ajuste" ,required=true) 
+    		@RequestHeader(value="vigencia", required=true) LocalDate vigencia,
+    		@ApiParam(value = "Nombre del ajuste" ,required=true) 
+    		@RequestHeader(value="nombreAjuste", required=true) String nombreAjuste,
+    		@ApiParam(value = "Flag para indicar si el ajuste es emergente" ,required=true) 
+    		@RequestHeader(value="emergente", required=true) Boolean emergente);
 
 }
