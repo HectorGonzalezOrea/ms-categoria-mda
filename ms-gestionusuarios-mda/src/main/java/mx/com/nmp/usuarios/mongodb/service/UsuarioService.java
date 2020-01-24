@@ -81,6 +81,7 @@ public class UsuarioService {
 	public static final String ACCION = "accion";
 	public static final String FECHA = "fecha";
 	public static final String ID = "_id";
+	public static final String PERFIL = "perfil";
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -289,7 +290,7 @@ public class UsuarioService {
 				infoUsuario.setNombre(aux.getNombre());
 				infoUsuario.setUsuario(aux.getUsuario());
 				
-				CapacidadUsuariosRes perfilc = this.buscarPerfilConCapacidades(aux.getPerfil());
+				CapacidadUsuariosRes perfilc = this.buscarPerfilConCapacidades(aux.getIdPerfil());
 				
 				if(perfilc != null) {
 					infoUsuario.setPerfil(perfilc);
@@ -629,7 +630,7 @@ public class UsuarioService {
 				
 				usuario.setUsuario(request.getUsuario());
 				usuario.setNombre(request.getNombre());
-				usuario.setPerfil(request.getPerfil().getIdPerfil());
+				usuario.setIdPerfil(request.getPerfil().getIdPerfil());
 				
 				Long id = sequenceGeneratorService.generateSequence(USUARIO_SEQ_KEY);
 				usuario.setIdUsuario(id);

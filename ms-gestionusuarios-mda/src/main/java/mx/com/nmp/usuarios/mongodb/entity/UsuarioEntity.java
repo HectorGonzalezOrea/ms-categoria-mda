@@ -24,6 +24,7 @@ public class UsuarioEntity {
 	private Integer gerencia;
 	private Integer departamentoArea;
 	private Integer perfil;
+	private Integer idPerfil;
 	private Boolean activo;
 	
 	public ObjectId get_id() {
@@ -103,6 +104,12 @@ public class UsuarioEntity {
 	}
 	public void setActivo(Boolean activo) {
 		this.activo = activo;
+	}
+	public Integer getIdPerfil() {
+		return idPerfil;
+	}
+	public void setIdPerfil(Integer idPerfil) {
+		this.idPerfil = idPerfil;
 	}
 	
 }
