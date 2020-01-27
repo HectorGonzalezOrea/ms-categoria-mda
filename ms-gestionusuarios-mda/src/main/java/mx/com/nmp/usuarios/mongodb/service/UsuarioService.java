@@ -75,7 +75,6 @@ public class UsuarioService {
 	public static final String ACTIVO = "activo";
 	public static final String USUARIO = "usuario";
 	public static final String ID_USUARIO = "idUsuario";
-	public static final String ID_PERFIL = "idPerfil";
 	public static final String ID_CAPACIDAD = "idCapacidad";
 	public static final String DESCRIPCION = "descripcion";
 	public static final String ACCION = "accion";
@@ -290,7 +289,7 @@ public class UsuarioService {
 				infoUsuario.setNombre(aux.getNombre());
 				infoUsuario.setUsuario(aux.getUsuario());
 				
-				CapacidadUsuariosRes perfilc = this.buscarPerfilConCapacidades(aux.getIdPerfil());
+				CapacidadUsuariosRes perfilc = this.buscarPerfilConCapacidades(aux.getPerfil());
 				
 				if(perfilc != null) {
 					infoUsuario.setPerfil(perfilc);
@@ -371,7 +370,7 @@ public class UsuarioService {
 
 				for (CapacidadUsuariosReqInner capacidad : informacionPerfil) {
 					aux = null;
-					aux = Criteria.where(ID_PERFIL).is(idPerfil);
+					aux = Criteria.where(PERFIL).is(idPerfil);
 					IdCapacidadEnum idEnum = capacidad.getIdCapacidad();
 					DescripcinCapEnum descEnum = capacidad.getDescripcinCap();
 
@@ -432,7 +431,7 @@ public class UsuarioService {
 
 				for (ModCapacidadUsuarioInner capacidad : modCapacidadReq) {
 					aux = null;
-					aux = Criteria.where(ID_PERFIL).is(idPerfil);
+					aux = Criteria.where(PERFIL).is(idPerfil);
 					mx.com.nmp.usuarios.model.ModCapacidadUsuarioInner.IdCapacidadEnum idEnum = capacidad.getIdCapacidad();
 
 					CapacidadEntity cap = (CapacidadEntity) capacidadRepository.findByIdCapacidad(new Integer(idEnum.toString()));
@@ -473,7 +472,7 @@ public class UsuarioService {
 			Query query = new Query();
 			query.addCriteria(Criteria.where(ID_USUARIO).is(idUsuario));
 			Update update = new Update();
-			update.set(ID_PERFIL, idPerfil);
+			update.set(PERFIL, idPerfil);
 			UsuarioEntity user = mongoTemplate.findAndModify(query, update, UsuarioEntity.class);
 
 			if (user != null) {
@@ -630,7 +629,7 @@ public class UsuarioService {
 				
 				usuario.setUsuario(request.getUsuario());
 				usuario.setNombre(request.getNombre());
-				usuario.setIdPerfil(request.getPerfil().getIdPerfil());
+				usuario.setPerfil(request.getPerfil().getIdPerfil());
 				
 				Long id = sequenceGeneratorService.generateSequence(USUARIO_SEQ_KEY);
 				usuario.setIdUsuario(id);
