@@ -1,18 +1,18 @@
 package mx.com.nmp.consolidados.model;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.Objects;
-
-import javax.validation.Valid;
-
-import org.springframework.validation.annotation.Validated;
-import org.threeten.bp.OffsetDateTime;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import mx.com.nmp.consolidados.model.InfoProducto;
+
+import java.util.ArrayList;
+import java.util.List;
+import org.threeten.bp.OffsetDateTime;
+import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
 /**
  * ConsultarArchivoConsolidadoRes
@@ -25,7 +25,7 @@ public class ConsultarArchivoConsolidadoRes   {
   private String nombreArchivo = null;
 
   @JsonProperty("fechaReporte")
-  private Date fechaReporte = null;
+  private OffsetDateTime fechaReporte = null;
 
   @JsonProperty("nombreCliente")
   private String nombreCliente = null;
@@ -54,7 +54,7 @@ public class ConsultarArchivoConsolidadoRes   {
     this.nombreArchivo = nombreArchivo;
   }
 
-  public ConsultarArchivoConsolidadoRes fechaReporte(Date fechaReporte) {
+  public ConsultarArchivoConsolidadoRes fechaReporte(OffsetDateTime fechaReporte) {
     this.fechaReporte = fechaReporte;
     return this;
   }
@@ -67,11 +67,11 @@ public class ConsultarArchivoConsolidadoRes   {
 
   @Valid
 
-  public Date getFechaReporte() {
+  public OffsetDateTime getFechaReporte() {
     return fechaReporte;
   }
 
-  public void setFechaReporte(Date fechaReporte) {
+  public void setFechaReporte(OffsetDateTime fechaReporte) {
     this.fechaReporte = fechaReporte;
   }
 

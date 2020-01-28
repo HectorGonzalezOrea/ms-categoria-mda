@@ -3,7 +3,6 @@ package mx.com.nmp.consolidados.mongodb.entity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.File;
-import java.time.LocalDate;
 import java.util.Date;
 
 import org.bson.types.ObjectId;
@@ -14,13 +13,13 @@ import org.springframework.data.annotation.Transient;
 public class ArchivoEntity {
 	
 	@Transient
-    public static final String SEQUENCE_NAME = "consolidado_sequence";
+    public static final String SEQUENCE_NAME = "usuario_sequence";
 	
 	@Id
 	private ObjectId _id;
 	private Long idArchivo;
 	private File adjunto;
-	private LocalDate vigencia;
+	private Date vigencia;
 	private String nombreAjuste;
 	private Boolean emergente;
 	private Date fechaAplicacion;
@@ -42,10 +41,10 @@ public class ArchivoEntity {
 	public void setAdjunto(File adjunto) {
 		this.adjunto = adjunto;
 	}
-	public LocalDate getVigencia() {
+	public Date getVigencia() {
 		return vigencia;
 	}
-	public void setVigencia(LocalDate vigencia) {
+	public void setVigencia(Date vigencia) {
 		this.vigencia = vigencia;
 	}
 	public String getNombreAjuste() {
