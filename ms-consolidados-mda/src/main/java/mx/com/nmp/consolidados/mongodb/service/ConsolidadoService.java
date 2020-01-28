@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import mx.com.nmp.consolidados.model.Consolidados;
+import mx.com.nmp.consolidados.model.ConsultarArchivoConsolidadoResInner;
 import mx.com.nmp.consolidados.mongodb.entity.ArchivoEntity;
 import mx.com.nmp.consolidados.mongodb.entity.caster.CastConsolidados;
 import mx.com.nmp.consolidados.mongodb.service.sequenceGeneratorService;
@@ -48,8 +49,8 @@ public class ConsolidadoService {
 		}
 		return insertado;
 	}
-	public List<Consolidados> getConsolidados(LocalDate fechaAplicacion){
-		List<Consolidados> lstConsolidados=new ArrayList<>();
+	public List<ConsultarArchivoConsolidadoResInner> getConsolidados(LocalDate fechaAplicacion){
+		List<ConsultarArchivoConsolidadoResInner> lstConsolidados=new ArrayList<>();
 		Query q=new Query();
 		Criteria aux = Criteria.where("fechaAplicacion").is(fechaAplicacion);
 		q.addCriteria(aux);

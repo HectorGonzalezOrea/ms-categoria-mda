@@ -2,33 +2,44 @@ package mx.com.nmp.consolidados.mongodb.entity.caster;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import mx.com.nmp.consolidados.model.Consolidados;
+import mx.com.nmp.consolidados.model.ConsultarArchivoConsolidadoResInner;
 import mx.com.nmp.consolidados.model.InfoProducto;
 import mx.com.nmp.consolidados.mongodb.entity.ArchivoEntity;
 
 public class CastConsolidados {
-	public Consolidados fillVoValues(ArchivoEntity entity) {
-		Consolidados consolidado=null;
+	public ConsultarArchivoConsolidadoResInner fillVoValues(ArchivoEntity entity) {
+		ConsultarArchivoConsolidadoResInner consolidado=null;
 		if(entity!=null) {
-			consolidado=new Consolidados();
-			consolidado.setIdArchivo(entity.getIdArchivo());
-			consolidado.setAdjunto(entity.getAdjunto());
-			consolidado.setVigencia(entity.getVigencia());
-			consolidado.setNombreAjuste(entity.getNombreAjuste());
-			consolidado.setEmergente(entity.getEmergente());
-			consolidado.setFechaAplicacion(entity.getFechaAplicacion());
+			try {
+				consolidado=new ConsultarArchivoConsolidadoResInner();
+				consolidado.setIdArchivo(Integer.valueOf(entity.getIdArchivo().intValue()));
+				consolidado.setFechaReporte(entity.getFechaAplicacion());
+				consolidado.nombreArchivo(entity.getAdjunto().getName());
+				File archivo =entity.getAdjunto();
+				FileReader fileReader;
+				fileReader = new FileReader(archivo);
+				BufferedReader b=new BufferedReader(fileReader);
+	    		List<InfoProducto> productos=cvsLectura(b);
+				consolidado.setProducto(productos);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+    		
 		}
 		return consolidado;
 	}
-	public List<Consolidados> toVOs(List<ArchivoEntity> entities){
-		List<Consolidados> lstConsolidados=null;
+	public List<ConsultarArchivoConsolidadoResInner> toVOs(List<ArchivoEntity> entities){
+		List<ConsultarArchivoConsolidadoResInner> lstConsolidados=null;
+		
 		if(entities != null && !entities.isEmpty()){
 			lstConsolidados=new ArrayList<>();
 			for (ArchivoEntity entity : entities) {
@@ -47,7 +58,7 @@ public class CastConsolidados {
 	     return convFile;
 	}
 	
-	public List<InfoProducto> cvsLectura(BufferedReader b) {
+	private List<InfoProducto> cvsLectura(BufferedReader b) {
     	String line = "";
         String cvsSplitBy = ",";
     	List<InfoProducto> lst =new ArrayList<>();
@@ -72,4 +83,5 @@ public class CastConsolidados {
 		}
     	return lst;
     }	
+	
 }

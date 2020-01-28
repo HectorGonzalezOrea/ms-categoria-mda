@@ -9,6 +9,7 @@ import mx.com.nmp.consolidados.model.BadRequest;
 import mx.com.nmp.consolidados.model.ConflictRequest;
 import mx.com.nmp.consolidados.model.Consolidados;
 import mx.com.nmp.consolidados.model.ConsultarArchivoConsolidadoRes;
+import mx.com.nmp.consolidados.model.ConsultarArchivoConsolidadoResInner;
 import mx.com.nmp.consolidados.model.GeneralResponse;
 import mx.com.nmp.consolidados.model.InlineResponse200;
 import mx.com.nmp.consolidados.model.InternalServerError;
@@ -76,19 +77,8 @@ public class ConsolidadosApiController implements ConsolidadosApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-            	CastConsolidados util=new CastConsolidados();
-            	ConsultarArchivoConsolidadoRes res=new ConsultarArchivoConsolidadoRes();
-            
-            	Consolidados consolidadeslst=consolidadoService.getConsolidados(fechaAplicacion).get(0);
-//            	if(consolidadeslst!=null) {
-//            		res.setNombreArchivo(consolidadeslst.getAdjunto().getName());
-//            		res.setFechaReporte(consolidadeslst.getFechaAplicacion());
-//            		res.setNombreCliente(usuario);
-//            		File archivo=consolidadeslst.getAdjunto();
-//            		FileReader fileReader = new FileReader(archivo);
-//            		BufferedReader b=new BufferedReader(fileReader);
-//            		List<InfoProducto> productos=util.cvsLectura(b);
-//            		res.setProducto(productos);
+            	List<ConsultarArchivoConsolidadoResInner> consolidadeslst=consolidadoService.getConsolidados(fechaAplicacion);
+            	ConsultarArchivoConsolidadoRes response=(ConsultarArchivoConsolidadoRes) consolidadeslst;
                 return new ResponseEntity<ConsultarArchivoConsolidadoRes>(objectMapper.readValue("\"\"", ConsultarArchivoConsolidadoRes.class), HttpStatus.NOT_IMPLEMENTED);
             } catch (IOException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
