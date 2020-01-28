@@ -38,7 +38,7 @@ import java.util.List;
 @Controller
 public class ConsolidadosApiController implements ConsolidadosApi {
 
-    private static final Logger log = LoggerFactory.getLogger(ConsolidadosApiController.class);
+	private static final Logger log = LoggerFactory.getLogger(ConsolidadosApiController.class);
 
     private final ObjectMapper objectMapper;
 
@@ -64,7 +64,19 @@ public class ConsolidadosApiController implements ConsolidadosApi {
         return new ResponseEntity<InlineResponse200>(HttpStatus.NOT_IMPLEMENTED);
     }
 
+    public ResponseEntity<ConsultarArchivoConsolidadoRes> consultaConsolidadosArchivosGET(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@NotNull @ApiParam(value = "Fecha de ejecución del proceso de consolidados", required = true) @Valid @RequestParam(value = "fechaAplicacion", required = true) LocalDate fechaAplicacion,@NotNull @ApiParam(value = "Prioridad en la ejecución del archivo", required = true) @Valid @RequestParam(value = "idPrioridad", required = true) String idPrioridad) {
+        String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains("application/json")) {
+            try {
+                return new ResponseEntity<ConsultarArchivoConsolidadoRes>(objectMapper.readValue("\"\"", ConsultarArchivoConsolidadoRes.class), HttpStatus.NOT_IMPLEMENTED);
+            } catch (IOException e) {
+                log.error("Couldn't serialize response for content type application/json", e);
+                return new ResponseEntity<ConsultarArchivoConsolidadoRes>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
 
+        return new ResponseEntity<ConsultarArchivoConsolidadoRes>(HttpStatus.NOT_IMPLEMENTED);
+    }
 
     public ResponseEntity<SuccessfulResponse> eliminarArchivoConsolidadoDELETE(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Identificador del archivo",required=true) @PathVariable("idArchivo") String idArchivo) {
         String accept = request.getHeader("Accept");
@@ -106,24 +118,6 @@ public class ConsolidadosApiController implements ConsolidadosApi {
         }
 
         return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
-    }
-	
-    public ResponseEntity<ConsultarArchivoConsolidadoRes> consultaConsolidadosArchivosGET(
-    		@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,
-    		@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,
-    		@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,
-    		@NotNull @ApiParam(value = "Fecha de ejecución del proceso de consolidados", required = true) @Valid @RequestParam(value = "fechaAplicacion", required = true) LocalDate fechaAplicacion) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<ConsultarArchivoConsolidadoRes>(objectMapper.readValue("{  \"nombreArchivo\" : \"nombreArchivo\",  \"nombreCliente\" : \"nombreCliente\",  \"fechaReporte\" : \"2000-01-23T04:56:07.000+00:00\",  \"producto\" : [ {    \"prestamoCosto\" : 1.4658129,    \"folio_Sku\" : 6,    \"precioFinal\" : 5.962134,    \"idProducto\" : 0,    \"ubicacionActual\" : \"ubicacionActual\"  }, {    \"prestamoCosto\" : 1.4658129,    \"folio_Sku\" : 6,    \"precioFinal\" : 5.962134,    \"idProducto\" : 0,    \"ubicacionActual\" : \"ubicacionActual\"  } ]}", ConsultarArchivoConsolidadoRes.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<ConsultarArchivoConsolidadoRes>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<ConsultarArchivoConsolidadoRes>(HttpStatus.NOT_IMPLEMENTED);
     }
 
 }
