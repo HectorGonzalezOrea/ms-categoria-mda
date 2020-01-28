@@ -79,7 +79,7 @@ public class ConsolidadosApiController implements ConsolidadosApi {
             try {
             	List<ConsultarArchivoConsolidadoResInner> consolidadeslst=consolidadoService.getConsolidados(fechaAplicacion);
             	ConsultarArchivoConsolidadoRes response=(ConsultarArchivoConsolidadoRes) consolidadeslst;
-                return new ResponseEntity<ConsultarArchivoConsolidadoRes>(objectMapper.readValue("\"\"", ConsultarArchivoConsolidadoRes.class), HttpStatus.NOT_IMPLEMENTED);
+                return new ResponseEntity<ConsultarArchivoConsolidadoRes>(objectMapper.readValue("\"\"", ConsultarArchivoConsolidadoRes.class), HttpStatus.OK);
             } catch (IOException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<ConsultarArchivoConsolidadoRes>(HttpStatus.INTERNAL_SERVER_ERROR);
