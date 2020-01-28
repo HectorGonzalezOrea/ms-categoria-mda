@@ -5,21 +5,12 @@
  */
 package mx.com.nmp.consolidados.api;
 
-import mx.com.nmp.consolidados.model.BadRequest;
-import mx.com.nmp.consolidados.model.ConflictRequest;
-import mx.com.nmp.consolidados.model.ConsultarArchivoConsolidadoRes;
-import mx.com.nmp.consolidados.model.GeneralResponse;
-import mx.com.nmp.consolidados.model.InlineResponse200;
-import mx.com.nmp.consolidados.model.InternalServerError;
-import mx.com.nmp.consolidados.model.InvalidAuthentication;
-import org.threeten.bp.LocalDate;
-import mx.com.nmp.consolidados.model.ModificarPrioridadArchivoConsolidadoReq;
-import mx.com.nmp.consolidados.model.NotFound;
-import org.springframework.core.io.Resource;
-import mx.com.nmp.consolidados.model.SuccessfulResponse;
-import io.swagger.annotations.*;
+import java.time.LocalDate;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -29,9 +20,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Valid;
-import javax.validation.constraints.*;
-import java.util.List;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
+import mx.com.nmp.consolidados.model.BadRequest;
+import mx.com.nmp.consolidados.model.ConflictRequest;
+import mx.com.nmp.consolidados.model.ConsultarArchivoConsolidadoRes;
+import mx.com.nmp.consolidados.model.GeneralResponse;
+import mx.com.nmp.consolidados.model.InlineResponse200;
+import mx.com.nmp.consolidados.model.InternalServerError;
+import mx.com.nmp.consolidados.model.InvalidAuthentication;
+import mx.com.nmp.consolidados.model.ModificarPrioridadArchivoConsolidadoReq;
+import mx.com.nmp.consolidados.model.NotFound;
+import mx.com.nmp.consolidados.model.SuccessfulResponse;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-01-22T02:47:50.165Z")
 
 @Api(value = "consolidados", description = "the consolidados API")

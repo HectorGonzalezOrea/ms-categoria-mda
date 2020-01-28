@@ -2,3 +2,4 @@
 .project
 *.lst
 *.settings
+/target/**

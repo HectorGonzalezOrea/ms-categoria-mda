@@ -1,35 +1,26 @@
-package mx.com.nmp.consolidados.mongodb.entity;
-
-import org.springframework.data.mongodb.core.mapping.Document;
+package mx.com.nmp.consolidados.model;
 
 import java.io.File;
 import java.time.LocalDate;
 import java.util.Date;
+import org.springframework.validation.annotation.Validated;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-
-@Document(collection = "Consolidados")
-public class ArchivoEntity {
-	
-	@Transient
-    public static final String SEQUENCE_NAME = "consolidado_sequence";
-	
-	@Id
-	private ObjectId _id;
+@Validated
+public class Consolidados {
+	@JsonProperty("idArchivo")
 	private Long idArchivo;
+	@JsonProperty("adjunto")
 	private File adjunto;
+	@JsonProperty("vigencia")
 	private LocalDate vigencia;
+	@JsonProperty("nombreAjuste")
 	private String nombreAjuste;
+	@JsonProperty("emergente")
 	private Boolean emergente;
+	@JsonProperty("fechaAplicacion")
 	private Date fechaAplicacion;
-	public ObjectId get_id() {
-		return _id;
-	}
-	public void set_id(ObjectId _id) {
-		this._id = _id;
-	}
+	
 	public Long getIdArchivo() {
 		return idArchivo;
 	}
@@ -66,10 +57,4 @@ public class ArchivoEntity {
 	public void setFechaAplicacion(Date fechaAplicacion) {
 		this.fechaAplicacion = fechaAplicacion;
 	}
-	public static String getSequenceName() {
-		return SEQUENCE_NAME;
-	}
-	
-	
-
 }

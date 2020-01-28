@@ -9,10 +9,11 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Repository;
 
 import mx.com.nmp.consolidados.mongodb.entity.DatabaseSequenceEntity;
 
-
+@Repository
 public class sequenceGeneratorService {
 	
 	@Autowired
