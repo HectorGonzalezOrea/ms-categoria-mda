@@ -39,7 +39,6 @@ import mx.com.nmp.consolidados.model.SuccessfulResponse;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-01-22T02:47:50.165Z")
 
 @Api(value = "consolidados", description = "the consolidados API")
-@RequestMapping(value = "/SPSolutions/MotorDescuentosAPI/1.0.0")
 public interface ConsolidadosApi {
 
 	@ApiOperation(value = "Actualizar prioridad de ejecución del archivo", nickname = "actualizarPosicionArchivoPUT", notes = "Actualiza la prioridad de ejecución de los archivos.  ", response = InlineResponse200.class, authorizations = {
