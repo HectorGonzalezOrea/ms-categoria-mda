@@ -3,8 +3,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -62,10 +65,16 @@ public class ConsolidadoService {
 		}
 		return insertado;
 	}
-	public List<ConsultarArchivoConsolidadoResInner> getConsolidados(LocalDate fechaAplicacion){
+	public List<ConsultarArchivoConsolidadoResInner> getConsolidados(String fechaAplicacion){
 		List<ConsultarArchivoConsolidadoResInner> lstConsolidados=new ArrayList<>();
+		Date date1 = null;
+	    try {
+		 date1=new SimpleDateFormat("dd/MM/yyyy").parse(fechaAplicacion);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}  
 		Query q=new Query();
-		Criteria aux = Criteria.where("fechaAplicacion").is(fechaAplicacion);
+		Criteria aux = Criteria.where("fechaAplicacion").is(date1);
 		q.addCriteria(aux);
 		List<ArchivoEntity> busquedaList = mongoTemplate.find(q, ArchivoEntity.class);
 		if(busquedaList!=null) {

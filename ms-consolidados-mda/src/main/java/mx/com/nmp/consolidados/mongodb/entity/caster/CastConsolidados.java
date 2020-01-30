@@ -27,9 +27,9 @@ public class CastConsolidados {
 			consolidado = new ConsultarArchivoConsolidadoResInner();
 			consolidado.setIdArchivo(Integer.valueOf(entity.getIdArchivo().intValue()));
 			consolidado.setFechaReporte(entity.getFechaAplicacion());
-			consolidado.nombreArchivo(entity.getAdjunto());
 			consolidado.setNombreArchivo(entity.getNombreArchivo());
 			consolidado.setIdPrioridad(entity.getPrioridad());
+			consolidado.setNombreArchivo(entity.getNombreAjuste());
 			String contentDoc = entity.getAdjunto();
 			List<InfoProducto> lst = castJsonToList(contentDoc);
 			consolidado.setProducto(lst);
