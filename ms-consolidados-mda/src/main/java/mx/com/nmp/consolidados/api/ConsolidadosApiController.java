@@ -37,6 +37,7 @@ import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-01-22T02:47:50.165Z")
@@ -126,16 +127,24 @@ public class ConsolidadosApiController implements ConsolidadosApi {
     		@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,
     		@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,
     		@ApiParam(value = "Archivo CSV de consolidados") @Valid @RequestPart(value="adjunto", required=true) MultipartFile adjunto,
-    		@ApiParam(value = "Fecha de vigencia para el ajuste" ,required=true) @RequestHeader(value="vigencia", required=true) LocalDate vigencia,
+    		@ApiParam(value = "Fecha de vigencia para el ajuste" ,required=true) @RequestHeader(value="vigencia", required=true) String vigencia,
     		@ApiParam(value = "Nombre del ajuste" ,required=true) @RequestHeader(value="nombreAjuste", required=true) String nombreAjuste,@ApiParam(value = "Flag para indicar si el ajuste es emergente" ,required=true) @RequestHeader(value="emergente", required=true) Boolean emergente) {
         String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+        System.out.println("usuario "+usuario);
+        System.out.println("origen "+origen);
+        System.out.println("destino "+destino);
+        System.out.println("adjunto "+adjunto.getName());
+        System.out.println("vigencia "+vigencia);
+        System.out.println("nombreAjuste "+nombreAjuste);
+        //if (accept != null && accept.contains("application/json")) {
             try {
             	CastConsolidados util=new CastConsolidados();
             	Consolidados consolidado=new Consolidados();
             	consolidado.setEmergente(emergente);
             	consolidado.setFechaAplicacion(new Date());
-            	consolidado.setVigencia(vigencia);
+            	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
+            	LocalDate localDate = LocalDate.parse(vigencia, formatter);
+            	consolidado.setVigencia(localDate);
             	consolidado.setNombreAjuste(nombreAjuste);
             	consolidado.setAdjunto(util.convert(adjunto));
             	Boolean service=consolidadoService.crearConsolidado(consolidado);
@@ -145,7 +154,7 @@ public class ConsolidadosApiController implements ConsolidadosApi {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<GeneralResponse>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        }
+       //}
 
         return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
     }

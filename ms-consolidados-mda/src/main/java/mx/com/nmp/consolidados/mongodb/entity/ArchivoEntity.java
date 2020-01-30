@@ -19,11 +19,13 @@ public class ArchivoEntity {
 	@Id
 	private ObjectId _id;
 	private Long idArchivo;
-	private File adjunto;
+	private String adjunto;
 	private LocalDate vigencia;
 	private String nombreAjuste;
 	private Boolean emergente;
 	private Date fechaAplicacion;
+	private Integer prioridad;
+	private String nombreArchivo;
 	public ObjectId get_id() {
 		return _id;
 	}
@@ -36,10 +38,10 @@ public class ArchivoEntity {
 	public void setIdArchivo(Long idArchivo) {
 		this.idArchivo = idArchivo;
 	}
-	public File getAdjunto() {
+	public String getAdjunto() {
 		return adjunto;
 	}
-	public void setAdjunto(File adjunto) {
+	public void setAdjunto(String adjunto) {
 		this.adjunto = adjunto;
 	}
 	public LocalDate getVigencia() {
@@ -66,10 +68,21 @@ public class ArchivoEntity {
 	public void setFechaAplicacion(Date fechaAplicacion) {
 		this.fechaAplicacion = fechaAplicacion;
 	}
+	public Integer getPrioridad() {
+		return prioridad;
+	}
+	public void setPrioridad(Integer prioridad) {
+		this.prioridad = prioridad;
+	}
+	public String getNombreArchivo() {
+		return nombreArchivo;
+	}
+	public void setNombreArchivo(String nombreArchivo) {
+		this.nombreArchivo = nombreArchivo;
+	}
 	public static String getSequenceName() {
 		return SEQUENCE_NAME;
 	}
-	
 	
 
 }
