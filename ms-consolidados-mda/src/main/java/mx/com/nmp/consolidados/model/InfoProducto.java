@@ -2,6 +2,7 @@ package mx.com.nmp.consolidados.model;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonRootName;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -14,7 +15,7 @@ import javax.validation.constraints.*;
  */
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-01-22T02:47:50.165Z")
-
+@JsonRootName("producto")
 public class InfoProducto   {
   @JsonProperty("idProducto")
   private Integer idProducto = null;
@@ -22,7 +23,7 @@ public class InfoProducto   {
   @JsonProperty("ubicacionActual")
   private String ubicacionActual = null;
 
-  @JsonProperty("folio_Sku")
+  @JsonProperty("folioSku")
   private Integer folioSku = null;
 
   @JsonProperty("prestamoCosto")

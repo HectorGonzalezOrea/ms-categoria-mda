@@ -65,22 +65,31 @@ public class ConsolidadoService {
 		}
 		return insertado;
 	}
-	public List<ConsultarArchivoConsolidadoResInner> getConsolidados(String fechaAplicacion){
-		List<ConsultarArchivoConsolidadoResInner> lstConsolidados=new ArrayList<>();
-		Date date1 = null;
+	public ArrayList<ConsultarArchivoConsolidadoResInner> getConsolidados(String fechaAplicacion){
+		System.out.println("entrando a ConsolidadoService.getConsolidados");
+		ArrayList<ConsultarArchivoConsolidadoResInner> lstConsolidados=new ArrayList<>();
+		Date fechaAplicaciondate = null;
 	    try {
-		 date1=new SimpleDateFormat("dd/MM/yyyy").parse(fechaAplicacion);
+	    	fechaAplicaciondate=new SimpleDateFormat("dd/MM/yyyy").parse(fechaAplicacion);
+		 System.out.println("fechaActual "+fechaAplicaciondate);
+		 System.out.println("***************");
 		} catch (ParseException e) {
 			e.printStackTrace();
-		}  
+		}
+	    Date fechaAplicacionInicioDia=CastConsolidados.resetTimeToDown(fechaAplicaciondate);
+	    System.out.println("fecha inicio dia "+fechaAplicacionInicioDia);
+	    Date fechaAplicacionFinDia=CastConsolidados.resetTimeToUp(fechaAplicaciondate);
+	    System.out.println("fecha fin dia "+fechaAplicacionFinDia);
+	    System.out.println("armando query");
 		Query q=new Query();
-		Criteria aux = Criteria.where("fechaAplicacion").is(date1);
-		q.addCriteria(aux);
+		q.addCriteria(Criteria.where("fechaAplicacion").gte(fechaAplicacionInicioDia).lt(fechaAplicacionFinDia));
 		List<ArchivoEntity> busquedaList = mongoTemplate.find(q, ArchivoEntity.class);
+		System.out.println("query size() "+busquedaList.size());
 		if(busquedaList!=null) {
 			CastConsolidados castConsolidados=new CastConsolidados();
 			lstConsolidados=castConsolidados.toVOs(busquedaList);
 		}
+		System.out.println("saliendo a ConsolidadoService.getConsolidados");
 		return lstConsolidados;
 	}
 }

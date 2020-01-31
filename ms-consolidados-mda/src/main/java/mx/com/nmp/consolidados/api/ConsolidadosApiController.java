@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-01-22T02:47:50.165Z")
@@ -74,20 +75,22 @@ public class ConsolidadosApiController implements ConsolidadosApi {
         return new ResponseEntity<InlineResponse200>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<ConsultarArchivoConsolidadoRes> consultaConsolidadosArchivosGET(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@NotNull @ApiParam(value = "Fecha de ejecución del proceso de consolidados", required = true) @Valid @RequestParam(value = "fechaAplicacion", required = true) String fechaAplicacion,@NotNull @ApiParam(value = "Prioridad en la ejecución del archivo", required = true) @Valid @RequestParam(value = "idPrioridad", required = true) String idPrioridad) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-            	List<ConsultarArchivoConsolidadoResInner> consolidadeslst=consolidadoService.getConsolidados(fechaAplicacion);
-            	ConsultarArchivoConsolidadoRes response=(ConsultarArchivoConsolidadoRes) consolidadeslst;
-                return new ResponseEntity<ConsultarArchivoConsolidadoRes>(objectMapper.readValue("\"\"", ConsultarArchivoConsolidadoRes.class), HttpStatus.OK);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<ConsultarArchivoConsolidadoRes>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<ConsultarArchivoConsolidadoRes>(HttpStatus.NOT_IMPLEMENTED);
+    public ResponseEntity<ConsultarArchivoConsolidadoRes> consultaConsolidadosArchivosGET(
+    		@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,
+    		@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,
+    		@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,
+    		@NotNull @ApiParam(value = "Fecha de ejecución del proceso de consolidados", required = true) @Valid @RequestParam(value = "fechaAplicacion", required = true) String fechaAplicacion,
+    		@NotNull @ApiParam(value = "Prioridad en la ejecución del archivo", required = true) @Valid @RequestParam(value = "idPrioridad", required = true) String idPrioridad) {
+        	String accept = request.getHeader("Accept");
+            System.out.println(usuario);
+			System.out.println(origen);
+			System.out.println(fechaAplicacion);
+			System.out.println(idPrioridad);
+			ArrayList<ConsultarArchivoConsolidadoResInner> response=new ArrayList<ConsultarArchivoConsolidadoResInner>();			
+			response=consolidadoService.getConsolidados(fechaAplicacion);
+			ConsultarArchivoConsolidadoRes res=new ConsultarArchivoConsolidadoRes();
+			res.addAll(response);
+			return new ResponseEntity<ConsultarArchivoConsolidadoRes>(res, HttpStatus.OK);
     }
 
     public ResponseEntity<SuccessfulResponse> eliminarArchivoConsolidadoDELETE(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Identificador del archivo",required=true) @PathVariable("idArchivo") String idArchivo) {

@@ -29,6 +29,7 @@ import io.swagger.annotations.Authorization;
 import mx.com.nmp.consolidados.model.BadRequest;
 import mx.com.nmp.consolidados.model.ConflictRequest;
 import mx.com.nmp.consolidados.model.ConsultarArchivoConsolidadoRes;
+import mx.com.nmp.consolidados.model.ConsultarArchivoConsolidadoResInner;
 import mx.com.nmp.consolidados.model.GeneralResponse;
 import mx.com.nmp.consolidados.model.InlineResponse200;
 import mx.com.nmp.consolidados.model.InternalServerError;

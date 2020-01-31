@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -25,20 +27,23 @@ public class CastConsolidados {
 		ConsultarArchivoConsolidadoResInner consolidado = null;
 		if (entity != null) {
 			consolidado = new ConsultarArchivoConsolidadoResInner();
-			consolidado.setIdArchivo(Integer.valueOf(entity.getIdArchivo().intValue()));
+			//consolidado.setIdArchivo(Integer.valueOf(entity.getIdArchivo().intValue()));
 			consolidado.setFechaReporte(entity.getFechaAplicacion());
 			consolidado.setNombreArchivo(entity.getNombreArchivo());
 			consolidado.setIdPrioridad(entity.getPrioridad());
 			consolidado.setNombreArchivo(entity.getNombreAjuste());
 			String contentDoc = entity.getAdjunto();
+			System.out.println("impriendo json de mongo");
+			System.out.println(contentDoc);
 			List<InfoProducto> lst = castJsonToList(contentDoc);
+			System.out.println("lista json to lstInfoProducto" + lst.size());
 			consolidado.setProducto(lst);
 		}
 		return consolidado;
 	}
 
-	public List<ConsultarArchivoConsolidadoResInner> toVOs(List<ArchivoEntity> entities) {
-		List<ConsultarArchivoConsolidadoResInner> lstConsolidados = null;
+	public ArrayList<ConsultarArchivoConsolidadoResInner> toVOs(List<ArchivoEntity> entities) {
+		ArrayList<ConsultarArchivoConsolidadoResInner> lstConsolidados = null;
 
 		if (entities != null && !entities.isEmpty()) {
 			lstConsolidados = new ArrayList<>();
@@ -104,5 +109,25 @@ public class CastConsolidados {
 			e.printStackTrace();
 		}
 		return participantJsonList;
+	}
+
+	public static Date resetTimeToUp(Date fecha) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(fecha);
+		cal.set(Calendar.HOUR_OF_DAY, 23);
+		cal.set(Calendar.MINUTE, 59);
+		cal.set(Calendar.SECOND, 59);
+		cal.set(Calendar.MILLISECOND, 999);
+		return cal.getTime();
+	}
+
+	public static Date resetTimeToDown(Date fecha) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(fecha);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal.getTime();
 	}
 }
