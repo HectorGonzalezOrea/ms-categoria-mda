@@ -28,12 +28,12 @@ public class ConsolidadoService {
 	private static final Logger LOG = LoggerFactory.getLogger(ConsolidadoService.class);
 	
 	public static final String FECHA = "fechaAplicacion";
-	private static final String USUARIO_SEQ_KEY = "consolidado_sequence";
+	private static final String SEQUENCE = "consolidado_sequence";
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
 	@Autowired
-	private sequenceGeneratorService SequenceGeneratorService;
+	private SequenceGeneratorService SequenceGeneratorService;
 	
 	public Boolean crearConsolidado(Consolidados request) {
 		LOG.info("ConsolidadoService.crearConsolidado");
@@ -46,8 +46,7 @@ public class ConsolidadoService {
 				consolidado.setNombreAjuste(request.getNombreAjuste());
 				consolidado.setEmergente(request.getEmergente());
 				consolidado.setFechaAplicacion(request.getFechaAplicacion());
-//				Long id = SequenceGeneratorService.generateSequence(USUARIO_SEQ_KEY);
-//				consolidado.setIdArchivo(id);
+				consolidado.setIdArchivo(SequenceGeneratorService.generateSequence(SEQUENCE));
 				File archivo=request.getAdjunto();
 				FileReader targetReader = new FileReader(archivo);
 	    		BufferedReader b=new BufferedReader(targetReader);

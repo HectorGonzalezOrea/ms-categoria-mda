@@ -27,7 +27,7 @@ public class CastConsolidados {
 		ConsultarArchivoConsolidadoResInner consolidado = null;
 		if (entity != null) {
 			consolidado = new ConsultarArchivoConsolidadoResInner();
-			//consolidado.setIdArchivo(Integer.valueOf(entity.getIdArchivo().intValue()));
+			consolidado.setIdArchivo(Integer.valueOf(entity.getIdArchivo().intValue()));
 			consolidado.setFechaReporte(entity.getFechaAplicacion());
 			consolidado.setNombreArchivo(entity.getNombreArchivo());
 			consolidado.setIdPrioridad(entity.getPrioridad());
