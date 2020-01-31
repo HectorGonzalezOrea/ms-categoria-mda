@@ -25,7 +25,7 @@ import mx.com.nmp.consolidados.mongodb.entity.ArchivoEntity;
 import mx.com.nmp.consolidados.mongodb.entity.caster.CastConsolidados;
 @Service
 public class ConsolidadoService {
-	private static final Logger log = LoggerFactory.getLogger(ConsolidadoService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ConsolidadoService.class);
 	
 	public static final String FECHA = "fechaAplicacion";
 	private static final String USUARIO_SEQ_KEY = "consolidado_sequence";
@@ -37,7 +37,7 @@ public class ConsolidadoService {
 	private sequenceGeneratorService SequenceGeneratorService;
 	
 	public Boolean crearConsolidado(Consolidados request) {
-		log.info("Registrar documento");
+		LOG.info("ConsolidadoService.crearConsolidado");
 		Boolean insertado = false;
 		if(request != null) {
 				CastConsolidados castConsolidados=new CastConsolidados();
@@ -56,7 +56,7 @@ public class ConsolidadoService {
 				consolidado.setAdjunto(castConsolidados.lstToJson(lst));
 				consolidado.setPrioridad(PRIORIDAD);
 				consolidado.setNombreArchivo(archivo.getName());
-				System.out.println(castConsolidados.lstToJson(lst));
+				LOG.info(castConsolidados.lstToJson(lst));
 				} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				}
@@ -66,13 +66,11 @@ public class ConsolidadoService {
 		return insertado;
 	}
 	public ArrayList<ConsultarArchivoConsolidadoResInner> getConsolidados(String fechaAplicacion){
-		System.out.println("entrando a ConsolidadoService.getConsolidados");
+		LOG.info("entrando a ConsolidadoService.getConsolidados");
 		ArrayList<ConsultarArchivoConsolidadoResInner> lstConsolidados=new ArrayList<>();
 		Date fechaAplicaciondate = null;
 	    try {
 	    	fechaAplicaciondate=new SimpleDateFormat("dd/MM/yyyy").parse(fechaAplicacion);
-		 System.out.println("fechaActual "+fechaAplicaciondate);
-		 System.out.println("***************");
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -80,16 +78,15 @@ public class ConsolidadoService {
 	    System.out.println("fecha inicio dia "+fechaAplicacionInicioDia);
 	    Date fechaAplicacionFinDia=CastConsolidados.resetTimeToUp(fechaAplicaciondate);
 	    System.out.println("fecha fin dia "+fechaAplicacionFinDia);
-	    System.out.println("armando query");
 		Query q=new Query();
 		q.addCriteria(Criteria.where("fechaAplicacion").gte(fechaAplicacionInicioDia).lt(fechaAplicacionFinDia));
 		List<ArchivoEntity> busquedaList = mongoTemplate.find(q, ArchivoEntity.class);
-		System.out.println("query size() "+busquedaList.size());
+		LOG.info("query size() "+busquedaList.size());
 		if(busquedaList!=null) {
 			CastConsolidados castConsolidados=new CastConsolidados();
 			lstConsolidados=castConsolidados.toVOs(busquedaList);
 		}
-		System.out.println("saliendo a ConsolidadoService.getConsolidados");
+		LOG.info("saliendo a ConsolidadoService.getConsolidados");
 		return lstConsolidados;
 	}
 }

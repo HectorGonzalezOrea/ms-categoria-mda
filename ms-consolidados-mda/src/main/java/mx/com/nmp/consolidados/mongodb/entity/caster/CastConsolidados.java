@@ -21,7 +21,7 @@ import com.google.gson.GsonBuilder;
 import mx.com.nmp.consolidados.model.ConsultarArchivoConsolidadoResInner;
 import mx.com.nmp.consolidados.model.InfoProducto;
 import mx.com.nmp.consolidados.mongodb.entity.ArchivoEntity;
-
+//@Repository
 public class CastConsolidados {
 	public ConsultarArchivoConsolidadoResInner fillVoValues(ArchivoEntity entity) {
 		ConsultarArchivoConsolidadoResInner consolidado = null;
@@ -33,10 +33,7 @@ public class CastConsolidados {
 			consolidado.setIdPrioridad(entity.getPrioridad());
 			consolidado.setNombreArchivo(entity.getNombreAjuste());
 			String contentDoc = entity.getAdjunto();
-			System.out.println("impriendo json de mongo");
-			System.out.println(contentDoc);
 			List<InfoProducto> lst = castJsonToList(contentDoc);
-			System.out.println("lista json to lstInfoProducto" + lst.size());
 			consolidado.setProducto(lst);
 		}
 		return consolidado;
@@ -73,7 +70,6 @@ public class CastConsolidados {
 			while ((line = b.readLine()) != null) {
 				p = new InfoProducto();
 				String[] csv = line.split(cvsSplitBy);
-				System.out.println(csv[0] + "*" + csv[1] + "*" + csv[2] + "*" + csv[3] + "*" + csv[4]);
 				if (!csv[0].equals(aux)) {
 					p.setIdProducto(Integer.parseInt(csv[0]));
 					p.setUbicacionActual(csv[1]);
