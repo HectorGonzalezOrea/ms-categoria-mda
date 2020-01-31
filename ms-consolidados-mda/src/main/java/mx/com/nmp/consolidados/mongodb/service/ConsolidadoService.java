@@ -29,7 +29,6 @@ public class ConsolidadoService {
 	
 	public static final String FECHA = "fechaAplicacion";
 	private static final String USUARIO_SEQ_KEY = "consolidado_sequence";
-	private static final Integer PRIORIDAD=3;
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -54,8 +53,8 @@ public class ConsolidadoService {
 	    		BufferedReader b=new BufferedReader(targetReader);
 	    		List<InfoProducto> lst=castConsolidados.cvsLectura(b);
 				consolidado.setAdjunto(castConsolidados.lstToJson(lst));
-				consolidado.setPrioridad(PRIORIDAD);
 				consolidado.setNombreArchivo(archivo.getName());
+				consolidado.setPrioridad(consultaArhivoConsolidadoByDate(request.getFechaAplicacion()).size()+1);
 				LOG.info(castConsolidados.lstToJson(lst));
 				} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -65,6 +64,7 @@ public class ConsolidadoService {
 		}
 		return insertado;
 	}
+	
 	public ArrayList<ConsultarArchivoConsolidadoResInner> getConsolidados(String fechaAplicacion){
 		LOG.info("entrando a ConsolidadoService.getConsolidados");
 		ArrayList<ConsultarArchivoConsolidadoResInner> lstConsolidados=new ArrayList<>();
@@ -74,19 +74,24 @@ public class ConsolidadoService {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-	    Date fechaAplicacionInicioDia=CastConsolidados.resetTimeToDown(fechaAplicaciondate);
-	    System.out.println("fecha inicio dia "+fechaAplicacionInicioDia);
-	    Date fechaAplicacionFinDia=CastConsolidados.resetTimeToUp(fechaAplicaciondate);
-	    System.out.println("fecha fin dia "+fechaAplicacionFinDia);
-		Query q=new Query();
-		q.addCriteria(Criteria.where("fechaAplicacion").gte(fechaAplicacionInicioDia).lt(fechaAplicacionFinDia));
-		List<ArchivoEntity> busquedaList = mongoTemplate.find(q, ArchivoEntity.class);
-		LOG.info("query size() "+busquedaList.size());
+	    List<ArchivoEntity> busquedaList=consultaArhivoConsolidadoByDate(fechaAplicaciondate);
 		if(busquedaList!=null) {
 			CastConsolidados castConsolidados=new CastConsolidados();
 			lstConsolidados=castConsolidados.toVOs(busquedaList);
 		}
 		LOG.info("saliendo a ConsolidadoService.getConsolidados");
 		return lstConsolidados;
+	}
+	
+	private List<ArchivoEntity> consultaArhivoConsolidadoByDate(Date fechaAplicacion){
+	    Date fechaAplicacionInicioDia=CastConsolidados.resetTimeToDown(fechaAplicacion);
+	    LOG.info("fecha inicio dia "+fechaAplicacionInicioDia);
+	    Date fechaAplicacionFinDia=CastConsolidados.resetTimeToUp(fechaAplicacion);
+	    LOG.info("fecha fin dia "+fechaAplicacionFinDia);
+		Query q=new Query();
+		q.addCriteria(Criteria.where("fechaAplicacion").gte(fechaAplicacionInicioDia).lt(fechaAplicacionFinDia));
+		List<ArchivoEntity> busquedaList = mongoTemplate.find(q, ArchivoEntity.class);
+		LOG.info("query size() "+busquedaList.size());
+		return busquedaList;
 	}
 }

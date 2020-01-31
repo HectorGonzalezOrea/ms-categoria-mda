@@ -86,11 +86,11 @@ public class ConsolidadosApiController implements ConsolidadosApi {
     		@ApiParam(value = "Destino final de la informaci\u00F3n" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,
     		@NotNull @ApiParam(value = "Fecha de ejecuci\u00F3n del proceso de consolidados", required = true) @Valid @RequestParam(value = "fechaAplicacion", required = true) String fechaAplicacion,
     		@NotNull @ApiParam(value = "Prioridad en la ejecuci\u00F3n del archivo", required = true) @Valid @RequestParam(value = "idPrioridad", required = true) String idPrioridad) {
-    		LOG.debug("ConsolidadosApiController.consultaConsolidadosArchivosGET");
-        	LOG.debug(usuario);
-        	LOG.debug(origen);
-        	LOG.debug(fechaAplicacion);
-        	LOG.debug(idPrioridad);
+    		LOG.info("ConsolidadosApiController.consultaConsolidadosArchivosGET");
+        	LOG.info(usuario);
+        	LOG.info(origen);
+        	LOG.info(fechaAplicacion);
+        	LOG.info(idPrioridad);
 			ArrayList<ConsultarArchivoConsolidadoResInner> result=consolidadoService.getConsolidados(fechaAplicacion);		
 			ConsultarArchivoConsolidadoRes response=new ConsultarArchivoConsolidadoRes();
 			if(result!=null) {
@@ -138,12 +138,12 @@ public class ConsolidadosApiController implements ConsolidadosApi {
     		@ApiParam(value = "Archivo CSV de consolidados") @Valid @RequestPart(value="adjunto", required=true) MultipartFile adjunto,
     		@ApiParam(value = "Fecha de vigencia para el ajuste" ,required=true) @RequestHeader(value="vigencia", required=true) String vigencia,
     		@ApiParam(value = "Nombre del ajuste" ,required=true) @RequestHeader(value="nombreAjuste", required=true) String nombreAjuste,@ApiParam(value = "Flag para indicar si el ajuste es emergente" ,required=true) @RequestHeader(value="emergente", required=true) Boolean emergente) {
-        LOG.debug("ConsolidadosApiController.registrarConsolidadoPOST");
-        LOG.debug(usuario);
-        LOG.debug(origen);
-        LOG.debug(destino);
-        LOG.debug(adjunto.getOriginalFilename());
-        LOG.debug(nombreAjuste);
+        LOG.info("ConsolidadosApiController.registrarConsolidadoPOST");
+        LOG.info(usuario);
+        LOG.info(origen);
+        LOG.info(destino);
+        LOG.info(adjunto.getOriginalFilename());
+        LOG.info(nombreAjuste);
             try {
             	CastConsolidados util=new CastConsolidados();
             	Consolidados consolidado=new Consolidados();
