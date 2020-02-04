@@ -3,11 +3,14 @@ package mx.com.nmp.establecimientoprecios.service;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.ws.BindingProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,19 +32,19 @@ import mx.com.nmp.ms.sivad.referencia.ws.oro.datatypes.ValorAnclaOroSucursalRequ
 
 @Service
 public class AnclaService {
-	
 
+	private static final String HEADER_APIKEY = "X-IBM-Client-Id";
 
-	@Value("${tablasreferencia.urlBase}")
+	@Value("${ws.tablasreferencia.urlBase}")
 	protected String urlBase;
 	
-	@Value("${ms.tablareferencia.apikey.value}")
+	@Value("${ws.tablareferencia.apikey.value}")
 	protected String tablasReferenciaApiKeyValue;
 	
-	@Value("${tablasreferencia.servicio.tipocambio.ajustar}")
+	@Value("${ws.tablasreferencia.servicio.tipocambio.ajustar}")
 	protected String servicioAjustarTipoCambio;
 	
-	@Value("${tablasreferencia.servicio.valoranclaoro.ajustar}")
+	@Value("${ws.tablasreferencia.servicio.valoranclaoro.ajustar}")
 	protected String servicioAjustarValorAnclaOro;
 
 	private static final String MONEDA_DESTINO = "MXN";
@@ -93,10 +96,12 @@ public class AnclaService {
 					}
 					anclaOroSucursal.setSucursal(Integer.valueOf(sucursal));
 				}
-				
+
 				url = new URL(urlBase+servicioAjustarValorAnclaOro+SUFIJO_WSDL);
 				anclaOroServiceEndpointService = new ReferenciaValorAnclaOroServiceEndpointService(url);
 				anclaOroService = anclaOroServiceEndpointService.getReferenciaValorAnclaOroServiceEndpointPort();				
+				Map<String, Object> reqCtx = ((BindingProvider)anclaOroService).getRequestContext();
+				reqCtx.put(HEADER_APIKEY, tablasReferenciaApiKeyValue);				
 				anclaOroService.actualizarValorAnclaOro(anclaOroSucursalRequest);
 				ret = true;
 			}
@@ -158,6 +163,8 @@ public class AnclaService {
 				
 				url = new URL(urlBase+servicioAjustarTipoCambio+SUFIJO_WSDL);
 				cambiarioEndpointService = new TipoCambiarioEndpointService(url);
+				Map<String, Object> reqCtx = ((BindingProvider)cambiarioEndpointService).getRequestContext();
+				reqCtx.put(HEADER_APIKEY, tablasReferenciaApiKeyValue);
 				cambiarioService = cambiarioEndpointService.getTipoCambiarioEndpointPort();
 				cambiarioService.actualizar(tiposType);
 				ret = true;
