@@ -1,19 +1,18 @@
 package mx.com.nmp.establecimientoprecios.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+
+import javax.validation.Valid;
+
+import org.springframework.validation.annotation.Validated;
+import org.threeten.bp.LocalDate;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import mx.com.nmp.establecimientoprecios.model.ValorAnclaOroDolar;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import org.threeten.bp.LocalDate;
-import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 
 /**
  * Información correspondiente a la modificación del valor ancla de Oro y Dolar
