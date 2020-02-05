@@ -87,10 +87,18 @@ public class AnclaService {
 		ReferenciaValorAnclaOroService anclaOroService = null;
 		
 		ValorAnclaOroSucursalRequest anclaOroSucursalRequest = new ValorAnclaOroSucursalRequest();
+		ValorAnclaOroSucursal anclaOroSucursal = null;
 		try {
 			if (valorAncla.getSucursales() != null) {
+				url = new URL(urlBaseOro+servicioAjustarValorAnclaOro+SUFIJO_WSDL);
+				anclaOroServiceEndpointService = new ReferenciaValorAnclaOroServiceEndpointService(url);
+				anclaOroService = anclaOroServiceEndpointService.getReferenciaValorAnclaOroServiceEndpointPort();				
+				Map<String, Object> reqCtx = ((BindingProvider)anclaOroService).getRequestContext();
+				reqCtx.put(HEADER_APIKEY, tablasReferenciaApiKeyValue);
+				
 				for (String sucursal: valorAncla.getSucursales() ) {
-					ValorAnclaOroSucursal anclaOroSucursal = new ValorAnclaOroSucursal();
+					anclaOroSucursal = new ValorAnclaOroSucursal();
+					
 					anclaOroSucursal.setCalidad(CALIDAD_ORO_DEFAULT);
 					if (valorAncla.getValorAnclaOro()!=null) {
 						anclaOroSucursal.setPrecio(new BigDecimal(valorAncla.getValorAnclaOro().doubleValue()));
@@ -98,14 +106,9 @@ public class AnclaService {
 						anclaOroSucursal.setPrecio(new BigDecimal(valorAncla.getValorAnclaOro().doubleValue()));
 					}
 					anclaOroSucursal.setSucursal(Integer.valueOf(sucursal));
+					anclaOroSucursalRequest.getValoresAnclaOroSucursal().add(anclaOroSucursal);
+					anclaOroService.actualizarValorAnclaOro(anclaOroSucursalRequest);
 				}
-
-				url = new URL(urlBaseOro+servicioAjustarValorAnclaOro+SUFIJO_WSDL);
-				anclaOroServiceEndpointService = new ReferenciaValorAnclaOroServiceEndpointService(url);
-				anclaOroService = anclaOroServiceEndpointService.getReferenciaValorAnclaOroServiceEndpointPort();				
-				Map<String, Object> reqCtx = ((BindingProvider)anclaOroService).getRequestContext();
-				reqCtx.put(HEADER_APIKEY, tablasReferenciaApiKeyValue);				
-				anclaOroService.actualizarValorAnclaOro(anclaOroSucursalRequest);
 				ret = true;
 			}
 		} catch (Exception e) {
