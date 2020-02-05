@@ -71,7 +71,7 @@ public class AnclaApiController implements AnclaApi {
             		BadRequest bd = new BadRequest();
             		
             		bd.setCode("NMP-MDA-400");
-            		bd.setMessage("El cuerpo de la petición no está bien formado, verifique su información.");
+            		bd.setMessage("El cuerpo de la petición no está bien formado, verifique su información: "+usuario);
             		
             		return new ResponseEntity<BadRequest>(bd, HttpStatus.BAD_REQUEST);
             	}
@@ -80,7 +80,7 @@ public class AnclaApiController implements AnclaApi {
             		BadRequest bd = new BadRequest();
             		
             		bd.setCode("NMP-MDA-400");
-            		bd.setMessage("El cuerpo de la petición no está bien formado, verifique sus parametros.");
+            		bd.setMessage("El cuerpo de la petición no está bien formado, verifique sus parametros: "+peticion);
             		
             		return new ResponseEntity<BadRequest>(bd, HttpStatus.BAD_REQUEST);
             	} else {
@@ -91,7 +91,7 @@ public class AnclaApiController implements AnclaApi {
             	log.error("Error al invocar los servicios de tablas de referencia", e);
             	BadRequest badRequest = new BadRequest();
             	badRequest.setCode("NMP-MDA-400");
-            	badRequest.setMessage("Error al invocar los servicios de tablas de referencia");
+            	badRequest.setMessage(e.getMessage());
             	return new ResponseEntity<BadRequest>(badRequest, HttpStatus.BAD_REQUEST);
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);

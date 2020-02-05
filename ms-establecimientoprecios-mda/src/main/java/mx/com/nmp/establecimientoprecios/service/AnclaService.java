@@ -72,7 +72,7 @@ public class AnclaService {
 		if(valorAncla != null && ajusteValorAnclaOro(valorAncla) && ajusteValorAnclaDolar(valorAncla)) {
 			gr.setMessage("Alta exitosa. ajusteValorAncla oro y dolar ");
 		} else {
-			throw new TablasReferenciaException("Parametros nulos o invalidos al envocar el ajuste de valor ancla. Paramtros: " + valorAncla);
+			throw new TablasReferenciaException("Parametros nulos o invalidos al envocar el ajuste de valor ancla. Parametros: " + valorAncla);
 		}
 		return gr;
 	}
