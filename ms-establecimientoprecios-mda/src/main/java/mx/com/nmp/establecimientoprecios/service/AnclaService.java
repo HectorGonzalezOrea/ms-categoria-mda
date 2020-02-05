@@ -170,8 +170,8 @@ public class AnclaService {
 				
 				url = new URL(urlBaseTipoCambio+servicioAjustarTipoCambio+SUFIJO_WSDL);
 				cambiarioEndpointService = new TipoCambiarioEndpointService(url);
-				Map<String, Object> reqCtx = ((BindingProvider)cambiarioEndpointService).getRequestContext();
-				reqCtx.put(HEADER_APIKEY, tablasReferenciaApiKeyValue);
+				//Map<String, Object> reqCtx = ((BindingProvider)cambiarioEndpointService).getRequestContext();
+				//reqCtx.put(HEADER_APIKEY, tablasReferenciaApiKeyValue);
 				cambiarioService = cambiarioEndpointService.getTipoCambiarioEndpointPort();
 				cambiarioService.actualizar(tiposType);
 				ret = true;
