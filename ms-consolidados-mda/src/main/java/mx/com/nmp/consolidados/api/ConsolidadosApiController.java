@@ -61,19 +61,51 @@ public class ConsolidadosApiController implements ConsolidadosApi {
         this.request = request;
     }
 
-    public ResponseEntity<InlineResponse200> actualizarPosicionArchivoPUT(
+    public ResponseEntity<?> actualizarPosicionArchivoPUT(
     		@ApiParam(value = "Usuario en el sistema origen que lanza la petici\u00F3n" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,
     		@ApiParam(value = "Sistema que origina la petici\u00F3n" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,
     		@ApiParam(value = "Destino final de la informaci\u00F3n" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,
     		@ApiParam(value = "Identificador del archivo",required=true) @PathVariable("idArchivo") String idArchivo,
     		@ApiParam(value = "peticion para modificar la posicion de un archivo"  )  @Valid @RequestBody ModificarPrioridadArchivoConsolidadoReq modificarPosicionReq) {
+    	
+    	LOG.info("Actualizar la posición de los archivos consolidados.");
+    	
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<InlineResponse200>(objectMapper.readValue("{  \"nombreArchivo\" : \"nombreArchivo\",  \"idPosicion\" : 0}", InlineResponse200.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+            	
+            	LOG.info("usuario : {}" , usuario);
+            	LOG.info("origen : {}" , origen);
+            	LOG.info("destino : {}" , destino);
+            	LOG.info("idArchivo : {}" , idArchivo);
+            	LOG.info("request : {}" , modificarPosicionReq);
+            	
+            	if(modificarPosicionReq == null || idArchivo == null || idArchivo.equals("") || usuario == null || usuario.equals("") || origen == null || origen.equals("")  || destino == null || destino.equals("") ) {
+            		BadRequest br =  new BadRequest();
+            		
+            		br.setCodigo("NMP-MDA-400");
+            		br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información.");
+            		
+            		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+            	}
+            	
+            	InlineResponse200 resp = consolidadoService.actualizarPrioridadArchivo(modificarPosicionReq);
+            	if(resp != null) {
+            		return new ResponseEntity<InlineResponse200>(resp, HttpStatus.OK);
+            	} else {
+            		InternalServerError isr = new InternalServerError();
+             		isr.setCodigo("NMP-MDA-500");
+             		isr.setMensaje("Error interno del servidor. Falla de comunicación.");
+             		
+            		return new ResponseEntity<InternalServerError>(isr, HttpStatus.INTERNAL_SERVER_ERROR);
+            	}
+            	
+                //return new ResponseEntity<InlineResponse200>(objectMapper.readValue("{  \"nombreArchivo\" : \"nombreArchivo\",  \"idPosicion\" : 0}", InlineResponse200.class), HttpStatus.NOT_IMPLEMENTED);
+            } catch (Exception e) {
             	LOG.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<InlineResponse200>(HttpStatus.INTERNAL_SERVER_ERROR);
+            	InternalServerError isr = new InternalServerError();
+         		isr.setCodigo("NMP-MDA-500");
+         		isr.setMensaje("Error interno del servidor. Falla de comunicación.");
             }
         }
 
@@ -99,14 +131,51 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 			return new ResponseEntity<ConsultarArchivoConsolidadoRes>(response, HttpStatus.OK);
     }
 
-    public ResponseEntity<SuccessfulResponse> eliminarArchivoConsolidadoDELETE(@ApiParam(value = "Usuario en el sistema origen que lanza la petici\u00F3n" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petici\u00F3n" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la informaci\u00F3n" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Identificador del archivo",required=true) @PathVariable("idArchivo") String idArchivo) {
-        String accept = request.getHeader("Accept");
+    public ResponseEntity<?> eliminarArchivoConsolidadoDELETE(@ApiParam(value = "Usuario en el sistema origen que lanza la petici\u00F3n" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petici\u00F3n" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la informaci\u00F3n" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Identificador del archivo",required=true) @PathVariable("idArchivo") String idArchivo) {
+    	LOG.info("Elimina archivos consolidados.");
+    	
+    	String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<SuccessfulResponse>(objectMapper.readValue("{  \"codigo\" : \"NMP-MDA-000\",  \"mensaje\" : \"Operación ejecutada satisfactoriamente\"}", SuccessfulResponse.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+            	
+            	LOG.info("usuario : {}" , usuario);
+            	LOG.info("origen : {}" , origen);
+            	LOG.info("destino : {}" , destino);
+            	LOG.info("id Archivo : {}" , idArchivo);
+            	
+            	if(idArchivo == null || idArchivo.equals("") || usuario == null || usuario.equals("") || origen == null || origen.equals("")  || destino == null || destino.equals("") ) {
+            		BadRequest br =  new BadRequest();
+            		
+            		br.setCodigo("NMP-MDA-400");
+            		br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información.");
+            		
+            		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+            	}
+            	
+             	Boolean eliminado = consolidadoService.eliminarConsolidado(idArchivo);
+            	
+             	if(Boolean.TRUE.equals(eliminado)) {
+             		SuccessfulResponse sr = new SuccessfulResponse();
+             		sr.setCodigo("NMP-MDA-200");
+             		sr.setMensaje("Operación ejecutada satisfactoriamente.");
+             		
+             		return new ResponseEntity<SuccessfulResponse>(sr, HttpStatus.OK);
+             	}  else {
+             		InternalServerError isr = new InternalServerError();
+             		isr.setCodigo("NMP-MDA-500");
+             		isr.setMensaje("Error interno del servidor. Falla de comunicación.");
+             		
+             		return new ResponseEntity<InternalServerError>(isr, HttpStatus.INTERNAL_SERVER_ERROR);
+             	}
+                //return new ResponseEntity<SuccessfulResponse>(objectMapper.readValue("{  \"codigo\" : \"NMP-MDA-000\",  \"mensaje\" : \"Operación ejecutada satisfactoriamente\"}", SuccessfulResponse.class), HttpStatus.NOT_IMPLEMENTED);
+            } catch (Exception e) {
             	LOG.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<SuccessfulResponse>(HttpStatus.INTERNAL_SERVER_ERROR);
+            	
+            	InternalServerError isr = new InternalServerError();
+         		isr.setCodigo("NMP-MDA-500");
+         		isr.setMensaje("Error interno del servidor. Falla de comunicación.");
+         		
+         		return new ResponseEntity<InternalServerError>(isr, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
@@ -156,7 +225,7 @@ public class ConsolidadosApiController implements ConsolidadosApi {
             	consolidado.setAdjunto(util.convert(adjunto));
             	Boolean service=consolidadoService.crearConsolidado(consolidado);
             	if(service)
-                return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
+                return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.OK);
             } catch (IOException e) {
             	LOG.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<GeneralResponse>(HttpStatus.INTERNAL_SERVER_ERROR);

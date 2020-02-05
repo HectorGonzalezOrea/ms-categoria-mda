@@ -26,6 +26,8 @@ public class ArchivoEntity {
 	private Date fechaAplicacion;
 	private Integer prioridad;
 	private String nombreArchivo;
+	private String requestIdCalenzarizacion;
+	
 	public ObjectId get_id() {
 		return _id;
 	}
@@ -83,6 +85,10 @@ public class ArchivoEntity {
 	public static String getSequenceName() {
 		return SEQUENCE_NAME;
 	}
-	
-
+	public String getRequestIdCalenzarizacion() {
+		return requestIdCalenzarizacion;
+	}
+	public void setRequestIdCalenzarizacion(String requestIdCalenzarizacion) {
+		this.requestIdCalenzarizacion = requestIdCalenzarizacion;
+	}
 }
