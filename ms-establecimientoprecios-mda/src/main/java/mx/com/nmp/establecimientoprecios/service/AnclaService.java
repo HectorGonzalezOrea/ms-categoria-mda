@@ -35,7 +35,7 @@ public class AnclaService {
 
 	private static final String HEADER_APIKEY = "X-IBM-Client-Id";
 
-	@Value("${ws.tablasreferencia.tipocambio.urlBas}")
+	@Value("${ws.tablasreferencia.tipocambio.urlBase}")
 	protected String urlBaseTipoCambio;
 	
 	@Value("${ws.tablasreferencia.anclaoro.urlBase}")
