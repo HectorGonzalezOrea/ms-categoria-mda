@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.ApiParam;
+import mx.com.nmp.establecimientoprecios.exceptions.TablasReferenciaException;
 import mx.com.nmp.establecimientoprecios.model.BadRequest;
 import mx.com.nmp.establecimientoprecios.model.GeneralResponse;
 import mx.com.nmp.establecimientoprecios.model.InternalServerError;
@@ -86,7 +87,12 @@ public class AnclaApiController implements AnclaApi {
             		GeneralResponse resp = anclaService.ajusteValorAncla(peticion);
             		return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
             	}
-                //return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
+            } catch (TablasReferenciaException e) {
+            	log.error("Error al invocar los servicios de tablas de referencia", e);
+            	BadRequest badRequest = new BadRequest();
+            	badRequest.setCode("NMP-MDA-400");
+            	badRequest.setMessage("Error al invocar los servicios de tablas de referencia");
+            	return new ResponseEntity<BadRequest>(badRequest, HttpStatus.BAD_REQUEST);
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 

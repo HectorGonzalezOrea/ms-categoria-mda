@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import mx.com.nmp.establecimientoprecios.exceptions.TablasReferenciaException;
+import mx.com.nmp.establecimientoprecios.model.BadRequest;
 import mx.com.nmp.establecimientoprecios.model.GeneralResponse;
 import mx.com.nmp.establecimientoprecios.model.ModificarValorAnclaOroDolar;
 import mx.com.nmp.ms.sivad.cambiario.api.ws.TipoCambiarioEndpointService;
@@ -62,7 +64,7 @@ public class AnclaService {
 	 * @param valorAncla
 	 * @return
 	 */
-	public GeneralResponse ajusteValorAncla(ModificarValorAnclaOroDolar valorAncla) {
+	public GeneralResponse ajusteValorAncla(ModificarValorAnclaOroDolar valorAncla) throws TablasReferenciaException {
 		log.info("ajusteValorAncla");
 		
 		GeneralResponse gr = new GeneralResponse();
@@ -70,9 +72,8 @@ public class AnclaService {
 		if(valorAncla != null && ajusteValorAnclaOro(valorAncla) && ajusteValorAnclaDolar(valorAncla)) {
 			gr.setMessage("Alta exitosa. ajusteValorAncla oro y dolar ");
 		} else {
-			gr.setMessage("Parametros nulos o incompletos al envocar el ajuste de valor ancla. Paramtros: " + valorAncla);
+			throw new TablasReferenciaException("Parametros nulos o incompletos al envocar el ajuste de valor ancla. Paramtros: " + valorAncla);
 		}
-		
 		return gr;
 	}
 	
@@ -80,7 +81,7 @@ public class AnclaService {
 	 * @param valorAncla
 	 * @return
 	 */
-	private boolean ajusteValorAnclaOro(ModificarValorAnclaOroDolar valorAncla) {
+	private boolean ajusteValorAnclaOro(ModificarValorAnclaOroDolar valorAncla) throws TablasReferenciaException {
 		boolean ret = false;
 		URL url = null;
 		ReferenciaValorAnclaOroServiceEndpointService anclaOroServiceEndpointService = null;
@@ -114,7 +115,7 @@ public class AnclaService {
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.error("error al ajustar el valor ancla oro ",e);
-			throw new RuntimeException("error al ajustar el valor ancla oro ",e);
+			throw new TablasReferenciaException("error al ajustar el valor ancla oro ",e);
 		}
 		
 		return ret;
@@ -125,7 +126,7 @@ public class AnclaService {
 	 * @param valorAncla
 	 * @return
 	 */
-	private boolean ajusteValorAnclaDolar(ModificarValorAnclaOroDolar valorAncla) {
+	private boolean ajusteValorAnclaDolar(ModificarValorAnclaOroDolar valorAncla) throws TablasReferenciaException {
 		boolean ret = false;
 		URL url = null;
 		TipoCambiarioEndpointService cambiarioEndpointService = null;
@@ -180,7 +181,7 @@ public class AnclaService {
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.error("error al ajustar el valor ancla dolar ",e);
-			throw new RuntimeException("error al ajustar el valor ancla dolar ",e);
+			throw new TablasReferenciaException("error al ajustar el valor ancla dolar ",e);
 		}
 		
 		return ret;
