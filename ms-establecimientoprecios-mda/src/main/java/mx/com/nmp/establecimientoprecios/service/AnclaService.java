@@ -35,8 +35,11 @@ public class AnclaService {
 
 	private static final String HEADER_APIKEY = "X-IBM-Client-Id";
 
-	@Value("${ws.tablasreferencia.urlBase}")
-	protected String urlBase;
+	@Value("${ws.tablasreferencia.tipocambio.urlBas}")
+	protected String urlBaseTipoCambio;
+	
+	@Value("${ws.tablasreferencia.anclaoro.urlBase}")
+	protected String urlBaseOro;
 	
 	@Value("${ws.tablareferencia.apikey.value}")
 	protected String tablasReferenciaApiKeyValue;
@@ -97,7 +100,7 @@ public class AnclaService {
 					anclaOroSucursal.setSucursal(Integer.valueOf(sucursal));
 				}
 
-				url = new URL(urlBase+servicioAjustarValorAnclaOro+SUFIJO_WSDL);
+				url = new URL(urlBaseOro+servicioAjustarValorAnclaOro+SUFIJO_WSDL);
 				anclaOroServiceEndpointService = new ReferenciaValorAnclaOroServiceEndpointService(url);
 				anclaOroService = anclaOroServiceEndpointService.getReferenciaValorAnclaOroServiceEndpointPort();				
 				Map<String, Object> reqCtx = ((BindingProvider)anclaOroService).getRequestContext();
@@ -106,6 +109,7 @@ public class AnclaService {
 				ret = true;
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			log.error("error al ajustar el valor ancla oro ",e);
 			throw new RuntimeException("error al ajustar el valor ancla oro ",e);
 		}
@@ -161,7 +165,7 @@ public class AnclaService {
 				actualizacionesType.getTipocambio().add(tipocambioType);
 				tiposType.setActualizaciones(actualizacionesType);
 				
-				url = new URL(urlBase+servicioAjustarTipoCambio+SUFIJO_WSDL);
+				url = new URL(urlBaseTipoCambio+servicioAjustarTipoCambio+SUFIJO_WSDL);
 				cambiarioEndpointService = new TipoCambiarioEndpointService(url);
 				Map<String, Object> reqCtx = ((BindingProvider)cambiarioEndpointService).getRequestContext();
 				reqCtx.put(HEADER_APIKEY, tablasReferenciaApiKeyValue);
@@ -171,6 +175,7 @@ public class AnclaService {
 			}
 		
 		} catch (Exception e) {
+			e.printStackTrace();
 			log.error("error al ajustar el valor ancla dolar ",e);
 			throw new RuntimeException("error al ajustar el valor ancla dolar ",e);
 		}
