@@ -56,7 +56,8 @@ public interface ConsolidadosApi {
 	    @RequestMapping(value = "/consolidados/archivos/{idArchivo}/prioridad",
 	        produces = { "application/json" }, 
 	        method = RequestMethod.PUT)
-	    ResponseEntity<InlineResponse200> actualizarPosicionArchivoPUT(
+	    //ResponseEntity<InlineResponse200> actualizarPosicionArchivoPUT(
+		ResponseEntity<?> actualizarPosicionArchivoPUT(
 	    		@ApiParam(value = "Usuario en el sistema origen que lanza la petici\u00F3n" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,
 	    		@ApiParam(value = "Sistema que origina la petici\u00F3n" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,
 	    		@ApiParam(value = "Destino final de la informaci\u00F3n" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,
@@ -97,7 +98,8 @@ public interface ConsolidadosApi {
 	    @RequestMapping(value = "/consolidados/archivos/{idArchivo}",
 	        produces = { "application/json" }, 
 	        method = RequestMethod.DELETE)
-	    ResponseEntity<SuccessfulResponse> eliminarArchivoConsolidadoDELETE(
+	    //ResponseEntity<SuccessfulResponse> eliminarArchivoConsolidadoDELETE(
+	    ResponseEntity<?> eliminarArchivoConsolidadoDELETE(
 	    		@ApiParam(value = "Usuario en el sistema origen que lanza la petici\u00F3n" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,
 	    		@ApiParam(value = "Sistema que origina la petici\u00F3n" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,
 	    		@ApiParam(value = "Destino final de la informaci\u00F3n" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,

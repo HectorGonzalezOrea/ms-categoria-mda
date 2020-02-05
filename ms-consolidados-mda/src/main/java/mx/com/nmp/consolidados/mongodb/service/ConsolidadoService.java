@@ -16,24 +16,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import mx.com.nmp.consolidados.model.Consolidados;
 import mx.com.nmp.consolidados.model.ConsultarArchivoConsolidadoResInner;
 import mx.com.nmp.consolidados.model.InfoProducto;
+import mx.com.nmp.consolidados.model.InlineResponse200;
+import mx.com.nmp.consolidados.model.ModificarPrioridadArchivoConsolidadoReq;
 import mx.com.nmp.consolidados.mongodb.entity.ArchivoEntity;
 import mx.com.nmp.consolidados.mongodb.entity.caster.CastConsolidados;
+import mx.com.nmp.consolidados.oag.controller.OAGController;
+
 @Service
 public class ConsolidadoService {
 	private static final Logger LOG = LoggerFactory.getLogger(ConsolidadoService.class);
 	
 	public static final String FECHA = "fechaAplicacion";
 	private static final String SEQUENCE = "consolidado_sequence";
+	public static final String ID_ARCHIVO = "idArchivo";
+	public static final String PRIORIDAD = "prioridad";
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
 	@Autowired
 	private SequenceGeneratorService SequenceGeneratorService;
+	
+	@Autowired
+	private OAGController oAGController;
 	
 	public Boolean crearConsolidado(Consolidados request) {
 		LOG.info("ConsolidadoService.crearConsolidado");
@@ -93,4 +103,76 @@ public class ConsolidadoService {
 		LOG.info("query size() "+busquedaList.size());
 		return busquedaList;
 	}
+	
+	private List<ArchivoEntity> getConsolidados(Integer idArchivo) {
+		LOG.info("getConsolidadosPorIdArchivo");
+		
+		Query query = new Query();
+		Criteria aux = Criteria.where(ID_ARCHIVO).is(idArchivo);
+		query.addCriteria(aux);
+		
+		return mongoTemplate.find(query, ArchivoEntity.class);
+	}
+	
+	private Boolean eliminarConsolidado(ArchivoEntity consolidado) {
+		LOG.info("eliminarConsolidadoMongo");
+		
+		Boolean eliminado = false;
+		
+		if(consolidado != null) {
+			mongoTemplate.remove(consolidado);
+			eliminado = true;
+		}
+		
+		return eliminado;
+	}
+	
+	public Boolean eliminarConsolidado(String idArchivo) {
+		LOG.info("eliminarConsolidado");
+		
+		Boolean eliminado = false;
+		
+		List<ArchivoEntity> consolidados = this.getConsolidados(new Integer(idArchivo));
+		
+		LOG.info("consolidados : {} " , consolidados.size());
+		
+		for(ArchivoEntity consolidado : consolidados) {
+			String requestId = consolidado.getRequestIdCalenzarizacion();
+			if (requestId != null && !requestId.equals("")) {
+				Boolean eliminadoESS = oAGController.eliminarCalendarizacion(requestId);
+				if (Boolean.TRUE.equals(eliminadoESS)) {
+					Boolean eliminadoMongo = this.eliminarConsolidado(consolidado);
+					if (Boolean.TRUE.equals(eliminadoMongo)) {
+						eliminado = true;
+					}
+				}
+			}
+		}
+		return eliminado;
+	}
+	
+	public InlineResponse200 actualizarPrioridadArchivo(ModificarPrioridadArchivoConsolidadoReq request) {
+		LOG.info("Actualizar Prioridad Archivo Consolidado");
+		
+		Boolean modificado = false;
+		InlineResponse200 resp = null;
+		
+		
+		Query query = new Query();
+		query.addCriteria(Criteria.where(ID_ARCHIVO).is(request.getIdArchivo()));
+		Update update = new Update();
+		update.set(PRIORIDAD, request.getIdPrioridad());
+
+		ArchivoEntity consolidado = mongoTemplate.findAndModify(query, update, ArchivoEntity.class);
+		
+		if(consolidado != null) {
+			resp = new InlineResponse200();
+			
+			resp.setIdPosicion(consolidado.getPrioridad());
+			resp.setNombreArchivo(consolidado.getNombreAjuste());
+		}
+		
+		return resp;
+	}
+	
 }
