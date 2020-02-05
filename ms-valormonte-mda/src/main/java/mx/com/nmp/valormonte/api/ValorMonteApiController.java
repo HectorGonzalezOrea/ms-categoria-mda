@@ -47,6 +47,7 @@ public class ValorMonteApiController implements ValorMonteApi {
         if (accept != null && accept.contains("application/json")) {
             try {
                 return new ResponseEntity<CalculoValorMonteRes>(objectMapper.readValue("\"\"", CalculoValorMonteRes.class), HttpStatus.NOT_IMPLEMENTED);
+                
             } catch (IOException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<CalculoValorMonteRes>(HttpStatus.INTERNAL_SERVER_ERROR);

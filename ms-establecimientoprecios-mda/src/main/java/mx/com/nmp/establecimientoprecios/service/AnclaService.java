@@ -72,7 +72,7 @@ public class AnclaService {
 		if(valorAncla != null && ajusteValorAnclaOro(valorAncla) && ajusteValorAnclaDolar(valorAncla)) {
 			gr.setMessage("Alta exitosa. ajusteValorAncla oro y dolar ");
 		} else {
-			throw new TablasReferenciaException("Parametros nulos o incompletos al envocar el ajuste de valor ancla. Paramtros: " + valorAncla);
+			throw new TablasReferenciaException("Parametros nulos o invalidos al envocar el ajuste de valor ancla. Paramtros: " + valorAncla);
 		}
 		return gr;
 	}
@@ -109,8 +109,10 @@ public class AnclaService {
 					anclaOroSucursal.setSucursal(Integer.valueOf(sucursal));
 					anclaOroSucursalRequest.getValoresAnclaOroSucursal().add(anclaOroSucursal);
 					anclaOroService.actualizarValorAnclaOro(anclaOroSucursalRequest);
+					
+					ret = true;
 				}
-				ret = true;
+				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -141,7 +143,7 @@ public class AnclaService {
 		List<Integer> lstSucursales = null;
 		
 		try {
-			if (valorAncla.getSucursales() != null) {
+			if (valorAncla.getSucursales() != null && valorAncla.getSucursales().size()>0) {
 				tiposType = new TiposType();
 				actualizacionesType = new ActualizacionesType();
 				tipocambioType = new TipocambioType();
