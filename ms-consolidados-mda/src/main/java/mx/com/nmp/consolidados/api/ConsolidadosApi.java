@@ -77,7 +77,7 @@ public interface ConsolidadosApi {
 	    @RequestMapping(value = "/consolidados/archivos",
 	        produces = { "application/json" }, 
 	        method = RequestMethod.GET)
-	    ResponseEntity<ConsultarArchivoConsolidadoRes> consultaConsolidadosArchivosGET(
+	    ResponseEntity<?> consultaConsolidadosArchivosGET(
 	    		@ApiParam(value = "Usuario en el sistema origen que lanza la petici\u00F3n" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,
 	    		@ApiParam(value = "Sistema que origina la petici\u00F3n" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,
 	    		@ApiParam(value = "Destino final de la informaci\u00F3n" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,
@@ -139,7 +139,7 @@ public interface ConsolidadosApi {
 	        produces = { "application/json" }, 
 	        consumes = { "multipart/form-data" },
 	        method = RequestMethod.POST)
-	    ResponseEntity<GeneralResponse> registrarConsolidadoPOST(
+	    ResponseEntity<?> registrarConsolidadoPOST(
 	    		@ApiParam(value = "Usuario en el sistema origen que lanza la petici\u00F3n" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,
 	    		@ApiParam(value = "Sistema que origina la petici\u00F3n" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,
 	    		@ApiParam(value = "Destino final de la informaci\u00F3n" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,
