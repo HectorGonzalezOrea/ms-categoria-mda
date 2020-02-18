@@ -1,4 +1,4 @@
-package mx.com.nmp.valormonte.elastic.service;
+package mx.com.nmp.valormonte.service;
 
 import javax.validation.Valid;
 
@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import mx.com.nmp.valormonte.elastic.vo.ValorMonteVO;
 import mx.com.nmp.valormonte.model.CalculoValorMonteReq;
 import mx.com.nmp.valormonte.model.CalculoValorMonteReqInner;
 import mx.com.nmp.valormonte.model.CalculoValorMonteRes;
@@ -19,7 +18,7 @@ public class ValorMonteService {
 	
 	private static final Logger log = LoggerFactory.getLogger(ValorMonteService.class);
 	
-	public CalculoValorMonteRes calcularValorMonte (CalculoValorMonteReq vm) {
+	public CalculoValorMonteRes calcularValorMonte(CalculoValorMonteReq vm) {
 		log.info("ValorMonteService.CalcularValorMonte");
 		
 		Float vma = null;

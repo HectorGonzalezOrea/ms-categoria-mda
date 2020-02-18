@@ -13,7 +13,6 @@ public final class Constantes {
 	public static final String HEADER_OAUTH_BEARER = "oauth.bearer";
 	public static final String GRANT_TYPE = "grant_type";
 	public static final String SCOPE = "scope";
-	public static final String OAUTH_BEARER = "oauth.bearer";
 	
 	public static final int STATUS_CODE_OK = 200;
 	

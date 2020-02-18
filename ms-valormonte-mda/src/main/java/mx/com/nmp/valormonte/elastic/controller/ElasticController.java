@@ -1,4 +1,4 @@
-package mx.com.nmp.valormonte.elastic.service;
+package mx.com.nmp.valormonte.elastic.controller;
 
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -22,9 +22,9 @@ import org.springframework.beans.factory.annotation.Value;
 
 
 
-public class ElasticService {
+public class ElasticController {
 	
-private static final Logger log = LoggerFactory.getLogger(ElasticService.class);
+private static final Logger log = LoggerFactory.getLogger(ElasticController.class);
 	
 	@Value("${spring.elasticsearch.host}")
 	private String host;
@@ -47,8 +47,8 @@ private static final Logger log = LoggerFactory.getLogger(ElasticService.class);
 	@Value("${spring.elasticsearch.timeoutElastic}")
 	private String timeoutElastic;
 	
-	
-	
 	SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder ();
 
+	
+	
 }

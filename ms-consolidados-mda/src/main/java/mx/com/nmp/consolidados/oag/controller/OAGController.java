@@ -20,7 +20,7 @@ import static mx.com.nmp.consolidados.utils.Constantes.GRANT_TYPE;
 import static mx.com.nmp.consolidados.utils.Constantes.HEADER_ID_CONSUMIDOR;
 import static mx.com.nmp.consolidados.utils.Constantes.HEADER_ID_DESTINO;
 import static mx.com.nmp.consolidados.utils.Constantes.SCOPE;
-import static mx.com.nmp.consolidados.utils.Constantes.OAUTH_BEARER;
+import static mx.com.nmp.consolidados.utils.Constantes.HEADER_OAUTH_BEARER;
 
 import javax.ws.rs.core.MediaType;
 
@@ -81,7 +81,7 @@ public class OAGController extends OAGBaseController {
 		try {
 			HttpResponse<String> response = Unirest.delete(urlBase + servicioEliminarCalendarizacion + "/" + idPeticion)
 			  .header(HEADER_USUARIO, headerUsuario)
-			  .header(OAUTH_BEARER, oauthBearer)
+			  .header(HEADER_OAUTH_BEARER, oauthBearer)
 			  .header(HEADER_ID_CONSUMIDOR, headerIdConsumidor)
 			  .header(HEADER_ID_DESTINO, headerIdDestino)
 			  .header(HttpHeaders.AUTHORIZATION, autenticacionBasica)
@@ -101,6 +101,32 @@ public class OAGController extends OAGBaseController {
 		}
 		
 		return eliminado;
+	}
+	
+	public void validarArbitrajePreciosPartidas() {
+		
+		String credenciales = usuario + ":" + password;
+		String autenticacionBasica = "Basic " + ConvertStringToBase64.encode(credenciales);
+		
+		String oauthBearer = this.getToken();
+		
+		Unirest.setTimeouts(0, 0);
+		try {
+			HttpResponse<String> response = Unirest.post(urlBase + servicioValidarArbitrajePreciosPartidas)
+			  .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED)
+			  .header(HEADER_USUARIO, headerUsuario)
+			  .header(HEADER_ID_CONSUMIDOR, headerIdConsumidor)
+			  .header(HEADER_ID_DESTINO, headerIdDestino)
+			  .header(HEADER_OAUTH_BEARER, oauthBearer)
+			  .header(HttpHeaders.AUTHORIZATION, autenticacionBasica)
+			  .body("{\r\n  \"partida\" : [ {\r\n    \"idPartida\" : \"1\",\r\n    \"sku\" : \"S1\",\r\n    \"precioVenta\" : 100,\r\n    \"montoPrestamo\" : 1000\r\n  } ,\r\n  {\r\n    \"idPartida\" : \"2\",\r\n    \"sku\" : \"S21\",\r\n    \"precioVenta\" : 100,\r\n    \"montoPrestamo\" : 1000\r\n  }]\r\n}")
+			  .asString();
+		} catch (UnirestException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
 	}
 	
 }
