@@ -102,5 +102,10 @@ public class InternalServerError   {
     }
     return o.toString().replace("\n", "\n    ");
   }
+
+public void setMessage(String string) {
+	// TODO Auto-generated method stub
+	
+}
 }
 

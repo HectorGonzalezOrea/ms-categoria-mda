@@ -28,7 +28,6 @@ import java.util.List;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-01-30T17:34:52.695Z")
 
 @Api(value = "valorMonte", description = "the valorMonte API")
-@RequestMapping(value = "/SPSolutions/MotorDescuentosAPI/1.0.0")
 public interface ValorMonteApi {
 
     @ApiOperation(value = "Realiza cálculo del valor monte actual de una partida y/o producto.", nickname = "calcularValorMontePOST", notes = "Se realiza el cálculo del valor monte con la información actual de la partida.   En caso de no obtener los valores necesarios para realizar el cálculo, se deberá consultar la información de las partidas en ElasticSearch. ", response = CalculoValorMonteRes.class, authorizations = {
@@ -43,6 +42,6 @@ public interface ValorMonteApi {
     @RequestMapping(value = "/valorMonte",
         produces = { "application/json" }, 
         method = RequestMethod.POST)
-     ResponseEntity<CalculoValorMonteRes> calcularValorMontePOST(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = ""  )  @Valid @RequestBody CalculoValorMonteReq valorMonteReq);
+     ResponseEntity<?> calcularValorMontePOST(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = ""  )  @Valid @RequestBody CalculoValorMonteReq valorMonteReq);
 
 }
