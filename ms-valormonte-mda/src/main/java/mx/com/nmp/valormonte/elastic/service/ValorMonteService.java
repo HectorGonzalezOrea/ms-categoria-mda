@@ -19,31 +19,42 @@ public class ValorMonteService {
 	
 	private static final Logger log = LoggerFactory.getLogger(ValorMonteService.class);
 	
-	public CalculoValorMonteReq calcularValorMonte (CalculoValorMonteReq vm) {
+	public CalculoValorMonteRes calcularValorMonte (CalculoValorMonteReq vm) {
+		log.info("ValorMonteService.CalcularValorMonte");
+		
+		Float vma = null;
+		CalculoValorMonteRes cvmResp = null;
+		CalculoValorMonteResInner cvmRespInner = null;
 		
 		if(vm != null) {
-			log.info("ValorMonteService.CalcularValorMonte");
-			for(CalculoValorMonteReqInner vmri:vm) {
-				vmri.getIdPartida();
-				vmri.getSKU();
-				vmri.getValorAncla();
-				vmri.getGramaje();
-				vmri.getKilataje();
-				vmri.getIncremento();
-				vmri.getGramaje();
-				vmri.getDesplazamiento();
-				vmri.getAvaluoComplementario();
-				
+			cvmResp = new CalculoValorMonteRes();
+			for(CalculoValorMonteReqInner vmri : vm) {
+				if(vmri.getValorAncla() != null && vmri.getDesplazamiento() != null && vmri.getGramaje() != null && vmri.getIncremento() != null && vmri.getKilataje() != null && vmri.getAvaluoComplementario() != null) {
+					vma = this.valorMonteActualizado(vmri);
+					cvmRespInner = new CalculoValorMonteResInner();
+					
+					cvmRespInner.setIdPartida(vmri.getIdPartida());
+					cvmRespInner.setSKU(vmri.getSKU());
+					cvmRespInner.setValorMonteActualizado(vma);
+					
+					cvmResp.add(cvmRespInner);
+				}
 			}
 			
 		}
-		return vm;
+		
+		return cvmResp;
 		
 	}
 
 	
-	
-	
-	
+	private Float valorMonteActualizado(CalculoValorMonteReqInner producto) {
+		
+		float k24 =  producto.getKilataje()/24;
+		float id100 = 1 + ((producto.getIncremento() + producto.getDesplazamiento()) / 100);
+		float vma = (producto.getValorAncla() * producto.getGramaje() * k24 * id100) + producto.getAvaluoComplementario();
+		
+		return Float.valueOf(vma);
+	}
 
 }
