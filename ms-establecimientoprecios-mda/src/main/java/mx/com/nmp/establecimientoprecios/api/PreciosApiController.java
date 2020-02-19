@@ -93,7 +93,7 @@ public class PreciosApiController implements PreciosApi {
             			ise.setCode("NMP-MDA-500");
             			ise.setMessage("Error interno del servidor. Falla de comunicación.");
             			
-            			return new ResponseEntity<InternalServerError>(ise, HttpStatus.OK);
+            			return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
             		}
             	}
             	
@@ -104,7 +104,7 @@ public class PreciosApiController implements PreciosApi {
     			ise.setCode("NMP-MDA-500");
     			ise.setMessage("Error interno del servidor. Falla de comunicación.");
     			
-    			return new ResponseEntity<InternalServerError>(ise, HttpStatus.OK);
+    			return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
@@ -152,7 +152,7 @@ public class PreciosApiController implements PreciosApi {
             			ise.setCode("NMP-MDA-500");
             			ise.setMessage("Error interno del servidor. Falla de comunicación.");
             			
-            			return new ResponseEntity<InternalServerError>(ise, HttpStatus.OK);
+            			return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
             		}
             	}
             	
@@ -163,7 +163,7 @@ public class PreciosApiController implements PreciosApi {
     			ise.setCode("NMP-MDA-500");
     			ise.setMessage("Error interno del servidor. Falla de comunicación.");
     			
-    			return new ResponseEntity<InternalServerError>(ise, HttpStatus.OK);
+    			return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
