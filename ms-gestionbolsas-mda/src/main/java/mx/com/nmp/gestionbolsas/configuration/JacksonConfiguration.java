@@ -1,4 +1,4 @@
-package io.swagger.configuration;
+package mx.com.nmp.gestionbolsas.configuration;
 
 import com.fasterxml.jackson.datatype.threetenbp.ThreeTenModule;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

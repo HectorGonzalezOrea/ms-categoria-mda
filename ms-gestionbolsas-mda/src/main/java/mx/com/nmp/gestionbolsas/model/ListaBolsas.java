@@ -1,44 +1,23 @@
-package io.swagger.model;
+package mx.com.nmp.gestionbolsas.model;
 
 import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import mx.com.nmp.gestionbolsas.model.ListaBolsasInner;
+
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * ListaTipoBolsasInner
+ * Lista de Bolsas configuradas
  */
+@ApiModel(description = "Lista de Bolsas configuradas")
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-02-21T17:43:22.226Z")
 
-public class ListaTipoBolsasInner   {
-  @JsonProperty("tipo")
-  private Object tipo = null;
-
-  public ListaTipoBolsasInner tipo(Object tipo) {
-    this.tipo = tipo;
-    return this;
-  }
-
-  /**
-   * Tipo de Bolsa
-   * @return tipo
-  **/
-  @ApiModelProperty(value = "Tipo de Bolsa")
-
-
-  public Object getTipo() {
-    return tipo;
-  }
-
-  public void setTipo(Object tipo) {
-    this.tipo = tipo;
-  }
-
+public class ListaBolsas extends ArrayList<ListaBolsasInner>  {
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -48,21 +27,19 @@ public class ListaTipoBolsasInner   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ListaTipoBolsasInner listaTipoBolsasInner = (ListaTipoBolsasInner) o;
-    return Objects.equals(this.tipo, listaTipoBolsasInner.tipo);
+    return true;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(tipo);
+    return Objects.hash(super.hashCode());
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ListaTipoBolsasInner {\n");
-    
-    sb.append("    tipo: ").append(toIndentedString(tipo)).append("\n");
+    sb.append("class ListaBolsas {\n");
+    sb.append("    ").append(toIndentedString(super.toString())).append("\n");
     sb.append("}");
     return sb.toString();
   }

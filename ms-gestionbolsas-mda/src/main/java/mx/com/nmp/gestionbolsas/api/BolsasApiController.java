@@ -1,14 +1,15 @@
-package io.swagger.api;
+package mx.com.nmp.gestionbolsas.api;
 
-import io.swagger.model.BadRequest;
-import io.swagger.model.Bolsa;
-import io.swagger.model.GeneralResponse;
-import io.swagger.model.InternalServerError;
-import io.swagger.model.InvalidAuthentication;
-import io.swagger.model.ListaBolsas;
-import io.swagger.model.ListaTipoBolsas;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
+import mx.com.nmp.gestionbolsas.model.BadRequest;
+import mx.com.nmp.gestionbolsas.model.Bolsa;
+import mx.com.nmp.gestionbolsas.model.GeneralResponse;
+import mx.com.nmp.gestionbolsas.model.InternalServerError;
+import mx.com.nmp.gestionbolsas.model.InvalidAuthentication;
+import mx.com.nmp.gestionbolsas.model.ListaBolsas;
+import mx.com.nmp.gestionbolsas.model.ListaTipoBolsas;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

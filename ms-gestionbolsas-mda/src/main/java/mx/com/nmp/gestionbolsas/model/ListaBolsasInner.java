@@ -1,4 +1,4 @@
-package io.swagger.model;
+package mx.com.nmp.gestionbolsas.model;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;

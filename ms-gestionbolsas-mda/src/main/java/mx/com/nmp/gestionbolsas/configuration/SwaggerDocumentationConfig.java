@@ -1,4 +1,4 @@
-package io.swagger.configuration;
+package mx.com.nmp.gestionbolsas.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

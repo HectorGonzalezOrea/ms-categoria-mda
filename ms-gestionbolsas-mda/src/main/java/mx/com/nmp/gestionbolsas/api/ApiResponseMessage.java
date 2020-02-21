@@ -1,4 +1,4 @@
-package io.swagger.api;
+package mx.com.nmp.gestionbolsas.api;
 
 import javax.xml.bind.annotation.XmlTransient;
 

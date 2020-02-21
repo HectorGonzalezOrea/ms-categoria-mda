@@ -1,4 +1,4 @@
-package io.swagger;
+package mx.com.nmp.gestionbolsas;
 
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.fasterxml.jackson.databind.util.ISO8601Utils;

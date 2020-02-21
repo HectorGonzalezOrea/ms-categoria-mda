@@ -1,22 +1,44 @@
-package io.swagger.model;
+package mx.com.nmp.gestionbolsas.model;
 
 import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
-import io.swagger.model.ListaBolsasInner;
-import java.util.ArrayList;
-import java.util.List;
+import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * Lista de Bolsas configuradas
+ * GeneralResponse
  */
-@ApiModel(description = "Lista de Bolsas configuradas")
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-02-21T17:43:22.226Z")
 
-public class ListaBolsas extends ArrayList<ListaBolsasInner>  {
+public class GeneralResponse   {
+  @JsonProperty("message")
+  private String message = null;
+
+  public GeneralResponse message(String message) {
+    this.message = message;
+    return this;
+  }
+
+  /**
+   * Get message
+   * @return message
+  **/
+  @ApiModelProperty(example = "Exitoso", value = "")
+
+
+  public String getMessage() {
+    return message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -26,19 +48,21 @@ public class ListaBolsas extends ArrayList<ListaBolsasInner>  {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    return true;
+    GeneralResponse generalResponse = (GeneralResponse) o;
+    return Objects.equals(this.message, generalResponse.message);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode());
+    return Objects.hash(message);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ListaBolsas {\n");
-    sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+    sb.append("class GeneralResponse {\n");
+    
+    sb.append("    message: ").append(toIndentedString(message)).append("\n");
     sb.append("}");
     return sb.toString();
   }

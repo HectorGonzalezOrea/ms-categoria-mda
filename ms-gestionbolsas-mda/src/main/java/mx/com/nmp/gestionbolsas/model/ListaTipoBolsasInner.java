@@ -1,22 +1,44 @@
-package io.swagger.model;
+package mx.com.nmp.gestionbolsas.model;
 
 import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
-import io.swagger.model.ListaTipoBolsasInner;
-import java.util.ArrayList;
-import java.util.List;
+import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * Información de los tipos de bolsas
+ * ListaTipoBolsasInner
  */
-@ApiModel(description = "Información de los tipos de bolsas")
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-02-21T17:43:22.226Z")
 
-public class ListaTipoBolsas extends ArrayList<ListaTipoBolsasInner>  {
+public class ListaTipoBolsasInner   {
+  @JsonProperty("tipo")
+  private Object tipo = null;
+
+  public ListaTipoBolsasInner tipo(Object tipo) {
+    this.tipo = tipo;
+    return this;
+  }
+
+  /**
+   * Tipo de Bolsa
+   * @return tipo
+  **/
+  @ApiModelProperty(value = "Tipo de Bolsa")
+
+
+  public Object getTipo() {
+    return tipo;
+  }
+
+  public void setTipo(Object tipo) {
+    this.tipo = tipo;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -26,19 +48,21 @@ public class ListaTipoBolsas extends ArrayList<ListaTipoBolsasInner>  {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    return true;
+    ListaTipoBolsasInner listaTipoBolsasInner = (ListaTipoBolsasInner) o;
+    return Objects.equals(this.tipo, listaTipoBolsasInner.tipo);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode());
+    return Objects.hash(tipo);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ListaTipoBolsas {\n");
-    sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+    sb.append("class ListaTipoBolsasInner {\n");
+    
+    sb.append("    tipo: ").append(toIndentedString(tipo)).append("\n");
     sb.append("}");
     return sb.toString();
   }
