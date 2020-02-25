@@ -97,8 +97,8 @@ public class OAGController extends OAGBaseController {
 			
 			int statusCode = response.getStatus();
 			
-			log.info("Status Code Response: " + statusCode);
-			log.info("Body Response: " + response.getBody());
+			log.info("Status Code Response: {} " , statusCode);
+			log.info("Body Response: {} " , response.getBody());
 			
 			if (statusCode == STATUS_CODE_OK) {
 				resp = ConverterUtil.StringJsonToObjectIdentidadUsuarioResponseVO(response.getBody());

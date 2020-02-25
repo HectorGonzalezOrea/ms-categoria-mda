@@ -17,9 +17,9 @@ import javax.validation.constraints.*;
 
 public class ListaTipoBolsasInner   {
   @JsonProperty("tipo")
-  private Object tipo = null;
+  private TipoBolsa tipo = null;
 
-  public ListaTipoBolsasInner tipo(Object tipo) {
+  public ListaTipoBolsasInner tipo(TipoBolsa tipo) {
     this.tipo = tipo;
     return this;
   }
@@ -35,7 +35,7 @@ public class ListaTipoBolsasInner   {
     return tipo;
   }
 
-  public void setTipo(Object tipo) {
+  public void setTipo(TipoBolsa tipo) {
     this.tipo = tipo;
   }
 
