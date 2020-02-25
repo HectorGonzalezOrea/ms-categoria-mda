@@ -20,7 +20,7 @@ public class CalculoValorMonteReqInner   {
   private Integer idPartida = null;
 
   @JsonProperty("SKU")
-  private Integer SKU = null;
+  private String SKU = null;
 
   @JsonProperty("valorAncla")
   private Float valorAncla = null;
@@ -60,7 +60,7 @@ public class CalculoValorMonteReqInner   {
     this.idPartida = idPartida;
   }
 
-  public CalculoValorMonteReqInner SKU(Integer SKU) {
+  public CalculoValorMonteReqInner SKU(String SKU) {
     this.SKU = SKU;
     return this;
   }
@@ -72,11 +72,11 @@ public class CalculoValorMonteReqInner   {
   @ApiModelProperty(example = "4321", value = "Identificador comercial de la partida.")
 
 
-  public Integer getSKU() {
+  public String getSKU() {
     return SKU;
   }
 
-  public void setSKU(Integer SKU) {
+  public void setSKU(String SKU) {
     this.SKU = SKU;
   }
 

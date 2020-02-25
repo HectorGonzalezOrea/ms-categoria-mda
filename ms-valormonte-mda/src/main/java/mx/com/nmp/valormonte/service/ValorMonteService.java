@@ -4,8 +4,10 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import mx.com.nmp.valormonte.elastic.controller.ElasticController;
 import mx.com.nmp.valormonte.model.CalculoValorMonteReq;
 import mx.com.nmp.valormonte.model.CalculoValorMonteReqInner;
 import mx.com.nmp.valormonte.model.CalculoValorMonteRes;
@@ -15,6 +17,8 @@ import mx.com.nmp.valormonte.model.CalculoValorMonteResInner;
 @Service
 public class ValorMonteService {
 
+	@Autowired
+	private ElasticController elasticController;
 	
 	private static final Logger log = LoggerFactory.getLogger(ValorMonteService.class);
 	
@@ -37,7 +41,14 @@ public class ValorMonteService {
 					cvmRespInner.setValorMonteActualizado(vma);
 					
 					cvmResp.add(cvmRespInner);
+				}else {
+					
+					 
+					
 				}
+					 
+					
+				
 			}
 			
 		}

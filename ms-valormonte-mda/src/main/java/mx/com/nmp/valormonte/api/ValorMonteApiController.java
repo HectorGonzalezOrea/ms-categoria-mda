@@ -2,7 +2,7 @@ package mx.com.nmp.valormonte.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
-import mx.com.nmp.valormonte.elastic.vo.ValorMonteVO;
+import mx.com.nmp.valormonte.elastic.vo.ElasticVO;
 import mx.com.nmp.valormonte.model.BadRequest;
 import mx.com.nmp.valormonte.model.CalculoValorMonteReq;
 import mx.com.nmp.valormonte.model.CalculoValorMonteReqInner;
