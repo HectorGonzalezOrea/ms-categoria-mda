@@ -2,7 +2,7 @@ package mx.com.nmp.valormonte.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
-import mx.com.nmp.valormonte.elastic.vo.ElasticVO;
+import mx.com.nmp.valormonte.elastic.vo.ResponseElasticVO;
 import mx.com.nmp.valormonte.model.BadRequest;
 import mx.com.nmp.valormonte.model.CalculoValorMonteReq;
 import mx.com.nmp.valormonte.model.CalculoValorMonteReqInner;
@@ -43,16 +43,12 @@ public class ValorMonteApiController implements ValorMonteApi {
     @Autowired
     private ValorMonteService valorMonteService;
     
-   
-    
-
     @org.springframework.beans.factory.annotation.Autowired
     public ValorMonteApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
     }
 
-  
 	public ResponseEntity<?> calcularValorMontePOST(
 			@ApiParam(value = "Usuario en el sistema origen que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = "Sistema que origina la petición", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
@@ -64,32 +60,38 @@ public class ValorMonteApiController implements ValorMonteApi {
 				CalculoValorMonteRes resp;
 				
 				if (valorMonteReq == null) {
-					log.info("Esto esta vacio");
+					log.info("Request Invalido");
+					BadRequest br = new BadRequest();
+					br.setCodigo("NMP-MDA-400");
+					br.mensaje("El cuerpo de la petición no está bien formado, verifique su información");
+					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 				} else {
 					resp = valorMonteService.calcularValorMonte(valorMonteReq);
 					if (resp != null) {
-						log.info("ya estas en esta parte");
-						log.info("Datos: " + resp);
+						log.info("{}", resp);
 
 						return new ResponseEntity<CalculoValorMonteRes>(resp, HttpStatus.OK);
 					} else {
-						BadRequest br = new BadRequest();
-						br.setCodigo("NMP-MDA-400");
-						br.mensaje("El cuerpo de la petición no está bien formado, verifique su información");
-						return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+						log.error("No se pudo hacer el calculo");
+						InternalServerError ise = new InternalServerError();
+						ise.setCodigo("NMP-MDA-500");
+						ise.setMensaje("Internal Server Error");
+						return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
 					}
-
 				}
 			} catch (Exception e) {
 				log.error("Couldn't serialize response for content type application/json", e);
 				InternalServerError ise = new InternalServerError();
 				ise.setCodigo("NMP-MDA-500");
 				ise.setMensaje("Internal Server Error");
-				return new ResponseEntity<InternalServerError>(ise, HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
+		} else {
+			BadRequest br = new BadRequest();
+			br.setCodigo("NMP-MDA-400");
+			br.mensaje("El cuerpo de la petición no está bien formado, verifique su información");
+			return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 		}
-
-		return new ResponseEntity<CalculoValorMonteRes>(HttpStatus.NOT_IMPLEMENTED);
 	}
 
 }

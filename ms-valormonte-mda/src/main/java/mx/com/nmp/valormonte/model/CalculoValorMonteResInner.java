@@ -20,7 +20,7 @@ public class CalculoValorMonteResInner   {
   private Integer idPartida = null;
 
   @JsonProperty("SKU")
-  private String SKU = null;
+  private String sku = null;
 
   @JsonProperty("valorMonteActualizado")
   private Float valorMonteActualizado = null;
@@ -45,8 +45,8 @@ public class CalculoValorMonteResInner   {
     this.idPartida = idPartida;
   }
 
-  public CalculoValorMonteResInner SKU(String SKU) {
-    this.SKU = SKU;
+  public CalculoValorMonteResInner sku(String sku) {
+    this.sku = sku;
     return this;
   }
 
@@ -57,12 +57,12 @@ public class CalculoValorMonteResInner   {
   @ApiModelProperty(example = "4321", value = "Identificador comercial de la partida.")
 
 
-  public String getSKU() {
-    return SKU;
+  public String getSku() {
+    return sku;
   }
 
-  public void setSKU(String SKU) {
-    this.SKU = SKU;
+  public void setSku(String sku) {
+    this.sku = sku;
   }
 
   public CalculoValorMonteResInner valorMonteActualizado(Float valorMonteActualizado) {
@@ -96,13 +96,13 @@ public class CalculoValorMonteResInner   {
     }
     CalculoValorMonteResInner calculoValorMonteResInner = (CalculoValorMonteResInner) o;
     return Objects.equals(this.idPartida, calculoValorMonteResInner.idPartida) &&
-        Objects.equals(this.SKU, calculoValorMonteResInner.SKU) &&
+        Objects.equals(this.sku, calculoValorMonteResInner.sku) &&
         Objects.equals(this.valorMonteActualizado, calculoValorMonteResInner.valorMonteActualizado);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(idPartida, SKU, valorMonteActualizado);
+    return Objects.hash(idPartida, sku, valorMonteActualizado);
   }
 
   @Override
@@ -111,7 +111,7 @@ public class CalculoValorMonteResInner   {
     sb.append("class CalculoValorMonteResInner {\n");
     
     sb.append("    idPartida: ").append(toIndentedString(idPartida)).append("\n");
-    sb.append("    SKU: ").append(toIndentedString(SKU)).append("\n");
+    sb.append("    SKU: ").append(toIndentedString(sku)).append("\n");
     sb.append("    valorMonteActualizado: ").append(toIndentedString(valorMonteActualizado)).append("\n");
     sb.append("}");
     return sb.toString();
