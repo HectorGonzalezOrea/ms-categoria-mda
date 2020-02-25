@@ -9,9 +9,13 @@ import mx.com.nmp.gestionbolsas.model.InternalServerError;
 import mx.com.nmp.gestionbolsas.model.InvalidAuthentication;
 import mx.com.nmp.gestionbolsas.model.ListaBolsas;
 import mx.com.nmp.gestionbolsas.model.ListaTipoBolsas;
+import mx.com.nmp.gestionbolsas.model.ListaTipoBolsasInner;
+import mx.com.nmp.gestionbolsas.mongodb.service.BolsasService;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -33,10 +37,14 @@ import java.util.List;
 public class BolsasApiController implements BolsasApi {
 
     private static final Logger log = LoggerFactory.getLogger(BolsasApiController.class);
+    
 
     private final ObjectMapper objectMapper;
 
     private final HttpServletRequest request;
+    
+    @Autowired
+    private BolsasService bolsaService;
 
     @org.springframework.beans.factory.annotation.Autowired
     public BolsasApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -58,12 +66,70 @@ public class BolsasApiController implements BolsasApi {
         return new ResponseEntity<ListaBolsas>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<GeneralResponse> bolsasIdBolsaDelete(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Identificador de la Bolsa a eliminar",required=true) @PathVariable("idBolsa") Integer idBolsa) {
+    public ResponseEntity<?> bolsasIdBolsaDelete(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Identificador de la Bolsa a eliminar",required=true) @PathVariable("idBolsa") Integer idBolsa) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+            	
+            	if(idBolsa == null) {
+            		log.error("Error en el mensaje de petición, verifique la información");
+					BadRequest br = new BadRequest();
+					br.setMessage("El cuerpo de la petición no está bien formado, verifique su información");
+					br.setCode("NMP-MDA-400");
+					
+					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
+            	}else {
+            		Boolean eliminado = bolsaService.deleteBolsa(idBolsa);
+            		GeneralResponse resp =  new GeneralResponse();
+            		if(eliminado) {
+						resp.setMessage("Usuario eliminado exitosamente");
+						return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
+					} else {
+						resp.setMessage("Usuario no eliminado");
+						return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
+					}
+            		}
+                               	
+            } catch (Exception e) {
+                log.error("Couldn't serialize response for content type application/json", e);
+                return new ResponseEntity<InternalServerError>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    public ResponseEntity<?> bolsasPatch(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody Bolsa peticion) {
+        String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains("application/json")) {
+            try {
+            	if (peticion != null) {
+            		log.info("peticion: " + peticion.toString());
+            		Boolean actualizado = bolsaService.updateBolsa(peticion);
+            		
+            		if(actualizado) {
+            			GeneralResponse resp =  new GeneralResponse();
+            			resp.setMessage("Bolsa actualizada correctamente.");
+            			
+            			return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
+            			
+            		}else {
+            			InternalServerError ie = new InternalServerError();
+        				ie.setCode("NMP-MDA-500");
+        				ie.setMessage("Error interno del servidor");
+                        
+                        return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+            		}
+            	}else {
+            		BadRequest br = new BadRequest();
+					br.setMessage("El cuerpo de la petición no está bien formado, verifique su información");
+					br.setCode("NMP-MDA-400");
+					
+					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+            	}
+            		
+                
+            } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<GeneralResponse>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -72,38 +138,56 @@ public class BolsasApiController implements BolsasApi {
         return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<GeneralResponse> bolsasPatch(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody Bolsa peticion) {
-        String accept = request.getHeader("Accept");
+    public ResponseEntity<?> bolsasPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody Bolsa peticion) {
+    	log.info("Crear Bolsa");
+    	String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<GeneralResponse>(HttpStatus.INTERNAL_SERVER_ERROR);
+            	
+            	if (peticion != null) {
+            		
+            		log.info("peticion: " + peticion.toString());
+            		
+            		Boolean insertado = bolsaService.crearBolsa(peticion);
+            		if(insertado) {
+            			GeneralResponse resp =  new GeneralResponse();
+            			resp.setMessage("Bolsa creada correctamente.");
+            			
+            			return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
+            		} else {
+            			InternalServerError ie = new InternalServerError();
+        				ie.setCode("NMP-MDA-500");
+        				ie.setMessage("Error interno del servidor");
+                        
+                        return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+            		}
+            	} else {
+            		BadRequest br = new BadRequest();
+					br.setMessage("El cuerpo de la petición no está bien formado, verifique su información");
+					br.setCode("NMP-MDA-400");
+					
+					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+            	}
+            } catch (Exception e) {
+            	log.error("Couldn't serialize response for content type application/json", e);
+                InternalServerError ie = new InternalServerError();
+				ie.setCode("NMP-MDA-500");
+				ie.setMessage("Error interno del servidor");
+                
+                return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
         return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<GeneralResponse> bolsasPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody Bolsa peticion) {
+    public ResponseEntity<?> bolsasTiposGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<GeneralResponse>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    public ResponseEntity<ListaTipoBolsas> bolsasTiposGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
+            	
+            	
+            	
                 return new ResponseEntity<ListaTipoBolsas>(objectMapper.readValue("\"\"", ListaTipoBolsas.class), HttpStatus.NOT_IMPLEMENTED);
             } catch (IOException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
