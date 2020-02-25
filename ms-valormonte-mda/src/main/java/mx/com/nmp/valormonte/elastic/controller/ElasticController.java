@@ -1,115 +1,83 @@
 package mx.com.nmp.valormonte.elastic.controller;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RestController;
 import com.google.common.net.HttpHeaders;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-import mx.com.nmp.valormonte.elastic.entity.ElasticEntity;
-import mx.com.nmp.valormonte.elastic.vo.ElasticVO;
-import mx.com.nmp.valormonte.model.CalculoValorMonteReqInner;
+import static mx.com.nmp.valormonte.utils.Constantes.MAP_ID;
+import static mx.com.nmp.valormonte.utils.Constantes.MAP_QUERY;
+import static mx.com.nmp.valormonte.utils.Constantes.REQ_SKU;
+import static mx.com.nmp.valormonte.utils.Constantes.REQ_PARTIDA;
+import static mx.com.nmp.valormonte.utils.Constantes.REQ_VALOR_MONTE_ACT;
+
+import mx.com.nmp.valormonte.elastic.vo.ResponseElasticVO;
+import mx.com.nmp.valormonte.elastic.vo.Hits;
+import mx.com.nmp.valormonte.elastic.vo.RequestElasticVO;
+import mx.com.nmp.valormonte.elastic.vo.Source;
 import mx.com.nmp.valormonte.utils.ConvertStringToBase64;
-
-
-
+import mx.com.nmp.valormonte.utils.ConverterUtil;
 
 @RestController
-public class ElasticController {
-	
-private static final Logger log = LoggerFactory.getLogger(ElasticController.class);
-	
-	@Value("${spring.elasticsearch.urlbase}")
-	private String urlbase;
-	
-	@Value("${spring.elasticsearch.context}")
-	private String service;
-	
-	@Value("${spring.elasticsearch.username}")
-	private String username;
-	
-	@Value("${spring.elasticsearch.password}")
-	private String password;
-	
-	public synchronized RestHighLevelClient getConnectionElastic() {
-		RestClientBuilder builder = null;
+public class ElasticController extends ElasticBaseController {
 
+	private static final Logger log = LoggerFactory.getLogger(ElasticController.class);
+
+	public Source consultaElastic(String sku) {
+		log.info("consultaElastic por Sku: {} ", sku);
+		
+		Unirest.setTimeouts(0, 0);
+
+		Source producto = null;
+		
+		String credenciales = username + ":" + password;
+		String autenticacionBasica = "Basic " + ConvertStringToBase64.encode(credenciales);
+
+		Map<String, Object> map = new HashMap<>();
+		map.put(MAP_QUERY, MAP_ID + ":" + sku);
+
+		RequestElasticVO req = new RequestElasticVO();
+		List<String> source = new ArrayList<>();
+		source.add(REQ_SKU);
+		source.add(REQ_PARTIDA);
+		source.add(REQ_VALOR_MONTE_ACT);
+		
+		req.setSource(source);
+		
 		try {
-			final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-			credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
-
-			builder = RestClient.builder(new HttpHost(urlbase + service))
-					.setHttpClientConfigCallback(httpClientBuilder -> {
-						httpClientBuilder.disableAuthCaching();
-						return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
-					});
-		} catch (Exception e) {
-			log.error("Error getConnectionElastic: {}", e);
-		}
-
-		return new RestHighLevelClient(builder);
-		
-	}
-	
-	public synchronized void closeConnection(RestHighLevelClient restHighLevelClient) throws IOException {
-        restHighLevelClient.close();
-    }
-	
-	public Boolean ConsultaElastic (ElasticEntity busq, RestHighLevelClient restHighLevelClient) {
-		
-		Map<String, Object> map = new HashMap<String, Object>();
-	    map.put("q", "_id:" + busq.getSku());
-	    Boolean consultado = false;
-	    
-		return null;
-		
-		
-		
-		
-		
-		
-		/*Unirest.setTimeouts(0, 0);
-		
-		
-		Map<String, Object> map = new HashMap<String, Object>();
-	    map.put("q", "_id:" + sku);
-	    
-		try {
-			HttpResponse<String> response = Unirest.get(urlbase + service )
-			  .header("Content-Type", "application/json")
-			  .header(HttpHeaders.AUTHORIZATION, autenticacionBasica)
-			  .queryString(map)
-			  .asString();
+			HttpResponse<String> response = Unirest.post(urlbase + service)
+					.header(HttpHeaders.CONTENT_TYPE, org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
+					.header(HttpHeaders.AUTHORIZATION, autenticacionBasica)
+					.queryString(map)
+					.body("{\t\t\r\n\"_source\": [\"sku\", \"partida\", \"valor_monte_act\"]\r\n}")
+					.asString();
+			
 			int statusCode = response.getStatus();
 
-			log.info("Status Code Response: {} " , statusCode);
-			log.info("Body Response: {} " , response.getBody());
+			log.info("Status Code Response: {} ", statusCode);
+			log.info("Body Response: {} ", response.getBody());
+			
+			if(statusCode == 200) {
+				ResponseElasticVO responseVo = ConverterUtil.StringJsonToObjectElasticVO(response.getBody());
+				Hits hitsPrincipal = responseVo.getHits();
+				
+				if(!hitsPrincipal.getHits().isEmpty()) {
+					producto = hitsPrincipal.getHits().get(0).getSource();
+				}
+			}
+			
 		} catch (UnirestException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-		
-		
-		
-		
+			log.error("UnirestException: {}" , e);
+		}
+
+		return producto;
 	}
-	
-	
-	
+
 }
