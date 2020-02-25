@@ -8,6 +8,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -145,7 +146,21 @@ public class BolsasService {
 	
 	//Consulta tipo de Bolsa.
 	//***********************
-	
+	public ListaTipoBolsasInner consultaTipoBolsa () {
+		log.info("BolsasService.consultaTipoBolsa");
+		Query query = new Query().with(new Sort("id", "-1"));
+		List<TipoBolsaEntity> tipoBolsa = null;
+		tipoBolsa = mongoTemplate.find(query, TipoBolsaEntity.class);
+		ListaTipoBolsasInner lista =new ListaTipoBolsasInner();
+		log.info("respuesta: " + tipoBolsa);
+		if(tipoBolsa!= null) {
+			log.info("Respuesta: " + tipoBolsa);
+			lista.setTipo(tipoBolsa);
+		}
+		
+		return lista;
+		
+	}
 	
 	
 	

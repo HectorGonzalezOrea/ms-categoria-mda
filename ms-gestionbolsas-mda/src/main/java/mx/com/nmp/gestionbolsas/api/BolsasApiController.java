@@ -30,6 +30,7 @@ import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-02-21T17:43:22.226Z")
 
@@ -184,12 +185,28 @@ public class BolsasApiController implements BolsasApi {
     public ResponseEntity<?> bolsasTiposGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
+        	BadRequest br = new BadRequest();
             try {
-            	
-            	
-            	
-                return new ResponseEntity<ListaTipoBolsas>(objectMapper.readValue("\"\"", ListaTipoBolsas.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+            	if(usuario == null) {
+            		br.setCode("NMP-MDA-400");
+            		br.setMessage("El cuerpo de la petición no está bien formado, verifique su información");
+            		
+            		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+            	}
+            	ListaTipoBolsasInner result = bolsaService.consultaTipoBolsa();		
+    			ListaTipoBolsas response=new ListaTipoBolsas();
+    			if(result!=null) {
+    				log.info("Result: " + result);
+    				response.add(result);	
+    				log.info("Response: "+ response);
+    				return new ResponseEntity<ListaTipoBolsas>(response, HttpStatus.OK);
+    			}else {
+    				log.info("No se encontro nada");
+    				return new ResponseEntity<ListaTipoBolsas>(response, HttpStatus.BAD_REQUEST);
+    			}
+    			
+        
+            } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<ListaTipoBolsas>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
