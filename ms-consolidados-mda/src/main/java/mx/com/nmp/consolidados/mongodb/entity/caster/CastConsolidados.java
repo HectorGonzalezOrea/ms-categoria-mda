@@ -18,9 +18,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import mx.com.nmp.consolidados.constantes.Constantes.Common;
 import mx.com.nmp.consolidados.model.ConsultarArchivoConsolidadoResInner;
 import mx.com.nmp.consolidados.model.InfoProducto;
 import mx.com.nmp.consolidados.mongodb.entity.ArchivoEntity;
+import mx.com.nmp.consolidados.oag.vo.Partida;
+import mx.com.nmp.consolidados.oag.vo.ValidarArbitrajePreciosPartidasRequest;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.io.StringWriter;
 //@Repository
 public class CastConsolidados {
 	public ConsultarArchivoConsolidadoResInner fillVoValues(ArchivoEntity entity) {
@@ -125,5 +133,42 @@ public class CastConsolidados {
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
 		return cal.getTime();
+	}
+	
+	public String jaxbObjectToXML(Object obj) {
+        String xmlContent=null;
+        StringWriter sw=null;
+		try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(obj.getClass());
+            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+            sw = new StringWriter();
+            jaxbMarshaller.marshal(obj, sw);
+            xmlContent = sw.toString();
+        } catch (JAXBException e) {
+        	System.out.println("Error en jaxbObjectToXML: " + e.getMessage());
+        	e.getStackTrace();
+        }
+        return Common.OPEN_PAYLOAD+xmlContent+Common.CLOSE_PAYLOAD;
+    }
+	
+	public String getTagValue(String xml, String tagName){
+	    return xml.split("<"+tagName+">")[1].split("</"+tagName+">")[0];
+	}
+	
+	public ValidarArbitrajePreciosPartidasRequest fillVoValuesProducto(InfoProducto producto) {
+		Partida partida=null;
+		ValidarArbitrajePreciosPartidasRequest arbitraje=null;
+		if(producto!=null){
+			arbitraje=new ValidarArbitrajePreciosPartidasRequest();
+			partida=new Partida();
+			partida.setIdPartida(producto.getIdProducto());
+			partida.setMontoPrestamo(producto.getPrestamoCosto());
+			partida.setPrecioVenta(producto.getPrecioFinal());
+			partida.setSku(producto.getFolioSku());
+			arbitraje.setPartida(partida);
+		}
+		return arbitraje;
 	}
 }

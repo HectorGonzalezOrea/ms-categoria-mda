@@ -1,5 +1,23 @@
 package mx.com.nmp.consolidados.oag.controller;
 
+import static mx.com.nmp.consolidados.utils.Constantes.GRANT_TYPE;
+import static mx.com.nmp.consolidados.utils.Constantes.HEADER_ID_CONSUMIDOR;
+import static mx.com.nmp.consolidados.utils.Constantes.HEADER_ID_DESTINO;
+import static mx.com.nmp.consolidados.utils.Constantes.HEADER_OAUTH_BEARER;
+import static mx.com.nmp.consolidados.utils.Constantes.HEADER_USUARIO;
+import static mx.com.nmp.consolidados.utils.Constantes.SCOPE;
+import static mx.com.nmp.consolidados.utils.Constantes.STATUS_CODE_OK;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Configuration;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.glassfish.jersey.client.ClientConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,19 +28,12 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import mx.com.nmp.consolidados.constantes.Constantes.Common;
+import mx.com.nmp.consolidados.model.InfoProducto;
+import mx.com.nmp.consolidados.mongodb.entity.caster.CastConsolidados;
 import mx.com.nmp.consolidados.oag.vo.GetTokenResponseVO;
 import mx.com.nmp.consolidados.utils.ConvertStringToBase64;
 import mx.com.nmp.consolidados.utils.ConverterUtil;
-
-import static mx.com.nmp.consolidados.utils.Constantes.HEADER_USUARIO;
-import static mx.com.nmp.consolidados.utils.Constantes.STATUS_CODE_OK;
-import static mx.com.nmp.consolidados.utils.Constantes.GRANT_TYPE;
-import static mx.com.nmp.consolidados.utils.Constantes.HEADER_ID_CONSUMIDOR;
-import static mx.com.nmp.consolidados.utils.Constantes.HEADER_ID_DESTINO;
-import static mx.com.nmp.consolidados.utils.Constantes.SCOPE;
-import static mx.com.nmp.consolidados.utils.Constantes.HEADER_OAUTH_BEARER;
-
-import javax.ws.rs.core.MediaType;
 
 @RestController
 public class OAGController extends OAGBaseController {
@@ -32,12 +43,9 @@ public class OAGController extends OAGBaseController {
 	@PostMapping(path = "/getToken")
 	public String getToken() {
 		log.info("getToken");
-		
 		String accessToken = "";
-		
 		String credenciales = usuario + ":" + password;
 		String autenticacionBasica = "Basic " + ConvertStringToBase64.encode(credenciales);
-		
 		Unirest.setTimeouts(0, 0);
 		try {
 			HttpResponse<String> response = Unirest.post(urlBase + servicioGetToken)
@@ -49,12 +57,9 @@ public class OAGController extends OAGBaseController {
 			  .field(GRANT_TYPE, grantType)
 			  .field(SCOPE, scope)
 			  .asString();
-			
 			int statusCode = response.getStatus();
-
 			log.info("Status Code Response: {} " , statusCode);
 			log.info("Body Response: {} " , response.getBody());
-			
 			if (statusCode == STATUS_CODE_OK) {
 				GetTokenResponseVO resp = ConverterUtil.stringJsonToObjectGetTokenResponseVO(response.getBody());
 				accessToken = resp.getAccess_token();
@@ -62,21 +67,15 @@ public class OAGController extends OAGBaseController {
 		} catch (UnirestException ue) {
 			log.error("UnirestException: {} " , ue);
 		}
-		
 		return accessToken;
 	}
 	
-	public Boolean eliminarCalendarizacion(String idPeticion) {
-		
+	public Boolean eliminarCalendarizacion(String idPeticion) {	
 		log.info("eliminarCalendarizacion");
-		
 		Boolean eliminado = false;
-		
 		String credenciales = usuario + ":" + password;
 		String autenticacionBasica = "Basic " + ConvertStringToBase64.encode(credenciales);
-		
 		String oauthBearer = this.getToken();
-		
 		Unirest.setTimeouts(0, 0);
 		try {
 			HttpResponse<String> response = Unirest.delete(urlBase + servicioEliminarCalendarizacion + "/" + idPeticion)
@@ -86,20 +85,15 @@ public class OAGController extends OAGBaseController {
 			  .header(HEADER_ID_DESTINO, headerIdDestino)
 			  .header(HttpHeaders.AUTHORIZATION, autenticacionBasica)
 			  .asString();
-			
 			int statusCode = response.getStatus();
-
 			log.info("Status Code Response: {} " , statusCode);
 			log.info("Body Response: {} " , response.getBody());
-			
 			if (statusCode == STATUS_CODE_OK) {
 				eliminado = true;
 			}
-			
 		} catch (UnirestException ue) {
 			log.error("UnirestException: {} " , ue);
 		}
-		
 		return eliminado;
 	}
 	
@@ -107,9 +101,7 @@ public class OAGController extends OAGBaseController {
 		
 		String credenciales = usuario + ":" + password;
 		String autenticacionBasica = "Basic " + ConvertStringToBase64.encode(credenciales);
-		
-		String oauthBearer = this.getToken();
-		
+		String oauthBearer = this.getToken();	
 		Unirest.setTimeouts(0, 0);
 		try {
 			HttpResponse<String> response = Unirest.post(urlBase + servicioValidarArbitrajePreciosPartidas)
@@ -125,8 +117,30 @@ public class OAGController extends OAGBaseController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		
 	}
 	
+	//param producto de tipo InfoProducto
+	//retorna string de tag(false/true) de servicioSoap
+	//En la implementacion del query iterar los productos y por cada iteracion consultar si es arbitrado
+	public String esArbitrado(InfoProducto producto) {
+		CastConsolidados cast=new CastConsolidados();
+		String output = null;
+		StringBuilder sb = new StringBuilder(Common.WSDL_ARBITRADO);
+		Client client = ClientBuilder.newClient((Configuration) new ClientConfig());
+		WebTarget target = client.target(sb.toString());
+		Invocation.Builder invocationBuilder =  target.request(MediaType.APPLICATION_XML);
+		invocationBuilder.header(Common.USER, "usuario");
+		invocationBuilder.header(Common.DESTINO, "idDestino");
+		invocationBuilder.header(Common.CONSUMIDOR, "idConsumidor");
+		Response response = invocationBuilder.put(Entity.xml(cast.jaxbObjectToXML(cast.fillVoValuesProducto(producto))));
+		int statusCode = response.getStatus();
+		if (statusCode ==200) {
+			output = response.readEntity(String.class);
+			log.info("+++++++++++++++++++++++++++++++++++++");
+			log.info(output);
+			log.info("+++++++++++++++++++++++++++++++++++++");
+		}
+		log.info("cumpleArbitraje? {}"+cast.getTagValue(output,Common.TAG_ARBITRADO));
+		return cast.getTagValue(output,Common.TAG_ARBITRADO);
+	}
 }
