@@ -26,7 +26,7 @@ public class Bolsa   {
   private String nombre = null;
 
   @JsonProperty("tipo")
-  private Object tipo = null;
+  private TipoBolsa tipo = null;
 
   @JsonProperty("ramo")
   private String ramo = null;
@@ -84,7 +84,7 @@ public class Bolsa   {
     this.nombre = nombre;
   }
 
-  public Bolsa tipo(Object tipo) {
+  public Bolsa tipo(TipoBolsa tipo) {
     this.tipo = tipo;
     return this;
   }
@@ -96,11 +96,11 @@ public class Bolsa   {
   @ApiModelProperty(value = "Tipo de Bolsa")
 
 
-  public Object getTipo() {
+  public TipoBolsa getTipo() {
     return tipo;
   }
 
-  public void setTipo(Object tipo) {
+  public void setTipo(TipoBolsa tipo) {
     this.tipo = tipo;
   }
 

@@ -16,7 +16,7 @@ public class BolsasEntity {
 	@Id
 	private Integer idBolsa;
 	private String nombre;
-	private Object tipo;
+	private Integer tipo;
 	private String ramo;
 	private String subramo;
 	private String factor;
@@ -36,10 +36,10 @@ public class BolsasEntity {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	public Object getTipo() {
+	public Integer getTipo() {
 		return tipo;
 	}
-	public void setTipo(Object tipo) {
+	public void setTipo(Integer tipo) {
 		this.tipo = tipo;
 	}
 	public String getRamo() {

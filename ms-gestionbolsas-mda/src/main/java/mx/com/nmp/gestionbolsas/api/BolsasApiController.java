@@ -193,12 +193,10 @@ public class BolsasApiController implements BolsasApi {
             		
             		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
             	}
-            	ListaTipoBolsasInner result = bolsaService.consultaTipoBolsa();		
-    			ListaTipoBolsas response=new ListaTipoBolsas();
-    			if(result!=null) {
-    				log.info("Result: " + result);
-    				response.add(result);	
-    				log.info("Response: "+ response);
+            	ListaTipoBolsas response = bolsaService.consultaTipoBolsa();		
+            	
+    			if(!response.isEmpty()) {
+    				log.info("Result: {}" , response);
     				return new ResponseEntity<ListaTipoBolsas>(response, HttpStatus.OK);
     			}else {
     				log.info("No se encontro nada");

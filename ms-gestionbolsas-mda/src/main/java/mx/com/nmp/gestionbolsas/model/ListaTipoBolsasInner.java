@@ -1,5 +1,6 @@
 package mx.com.nmp.gestionbolsas.model;
 
+import java.util.ArrayList;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -15,11 +16,11 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-02-21T17:43:22.226Z")
 
-public class ListaTipoBolsasInner   {
+public class ListaTipoBolsasInner {
   @JsonProperty("tipo")
   private TipoBolsa tipo = null;
 
-  public ListaTipoBolsasInner tipo(TipoBolsa tipo) {
+  public ListaTipoBolsasInner tipo() {
     this.tipo = tipo;
     return this;
   }
