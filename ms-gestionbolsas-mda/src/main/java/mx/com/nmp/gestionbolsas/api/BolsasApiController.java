@@ -71,7 +71,6 @@ public class BolsasApiController implements BolsasApi {
 					br.setCode("NMP-MDA-400");
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
-            		
             	}
             	
             	ListaBolsas listaBolsa = bolsaService.getBolsas(idTipo, nombre, ramo, subramo, factor);
@@ -80,11 +79,8 @@ public class BolsasApiController implements BolsasApi {
             	if(!listaBolsa.isEmpty()) {
             		log.info("Resultado: {}" , listaBolsa);
             		listBol.addAll(listaBolsa);
-            		
             		return new ResponseEntity<ListaBolsas>(listBol,HttpStatus.OK);
             	}else {
-            		log.error("Mal Echo");
-            		
             		return new ResponseEntity<ListaBolsas>(listBol,HttpStatus.OK);
             	}
             			

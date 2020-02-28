@@ -2,7 +2,7 @@ package mx.com.nmp.gestionbolsas.mongodb.entity;
 
 import java.util.List;
 
-
+import org.threeten.bp.LocalDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -22,12 +22,13 @@ public class BolsasEntity {
 	private String factor;
 	private List<String> sucursales;
 	private String autor;
+	private LocalDate fechaCreacion;
+	private LocalDate fechaModificacion;
 	
-	
-	public Integer getidBolsa() {
+	public Integer getIdBolsa() {
 		return idBolsa;
 	}
-	public void setidBolsa(Integer idBolsa) {
+	public void setIdBolsa(Integer idBolsa) {
 		this.idBolsa = idBolsa;
 	}
 	public String getNombre() {
@@ -71,6 +72,18 @@ public class BolsasEntity {
 	}
 	public void setAutor(String autor) {
 		this.autor = autor;
+	}
+	public LocalDate getFechaCreacion() {
+		return fechaCreacion;
+	}
+	public void setFechaCreacion(LocalDate fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
+	}
+	public LocalDate getFechaModificacion() {
+		return fechaModificacion;
+	}
+	public void setFechaModificacion(LocalDate fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
 	}
 	
 }

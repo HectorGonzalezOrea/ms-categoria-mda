@@ -1,4 +1,4 @@
-package mx.com.nmp.gestionbolsas.mongodb.entity;
+package mx.com.nmp.gestionbolsas.mongodb.service;
 
 import java.util.Objects;
 
@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+
+import mx.com.nmp.gestionbolsas.mongodb.entity.DatabaseSequenceEntity;
 
 
 @Repository

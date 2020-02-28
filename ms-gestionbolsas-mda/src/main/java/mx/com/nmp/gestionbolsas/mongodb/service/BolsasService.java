@@ -3,7 +3,7 @@ package mx.com.nmp.gestionbolsas.mongodb.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.bson.codecs.jsr310.LocalDateCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,16 +11,14 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.threeten.bp.LocalDate;
 
 import mx.com.nmp.gestionbolsas.model.Bolsa;
 import mx.com.nmp.gestionbolsas.model.ListaBolsas;
-import mx.com.nmp.gestionbolsas.model.ListaBolsasInner;
 import mx.com.nmp.gestionbolsas.model.ListaTipoBolsas;
 import mx.com.nmp.gestionbolsas.model.ListaTipoBolsasInner;
 import mx.com.nmp.gestionbolsas.model.TipoBolsa;
-import mx.com.nmp.gestionbolsas.mongodb.VO.TipoBolsaVO;
 import mx.com.nmp.gestionbolsas.mongodb.entity.BolsasEntity;
-import mx.com.nmp.gestionbolsas.mongodb.entity.SequenceGeneratorService;
 import mx.com.nmp.gestionbolsas.mongodb.entity.TipoBolsaEntity;
 import mx.com.nmp.gestionbolsas.mongodb.repository.BolsaRepository;
 
@@ -28,7 +26,8 @@ import mx.com.nmp.gestionbolsas.mongodb.repository.BolsaRepository;
 public class BolsasService {
 	private static final Logger log = LoggerFactory.getLogger(BolsasService.class);
 
-	public static final String ID_TIPO = "idTipo";
+	public static final String ID_TIPO = "tipo";
+	public static final String TIPO = "tipo";
 	public static final String NOMBRE = "nombre";
 	public static final String RAMO = "ramo";
 	public static final String SUBRAMO = "subramo";
@@ -48,7 +47,7 @@ public class BolsasService {
 	 * Crear Bolsa.
 	 */
 	public Boolean crearBolsa(Bolsa peticion) {
-		
+		log.info("BolsasService.crearBolsa");
 		
 		Boolean insertado = false;
 		
@@ -62,8 +61,13 @@ public class BolsasService {
 			bolsa.setSucursales(peticion.getSucursales());
 			bolsa.setAutor(peticion.getAutor());
 
+			LocalDate locateDate = LocalDate.now();
+			
+			bolsa.setFechaCreacion(locateDate);
+			bolsa.setFechaModificacion(locateDate);
+			
 			Integer id = (int) sequenceGeneratorService.generateSequence(BOLSA_SEQ_KEY);
-			bolsa.setidBolsa(id);
+			bolsa.setIdBolsa(id);
 
 			try {
 				mongoTemplate.insert(bolsa);
@@ -79,50 +83,69 @@ public class BolsasService {
 	/*
 	 * Consulta de bolsas
 	 */
-	
 	public ListaBolsas getBolsas(String idTipo, String nombre, String ramo, String subramo, String factor) {
 		log.info("BolsasService.getBolsas");
 		 
-		Query query = this.busquedaBolsaNull(idTipo, nombre, ramo, subramo, factor);
+		Query query = this.busquedaBolsaNull(new Integer(idTipo), nombre, ramo, subramo, factor);
 		log.info("resultado: {}", query );
-		List<BolsasEntity> busquedaList = mongoTemplate.find(query, BolsasEntity.class);
+		List<BolsasEntity> busquedaList = new ArrayList<>();
+		try {
+			busquedaList = mongoTemplate.find(query, BolsasEntity.class);
+		} catch(Exception e) {
+			log.error("Exception : {}", e);
+		}
 		
 		ListaBolsas lista = new ListaBolsas();
-		ListaBolsasInner listaInner = null;
+		
 		if (!busquedaList.isEmpty()) {
 			Bolsa bolsa = null;
 			for(BolsasEntity aux : busquedaList) {
 				bolsa = new Bolsa();
-				listaInner = new ListaBolsasInner();
 				
-				bolsa.setId(aux.getidBolsa());
+				if(aux.getTipo() != null) {
+					Query queryT = new Query();
+					Criteria cr = Criteria.where(ID).is(aux.getTipo());
+					queryT.addCriteria(cr);
+					
+					log.info("queryT: {}", queryT);
+					
+					TipoBolsaEntity tipoEntity = null;
+					
+					try {
+						tipoEntity = mongoTemplate.findOne(queryT, TipoBolsaEntity.class);
+					} catch(Exception e) {
+						log.error("Exception : {}", e);
+					}
+					
+					if(tipoEntity != null) {
+						TipoBolsa tipoBolsaVO = new TipoBolsa();
+						tipoBolsaVO.setId(tipoEntity.getid());
+						tipoBolsaVO.setDescripcion(tipoEntity.getDescripcion());
+						
+						bolsa.setTipo(tipoBolsaVO);
+					}
+				}
+				
+				bolsa.setId(aux.getIdBolsa());
 				bolsa.setNombre(aux.getNombre());
 				bolsa.setRamo(aux.getRamo());
 				bolsa.setSubramo(aux.getSubramo());
 				bolsa.setFactor(aux.getFactor());
 				bolsa.setSucursales(aux.getSucursales());
-				bolsa.setAutor(aux.getAutor());
-				
-				listaInner.fechaCreacion(null);
-				listaInner.fechaModificacion(null);
-				listaInner.equals(bolsa);
-				
-				lista.add(listaInner);
-				
-				
-			}
-			
+				bolsa.setAutor(aux.getAutor());				
+				bolsa.setFechaCreacion(aux.getFechaCreacion());
+				bolsa.setFechaModificacion(aux.getFechaModificacion());
+
+				lista.add(bolsa);
+			}	
 		}
-		
-		
-		
 		return lista;
 
 	}
 	
-	
-
-	// Eliminar una bolsa.
+	/*
+	 * Eliminar una bolsa.
+	 */
 	public Boolean deleteBolsa(Integer idBolsa) {
 		log.info("BolsasService.deleteBolsa");
 		Boolean eliminado = false;
@@ -154,20 +177,30 @@ public class BolsasService {
 		BolsasEntity bolsa = null;
 		
 		if(peticion != null) {
-			bolsa = mongoTemplate.findOne(Query.query(Criteria.where(ID).is(peticion.getId())), BolsasEntity.class);
-			bolsa.setNombre(peticion.getNombre());
-			bolsa.setRamo(peticion.getRamo());
-			bolsa.setSubramo(peticion.getSubramo());
-			bolsa.setFactor(peticion.getFactor());
-			bolsa.setTipo(peticion.getTipo().getId());
-			bolsa.setSucursales(peticion.getSucursales());
-			bolsa.setAutor(peticion.getAutor());
-			
 			try {
-				mongoTemplate.save(bolsa);
-				actualizado = true;
+				bolsa = mongoTemplate.findOne(Query.query(Criteria.where(ID).is(peticion.getId())), BolsasEntity.class);
 			} catch(Exception e) {
 				log.error("Exception : {}", e);
+			}
+			
+			if(bolsa != null) {
+				bolsa.setNombre(peticion.getNombre());
+				bolsa.setRamo(peticion.getRamo());
+				bolsa.setSubramo(peticion.getSubramo());
+				bolsa.setFactor(peticion.getFactor());
+				bolsa.setTipo(peticion.getTipo().getId());
+				bolsa.setSucursales(peticion.getSucursales());
+				bolsa.setAutor(peticion.getAutor());
+				
+				LocalDate locateDate = LocalDate.now();
+				bolsa.setFechaModificacion(locateDate);
+				
+				try {
+					mongoTemplate.save(bolsa);
+					actualizado = true;
+				} catch(Exception e) {
+					log.error("Exception : {}", e);
+				}
 			}
 		}
 		
@@ -180,7 +213,12 @@ public class BolsasService {
 	public ListaTipoBolsas consultaTipoBolsa() {
 		log.info("BolsasService.consultaTipoBolsa");
 		
-		List<TipoBolsaEntity> listaTipoBolsa = mongoTemplate.findAll(TipoBolsaEntity.class);
+		List<TipoBolsaEntity> listaTipoBolsa = new ArrayList<>();
+		try {
+			listaTipoBolsa = mongoTemplate.findAll(TipoBolsaEntity.class);
+		} catch(Exception e) {
+			log.error("Exception : {}", e);
+		}
 		
 		ListaTipoBolsas lista = new ListaTipoBolsas();
 		ListaTipoBolsasInner listaInner = null;
@@ -209,7 +247,7 @@ public class BolsasService {
 	/*
 	 *  Armado de Busqueda de Bolsas
 	 */
-	private Query busquedaBolsaNull(String idTipo, String nombre, String ramo, String subramo, String factor) {
+	private Query busquedaBolsaNull(Integer idTipo, String nombre, String ramo, String subramo, String factor) {
 		log.info("BolsasService.busquedaBolsaNull");
 
 		Query query = new Query();
@@ -322,8 +360,6 @@ public class BolsasService {
 		log.info("Query: {}", query);
 		return query;
 	}
-	
-	
-	
+
 
 }

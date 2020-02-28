@@ -16,7 +16,7 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-02-21T17:43:22.226Z")
 
-public class ListaBolsasInner   {
+public class ListaBolsasInner  {
   @JsonProperty("fechaCreacion")
   private LocalDate fechaCreacion = null;
 
