@@ -8,4 +8,5 @@ public interface BolsaRepository extends MongoRepository<BolsasEntity, String>{
 	
 
 	BolsasEntity findByIdBolsa(Integer idBolsa);
+	
 }

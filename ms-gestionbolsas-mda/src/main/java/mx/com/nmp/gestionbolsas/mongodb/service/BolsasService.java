@@ -18,6 +18,7 @@ import mx.com.nmp.gestionbolsas.model.ListaBolsasInner;
 import mx.com.nmp.gestionbolsas.model.ListaTipoBolsas;
 import mx.com.nmp.gestionbolsas.model.ListaTipoBolsasInner;
 import mx.com.nmp.gestionbolsas.model.TipoBolsa;
+import mx.com.nmp.gestionbolsas.mongodb.VO.TipoBolsaVO;
 import mx.com.nmp.gestionbolsas.mongodb.entity.BolsasEntity;
 import mx.com.nmp.gestionbolsas.mongodb.entity.SequenceGeneratorService;
 import mx.com.nmp.gestionbolsas.mongodb.entity.TipoBolsaEntity;
@@ -42,11 +43,12 @@ public class BolsasService {
 	@Autowired
 	private BolsaRepository bolsaRepository;
 
+
 	/*
 	 * Crear Bolsa.
 	 */
 	public Boolean crearBolsa(Bolsa peticion) {
-		log.info("crear bolsa");
+		
 		
 		Boolean insertado = false;
 		
@@ -77,27 +79,48 @@ public class BolsasService {
 	/*
 	 * Consulta de bolsas
 	 */
-	public List<ListaBolsas> getBolsas(String idTipo, String nombre, String ramo, String subramo, String factor) {
+	
+	public ListaBolsas getBolsas(String idTipo, String nombre, String ramo, String subramo, String factor) {
 		log.info("BolsasService.getBolsas");
+		 
 		Query query = this.busquedaBolsaNull(idTipo, nombre, ramo, subramo, factor);
-
+		log.info("resultado: {}", query );
 		List<BolsasEntity> busquedaList = mongoTemplate.find(query, BolsasEntity.class);
-		List<ListaBolsas> bolsas = null;
-		List<ListaBolsasInner> bolsasIn = null;
-		if (CollectionUtils.isNotEmpty(busquedaList)) {
-			bolsas = new ArrayList<ListaBolsas>();
-			ListaBolsas listaBolsas = null;
-
-			for (BolsasEntity aux : busquedaList) {
-				listaBolsas = new ListaBolsas();
-
+		
+		ListaBolsas lista = new ListaBolsas();
+		ListaBolsasInner listaInner = null;
+		if (!busquedaList.isEmpty()) {
+			Bolsa bolsa = null;
+			for(BolsasEntity aux : busquedaList) {
+				bolsa = new Bolsa();
+				listaInner = new ListaBolsasInner();
+				
+				bolsa.setId(aux.getidBolsa());
+				bolsa.setNombre(aux.getNombre());
+				bolsa.setRamo(aux.getRamo());
+				bolsa.setSubramo(aux.getSubramo());
+				bolsa.setFactor(aux.getFactor());
+				bolsa.setSucursales(aux.getSucursales());
+				bolsa.setAutor(aux.getAutor());
+				
+				listaInner.fechaCreacion(null);
+				listaInner.fechaModificacion(null);
+				listaInner.equals(bolsa);
+				
+				lista.add(listaInner);
+				
+				
 			}
-
+			
 		}
-
-		return null;
+		
+		
+		
+		return lista;
 
 	}
+	
+	
 
 	// Eliminar una bolsa.
 	public Boolean deleteBolsa(Integer idBolsa) {
@@ -183,7 +206,9 @@ public class BolsasService {
 
 	}
 
-	// Armado de Busqueda de Bolsas
+	/*
+	 *  Armado de Busqueda de Bolsas
+	 */
 	private Query busquedaBolsaNull(String idTipo, String nombre, String ramo, String subramo, String factor) {
 		log.info("BolsasService.busquedaBolsaNull");
 
@@ -294,8 +319,11 @@ public class BolsasService {
 			query.addCriteria(aux);
 		}
 
-		log.info("Query: {}", query.toString());
+		log.info("Query: {}", query);
 		return query;
 	}
+	
+	
+	
 
 }
