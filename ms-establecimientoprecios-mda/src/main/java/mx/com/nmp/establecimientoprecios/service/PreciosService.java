@@ -46,17 +46,14 @@ public class PreciosService {
 	public Boolean almacenarAjustePrecios(String usuario, ListaPrecioPartidas listaPrecioPartidas) {
 		log.info("alamcenarAjustePrecios");
 
-		//GeneralResponse gr = null;
-
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-		Instant instant = timestamp.toInstant();
 		
 		Boolean correcto = false;
 		
 		if (listaPrecioPartidas != null) {
 			
 			GestionPreciosRequestVO gpRequest = new GestionPreciosRequestVO();
-			ArrayList<ProductoOAGVO> informacionProductoOAG = new ArrayList<ProductoOAGVO>();
+			ArrayList<ProductoOAGVO> informacionProductoOAG = new ArrayList<>();
 			ProductoOAGVO poag =  null;
 			for(ListaPrecioPartidasInner partida : listaPrecioPartidas) {
 				// llenado para el servicio gestionPrecios de OAG
@@ -74,56 +71,84 @@ public class PreciosService {
 			
 			Boolean insertadoOAG = oagController.gestionPrecios(gpRequest);
 			
-			if (insertadoOAG) {
-				ConsultaPartidaRequestVO cpRequest = new ConsultaPartidaRequestVO();
-				ActualizarPreciosRequestVO apRequest = new ActualizarPreciosRequestVO();
-				
-				for(ListaPrecioPartidasInner partida : listaPrecioPartidas) {
-					cpRequest.setFolio(new Long(partida.getFolioPartida()));
-					//cpRequest.setMercancia(partida.get);
-					cpRequest.setSku(partida.getSku());
-					
-					ConsultaPartidaResponseVO cpResp = apiProductosController.consultaPartida(cpRequest);
-					
-					if(cpResp != null) {
-						for(ProductoMidasVO pm : cpResp) {
-							pm.setPrecioVentaAct(partida.getPrecioModificado().toString());
-							pm.setPrecioVentaSalida(partida.getPrecioModificado().toString());
-							
-							apRequest.add(pm);
-						}
-					}
-				}
-				
-				Boolean actualizadoAPIProductos = apiProductosController.actualizarPartida(apRequest);
-				
-				if(actualizadoAPIProductos) {
-					
-					HistoricoPreciosRequestVO hpRequest = null;
-					
-					for(ListaPrecioPartidasInner partida : listaPrecioPartidas) {
-						hpRequest = new HistoricoPreciosRequestVO();
-						
-						hpRequest.setSku(partida.getSku());
-						hpRequest.setPrecioActual(partida.getPrecioActual());
-						hpRequest.setPrecioModificado(partida.getPrecioModificado());
-						hpRequest.setFolioPartida(partida.getFolioPartida());
-						hpRequest.setFecha(timestamp.toString());
-						
-						Boolean insertadoHistoricoPrecios = historicoPreciosController.insertaHistoricoPrecios(usuario, hpRequest);
-						
-						if(insertadoHistoricoPrecios) {
-							correcto = true;
-						}
-						
-					}
-					
-					//gr = new GeneralResponse();
-					//gr.setMessage("Alta exitosa.");
-				}
+			if (Boolean.TRUE.equals(insertadoOAG)) {
+				this.partidasPreciosAPIProductos(usuario, listaPrecioPartidas);
 			}
 		}
 
+		return correcto;
+	}
+	
+	/*
+	 *
+	 * Servicio para el ajuste de precios - API Productos
+	 */
+	private Boolean partidasPreciosAPIProductos(String usuario, ListaPrecioPartidas listaPrecioPartidas) {
+		log.info("partidasPreciosAPIProductos");
+		Boolean correcto = false;
+		ConsultaPartidaRequestVO cpRequest = new ConsultaPartidaRequestVO();
+		ActualizarPreciosRequestVO apRequest = new ActualizarPreciosRequestVO();
+		
+		for(ListaPrecioPartidasInner partida : listaPrecioPartidas) {
+			try {
+				cpRequest.setFolio(new Long(partida.getFolioPartida()));
+				cpRequest.setSku(partida.getSku());
+				
+				ConsultaPartidaResponseVO cpResp = apiProductosController.consultaPartida(cpRequest);
+				
+				if(cpResp != null) {
+					for(ProductoMidasVO pm : cpResp) {
+						pm.setPrecioVentaAct(partida.getPrecioModificado().toString());
+						pm.setPrecioVentaSalida(partida.getPrecioModificado().toString());
+						
+						apRequest.add(pm);
+					}
+				}
+			} catch (Exception e) {
+				log.error("Exception {} " , e);
+			}
+		}
+		
+		Boolean actualizadoAPIProductos = apiProductosController.actualizarPartida(apRequest);
+		
+		if(Boolean.TRUE.equals(actualizadoAPIProductos)) {
+			correcto = this.partidasPreciosMSHP(usuario , listaPrecioPartidas);
+		}
+		
+		return correcto;
+	}
+	
+	/*
+	 * Servicio para el ajuste de precios - MS Historico Precios
+	 */
+	private Boolean partidasPreciosMSHP(String usuario, ListaPrecioPartidas listaPrecioPartidas) {
+		log.info("partidasPreciosMSHP");
+		
+		HistoricoPreciosRequestVO hpRequest = null;
+		Boolean correcto = false;
+		
+		for(ListaPrecioPartidasInner partida : listaPrecioPartidas) {
+			try {
+				hpRequest = new HistoricoPreciosRequestVO();
+				
+				hpRequest.setSku(partida.getSku());
+				hpRequest.setPrecioActual(partida.getPrecioActual());
+				hpRequest.setPrecioModificado(partida.getPrecioModificado());
+				hpRequest.setFolioPartida(partida.getFolioPartida());
+				
+				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+				hpRequest.setFecha(timestamp.toString());
+				
+				Boolean insertadoHistoricoPrecios = historicoPreciosController.insertaHistoricoPrecios(usuario, hpRequest);
+				
+				if(Boolean.TRUE.equals(insertadoHistoricoPrecios)) {
+					correcto = true;
+				}
+			} catch (Exception e) {
+				log.error("Exception {} " , e);
+			}
+		}
+		
 		return correcto;
 	}
 	

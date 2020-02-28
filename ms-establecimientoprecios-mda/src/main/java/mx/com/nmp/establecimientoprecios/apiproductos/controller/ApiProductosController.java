@@ -46,17 +46,16 @@ public class ApiProductosController extends ApiProductosBaseController {
 
 			int statusCode = response.getStatus();
 
-			log.info("Status Code Response: " + statusCode);
-			log.info("Body Response: " + response.getBody());
+			log.info("Status Code Response: {} " , statusCode);
+			log.info("Body Response: {} " , response.getBody());
 
 			if (statusCode == STATUS_CODE_OK) {
 				resp = ConverterUtil.StringJsonToObjectConsultaPartidaResponse(response.getBody());
-
-				log.info("resp: " + resp.toString());
+				log.info("resp: {} " , resp);
 			}
 
 		} catch (UnirestException e) {
-			e.printStackTrace();
+			log.error("Exception {} " , e);
 		}
 
 		return resp;
@@ -82,18 +81,17 @@ public class ApiProductosController extends ApiProductosBaseController {
 			
 			int statusCode = response.getStatus();
 
-			log.info("Status Code Response: " + statusCode);
-			log.info("Body Response: " + response.getBody());
+			log.info("Status Code Response: {} " , statusCode);
+			log.info("Body Response: {} " , response.getBody());
 			
 			if (statusCode == STATUS_CODE_OK) {
 				actualizado = true;
 				resp = ConverterUtil.StringJsonToObjectActualizarPreciosResponse(response.getBody());
-				
-				log.info("resp: " + resp.toString());
+				log.info("resp: {} " , resp);
 			}
 			
 		} catch (UnirestException e) {
-			e.printStackTrace();
+			log.error("Exception {} " , e);
 		}
 		
 		return actualizado;

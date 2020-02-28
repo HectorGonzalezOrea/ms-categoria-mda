@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.net.HttpHeaders;
@@ -32,6 +31,8 @@ import mx.com.nmp.establecimientoprecios.utils.ConverterUtil;
 public class OAGController extends OAGBaseController {
 
 	private static final Logger log = LoggerFactory.getLogger(OAGController.class);
+	private static final String BASIC = "Basic ";
+	
 	
 	@PostMapping(path = "/getToken")
 	public String getToken() {
@@ -40,7 +41,7 @@ public class OAGController extends OAGBaseController {
 		String accessToken = "";
 		
 		String credenciales = usuario + ":" + password;
-		String autenticacionBasica = "Basic " + ConvertStringToBase64.encode(credenciales);
+		String autenticacionBasica = BASIC + ConvertStringToBase64.encode(credenciales);
 		
 		Unirest.setTimeouts(0, 0);
 		try {
@@ -56,15 +57,15 @@ public class OAGController extends OAGBaseController {
 			
 			int statusCode = response.getStatus();
 			
-			log.info("Status Code Response: " + statusCode);
-			log.info("Body Response: " + response.getBody());
+			log.info("Status Code Response: {}" , statusCode);
+			log.info("Body Response: {}" , response.getBody());
 			
 			if (statusCode == STATUS_CODE_OK) {
 				GetTokenResponseVO resp = ConverterUtil.StringJsonToObjectGetTokenResponseVO(response.getBody());
 				accessToken = resp.getAccess_token();
 			}
 		} catch (UnirestException e) {
-			e.printStackTrace();
+			log.error("Exception {} " , e);
 		}
 		
 		return accessToken;
@@ -77,11 +78,9 @@ public class OAGController extends OAGBaseController {
 		Boolean insertado = false;
 		
 		String credenciales = usuario + ":" + password;
-		String autenticacionBasica = "Basic " + ConvertStringToBase64.encode(credenciales);
+		String autenticacionBasica = BASIC + ConvertStringToBase64.encode(credenciales);
 		
 		String oauthBearer = this.getToken();
-		
-		log.info("Oauth Bearer: " + oauthBearer);
 		
 		String gpRequestJson = ConverterUtil.messageToJson(request);
 		
@@ -99,80 +98,23 @@ public class OAGController extends OAGBaseController {
 			
 			int statusCode = response.getStatus();
 			
-			log.info("Status Code Response: " + statusCode);
-			log.info("Body Response: " + response.getBody());
+			log.info("Status Code Response: {}" , statusCode);
+			log.info("Body Response: {}" , response.getBody());
 			
 			if (statusCode == STATUS_CODE_OK) {
 				GestionPreciosResponseVO resp = ConverterUtil.StringJsonToObjectGestionPreciosResponseVO(response.getBody());
 				
-				log.info("resp: " + resp.toString());
+				log.info("resp: {}" , resp);
 				
 				insertado = true;
 			}
 			
 		} catch (UnirestException e) {
-			e.printStackTrace();
+			log.error("Exception {} " , e);
 		}
 		
 		return insertado;
 	}
-	
-	/*
-	@PostMapping(path = "/getToken2")
-	public String getToken2() {
-		
-		log.info("Get Token OAG");
-		
-		Client client = ClientBuilder.newClient((Configuration) new ClientConfig());
-		
-		MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
-		headers.add(HttpHeaders.CONTENT_TYPE,MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-		headers.add(HttpHeaders.AUTHORIZATION,"Basic cG9ydGFsaW50ZWxpZ2VuY2lhOnNpZVRFSXVrZHlZRG8zMTRRUA==");
-		headers.add(HEADER_USUARIO,headerUsuario);
-		headers.add(HEADER_ID_CONSUMIDOR,headerIdConsumidor);
-		headers.add(HEADER_ID_DESTINO,headerIdDestino);
-		
-		Form form = new Form();
-		
-		form.param(GRANT_TYPE, grantType);
-		form.param(SCOPE, scope);
-		
-		Response response = client.target(urlBase + servicioGetToken)
-				.request()
-				.headers(headers)
-				.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED));
-				
-		String accessToken = "";
-		
-		log.info("response " + response);
-		
-		
-		int statusCode = response.getStatus();
-		
-		try {
-			if (statusCode == STATUS_CODE_OK) {
-				GetTokenResponseVO respVO = response.readEntity(GetTokenResponseVO.class);
-				
-				log.info(respVO.toString());
-				
-				Map rawJson = response.readEntity(Map.class);
-				
-				log.info(rawJson.toString());
-				
-				accessToken = respVO.getAccess_token();
-				
-			} else {
-				accessToken = "";
-			}
-		} catch(Exception e) {
-			e.printStackTrace();
-		} finally {
-			  response.close();
-		}
-		
-		return accessToken;
-	}
-	*/
 	
 	@PostMapping(path = "/valorAncla")
 	public Boolean valorAncla() {

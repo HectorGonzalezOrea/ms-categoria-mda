@@ -55,17 +55,17 @@ public class HistoricoPreciosController extends HistoricoPreciosBaseController {
 			
 			int statusCode = response.getStatus();
 
-			log.info("Status Code Response: " + statusCode);
-			log.info("Body Response: " + response.getBody());
+			log.info("Status Code Response: {}" , statusCode);
+			log.info("Body Response: {}" , response.getBody());
 			
 			if (statusCode == STATUS_CODE_OK) {
 				insertado =  true;
 				resp = ConverterUtil.StringJsonToObjectHistoricoPreciosResponseVO(response.getBody());
-				log.info("resp: " + resp.toString());
+				log.info("resp {} " , resp);
 			}
 			
 		} catch (UnirestException e) {
-			e.printStackTrace();
+			log.error("Exception {} " , e);
 		}
 		
 		return insertado;
