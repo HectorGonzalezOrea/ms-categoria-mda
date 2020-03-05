@@ -81,7 +81,7 @@ public class BolsasService {
 	}
 
 	/*
-	 * Consulta de bolsas
+	 * Consulta de bolsas con filtros
 	 */
 	public ListaBolsas getBolsas(String idTipo, String nombre, String ramo, String subramo, String factor) {
 		log.info("BolsasService.getBolsas");
@@ -142,6 +142,68 @@ public class BolsasService {
 		return lista;
 
 	}
+	
+	/*
+	 * Consulta Bolsas sin filtros
+	 */
+	public ListaBolsas getBolsa(String idTipo, String nombre, String ramo, String subramo, String factor) {
+		
+		List<BolsasEntity> busquedaList = new ArrayList<>();
+		try {
+			busquedaList = mongoTemplate.findAll(BolsasEntity.class);
+		} catch(Exception e) {
+			log.error("Exception : {}", e);
+		}
+		
+		ListaBolsas lista = new ListaBolsas();
+		
+		if (!busquedaList.isEmpty()) {
+			Bolsa bolsa = null;
+			for(BolsasEntity aux : busquedaList) {
+				bolsa = new Bolsa();
+				
+				if(aux.getTipo() != null) {
+					Query queryT = new Query();
+					Criteria cr = Criteria.where(ID).is(aux.getTipo());
+					queryT.addCriteria(cr);
+					
+					log.info("queryT: {}", queryT);
+					
+					TipoBolsaEntity tipoEntity = null;
+					
+					try {
+						tipoEntity = mongoTemplate.findOne(queryT, TipoBolsaEntity.class);
+					} catch(Exception e) {
+						log.error("Exception : {}", e);
+					}
+					
+					if(tipoEntity != null) {
+						TipoBolsa tipoBolsaVO = new TipoBolsa();
+						tipoBolsaVO.setId(tipoEntity.getid());
+						tipoBolsaVO.setDescripcion(tipoEntity.getDescripcion());
+						
+						bolsa.setTipo(tipoBolsaVO);
+					}
+				}
+				
+				bolsa.setId(aux.getIdBolsa());
+				bolsa.setNombre(aux.getNombre());
+				bolsa.setRamo(aux.getRamo());
+				bolsa.setSubramo(aux.getSubramo());
+				bolsa.setFactor(aux.getFactor());
+				bolsa.setSucursales(aux.getSucursales());
+				bolsa.setAutor(aux.getAutor());				
+				bolsa.setFechaCreacion(aux.getFechaCreacion());
+				bolsa.setFechaModificacion(aux.getFechaModificacion());
+
+				lista.add(bolsa);
+			}	
+		}
+		return lista;
+		
+	}
+	
+	
 	
 	/*
 	 * Eliminar una bolsa.
