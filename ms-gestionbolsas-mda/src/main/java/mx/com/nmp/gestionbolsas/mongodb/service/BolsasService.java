@@ -86,7 +86,7 @@ public class BolsasService {
 	public ListaBolsas getBolsas(String idTipo, String nombre, String ramo, String subramo, String factor) {
 		log.info("BolsasService.getBolsas");
 		 
-		Query query = this.busquedaBolsaNull(new Integer(idTipo), nombre, ramo, subramo, factor);
+		Query query = this.busquedaBolsaNull(idTipo, nombre, ramo, subramo, factor);
 		log.info("resultado: {}", query );
 		List<BolsasEntity> busquedaList = new ArrayList<>();
 		try {
@@ -146,7 +146,9 @@ public class BolsasService {
 	/*
 	 * Consulta Bolsas sin filtros
 	 */
-	public ListaBolsas getBolsa(String idTipo, String nombre, String ramo, String subramo, String factor) {
+	
+	public ListaBolsas getBolsasSinFiltro() {
+		ListaBolsas lista = new ListaBolsas();
 		
 		List<BolsasEntity> busquedaList = new ArrayList<>();
 		try {
@@ -154,8 +156,6 @@ public class BolsasService {
 		} catch(Exception e) {
 			log.error("Exception : {}", e);
 		}
-		
-		ListaBolsas lista = new ListaBolsas();
 		
 		if (!busquedaList.isEmpty()) {
 			Bolsa bolsa = null;
@@ -199,11 +199,9 @@ public class BolsasService {
 				lista.add(bolsa);
 			}	
 		}
-		return lista;
 		
+		return lista;
 	}
-	
-	
 	
 	/*
 	 * Eliminar una bolsa.
@@ -309,13 +307,13 @@ public class BolsasService {
 	/*
 	 *  Armado de Busqueda de Bolsas
 	 */
-	private Query busquedaBolsaNull(Integer idTipo, String nombre, String ramo, String subramo, String factor) {
+	private Query busquedaBolsaNull(String idTipo, String nombre, String ramo, String subramo, String factor) {
 		log.info("BolsasService.busquedaBolsaNull");
 
 		Query query = new Query();
 
 		if (idTipo != null) {
-			Criteria aux = Criteria.where(ID_TIPO).is(idTipo);
+			Criteria aux = Criteria.where(ID_TIPO).is(new Integer(idTipo));
 
 			if (nombre != null) {
 				aux.and(NOMBRE).is(nombre);
@@ -339,7 +337,7 @@ public class BolsasService {
 			Criteria aux = Criteria.where(NOMBRE).is(nombre);
 
 			if (idTipo != null) {
-				aux.and(ID_TIPO).is(idTipo);
+				aux.and(ID_TIPO).is(new Integer(idTipo));
 			}
 
 			if (ramo != null) {
@@ -360,7 +358,7 @@ public class BolsasService {
 			Criteria aux = Criteria.where(RAMO).is(ramo);
 
 			if (idTipo != null) {
-				aux.and(ID_TIPO).is(idTipo);
+				aux.and(ID_TIPO).is(new Integer(idTipo));
 			}
 
 			if (nombre != null) {
@@ -381,7 +379,7 @@ public class BolsasService {
 			Criteria aux = Criteria.where(SUBRAMO).is(subramo);
 
 			if (idTipo != null) {
-				aux.and(ID_TIPO).is(idTipo);
+				aux.and(ID_TIPO).is(new Integer(idTipo));
 			}
 
 			if (nombre != null) {
@@ -402,7 +400,7 @@ public class BolsasService {
 			Criteria aux = Criteria.where(FACTOR).is(factor);
 
 			if (idTipo != null) {
-				aux.and(ID_TIPO).is(idTipo);
+				aux.and(ID_TIPO).is(new Integer(idTipo));
 			}
 
 			if (nombre != null) {

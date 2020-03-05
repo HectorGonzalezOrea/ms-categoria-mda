@@ -53,55 +53,41 @@ public class BolsasApiController implements BolsasApi {
         this.request = request;
     }
 
-    public ResponseEntity<?> bolsasGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=false) @RequestHeader(value="usuario", required=true) String usuario,
-    		@ApiParam(value = " Identificador del tipo de bolsa a buscar") @Valid @RequestParam(value = "idTipo", required = false) String idTipo,
-    		@ApiParam(value = "Nombre de la Bolsa") @Valid @RequestParam(value = "nombre", required = false) String nombre,
-    		@ApiParam(value = "Ramo configurado en la Bolsa") @Valid @RequestParam(value = "ramo", required = false) String ramo,
-    		@ApiParam(value = "Subramo configurado en la Bolsa") @Valid @RequestParam(value = "subramo", required = false) String subramo,
-    		@ApiParam(value = "Factor configurado en la Bolsa") @Valid @RequestParam(value = "factor", required = false) String factor) {
-    	
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-            	log.info("Consulta Bolsas");
-            	if(idTipo == null && nombre == null && ramo == null && subramo == null && factor == null) {
-            		/*log.error("Error en el mensaje de petición, verifique la información");
-					BadRequest br = new BadRequest();
-					br.setMessage("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCode("NMP-MDA-400");
-					
-					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);*/
-            		ListaBolsas list = bolsaService.getBolsa(idTipo, nombre, ramo, subramo, factor);
-            		ListaBolsas listBol = new ListaBolsas();
-                	if(!list.isEmpty()) {
-                		log.info("Resultado: {}" , list);
-                		listBol.addAll(list);
-                		return new ResponseEntity<ListaBolsas>(listBol,HttpStatus.OK);
-                	}else {
-                		return new ResponseEntity<ListaBolsas>(listBol,HttpStatus.OK);
-                	}
-            		
-            	}
-            	
-            	ListaBolsas listaBolsa = bolsaService.getBolsas(idTipo, nombre, ramo, subramo, factor);
-            	
-            	ListaBolsas listBol = new ListaBolsas();
-            	if(!listaBolsa.isEmpty()) {
-            		log.info("Resultado: {}" , listaBolsa);
-            		listBol.addAll(listaBolsa);
-            		return new ResponseEntity<ListaBolsas>(listBol,HttpStatus.OK);
-            	}else {
-            		return new ResponseEntity<ListaBolsas>(listBol,HttpStatus.OK);
-            	}
-            			
-            } catch (Exception e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<ListaBolsas>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+	public ResponseEntity<?> bolsasGet(
+			@ApiParam(value = "Usuario de sistema que lanza la petición", required = false) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = " Identificador del tipo de bolsa a buscar") @Valid @RequestParam(value = "idTipo", required = false) String idTipo,
+			@ApiParam(value = "Nombre de la Bolsa") @Valid @RequestParam(value = "nombre", required = false) String nombre,
+			@ApiParam(value = "Ramo configurado en la Bolsa") @Valid @RequestParam(value = "ramo", required = false) String ramo,
+			@ApiParam(value = "Subramo configurado en la Bolsa") @Valid @RequestParam(value = "subramo", required = false) String subramo,
+			@ApiParam(value = "Factor configurado en la Bolsa") @Valid @RequestParam(value = "factor", required = false) String factor) {
 
-        return new ResponseEntity<ListaBolsas>(HttpStatus.NOT_IMPLEMENTED);
-    }
+		String accept = request.getHeader("Accept");
+		if (accept != null && accept.contains("application/json")) {
+			try {
+				log.info("Consulta Bolsas");
+				if (idTipo == null && nombre == null && ramo == null && subramo == null && factor == null) {
+					ListaBolsas list = bolsaService.getBolsasSinFiltro();
+					return new ResponseEntity<ListaBolsas>(list, HttpStatus.OK);
+				} else {
+					ListaBolsas listaBolsa = bolsaService.getBolsas(idTipo, nombre, ramo, subramo, factor);
+
+					ListaBolsas listBol = new ListaBolsas();
+					if (!listaBolsa.isEmpty()) {
+						log.info("Resultado: {}", listaBolsa);
+						listBol.addAll(listaBolsa);
+						return new ResponseEntity<ListaBolsas>(listBol, HttpStatus.OK);
+					} else {
+						return new ResponseEntity<ListaBolsas>(listBol, HttpStatus.OK);
+					}
+				}
+			} catch (Exception e) {
+				log.error("Couldn't serialize response for content type application/json", e);
+				return new ResponseEntity<ListaBolsas>(HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+
+		return new ResponseEntity<ListaBolsas>(HttpStatus.NOT_IMPLEMENTED);
+	}
 
     public ResponseEntity<?> bolsasIdBolsaDelete(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Identificador de la Bolsa a eliminar",required=true) @PathVariable("idBolsa") Integer idBolsa) {
         String accept = request.getHeader("Accept");
