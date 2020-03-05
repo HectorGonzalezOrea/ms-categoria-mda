@@ -347,6 +347,91 @@ public class UsuarioService {
 		}
 		return usuarios;
 	}
+	
+	/*
+	 * Consulta usuarios sin filtro
+	 */
+	
+	public List<InfoUsuario> getUsuariosSinFiltro() {
+		log.info("UsuarioService.getUsuarios");
+
+		List<UsuarioEntity> busquedaList = mongoTemplate.findAll(UsuarioEntity.class);
+
+		List<InfoUsuario> usuarios = null;
+
+		if (CollectionUtils.isNotEmpty(busquedaList)) {
+			usuarios = new ArrayList<InfoUsuario>();
+			InfoUsuario infoUsuario = null;
+
+			for (UsuarioEntity aux : busquedaList) {
+				infoUsuario = new InfoUsuario();
+
+				infoUsuario.setActivo(aux.getActivo());
+				infoUsuario.apellidoMaterno(aux.getApellidoMaterno());
+				infoUsuario.setApellidoPaterno(aux.getApellidoPaterno());
+				infoUsuario.setIdUsuario(aux.getIdUsuario().intValue());
+				infoUsuario.setNombre(aux.getNombre());
+				infoUsuario.setUsuario(aux.getUsuario());
+				
+				CapacidadUsuariosRes perfilc = this.buscarPerfilConCapacidades(aux.getPerfil());
+				
+				if(perfilc != null) {
+					infoUsuario.setPerfil(perfilc);
+				}
+				
+				DepartamentoAreaEntity dae = departamentoAreaRepository.findByIdDepartamento(aux.getDepartamentoArea());
+				
+				if(dae != null) {
+					DepatamentoAreaVO daevo = new DepatamentoAreaVO();
+					daevo.setId(dae.getIdDepartamento());
+					daevo.setDescripcion(dae.getDescripcion());
+					infoUsuario.setDepartamentoArea(daevo);
+				}
+				
+				DireccionEntity de = direccionRepository.findByIdDireccion(aux.getDireccion());
+				
+				if(de != null) {
+					DireccionVO devo = new DireccionVO();
+					devo.setId(de.getIdDireccion());
+					devo.setDescripcion(de.getDescripcion());
+					infoUsuario.setDireccion(devo);
+				}
+				
+				GerenciaEntity ge = gerenciaRepository.findByIdGerencia(aux.getGerencia());
+				
+				if(ge != null) {
+					GerenciaVO gvo = new GerenciaVO();
+					gvo.setId(ge.getIdGerencia());
+					gvo.setDescripcion(ge.getDescripcion());
+					infoUsuario.setGerencia(gvo);
+				}
+				
+				PuestoEntity pe = puestoRepository.findByIdPuesto(aux.getPuesto());
+				
+				if(pe != null) {
+					PuestoVO pvo = new PuestoVO();
+					pvo.setId(pe.getIdPuesto());
+					pvo.setDescripcion(pe.getDescripcion());
+					infoUsuario.setPuesto(pvo);
+				}
+				
+				SubdireccionEntity sde = subdireccionRepository.findByIdSubdireccion(aux.getSubdireccion());
+				
+				if(sde != null) {
+					SubdireccionVO sdvo = new SubdireccionVO();
+					
+					sdvo.setId(sde.getIdSubdireccion());
+					sdvo.setDescripcion(sde.getDescripcion());
+					
+					infoUsuario.setSubdireccion(sdvo);
+				}
+				
+				usuarios.add(infoUsuario);
+			}
+		}
+		return usuarios;
+	}
+	
 
 	/*
 	 * Crear Perfil con Capacidad

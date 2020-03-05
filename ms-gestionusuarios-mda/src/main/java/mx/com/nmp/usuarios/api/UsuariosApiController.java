@@ -105,12 +105,17 @@ public class UsuariosApiController implements UsuariosApi {
 
 				if (nombre == null && apellidoPaterno == null && apellidoMaterno == null && activo == null
 						&& usuario2 == null) {
-					log.error("Error en el mensaje de petición, verifique la información");
-					BadRequest br = new BadRequest();
-					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCodigo("NMP-MDA-400");
-					
-					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
+					List<InfoUsuario> usuarios = usuarioService.getUsuariosSinFiltro();
+					ConsultaUsuarioRes resp = new ConsultaUsuarioRes();
+
+					if (usuarios != null) {
+						log.info("Si hubo considencias.");
+						resp.setUsuarios(usuarios);
+						return new ResponseEntity<ConsultaUsuarioRes>(resp, HttpStatus.OK);
+					} else {
+						log.info("No concidencias.");
+						return new ResponseEntity<ConsultaUsuarioRes>(resp, HttpStatus.OK);
+					}
 				}
 
 				List<InfoUsuario> usuarios = usuarioService.getUsuarios(nombre, apellidoPaterno, apellidoMaterno,
