@@ -81,7 +81,7 @@ public class CastConsolidados {
 				if (!csv[0].equals(aux)) {
 					p.setIdProducto(Integer.parseInt(csv[0]));
 					p.setUbicacionActual(csv[1]);
-					p.setFolioSku(Integer.parseInt(csv[2]));
+					p.setFolioSku(csv[2]);
 					p.setPrestamoCosto(Float.valueOf(csv[3]));
 					p.setPrecioFinal(Float.valueOf(csv[4]));
 					lst.add(p);

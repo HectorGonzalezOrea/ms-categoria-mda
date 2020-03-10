@@ -1,13 +1,19 @@
 package mx.com.nmp.consolidados.msestablecimientoprecios.vo;
 
-public class AjustePreciosResponseVO {
+public class AjustePreciosFailedVO {
 
+	private String code;
 	private String message;
-
+	
+	public String getCode() {
+		return code;
+	}
+	public void setCode(String code) {
+		this.code = code;
+	}
 	public String getMessage() {
 		return message;
 	}
-
 	public void setMessage(String message) {
 		this.message = message;
 	}
@@ -15,7 +21,8 @@ public class AjustePreciosResponseVO {
 	@Override
 	  public String toString() {
 	    StringBuilder sb = new StringBuilder();
-	    sb.append("class AjustePreciosResponseVO {\n");
+	    sb.append("class AjustePreciosFailedVO {\n");
+	    sb.append("    code: ").append(toIndentedString(code)).append("\n");
 	    sb.append("    message: ").append(toIndentedString(message)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
@@ -27,5 +34,4 @@ public class AjustePreciosResponseVO {
 	    }
 	    return o.toString().replace("\n", "\n    ");
 	  }
-	
 }

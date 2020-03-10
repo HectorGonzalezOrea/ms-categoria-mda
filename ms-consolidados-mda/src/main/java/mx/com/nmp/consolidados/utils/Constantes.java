@@ -1,4 +1,4 @@
-	package mx.com.nmp.consolidados.utils;
+package mx.com.nmp.consolidados.utils;
 
 public final class Constantes {
 
@@ -13,10 +13,10 @@ public final class Constantes {
 	public static final String HEADER_OAUTH_BEARER = "oauth.bearer";
 	public static final String GRANT_TYPE = "grant_type";
 	public static final String SCOPE = "scope";
-	
 	public static final int STATUS_CODE_OK = 200;
-	
-	
 	public static final String ID_ARCHIVO = "idArchivo";
+	public static final String BASIC = "Basic ";
+	
+	public static final String PRODUCTOS = "productos";
 	
 }

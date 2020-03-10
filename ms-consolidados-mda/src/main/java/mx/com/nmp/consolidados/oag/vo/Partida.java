@@ -11,7 +11,7 @@ public class Partida {
 	@XmlElement(name="tip:idPartida")
 	private Integer idPartida;
 	@XmlElement(name="tip:sku")
-	private Integer sku;
+	private String sku;
 	@XmlElement(name="tip:precioVenta")
 	private Float precioVenta;
 	@XmlElement(name="tip:montoPrestamo")
@@ -22,10 +22,10 @@ public class Partida {
 	public void setIdPartida(Integer idPartida) {
 		this.idPartida = idPartida;
 	}
-	public Integer getSku() {
+	public String getSku() {
 		return sku;
 	}
-	public void setSku(Integer sku) {
+	public void setSku(String sku) {
 		this.sku = sku;
 	}
 	public Float getPrecioVenta() {

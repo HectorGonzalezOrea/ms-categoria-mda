@@ -24,7 +24,7 @@ public class InfoProducto   {
   private String ubicacionActual = null;
 
   @JsonProperty("folioSku")
-  private Integer folioSku = null;
+  private String folioSku = null;
 
   @JsonProperty("prestamoCosto")
   private Float prestamoCosto = null;
@@ -72,7 +72,7 @@ public class InfoProducto   {
     this.ubicacionActual = ubicacionActual;
   }
 
-  public InfoProducto folioSku(Integer folioSku) {
+  public InfoProducto folioSku(String folioSku) {
     this.folioSku = folioSku;
     return this;
   }
@@ -84,11 +84,11 @@ public class InfoProducto   {
   @ApiModelProperty(value = "Es el número de la partida para canales de ingreso diferente a Compra Cumplido, o el SKU para Compra Cumplido.")
 
 
-  public Integer getFolioSku() {
+  public String getFolioSku() {
     return folioSku;
   }
 
-  public void setFolioSku(Integer folioSku) {
+  public void setFolioSku(String folioSku) {
     this.folioSku = folioSku;
   }
 

@@ -1,7 +1,7 @@
 package mx.com.nmp.consolidados.constantes;
 
 public class Constantes {
-	public class Common{
+	public class Common {
 		public static final String ERROR_GUARDAR = "NMP-MDA-400";
 		public static final String ERROR_MENSAJE = "El cuerpo de la petición no está bien formado, verifique su información.";
 		

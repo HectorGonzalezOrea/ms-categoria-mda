@@ -7,6 +7,7 @@ import static mx.com.nmp.consolidados.utils.Constantes.HEADER_OAUTH_BEARER;
 import static mx.com.nmp.consolidados.utils.Constantes.HEADER_USUARIO;
 import static mx.com.nmp.consolidados.utils.Constantes.SCOPE;
 import static mx.com.nmp.consolidados.utils.Constantes.STATUS_CODE_OK;
+import static mx.com.nmp.consolidados.utils.Constantes.BASIC;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -31,9 +32,12 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import mx.com.nmp.consolidados.constantes.Constantes.Common;
 import mx.com.nmp.consolidados.model.InfoProducto;
 import mx.com.nmp.consolidados.mongodb.entity.caster.CastConsolidados;
+import mx.com.nmp.consolidados.oag.vo.ArbitrajePreciosPartidasRequestVO;
+import mx.com.nmp.consolidados.oag.vo.ArbitrajePreciosPartidasResponseVO;
 import mx.com.nmp.consolidados.oag.vo.GetTokenResponseVO;
 import mx.com.nmp.consolidados.utils.ConvertStringToBase64;
 import mx.com.nmp.consolidados.utils.ConverterUtil;
+import mx.com.nmp.consolidados.oag.vo.EnviarNotificacionRequestVO;
 
 @RestController
 public class OAGController extends OAGBaseController {
@@ -45,7 +49,7 @@ public class OAGController extends OAGBaseController {
 		log.info("getToken");
 		String accessToken = "";
 		String credenciales = usuario + ":" + password;
-		String autenticacionBasica = "Basic " + ConvertStringToBase64.encode(credenciales);
+		String autenticacionBasica = BASIC + ConvertStringToBase64.encode(credenciales);
 		Unirest.setTimeouts(0, 0);
 		try {
 			HttpResponse<String> response = Unirest.post(urlBase + servicioGetToken)
@@ -74,7 +78,7 @@ public class OAGController extends OAGBaseController {
 		log.info("eliminarCalendarizacion");
 		Boolean eliminado = false;
 		String credenciales = usuario + ":" + password;
-		String autenticacionBasica = "Basic " + ConvertStringToBase64.encode(credenciales);
+		String autenticacionBasica = BASIC + ConvertStringToBase64.encode(credenciales);
 		String oauthBearer = this.getToken();
 		Unirest.setTimeouts(0, 0);
 		try {
@@ -97,11 +101,16 @@ public class OAGController extends OAGBaseController {
 		return eliminado;
 	}
 	
-	public void validarArbitrajePreciosPartidas() {
+	public ArbitrajePreciosPartidasResponseVO validarArbitrajePreciosPartidas(ArbitrajePreciosPartidasRequestVO request) {
 		
 		String credenciales = usuario + ":" + password;
 		String autenticacionBasica = "Basic " + ConvertStringToBase64.encode(credenciales);
-		String oauthBearer = this.getToken();	
+		String oauthBearer = this.getToken();
+		
+		String iRequest = ConverterUtil.messageToJson(request);
+		
+		ArbitrajePreciosPartidasResponseVO respVo = null;
+		
 		Unirest.setTimeouts(0, 0);
 		try {
 			HttpResponse<String> response = Unirest.post(urlBase + servicioValidarArbitrajePreciosPartidas)
@@ -111,11 +120,53 @@ public class OAGController extends OAGBaseController {
 			  .header(HEADER_ID_DESTINO, headerIdDestino)
 			  .header(HEADER_OAUTH_BEARER, oauthBearer)
 			  .header(HttpHeaders.AUTHORIZATION, autenticacionBasica)
-			  .body("{\r\n  \"partida\" : [ {\r\n    \"idPartida\" : \"1\",\r\n    \"sku\" : \"S1\",\r\n    \"precioVenta\" : 100,\r\n    \"montoPrestamo\" : 1000\r\n  } ,\r\n  {\r\n    \"idPartida\" : \"2\",\r\n    \"sku\" : \"S21\",\r\n    \"precioVenta\" : 100,\r\n    \"montoPrestamo\" : 1000\r\n  }]\r\n}")
+			  .body(iRequest)
 			  .asString();
+			
+			int estatus = response.getStatus();
+			log.error("Status: {} " , response.getStatus());
+			log.error("Body Response: {} " , response.getBody());
+			
+			if(estatus == STATUS_CODE_OK) {
+				respVo = ConverterUtil.stringJsonToObjectArbitrajePreciosPartidasResponseVO(response.getBody());
+			}
+			
+		} catch (UnirestException ue) {
+			log.error("UnirestException: {} " , ue);
+		}
+		
+		return respVo;
+	}
+	
+	public void enviarNotificacion(EnviarNotificacionRequestVO request) {
+		
+		String credenciales = usuario + ":" + password;
+		String autenticacionBasica = BASIC + ConvertStringToBase64.encode(credenciales);
+		
+		String oauthBearer = this.getToken();
+		
+		String gpRequestJson = ConverterUtil.messageToJson(request);
+		
+		Unirest.setTimeouts(0, 0);
+		
+		try {
+			HttpResponse<String> response = Unirest.post("https://iamdr.montepiedad.com.mx:4444/NMP/Utileria/EnvioCorreo/v2/")
+			  .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+			  .header(HEADER_USUARIO, headerUsuario)
+			  .header(HEADER_ID_CONSUMIDOR, headerIdConsumidor)
+			  .header(HEADER_ID_DESTINO, headerIdDestino)
+			  .header(HEADER_OAUTH_BEARER, oauthBearer)
+			  .header(HttpHeaders.AUTHORIZATION, autenticacionBasica)
+			  .body(gpRequestJson)
+			  .asString();
+
+			int statusCode = response.getStatus();
+			
+			log.info("Status Code Response: {}" , statusCode);
+			log.info("Body Response: {}" , response.getBody());
+			
 		} catch (UnirestException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("Exception {} " , e);
 		}
 	}
 	
