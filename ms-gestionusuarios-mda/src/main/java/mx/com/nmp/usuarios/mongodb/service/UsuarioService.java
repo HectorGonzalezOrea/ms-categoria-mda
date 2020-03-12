@@ -81,6 +81,7 @@ public class UsuarioService {
 	public static final String FECHA = "fecha";
 	public static final String ID = "_id";
 	public static final String PERFIL = "perfil";
+	public static final String ID_PERFIL = "idPerfil";
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -266,10 +267,10 @@ public class UsuarioService {
 	/*
 	 * Consulta de usuarios
 	 */
-	public List<InfoUsuario> getUsuarios(String nombre, String apellidoPaterno, String apellidoMaterno, Boolean activo, String usuario) {
+	public List<InfoUsuario> getUsuarios(String nombre, String apellidoPaterno, String apellidoMaterno, Boolean activo, String usuario, Integer perfil) {
 		log.info("UsuarioService.getUsuarios");
 		
-		Query query = this.busquedaUsuarioNull(nombre, apellidoPaterno, apellidoMaterno, activo, usuario);
+		Query query = this.busquedaUsuarioNull(nombre, apellidoPaterno, apellidoMaterno, activo, usuario, perfil);
 
 		List<UsuarioEntity> busquedaList = mongoTemplate.find(query, UsuarioEntity.class);
 
@@ -649,7 +650,7 @@ public class UsuarioService {
 					
 					pf.setNombreDistinguido(uvo.getNombreDistintivo());
 					
-					List<InfoUsuario> listUsuarios = this.getUsuarios(user.getNombre(), user.getApellidoPaterno(), user.getApellidoMaterno(), null, user.getUsuario());
+					List<InfoUsuario> listUsuarios = this.getUsuarios(user.getNombre(), user.getApellidoPaterno(), user.getApellidoMaterno(), null, user.getUsuario(), null);
 					
 					if(listUsuarios !=null && listUsuarios.size() != 0) {
 						
@@ -684,7 +685,7 @@ public class UsuarioService {
 		
 		if(request != null) {
 			
-			List<InfoUsuario> listUsuarios = this.getUsuarios(request.getNombre(), request.getApellidoPaterno(), request.getApellidoMaterno(), null, request.getUsuario());
+			List<InfoUsuario> listUsuarios = this.getUsuarios(request.getNombre(), request.getApellidoPaterno(), request.getApellidoMaterno(), null, request.getUsuario(), null);
 			
 			if(listUsuarios == null ) {
 				UsuarioEntity usuario = new UsuarioEntity();
@@ -731,7 +732,7 @@ public class UsuarioService {
 	/*
 	 * armado de busqueda de usuario
 	 */
-	private Query busquedaUsuarioNull(String nombre, String apellidoPaterno, String apellidoMaterno, Boolean activo, String usuario) {
+	private Query busquedaUsuarioNull(String nombre, String apellidoPaterno, String apellidoMaterno, Boolean activo, String usuario, Integer perfil) {
 		log.info("UsuarioService.busquedaUsuarioNull");
 		
 		Query query = new Query();
@@ -754,6 +755,9 @@ public class UsuarioService {
 			if (usuario != null) {
 				aux.and(USUARIO).is(usuario);
 			}
+			if (perfil != null) {
+				aux.and(PERFIL).is(perfil);
+			}
 			query.addCriteria(aux);
 		}
 
@@ -774,6 +778,9 @@ public class UsuarioService {
 
 			if (usuario != null) {
 				aux.and(USUARIO).is(usuario);
+			}
+			if (perfil != null) {
+				aux.and(PERFIL).is(perfil);
 			}
 			query.addCriteria(aux);
 		}
@@ -796,6 +803,9 @@ public class UsuarioService {
 			if (usuario != null) {
 				aux.and(USUARIO).is(usuario);
 			}
+			if (perfil != null) {
+				aux.and(PERFIL).is(perfil);
+			}
 			query.addCriteria(aux);
 		}
 
@@ -816,6 +826,9 @@ public class UsuarioService {
 
 			if (usuario != null) {
 				aux.and(USUARIO).is(usuario);
+			}
+			if (perfil != null) {
+				aux.and(PERFIL).is(perfil);
 			}
 			query.addCriteria(aux);
 		}
@@ -838,8 +851,37 @@ public class UsuarioService {
 			if (nombre != null) {
 				aux.and(NOMBRE).is(nombre);
 			}
+			if (perfil != null) {
+				aux.and(PERFIL).is(perfil);
+			}
 			query.addCriteria(aux);
 		}
+		
+		if (perfil != null) {
+			Criteria aux = Criteria.where(PERFIL).is(perfil);
+			
+			if (usuario != null) {
+				aux.and(USUARIO).is(usuario);
+			}
+
+			if (apellidoPaterno != null) {
+				aux.and(APELLIDO_PATERNO).is(apellidoPaterno);
+			}
+
+			if (apellidoMaterno != null) {
+				aux.and(APELLIDO_MATERNO).is(apellidoMaterno);
+			}
+
+			if (activo != null) {
+				aux.and(ACTIVO).is(activo);
+			}
+
+			if (nombre != null) {
+				aux.and(NOMBRE).is(nombre);
+			}
+			query.addCriteria(aux);
+		}
+		
 		log.info("Query: " + query.toString());
 		return query;
 	}
