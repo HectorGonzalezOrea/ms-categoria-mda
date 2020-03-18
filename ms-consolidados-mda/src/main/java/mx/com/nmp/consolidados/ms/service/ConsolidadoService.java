@@ -154,6 +154,8 @@ public class ConsolidadoService {
 
 		for (ArchivoEntity consolidado : consolidados) {
 			String requestId = consolidado.getRequestIdCalenzarizacion();
+			
+			log.info("requestId : {} ", requestId);
 			if (requestId != null && !requestId.equals("")) {
 				Boolean eliminadoESS = oAGController.eliminarCalendarizacion(requestId);
 				if (Boolean.TRUE.equals(eliminadoESS)) {

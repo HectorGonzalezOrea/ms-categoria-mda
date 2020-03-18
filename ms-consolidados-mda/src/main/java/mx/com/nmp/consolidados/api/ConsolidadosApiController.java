@@ -152,17 +152,17 @@ public class ConsolidadosApiController implements ConsolidadosApi {
             	
              	Boolean eliminado = consolidadoService.eliminarConsolidado(idArchivo);
             	
+             	SuccessfulResponse sr = new SuccessfulResponse();
              	if(Boolean.TRUE.equals(eliminado)) {
-             		SuccessfulResponse sr = new SuccessfulResponse();
              		sr.setCodigo(Common.EXITO_ELIMINAR);
              		sr.setMensaje(Common.EXITO_ELIMINAR_MSG);    		
              		return new ResponseEntity<SuccessfulResponse>(sr, HttpStatus.OK);
-             	}  else {
-             		InternalServerError isr = new InternalServerError();
-             		isr.setCodigo(Common.ERROR_SERVER);
-             		isr.setMensaje(Common.ERROR_SERVER_MSG);
+             	} else {
              		
-             		return new ResponseEntity<InternalServerError>(isr, HttpStatus.INTERNAL_SERVER_ERROR);
+             		sr.setCodigo(Common.EXITO_ELIMINAR);
+             		sr.setMensaje(Common.NO_EXITO_ELIMINAR_MSG);    		
+             		
+             		return new ResponseEntity<SuccessfulResponse>(sr, HttpStatus.INTERNAL_SERVER_ERROR);
              	}
                 //return new ResponseEntity<SuccessfulResponse>(objectMapper.readValue("{  \"codigo\" : \"NMP-MDA-000\",  \"mensaje\" : \"Operación ejecutada satisfactoriamente\"}", SuccessfulResponse.class), HttpStatus.NOT_IMPLEMENTED);
             } catch (Exception e) {
