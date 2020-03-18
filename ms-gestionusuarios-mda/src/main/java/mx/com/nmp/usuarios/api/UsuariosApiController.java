@@ -1,7 +1,8 @@
 package mx.com.nmp.usuarios.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.*;
+
+import io.swagger.annotations.ApiParam;
 import mx.com.nmp.usuarios.model.BadRequest;
 import mx.com.nmp.usuarios.model.CapacidadUsuariosReq;
 import mx.com.nmp.usuarios.model.CapacidadUsuariosRes;
@@ -77,7 +78,8 @@ public class UsuariosApiController implements UsuariosApi {
 			@ApiParam(value = "Apellido paterno del usuario.") @Valid @RequestParam(value = "apellidoPaterno", required = false) String apellidoPaterno,
 			@ApiParam(value = "Apellido materno del usuario.") @Valid @RequestParam(value = "apellidoMaterno", required = false) String apellidoMaterno,
 			@ApiParam(value = "Estatus registrado por el administrador.") @Valid @RequestParam(value = "activo", required = false) Boolean activo,
-			@ApiParam(value = "Username registrado en el directorio activo.") @Valid @RequestParam(value = "usuario", required = false) String usuario2) {
+			@ApiParam(value = "Username registrado en el directorio activo.") @Valid @RequestParam(value = "usuario", required = false) String usuario2,
+			@ApiParam(value = "Username registrado en el directorio activo.") @Valid @RequestParam(value = "idPerfil", required = false) Integer idPerfil) {
 		
 		log.info("Consulta Usuario.");
 		
@@ -93,6 +95,7 @@ public class UsuariosApiController implements UsuariosApi {
 				log.info("apellidoMaterno: " + apellidoMaterno);
 				log.info("activo: " + activo);
 				log.info("usuario2: " + usuario2);
+				log.info("idPerfil: "+ idPerfil);
 
 				if (usuario == null || origen == null || destino == null) {
 					log.error("Error en el mensaje de petición, verifique la información");
@@ -104,7 +107,7 @@ public class UsuariosApiController implements UsuariosApi {
 				}
 
 				if (nombre == null && apellidoPaterno == null && apellidoMaterno == null && activo == null
-						&& usuario2 == null) {
+						&& usuario2 == null && idPerfil == null) {
 					List<InfoUsuario> usuarios = usuarioService.getUsuariosSinFiltro();
 					ConsultaUsuarioRes resp = new ConsultaUsuarioRes();
 
@@ -119,7 +122,7 @@ public class UsuariosApiController implements UsuariosApi {
 				}
 
 				List<InfoUsuario> usuarios = usuarioService.getUsuarios(nombre, apellidoPaterno, apellidoMaterno,
-						activo, usuario2);
+						activo, usuario2, idPerfil);
 				ConsultaUsuarioRes resp = new ConsultaUsuarioRes();
 
 				if (usuarios != null) {

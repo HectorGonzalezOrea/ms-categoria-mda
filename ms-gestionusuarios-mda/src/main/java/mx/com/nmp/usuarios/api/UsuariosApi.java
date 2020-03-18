@@ -82,7 +82,8 @@ public interface UsuariosApi {
 			@ApiParam(value = "Apellido paterno del usuario.") @Valid @RequestParam(value = "apellidoPaterno", required = false) String apellidoPaterno,
 			@ApiParam(value = "Apellido materno del usuario.") @Valid @RequestParam(value = "apellidoMaterno", required = false) String apellidoMaterno,
 			@ApiParam(value = "Estatus registrado por el administrador.") @Valid @RequestParam(value = "activo", required = false) Boolean activo,
-			@ApiParam(value = "Username registrado en el directorio activo.") @Valid @RequestParam(value = "usuario", required = false) String usuario2);
+			@ApiParam(value = "Username registrado en el directorio activo.") @Valid @RequestParam(value = "usuario", required = false) String usuario2,
+			@ApiParam(value = "Perfil del usuario registrado en Mongo.") @Valid @RequestParam(value = "perfil", required = false) Integer perfil);
 
 	@ApiOperation(value = "Elimina a un usuario previamente registrado.", nickname = "eliminarUsuariosDELETE", notes = "La baja de usuarios es la selección de cualquier usuario asignado a Motor de descuentos Automatizados, por medio de las casillas de selección el administrador debe elegir los usuarios que se eliminaran de la consulta de usuarios. ", response = EliminarUsuariosRes.class, authorizations = {
 			@Authorization(value = "apiKey") }, tags = { "Usuarios", })
