@@ -1,19 +1,20 @@
-package mx.com.nmp.consolidados.mongodb.service;
+package mx.com.nmp.consolidados.ms.service;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
@@ -30,20 +31,45 @@ import mx.com.nmp.consolidados.model.InlineResponse200;
 import mx.com.nmp.consolidados.model.ModificarPrioridadArchivoConsolidadoReq;
 import mx.com.nmp.consolidados.mongodb.entity.ArchivoEntity;
 import mx.com.nmp.consolidados.mongodb.entity.caster.CastConsolidados;
+import mx.com.nmp.consolidados.mongodb.service.SequenceGeneratorService;
 import mx.com.nmp.consolidados.msestablecimientoprecios.controller.EstablecimientoPreciosController;
 import mx.com.nmp.consolidados.msestablecimientoprecios.vo.AjustePrecio;
 import mx.com.nmp.consolidados.msestablecimientoprecios.vo.AjustePreciosRequestVO;
 import mx.com.nmp.consolidados.oag.controller.OAGController;
+import mx.com.nmp.consolidados.oag.vo.AdjuntoVO;
+import mx.com.nmp.consolidados.oag.vo.AdjuntosVO;
 import mx.com.nmp.consolidados.oag.vo.ArbitrajePreciosPartidasRequestVO;
 import mx.com.nmp.consolidados.oag.vo.ArbitrajePreciosPartidasResponseVO;
 import mx.com.nmp.consolidados.oag.vo.EnviarNotificacionRequestVO;
 import mx.com.nmp.consolidados.oag.vo.PartidaResponseVO;
 import mx.com.nmp.consolidados.oag.vo.PartidaVO;
+import mx.com.nmp.consolidados.utils.ConvertStringToBase64;
+import mx.com.nmp.consolidados.utils.ExcelUtils;
+import mx.com.nmp.consolidados.utils.HtmlUtil;
+
+import static mx.com.nmp.consolidados.utils.Constantes.ASUNTO_ARBITRARIEDAD_TRUE;
+import static mx.com.nmp.consolidados.utils.Constantes.CONTENIDO_HTML_ARBITRARIEDAD_TRUE;
+import static mx.com.nmp.consolidados.utils.Constantes.NOMBRE_EXCEL;
+
+import static mx.com.nmp.consolidados.utils.Constantes.ASUNTO_AJUSTE_PRECIOS_FALSE;
+import static mx.com.nmp.consolidados.utils.Constantes.CONTENIDO_HTML_PRECIOS_FALSE_INICIO;
+import static mx.com.nmp.consolidados.utils.Constantes.CONTENIDO_HTML_PRECIOS_FALSE_FINAL;
+
+import static mx.com.nmp.consolidados.utils.Constantes.CONTENIDO_HTML_BI;
+import static mx.com.nmp.consolidados.utils.Constantes.CONTENIDO_HTML_BI_FINAL;
+
 
 @Service
 public class ConsolidadoService {
+	
 	private static final Logger log = LoggerFactory.getLogger(ConsolidadoService.class);
 
+	@Value("${oag.resource.oauth.enviarCorreo.para}")
+	protected String para;
+	
+	@Value("${oag.resource.oauth.enviarCorreo.de}")
+	protected String de;
+	
 	public static final String FECHA = "fechaAplicacion";
 	private static final String SEQUENCE = "consolidado_sequence";
 	public static final String ID_ARCHIVO = "idArchivo";
@@ -169,30 +195,128 @@ public class ConsolidadoService {
 	/*
 	 * Procesar Consolidados
 	 */
-	public void procesarConsolidados(String usuario, String fechaAplicacion) {
+	public Boolean procesarConsolidados(String usuario, String fechaAplicacion) {
 		log.info("Procesar un archivo consolidado");
+
+		Boolean procesado = false;
 		
 		// obtener consolidados
 		ArrayList<ConsultarArchivoConsolidadoResInner> consolidados = this.getConsolidados(fechaAplicacion);
-		
-		ArrayList<ArbitrajePreciosPartidasRequestVO> listaVerificarRegistrosReq = new ArrayList<>();
+
+		ArrayList<ArbitrajePreciosPartidasRequestVO> listaVerificarRegistrosReq = null;
 		// se arma los request de validar arbitrariedad
-		if(consolidados !=  null) {
+		if (consolidados != null) {
 			listaVerificarRegistrosReq = this.armarVerificarRegistros(consolidados);
+
+			ArrayList<ArbitrajePreciosPartidasResponseVO> listaVerificarRegistrosResp = new ArrayList<>();
+			// se arma los request de validar arbitrariedad
+			if (!listaVerificarRegistrosReq.isEmpty()) {
+				listaVerificarRegistrosResp = this.verificarRegistros(listaVerificarRegistrosReq);
+
+				// Establecimiento de precios
+				this.enviarAjustePrecios(usuario, listaVerificarRegistrosReq, consolidados);
+				
+				procesado = true;
+			}
+
+			if (!listaVerificarRegistrosResp.isEmpty()) {
+				if (listaVerificarRegistrosResp.size() <= 10) {
+					this.enviarCorreoPartidasArbitraje(listaVerificarRegistrosResp);
+				} else {
+					this.enviarCorreoPartidasArbitrariedadConAdjunto(listaVerificarRegistrosResp);
+				}
+			}
 		}
 		
-		ArrayList<ArbitrajePreciosPartidasResponseVO> listaVerificarRegistrosResp = new ArrayList<>();
-		// se arma los request de validar arbitrariedad
-		if(!listaVerificarRegistrosReq.isEmpty()) {
-			listaVerificarRegistrosResp = this.verificarRegistros(listaVerificarRegistrosReq);
+		return procesado;
+	}
+	
+	/*
+	 * Arma un excel con las partidas que cumplieron el arbitraje
+	 */
+	private String armarExcelPartidasConArbitraje(ArrayList<ArbitrajePreciosPartidasResponseVO> listaVerificarRegistrosResp) {
+		log.info("armarExcelPartidasConArbitraje");
+		
+		String encodedString = "";
+		if (!listaVerificarRegistrosResp.isEmpty()) {
+
+			ArrayList<PartidaResponseVO> partidas = new ArrayList<>();
+
+			listaVerificarRegistrosResp.stream().forEach(l -> {
+				l.getPartida().stream().forEach(p -> {
+					if (Boolean.TRUE.equals(p.getCumpleArbitraje())) {
+						PartidaResponseVO partida = new PartidaResponseVO();
+						partida.setSku(p.getSku());
+						partida.setIdPartida(p.getIdPartida());
+						partida.setCumpleArbitraje(p.getCumpleArbitraje());
+
+						partidas.add(partida);
+					}
+				});
+			});
 			
-			// Establecimiento de precios
-			this.enviarAjustePrecios(usuario, listaVerificarRegistrosReq);
+			ExcelUtils eu = new ExcelUtils();
+			File archivo = eu.crearExcelNotificacionesCorrectas(partidas);
+			
+			if(archivo != null) {
+				try {
+					encodedString = ConvertStringToBase64.encodeFileToBase64Binary(archivo);
+				} catch (IOException e) {
+					log.error("enviarCorreoPartidas {} ", e);
+				}
+			}	
 		}
 		
-		if(!listaVerificarRegistrosResp.isEmpty()) {
-			
-		}
+		return encodedString;
+	}
+	
+	/*
+	 * Enviar correo con adjunto sobre las partidas que si cumplieron con la arbitrariedad
+	 */
+	private void enviarCorreoPartidasArbitrariedadConAdjunto(ArrayList<ArbitrajePreciosPartidasResponseVO> listaVerificarRegistrosResp) {
+		log.info("enviarCorreoPartidasArbitrariedadConAdjunto");
+
+		String contenido = this.armarExcelPartidasConArbitraje(listaVerificarRegistrosResp);
+
+		EnviarNotificacionRequestVO enr = new EnviarNotificacionRequestVO();
+		enr.setDe(de);
+		enr.setPara(para);
+		enr.setAsunto(ASUNTO_ARBITRARIEDAD_TRUE);
+		enr.setContenidoHTML(CONTENIDO_HTML_ARBITRARIEDAD_TRUE);
+
+		AdjuntosVO ads = new AdjuntosVO();
+		AdjuntoVO ad = new AdjuntoVO();
+		
+		ad.setNombreArchivo(NOMBRE_EXCEL);
+		ad.setContenido(contenido);
+		
+		ArrayList<AdjuntoVO> lista = new ArrayList<>();
+		lista.add(ad);
+		
+		ads.setAdjunto(lista);
+		enr.setAdjuntos(ads);
+		
+		oAGController.enviarNotificacion(enr);
+
+	}
+	
+	/*
+	 * Enviar correo sobre las partidas que si cumplieron con la arbitrariedad
+	 */
+	private void enviarCorreoPartidasArbitraje(ArrayList<ArbitrajePreciosPartidasResponseVO> listaVerificarRegistrosResp) {
+		log.info("enviarCorreoPartidasArbitraje");
+
+		EnviarNotificacionRequestVO enr = new EnviarNotificacionRequestVO();
+		enr.setDe(de);
+		enr.setPara(para);
+		enr.setAsunto(ASUNTO_ARBITRARIEDAD_TRUE);
+		
+		HtmlUtil hu = new HtmlUtil();
+		StringBuilder sb = hu.armarTablaPartidasConArbitrariedad(listaVerificarRegistrosResp);
+		
+		enr.setContenidoHTML(CONTENIDO_HTML_ARBITRARIEDAD_TRUE + "\n\n" + sb.toString());
+		
+		oAGController.enviarNotificacion(enr);
 	}
 	
 	/*
@@ -200,30 +324,33 @@ public class ConsolidadoService {
 	 */
 	private ArrayList<ArbitrajePreciosPartidasRequestVO> armarVerificarRegistros(ArrayList<ConsultarArchivoConsolidadoResInner> consolidados) {
 		log.info("armarVerificarRegistros"); 
-		ArbitrajePreciosPartidasRequestVO appRequest = null;
 		ArrayList<ArbitrajePreciosPartidasRequestVO> listAppRequest = new ArrayList<>();
 		
 		if (!consolidados.isEmpty()) {
 			ArrayList<PartidaVO> partidas =  new ArrayList<>();
-			PartidaVO p = null;
 			
-			for (ConsultarArchivoConsolidadoResInner consolidado : consolidados) {
-				List<InfoProducto> productosConsolidado = consolidado.getProducto();
-				appRequest = new ArbitrajePreciosPartidasRequestVO();
+			consolidados
+			.stream()
+			.forEach( c -> {
+				List<InfoProducto> productosConsolidado = c.getProducto();
 				
-				for(InfoProducto ip : productosConsolidado) {
-					p = new PartidaVO();
+				ArbitrajePreciosPartidasRequestVO appRequest = new ArbitrajePreciosPartidasRequestVO();
+				
+				productosConsolidado
+				.stream()
+				.forEach( ip -> {
+					PartidaVO p = new PartidaVO();
 					p.setIdPartida(ip.getIdProducto().toString());
 					p.setSku(ip.getFolioSku());
 					p.setPrecioVenta(ip.getPrecioFinal());
 					p.setMontoPrestamo(ip.getPrestamoCosto());
 					partidas.add(p);
-				}
+				});
 				
 				appRequest.setPartida(partidas);
 				
 				listAppRequest.add(appRequest);
-			}
+			});
 		}
 		
 		return listAppRequest;
@@ -236,18 +363,21 @@ public class ConsolidadoService {
 		log.info("verificarRegistros"); 
 		
 		ArrayList<ArbitrajePreciosPartidasResponseVO> listaResponse = new ArrayList<>();
+		
 		if(!listaVerificarRegistros.isEmpty()) {
-			ArbitrajePreciosPartidasResponseVO response = null;
-			for(ArbitrajePreciosPartidasRequestVO request : listaVerificarRegistros) {
+			
+			listaVerificarRegistros
+			.stream()
+			.forEach( r -> {
 				try {
-					response = oAGController.validarArbitrajePreciosPartidas(request);
+					ArbitrajePreciosPartidasResponseVO response = oAGController.validarArbitrajePreciosPartidas(r);
 					if(response != null) {
 						listaResponse.add(response);
 					}
 				} catch (Exception e) {
 					log.error("Exception {}" , e);
 				}
-			}
+			});
 		}
 		return listaResponse;
 	}
@@ -255,16 +385,24 @@ public class ConsolidadoService {
 	/*
 	 * Servicio para enviar el ajuste de precios
 	 */
-	private void enviarAjustePrecios(String usuario, ArrayList<ArbitrajePreciosPartidasRequestVO> listaVerificarRegistrosReq) {
+	private void enviarAjustePrecios(String usuario, ArrayList<ArbitrajePreciosPartidasRequestVO> listaVerificarRegistrosReq, ArrayList<ConsultarArchivoConsolidadoResInner> consolidados) {
 		
 		if(!listaVerificarRegistrosReq.isEmpty()) {
-			for(ArbitrajePreciosPartidasRequestVO req : listaVerificarRegistrosReq) {
+			
+			listaVerificarRegistrosReq
+			.stream()
+			.forEach( req -> {
+				
+				int i = 0;
+				
 				if(!req.getPartida().isEmpty()) {
-					AjustePrecio ap = null;
 					AjustePreciosRequestVO apRequest = new AjustePreciosRequestVO();
-					for(PartidaVO p : req.getPartida()) {
+					
+					req.getPartida()
+					.stream()
+					.forEach( p -> {
 						
-						ap = new AjustePrecio();
+						AjustePrecio ap = new AjustePrecio();
 						
 						ap.setEnLinea(false);
 						ap.setEscenario(CONSOLIDADOS);
@@ -274,17 +412,32 @@ public class ConsolidadoService {
 						ap.setPrecioModificado(p.getMontoPrestamo());
 						
 						apRequest.add(ap);
-					}
+					});
 					
 					Boolean estatus = establecimientoPreciosController.ajustePrecios(usuario, apRequest);
 					
 					if(Boolean.FALSE.equals(estatus)) {
-						EnviarNotificacionRequestVO r = new EnviarNotificacionRequestVO();
+						EnviarNotificacionRequestVO enr = new EnviarNotificacionRequestVO();
 						
-						oAGController.enviarNotificacion(r);
+						enr.setDe(de);
+						enr.setPara(para);
+						enr.setAsunto(ASUNTO_AJUSTE_PRECIOS_FALSE);
+						
+						StringBuilder sb = new StringBuilder();
+						
+						sb.append(CONTENIDO_HTML_PRECIOS_FALSE_INICIO);
+						sb.append(CONTENIDO_HTML_BI);
+						sb.append(consolidados.get(i).getNombreArchivo());
+						sb.append(CONTENIDO_HTML_BI_FINAL);
+						sb.append(CONTENIDO_HTML_PRECIOS_FALSE_FINAL);
+
+						enr.setContenidoHTML(sb.toString());
+						
+						oAGController.enviarNotificacion(enr);
 					}
 				}
-			}
+				i++;
+			});
 		}
 	}
 	

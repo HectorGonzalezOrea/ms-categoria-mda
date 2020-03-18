@@ -37,6 +37,7 @@ public abstract class OAGBaseController {
 		@Value("${oag.servicio.oauth.validarArbitrajePreciosPartidas}")
 		protected String servicioValidarArbitrajePreciosPartidas;
 		
-		
-		
+		@Value("${oag.servicio.oauth.enviarCorreo}")
+		protected String servicioEnviarCorreo;
+				
 }

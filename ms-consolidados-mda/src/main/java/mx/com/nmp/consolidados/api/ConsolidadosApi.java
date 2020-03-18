@@ -119,11 +119,11 @@ public interface ConsolidadosApi {
 	        produces = { "application/json" }, 
 	        consumes = { "application/json" },
 	        method = RequestMethod.POST)
-	    ResponseEntity<SuccessfulResponse> procesarConsolidadoPOST(
+	    ResponseEntity<?> procesarConsolidadoPOST(
 	    		@ApiParam(value = "Usuario en el sistema origen que lanza la petici\u00F3n" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,
 	    		@ApiParam(value = "Sistema que origina la petici\u00F3n" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,
 	    		@ApiParam(value = "Destino final de la informaci\u00F3n" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,
-	    		@NotNull @ApiParam(value = "Fecha de ejecuci\u00F3n del proceso de consolidados", required = true) @Valid @RequestParam(value = "fechaAplicacion", required = true) LocalDate fechaAplicacion);
+	    		@NotNull @ApiParam(value = "Fecha de ejecuci\u00F3n del proceso de consolidados", required = true) @Valid @RequestParam(value = "fechaAplicacion", required = true) String fechaAplicacion);
 
 
 	    @ApiOperation(value = "Registrar archivo con informaci\u00F3n de consolidados", nickname = "registrarConsolidadoPOST", notes = "Se almacena el archivo que contiene la informaci\u00F3n de las partidas a consolidar. Cada registro tendr\u00E1 un estado inicial para identificar que el archivo ha sido registrado y que a\u00F1n no se procesa. ", response = GeneralResponse.class, authorizations = {

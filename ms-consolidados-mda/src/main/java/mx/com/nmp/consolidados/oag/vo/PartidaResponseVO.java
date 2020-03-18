@@ -22,8 +22,6 @@ public class PartidaResponseVO {
 	private String sku;
 	@JsonProperty("cumpleArbitraje")
 	private Boolean cumpleArbitraje;
-	@JsonIgnore
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 	@JsonProperty("idPartida")
 	public String getIdPartida() {
@@ -53,15 +51,5 @@ public class PartidaResponseVO {
 	@JsonProperty("cumpleArbitraje")
 	public void setCumpleArbitraje(Boolean cumpleArbitraje) {
 		this.cumpleArbitraje = cumpleArbitraje;
-	}
-
-	@JsonAnyGetter
-	public Map<String, Object> getAdditionalProperties() {
-		return this.additionalProperties;
-	}
-
-	@JsonAnySetter
-	public void setAdditionalProperty(String name, Object value) {
-		this.additionalProperties.put(name, value);
 	}
 }

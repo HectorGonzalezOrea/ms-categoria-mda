@@ -74,7 +74,7 @@ public class OAGController extends OAGBaseController {
 		return accessToken;
 	}
 	
-	public Boolean eliminarCalendarizacion(String idPeticion) {	
+	public Boolean eliminarCalendarizacion(String idPeticion) {
 		log.info("eliminarCalendarizacion");
 		Boolean eliminado = false;
 		String credenciales = usuario + ":" + password;
@@ -102,6 +102,7 @@ public class OAGController extends OAGBaseController {
 	}
 	
 	public ArbitrajePreciosPartidasResponseVO validarArbitrajePreciosPartidas(ArbitrajePreciosPartidasRequestVO request) {
+		log.info("validarArbitrajePreciosPartidas");
 		
 		String credenciales = usuario + ":" + password;
 		String autenticacionBasica = "Basic " + ConvertStringToBase64.encode(credenciales);
@@ -109,12 +110,14 @@ public class OAGController extends OAGBaseController {
 		
 		String iRequest = ConverterUtil.messageToJson(request);
 		
+		log.info("iRequest: {} " , iRequest.toString());
+		
 		ArbitrajePreciosPartidasResponseVO respVo = null;
 		
 		Unirest.setTimeouts(0, 0);
 		try {
 			HttpResponse<String> response = Unirest.post(urlBase + servicioValidarArbitrajePreciosPartidas)
-			  .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED)
+			  .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
 			  .header(HEADER_USUARIO, headerUsuario)
 			  .header(HEADER_ID_CONSUMIDOR, headerIdConsumidor)
 			  .header(HEADER_ID_DESTINO, headerIdDestino)
@@ -124,8 +127,8 @@ public class OAGController extends OAGBaseController {
 			  .asString();
 			
 			int estatus = response.getStatus();
-			log.error("Status: {} " , response.getStatus());
-			log.error("Body Response: {} " , response.getBody());
+			log.info("Status: {} " , response.getStatus());
+			log.info("Body Response: {} " , response.getBody());
 			
 			if(estatus == STATUS_CODE_OK) {
 				respVo = ConverterUtil.stringJsonToObjectArbitrajePreciosPartidasResponseVO(response.getBody());
@@ -150,7 +153,7 @@ public class OAGController extends OAGBaseController {
 		Unirest.setTimeouts(0, 0);
 		
 		try {
-			HttpResponse<String> response = Unirest.post("https://iamdr.montepiedad.com.mx:4444/NMP/Utileria/EnvioCorreo/v2/")
+			HttpResponse<String> response = Unirest.post(urlBase + servicioEnviarCorreo)
 			  .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
 			  .header(HEADER_USUARIO, headerUsuario)
 			  .header(HEADER_ID_CONSUMIDOR, headerIdConsumidor)
@@ -191,7 +194,7 @@ public class OAGController extends OAGBaseController {
 			log.info(output);
 			log.info("+++++++++++++++++++++++++++++++++++++");
 		}
-		log.info("cumpleArbitraje? {}"+cast.getTagValue(output,Common.TAG_ARBITRADO));
+		log.info("cumpleArbitraje? {}", cast.getTagValue(output,Common.TAG_ARBITRADO));
 		return cast.getTagValue(output,Common.TAG_ARBITRADO);
 	}
 }

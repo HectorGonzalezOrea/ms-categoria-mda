@@ -17,10 +17,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-import mx.com.nmp.consolidados.msestablecimientoprecios.vo.AjustePreciosFailedVO;
 import mx.com.nmp.consolidados.msestablecimientoprecios.vo.AjustePreciosRequestVO;
-import mx.com.nmp.consolidados.msestablecimientoprecios.vo.AjustePreciosResponseVO;
-import mx.com.nmp.consolidados.oag.vo.EnviarNotificacionRequestVO;
 import mx.com.nmp.consolidados.utils.ConverterUtil;
 
 @RestController
@@ -32,7 +29,6 @@ public class EstablecimientoPreciosController extends EstablecimientoPreciosBase
 	public Boolean ajustePrecios(@PathVariable String usuario, AjustePreciosRequestVO request) {
 		
 		String requestJson = ConverterUtil.messageToJson(request);
-		AjustePreciosResponseVO apResp = null;
 
 		Boolean exitoso = false;
 		

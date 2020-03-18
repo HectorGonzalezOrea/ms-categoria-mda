@@ -18,8 +18,6 @@ public class ArbitrajePreciosPartidasRequestVO {
 
 	@JsonProperty("partida")
 	private List<PartidaVO> partida = null;
-	@JsonIgnore
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 	@JsonProperty("partida")
 	public List<PartidaVO> getPartida() {
@@ -29,16 +27,6 @@ public class ArbitrajePreciosPartidasRequestVO {
 	@JsonProperty("partida")
 	public void setPartida(List<PartidaVO> partida) {
 		this.partida = partida;
-	}
-
-	@JsonAnyGetter
-	public Map<String, Object> getAdditionalProperties() {
-		return this.additionalProperties;
-	}
-
-	@JsonAnySetter
-	public void setAdditionalProperty(String name, Object value) {
-		this.additionalProperties.put(name, value);
 	}
 
 }

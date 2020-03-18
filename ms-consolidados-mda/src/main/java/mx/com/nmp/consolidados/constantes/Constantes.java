@@ -10,6 +10,9 @@ public class Constantes {
 		public static final String ERROR_SERVER="NMP-MDA-500";
 		public static final String ERROR_SERVER_MSG="Error interno del servidor. Falla de comunicación.";
 		
+		public static final String EXITO_PROCESAR = "NMP-MDA-200";
+		public static final String EXITO_PROCESAR_MSG = "Operación ejecutada satisfactoriamente.";
+		
 		public static final String EXITO_ELIMINAR="NMP-MDA-200";
 		public static final String EXITO_ELIMINAR_MSG="Operación ejecutada satisfactoriamente.";
 		

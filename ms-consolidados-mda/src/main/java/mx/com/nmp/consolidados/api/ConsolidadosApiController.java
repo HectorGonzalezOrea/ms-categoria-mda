@@ -37,7 +37,7 @@ import mx.com.nmp.consolidados.model.InternalServerError;
 import mx.com.nmp.consolidados.model.ModificarPrioridadArchivoConsolidadoReq;
 import mx.com.nmp.consolidados.model.SuccessfulResponse;
 import mx.com.nmp.consolidados.mongodb.entity.caster.CastConsolidados;
-import mx.com.nmp.consolidados.mongodb.service.ConsolidadoService;
+import mx.com.nmp.consolidados.ms.service.ConsolidadoService;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-01-22T02:47:50.165Z")
 
 @Controller
@@ -177,18 +177,43 @@ public class ConsolidadosApiController implements ConsolidadosApi {
         return new ResponseEntity<SuccessfulResponse>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<SuccessfulResponse> procesarConsolidadoPOST(
+    public ResponseEntity<?> procesarConsolidadoPOST(
     		@ApiParam(value = "Usuario en el sistema origen que lanza la petici\u00F3n" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,
     		@ApiParam(value = "Sistema que origina la petici\u00F3n" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,
     		@ApiParam(value = "Destino final de la informaci\u00F3n" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,
-    		@NotNull @ApiParam(value = "Fecha de ejecuci\u00F3n del proceso de consolidados", required = true) @Valid @RequestParam(value = "fechaAplicacion", required = true) LocalDate fechaAplicacion) {
+    		@NotNull @ApiParam(value = "Fecha de ejecuci\u00F3n del proceso de consolidados", required = true) @Valid @RequestParam(value = "fechaAplicacion", required = true) String fechaAplicacion) {
         String accept = request.getHeader("Accept");
+        
+        LOG.info("procesarConsolidadoPOST");
+        
         if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<SuccessfulResponse>(objectMapper.readValue("{  \"codigo\" : \"NMP-MDA-000\",  \"mensaje\" : \"Operaci\u00F3n ejecutada satisfactoriamente\"}", SuccessfulResponse.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+        	try {
+        		BadRequest badReq=null;
+        		if(usuario != null && origen != null && destino != null && fechaAplicacion != null) {
+            		consolidadoService.procesarConsolidados(usuario, fechaAplicacion);
+            		
+            		SuccessfulResponse sr = new SuccessfulResponse();
+            		
+            		sr.setCodigo(Common.EXITO_PROCESAR);
+            		sr.setMensaje(Common.EXITO_PROCESAR_MSG);
+            		
+            		return new ResponseEntity<SuccessfulResponse>(sr, HttpStatus.OK);
+            	} else {
+            		badReq=new BadRequest();
+        			badReq.setCodigo(Common.ERROR_GUARDAR);
+        			badReq.setMensaje(Common.ERROR_MENSAJE);
+        			return new ResponseEntity<BadRequest>(badReq, HttpStatus.BAD_REQUEST);
+            	}
+        		
+                //return new ResponseEntity<SuccessfulResponse>(objectMapper.readValue("{  \"codigo\" : \"NMP-MDA-000\",  \"mensaje\" : \"Operaci\u00F3n ejecutada satisfactoriamente\"}", SuccessfulResponse.class), HttpStatus.NOT_IMPLEMENTED);
+            } catch (Exception e) {
             	LOG.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<SuccessfulResponse>(HttpStatus.INTERNAL_SERVER_ERROR);
+            	
+            	InternalServerError is = new InternalServerError();
+            	is.setCodigo(Common.ERROR_SERVER);
+            	is.setMensaje(Common.ERROR_SERVER_MSG);
+            	
+                return new ResponseEntity<InternalServerError>(is, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 

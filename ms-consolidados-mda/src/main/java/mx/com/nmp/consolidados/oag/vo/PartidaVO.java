@@ -26,8 +26,6 @@ public class PartidaVO {
 	private Float precioVenta;
 	@JsonProperty("montoPrestamo")
 	private Float montoPrestamo;
-	@JsonIgnore
-	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 	@JsonProperty("idPartida")
 	public String getIdPartida() {
@@ -68,15 +66,4 @@ public class PartidaVO {
 	public void setMontoPrestamo(Float montoPrestamo) {
 		this.montoPrestamo = montoPrestamo;
 	}
-
-	@JsonAnyGetter
-	public Map<String, Object> getAdditionalProperties() {
-		return this.additionalProperties;
-	}
-
-	@JsonAnySetter
-	public void setAdditionalProperty(String name, Object value) {
-		this.additionalProperties.put(name, value);
-	}
-
 }

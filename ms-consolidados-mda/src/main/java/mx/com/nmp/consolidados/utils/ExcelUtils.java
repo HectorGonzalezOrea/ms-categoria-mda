@@ -7,8 +7,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -16,13 +19,17 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static mx.com.nmp.consolidados.utils.Constantes.PRODUCTOS;
+import mx.com.nmp.consolidados.oag.vo.PartidaResponseVO;
+
+import static mx.com.nmp.consolidados.utils.Constantes.SKU;
+import static mx.com.nmp.consolidados.utils.Constantes.PARTIDA;
+import static mx.com.nmp.consolidados.utils.Constantes.CUMPLE_ARBITRARIEDAD;
 
 public class ExcelUtils {
 
 	private static final Logger log = LoggerFactory.getLogger(ExcelUtils.class);
 
-	public Workbook crearExcelNotificacionesCorrectas(List<String> productos) {
+	public File crearExcelNotificacionesCorrectas(List<PartidaResponseVO> partidas) {
 
         File archivo = new File("reporte.xlsx");
 
@@ -31,22 +38,40 @@ public class ExcelUtils {
         Sheet pagina = workbook.createSheet("Reporte de productos");
 
         ArrayList<String> titulos = new ArrayList<>();
-        titulos.add(PRODUCTOS);
+        titulos.add(SKU);
+        titulos.add(PARTIDA);
+        titulos.add(CUMPLE_ARBITRARIEDAD);
  
         Row fila = pagina.createRow(0);
 
+        CellStyle headerStyle = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setBold(true);
+        headerStyle.setFont(font);
+
+        CellStyle style = workbook.createCellStyle();
+        style.setFillForegroundColor(IndexedColors.LIGHT_YELLOW.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        
         for (int i = 0; i < titulos.size(); i++) {
             Cell celda = fila.createCell(i);
             
             celda.setCellValue(titulos.get(i));
+            celda.setCellStyle(headerStyle);
         }
-
-        fila = pagina.createRow(1);
-
-        for (int i = 0; i < productos.size(); i++) {
-            Cell celda = fila.createCell(i);
-
-            celda.setCellValue(productos.get(i));
+        
+        for (int i = 0; i < partidas.size(); i++) {
+        	
+        	fila = pagina.createRow(i + 1);
+        	
+            Cell celda = fila.createCell(0);
+            celda.setCellValue(partidas.get(i).getSku());
+            
+            Cell celda1 = fila.createCell(1);
+            celda1.setCellValue(partidas.get(i).getIdPartida());
+            
+            Cell celda2 = fila.createCell(2);
+            celda2.setCellValue(partidas.get(i).getCumpleArbitraje());
         }
 
         try {
@@ -55,34 +80,56 @@ public class ExcelUtils {
             workbook.write(salida);
 
             workbook.close();
-
-            log.info("Archivo creado existosamente en {0}", archivo.getAbsolutePath());
-
+      
         } catch (FileNotFoundException ex) {
         	log.info("Archivo no localizable en sistema de archivos");
         } catch (IOException ex) {
         	log.info("Error de entrada/salida");
         }
 		
-		return workbook;
+		return archivo;
 	}
 	
 	public static void main(String[] args) {
 
-		ArrayList<String> productos = new ArrayList<>();
+		ArrayList<PartidaResponseVO> partidas = new ArrayList<>();
+		PartidaResponseVO p = new PartidaResponseVO();
+		PartidaResponseVO p1 = new PartidaResponseVO();
+		PartidaResponseVO p2 = new PartidaResponseVO();
 		
-		productos.add("sku1");
-		productos.add("sku2");
-		productos.add("sku3");
-		productos.add("sku4");
-		productos.add("sku5");
+		p.setSku("sku1");
+		p.setIdPartida("partida1");
+		p.setCumpleArbitraje(true);
+		
+		p1.setSku("sku2");
+		p1.setIdPartida("partida2");
+		p1.setCumpleArbitraje(true);
+		
+		p2.setSku("sku3");
+		p2.setIdPartida("partida2");
+		p2.setCumpleArbitraje(true);
+		
+		partidas.add(p);
+		partidas.add(p1);
+		partidas.add(p2);
 		
 		ExcelUtils e = new ExcelUtils();
 		
-		Workbook archivo = e.crearExcelNotificacionesCorrectas(productos);
+		File archivo = e.crearExcelNotificacionesCorrectas(partidas);
 		
-		String encodedString = ConvertStringToBase64.encode(archivo.toString());
-		log.info("String : {}", encodedString);
+		String encodedString;
+		try {
+			encodedString = ConvertStringToBase64.encodeFileToBase64Binary(archivo);
+			log.info("String : {}", encodedString);
+			
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 	}
 
+
+
+
+	
 }
+
