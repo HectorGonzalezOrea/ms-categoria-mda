@@ -57,7 +57,8 @@ import static mx.com.nmp.consolidados.utils.Constantes.CONTENIDO_HTML_PRECIOS_FA
 
 import static mx.com.nmp.consolidados.utils.Constantes.CONTENIDO_HTML_BI;
 import static mx.com.nmp.consolidados.utils.Constantes.CONTENIDO_HTML_BI_FINAL;
-
+import static mx.com.nmp.consolidados.utils.Constantes.ARMAR_TABLA_INICIO_FALLIDOS;
+import static mx.com.nmp.consolidados.utils.Constantes.ARMAR_TABLA_FINAL_FALLIDOS;
 
 @Service
 public class ConsolidadoService {
@@ -210,75 +211,84 @@ public class ConsolidadoService {
 		if (consolidados != null) {
 			listaVerificarRegistrosReq = this.armarVerificarRegistros(consolidados);
 
-			ArrayList<ArbitrajePreciosPartidasResponseVO> listaVerificarRegistrosResp = new ArrayList<>();
-			// se arma los request de validar arbitrariedad
+			ArrayList<ArbitrajePreciosPartidasResponseVO> listaVerificarRegistrosResp = null;
+			// se verifica la arbitrariedad
 			if (!listaVerificarRegistrosReq.isEmpty()) {
 				listaVerificarRegistrosResp = this.verificarRegistros(listaVerificarRegistrosReq);
 
+				this.enviarCorreoPartidasConArbitratierdad(listaVerificarRegistrosResp);
+				
 				// Establecimiento de precios
 				this.enviarAjustePrecios(usuario, listaVerificarRegistrosReq, consolidados);
 				
 				procesado = true;
-			}
-
-			if (!listaVerificarRegistrosResp.isEmpty()) {
-				if (listaVerificarRegistrosResp.size() <= 10) {
-					this.enviarCorreoPartidasArbitraje(listaVerificarRegistrosResp);
-				} else {
-					this.enviarCorreoPartidasArbitrariedadConAdjunto(listaVerificarRegistrosResp);
-				}
 			}
 		}
 		
 		return procesado;
 	}
 	
+	private void enviarCorreoPartidasConArbitratierdad(ArrayList<ArbitrajePreciosPartidasResponseVO> listaVerificarRegistrosResp) {
+		log.info("enviarCorreoPartidasConArbitratierdad");
+		
+		List<PartidaResponseVO> procesadas = new ArrayList<>();
+		
+		if(!listaVerificarRegistrosResp.isEmpty()) {
+			listaVerificarRegistrosResp
+			.stream()
+			.forEach(lvr -> {
+				if(!lvr.getPartida().isEmpty()) {
+					lvr.getPartida()
+					.stream()
+					.forEach(p -> {
+						if(Boolean.TRUE.equals(p.getCumpleArbitraje())) {
+							procesadas.add(p);
+						}
+					});
+				}
+			});
+			
+			if(!procesadas.isEmpty()) {
+				if(procesadas.size() <= 10) {
+					this.enviarCorreoPartidasArbitrajeSinAdjunto(procesadas);
+				} else {
+					this.enviarCorreoPartidasArbitrariedadConAdjunto(procesadas);
+				}
+			}
+			
+		}
+	}
+	
 	/*
 	 * Arma un excel con las partidas que cumplieron el arbitraje
 	 */
-	private String armarExcelPartidasConArbitraje(ArrayList<ArbitrajePreciosPartidasResponseVO> listaVerificarRegistrosResp) {
+	private String armarExcelPartidasConArbitraje(List<PartidaResponseVO> procesadas) {
 		log.info("armarExcelPartidasConArbitraje");
-		
+
 		String encodedString = "";
-		if (!listaVerificarRegistrosResp.isEmpty()) {
 
-			ArrayList<PartidaResponseVO> partidas = new ArrayList<>();
+		ExcelUtils eu = new ExcelUtils();
+		File archivo = eu.crearExcelNotificacionesCorrectas(procesadas);
 
-			listaVerificarRegistrosResp.stream().forEach(l -> {
-				l.getPartida().stream().forEach(p -> {
-					if (Boolean.TRUE.equals(p.getCumpleArbitraje())) {
-						PartidaResponseVO partida = new PartidaResponseVO();
-						partida.setSku(p.getSku());
-						partida.setIdPartida(p.getIdPartida());
-						partida.setCumpleArbitraje(p.getCumpleArbitraje());
-
-						partidas.add(partida);
-					}
-				});
-			});
-			
-			ExcelUtils eu = new ExcelUtils();
-			File archivo = eu.crearExcelNotificacionesCorrectas(partidas);
-			
-			if(archivo != null) {
-				try {
-					encodedString = ConvertStringToBase64.encodeFileToBase64Binary(archivo);
-				} catch (IOException e) {
-					log.error("enviarCorreoPartidas {} ", e);
-				}
-			}	
+		if (archivo != null) {
+			try {
+				encodedString = ConvertStringToBase64.encodeFileToBase64Binary(archivo);
+			} catch (IOException e) {
+				log.error("enviarCorreoPartidas {} ", e);
+			}
 		}
-		
+
 		return encodedString;
+
 	}
 	
 	/*
 	 * Enviar correo con adjunto sobre las partidas que si cumplieron con la arbitrariedad
 	 */
-	private void enviarCorreoPartidasArbitrariedadConAdjunto(ArrayList<ArbitrajePreciosPartidasResponseVO> listaVerificarRegistrosResp) {
+	private void enviarCorreoPartidasArbitrariedadConAdjunto(List<PartidaResponseVO> procesadas) {
 		log.info("enviarCorreoPartidasArbitrariedadConAdjunto");
 
-		String contenido = this.armarExcelPartidasConArbitraje(listaVerificarRegistrosResp);
+		String contenido = this.armarExcelPartidasConArbitraje(procesadas);
 
 		EnviarNotificacionRequestVO enr = new EnviarNotificacionRequestVO();
 		enr.setDe(de);
@@ -305,8 +315,8 @@ public class ConsolidadoService {
 	/*
 	 * Enviar correo sobre las partidas que si cumplieron con la arbitrariedad
 	 */
-	private void enviarCorreoPartidasArbitraje(ArrayList<ArbitrajePreciosPartidasResponseVO> listaVerificarRegistrosResp) {
-		log.info("enviarCorreoPartidasArbitraje");
+	private void enviarCorreoPartidasArbitrajeSinAdjunto(List<PartidaResponseVO> procesadas) {
+		log.info("enviarCorreoPartidasArbitrajeSinAdjunto");
 
 		EnviarNotificacionRequestVO enr = new EnviarNotificacionRequestVO();
 		enr.setDe(de);
@@ -314,9 +324,9 @@ public class ConsolidadoService {
 		enr.setAsunto(ASUNTO_ARBITRARIEDAD_TRUE);
 		
 		HtmlUtil hu = new HtmlUtil();
-		StringBuilder sb = hu.armarTablaPartidasConArbitrariedad(listaVerificarRegistrosResp);
+		StringBuilder sb = hu.armarTablaPartidasConArbitrariedad(procesadas);
 		
-		enr.setContenidoHTML(CONTENIDO_HTML_ARBITRARIEDAD_TRUE + "\n\n" + sb.toString());
+		enr.setContenidoHTML(CONTENIDO_HTML_ARBITRARIEDAD_TRUE + sb.toString());
 		
 		oAGController.enviarNotificacion(enr);
 	}
@@ -373,7 +383,7 @@ public class ConsolidadoService {
 			.forEach( r -> {
 				try {
 					ArbitrajePreciosPartidasResponseVO response = oAGController.validarArbitrajePreciosPartidas(r);
-					if(response != null) {
+					if(response != null) {						
 						listaResponse.add(response);
 					}
 				} catch (Exception e) {
@@ -385,9 +395,54 @@ public class ConsolidadoService {
 	}
 	
 	/*
+	 * 
+	 */
+	private void armarExcelPartidasNoAjuste(AjustePreciosRequestVO apRequest) {
+		log.info("armarExcelPartidasNoAjuste");
+		
+			
+	}
+	
+	/*
+	 * 
+	 */
+	private String armarExcelPartidasNoAjusteConAdjuto(AjustePreciosRequestVO apRequest) {
+		log.info("armarExcelPartidasNoAjusteConAdjuto");
+		
+		String encodedString = "";
+		ArrayList<PartidaResponseVO> partidas = new ArrayList<>();
+		
+		apRequest
+		.stream()
+		.forEach( a -> {
+			
+			PartidaResponseVO partida = new PartidaResponseVO();
+			partida.setSku(a.getSku());
+			partida.setIdPartida(a.getFolioPartida());
+
+			partidas.add(partida);
+			
+		});
+		
+		ExcelUtils eu = new ExcelUtils();
+		File archivo = eu.crearExcelNotificacionesFallidas(partidas);
+		
+		if(archivo != null) {
+			try {
+				encodedString = ConvertStringToBase64.encodeFileToBase64Binary(archivo);
+			} catch (IOException e) {
+				log.error("enviarCorreoPartidas {} ", e);
+			}
+		}
+		
+		return encodedString;
+	}
+	
+	/*
 	 * Servicio para enviar el ajuste de precios
 	 */
 	private void enviarAjustePrecios(String usuario, ArrayList<ArbitrajePreciosPartidasRequestVO> listaVerificarRegistrosReq, ArrayList<ConsultarArchivoConsolidadoResInner> consolidados) {
+		log.info("enviarAjustePrecios");
 		
 		if(!listaVerificarRegistrosReq.isEmpty()) {
 			
@@ -432,8 +487,34 @@ public class ConsolidadoService {
 						sb.append(consolidados.get(i).getNombreArchivo());
 						sb.append(CONTENIDO_HTML_BI_FINAL);
 						sb.append(CONTENIDO_HTML_PRECIOS_FALSE_FINAL);
-
-						enr.setContenidoHTML(sb.toString());
+						
+						if(apRequest.size() <= 10) {
+							sb.append(ARMAR_TABLA_INICIO_FALLIDOS);
+							
+							HtmlUtil hu = new HtmlUtil();
+							StringBuilder sbFallidas = hu.armarTablaPartidasFallidasAjuste(apRequest);
+							
+							sb.append(sbFallidas.toString());
+							sb.append(ARMAR_TABLA_FINAL_FALLIDOS);
+							
+							enr.setContenidoHTML(sb.toString());
+						} else {
+							
+							enr.setContenidoHTML(sb.toString());
+							
+							AdjuntosVO as = new AdjuntosVO();
+							
+							List<AdjuntoVO> listAd = new ArrayList<>();
+							
+							AdjuntoVO a = new AdjuntoVO();
+							a.setContenido(this.armarExcelPartidasNoAjusteConAdjuto(apRequest));
+							a.setNombreArchivo("reporteFallidas.xlsx");
+							
+							listAd.add(a);
+							as.setAdjunto(listAd);
+							
+							enr.setAdjuntos(as);
+						}
 						
 						oAGController.enviarNotificacion(enr);
 					}

@@ -24,8 +24,8 @@ public final class Constantes {
 	public static final String CUMPLE_ARBITRARIEDAD = "Cumple Arbitrariedad";
 	
 	public static final String NOMBRE_EXCEL = "Reporte.xlsx";
-	public static final String ASUNTO_ARBITRARIEDAD_TRUE = "Notificación de Partidas que cumplienron la arbitrariedad.";
-	public static final String CONTENIDO_HTML_ARBITRARIEDAD_TRUE = "'Se le informa que estas son las partidas que <i><b>si</b></i> cumplieron la arbitrariedad.'";
+	public static final String ASUNTO_ARBITRARIEDAD_TRUE = "Notificación de Partidas que cumplieron la arbitrariedad.";
+	public static final String CONTENIDO_HTML_ARBITRARIEDAD_TRUE = "'Se le informa que estas son las partidas que <i><b>si</b></i> cumplieron la arbitrariedad.' <br/><br/><br/>";
 	
 	public static final String ARMAR_TABLA_INICIO = "<html>\r\n" + 
 			"	<body >\r\n" + 
@@ -46,9 +46,25 @@ public final class Constantes {
 			"	</body>\r\n" + 
 			"</html>";
 	
+	public static final String ARMAR_TABLA_INICIO_FALLIDOS = "<html>\r\n" + 
+			"	<body >\r\n" + 
+			"		<table border=1>\r\n" + 
+			"			<caption>Partidas</caption>\r\n" + 
+			"			<tr>\r\n" + 
+			"				<th>\r\n" + 
+			"					SKU\r\n" + 
+			"				</th>\r\n" + 
+			"				<th>\r\n" + 
+			"					Id Partida\r\n" + 
+			"				</th>\r\n" + 
+			"			</tr>";
+	public static final String ARMAR_TABLA_FINAL_FALLIDOS = "		</table>\r\n" + 
+			"	</body>\r\n" + 
+			"</html>";
+	
 	public static final String ASUNTO_AJUSTE_PRECIOS_FALSE = "Notificación de Partidas a las que no se pudo hacer el ajuste de precios.";
 	public static final String CONTENIDO_HTML_PRECIOS_FALSE_INICIO = "'Se le informa que el reporte solicitado '";
-	public static final String CONTENIDO_HTML_PRECIOS_FALSE_FINAL = "' contiene las partidas que no han sido procesadas <br/><i>Favor de ingresar a al portal de inteligencia comercial para verificar los cambios realizados.</i>'";
+	public static final String CONTENIDO_HTML_PRECIOS_FALSE_FINAL = "' contiene las partidas que no han sido procesadas <br/><i>Favor de ingresar al portal de inteligencia comercial para verificar los cambios realizados.</i>' <br/><br/><br/>";
 	
 	public static final String CONTENIDO_HTML_BI = "<i><b>";
 	public static final String CONTENIDO_HTML_BI_FINAL = "</b></i>";
