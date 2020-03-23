@@ -41,7 +41,9 @@ import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-05T00:59:45.211Z")
 
@@ -118,11 +120,18 @@ public class UsuariosApiController implements UsuariosApi {
 					} else {
 						log.info("No concidencias.");
 						
+						usuarios = new ArrayList<InfoUsuario>();
+						//List<InfoUsuario>
+						resp.setUsuarios(usuarios);
+						return new ResponseEntity<ConsultaUsuarioRes>(resp, HttpStatus.OK);
+						
+						/*
 						NotFound nf = new NotFound();
 						nf.setCodigo("No existe el recurso con la información proporcionada. Verificar y volver a enviar la petición.");
 						nf.setMensaje("NMP-MDA-404");
 						
 						return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
+						*/
 					}
 				}
 
