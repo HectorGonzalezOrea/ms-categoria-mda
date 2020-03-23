@@ -400,8 +400,8 @@ public class UsuariosApiController implements UsuariosApi {
 						return new ResponseEntity<ResEstatus>(resp, HttpStatus.OK);
 					} else {
 						InternalServerError ie = new InternalServerError();
-						ie.setCodigo("NMP-MDA-500");
-						ie.setMensaje("Error interno del servidor");
+						ie.setCodigo("NMP-MDA-404");
+						ie.setMensaje("Usuario no encontrado");
 						
 						return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 					}
