@@ -708,21 +708,30 @@ public class UsuariosApiController implements UsuariosApi {
             		
             		log.info("peticion: " + peticion.toString());
             		
-            		Boolean insertado = usuarioService.crearUsuario(peticion);
-            		
-            		if(insertado) {
-            			GeneralResponse resp =  new GeneralResponse();
-            			resp.setMessage("Usuario creado correctamente.");
-            			
-            			return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
-            		} else {
-            			InternalServerError ie = new InternalServerError();
+            		if(Boolean.TRUE.equals(usuarioService.validarUsuarioAdmin(peticion.getPerfil()))) {
+                        InternalServerError ie = new InternalServerError();
         				ie.setCodigo("NMP-MDA-500");
-        				ie.setMensaje("Error interno del servidor");
+        				ie.setMensaje("Ya existe un usuario Administrador.");
                         
                         return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+
+            			
+            		} else {
+            			Boolean insertado = usuarioService.crearUsuario(peticion);
+                		
+                		if(insertado) {
+                			GeneralResponse resp =  new GeneralResponse();
+                			resp.setMessage("Usuario creado correctamente.");
+                			
+                			return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
+                		} else {
+                			InternalServerError ie = new InternalServerError();
+            				ie.setCodigo("NMP-MDA-500");
+            				ie.setMensaje("Error interno del servidor");
+                            
+                            return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+                		}
             		}
-            		
             	} else {
             		BadRequest br = new BadRequest();
 					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");

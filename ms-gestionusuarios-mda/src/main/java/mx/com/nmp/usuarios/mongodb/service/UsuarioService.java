@@ -722,6 +722,28 @@ public class UsuarioService {
 		return pf;
 	}
 	
+	public Boolean validarUsuarioAdmin(CapacidadUsuariosRes perfil) {
+		log.info("validarUsuarioAdmin");
+		
+		Boolean existente = false;
+		if (perfil != null && perfil.getIdPerfil() == 1) {
+
+			Query query = new Query();
+			
+			Criteria aux = Criteria.where(PERFIL).is(perfil.getIdPerfil());
+
+			query.addCriteria(aux);
+
+			UsuarioEntity usuario = mongoTemplate.findOne(query, UsuarioEntity.class);
+
+			if (usuario != null) {
+				existente = true;
+			}
+		}
+
+		return existente;
+	}
+	
 	/*
 	 * crear Usuario
 	 */
