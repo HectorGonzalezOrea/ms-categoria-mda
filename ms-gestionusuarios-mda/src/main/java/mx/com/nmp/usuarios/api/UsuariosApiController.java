@@ -117,7 +117,12 @@ public class UsuariosApiController implements UsuariosApi {
 						return new ResponseEntity<ConsultaUsuarioRes>(resp, HttpStatus.OK);
 					} else {
 						log.info("No concidencias.");
-						return new ResponseEntity<ConsultaUsuarioRes>(resp, HttpStatus.OK);
+						
+						NotFound nf = new NotFound();
+						nf.setCodigo("No existe el recurso con la información proporcionada. Verificar y volver a enviar la petición.");
+						nf.setMensaje("NMP-MDA-404");
+						
+						return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
 					}
 				}
 
@@ -180,8 +185,15 @@ public class UsuariosApiController implements UsuariosApi {
 				
 				CapacidadUsuariosRes resp = null;
 				
-				if(idPerfil != null && capacidadUsuarioReq != null) {
-					resp = usuarioService.crearPerfilCapacidad(new Integer(idPerfil), capacidadUsuarioReq);
+				if(idPerfil != null && !capacidadUsuarioReq.isEmpty()) {
+					
+					InternalServerError ie = usuarioService.validarCapacidadesCreacion(capacidadUsuarioReq);
+					
+					if(ie != null) {
+						return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+					} else {
+						resp = usuarioService.crearPerfilCapacidad(new Integer(idPerfil), capacidadUsuarioReq);
+					}
 				}
 				
 				if (resp != null) {
@@ -238,8 +250,15 @@ public class UsuariosApiController implements UsuariosApi {
 				
 				CapacidadUsuariosRes resp = null;
 				
-				if(idPerfil != null && modCapacidadReq != null) {
-					resp = usuarioService.modificarPerfilCapacidad(new Integer(idPerfil), modCapacidadReq);
+				if(idPerfil != null && !modCapacidadReq.isEmpty()) {
+					
+					InternalServerError ie = usuarioService.validarCapacidadesMod(modCapacidadReq);
+					
+					if(ie != null) {
+						return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+					} else {
+						resp = usuarioService.modificarPerfilCapacidad(new Integer(idPerfil), modCapacidadReq);
+					}
 				}
 				
 				if(resp != null) {

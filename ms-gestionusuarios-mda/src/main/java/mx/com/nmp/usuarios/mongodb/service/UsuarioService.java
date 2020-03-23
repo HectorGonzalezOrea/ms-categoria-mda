@@ -21,6 +21,7 @@ import mx.com.nmp.usuarios.model.CapacidadUsuariosRes.DescripcionPerfilEnum;
 import mx.com.nmp.usuarios.model.ConsultaHistoricoRes;
 import mx.com.nmp.usuarios.model.CrearHistoricoRes;
 import mx.com.nmp.usuarios.model.InfoUsuario;
+import mx.com.nmp.usuarios.model.InternalServerError;
 import mx.com.nmp.usuarios.model.ModCapacidadUsuario;
 import mx.com.nmp.usuarios.model.ModCapacidadUsuarioInner;
 import mx.com.nmp.usuarios.model.PerfilUsuario;
@@ -488,20 +489,66 @@ public class UsuarioService {
 		return resp;
 	}
 
+	public InternalServerError validarCapacidadesCreacion(CapacidadUsuariosReq capacidadUsuarioReq) {
+		log.info("validarCapacidades");
+		
+		InternalServerError ise = null;
+		
+		if(!capacidadUsuarioReq.isEmpty()) {
+			for(CapacidadUsuariosReqInner capacidad : capacidadUsuarioReq) {
+				mx.com.nmp.usuarios.model.CapacidadUsuariosReqInner.IdCapacidadEnum idEnum = capacidad.getIdCapacidad();
+				CapacidadEntity cap = capacidadRepository.findByIdCapacidad(new Integer(idEnum.toString()));
+				if(cap == null) {
+					
+					ise = new InternalServerError();
+					ise.setCodigo("NMP-MDA-500");
+					ise.setMensaje("Capacidades no validas");
+					
+					return ise;
+				}
+			}
+		}
+		
+		return ise;
+	}
+	
+	public InternalServerError validarCapacidadesMod(ModCapacidadUsuario modCapacidadReq) {
+		log.info("validarCapacidades");
+		
+		InternalServerError ise = null;
+		
+		if(!modCapacidadReq.isEmpty()) {
+			for(ModCapacidadUsuarioInner capacidad : modCapacidadReq) {
+				mx.com.nmp.usuarios.model.ModCapacidadUsuarioInner.IdCapacidadEnum idEnum = capacidad.getIdCapacidad();
+				CapacidadEntity cap = capacidadRepository.findByIdCapacidad(new Integer(idEnum.toString()));
+				if(cap == null) {
+					
+					ise = new InternalServerError();
+					ise.setCodigo("NMP-MDA-500");
+					ise.setMensaje("Capacidades no validas");
+					
+					return ise;
+				}
+			}
+		}
+		
+		return ise;
+	}
+	
 	/*
 	 * Modificar Capacidades de un perfil
 	 */
 	public CapacidadUsuariosRes modificarPerfilCapacidad(Integer idPerfil, ModCapacidadUsuario modCapacidadReq) {
 		log.info("UsuarioService.modificarPerfilCapacidad");
 		
-		
 		Boolean modificado = false;
 		PerfilEntity perfil = null;
 		
-		if(idPerfil != null && modCapacidadReq !=null) {
+		if(idPerfil != null && !modCapacidadReq.isEmpty()) {
+	
 			perfil = (PerfilEntity) perfilRepository.findByIdPerfil(idPerfil);
 
-			log.info("perfil: " + perfil);
+			log.info("perfil: {}" , perfil);
 
 			if (perfil != null) {
 				List<PerfilCapacidadEntity> pcList = perfilCapacidadRepository.findByIdPerfil(idPerfil);
@@ -516,7 +563,6 @@ public class UsuarioService {
 				Update updatePerfilCapacidad = new Update();
 
 				for (ModCapacidadUsuarioInner capacidad : modCapacidadReq) {
-					aux = null;
 					aux = Criteria.where(PERFIL).is(idPerfil);
 					mx.com.nmp.usuarios.model.ModCapacidadUsuarioInner.IdCapacidadEnum idEnum = capacidad.getIdCapacidad();
 
@@ -539,7 +585,7 @@ public class UsuarioService {
 		
 		CapacidadUsuariosRes resp = null;
 		
-		if(modificado) {
+		if(Boolean.TRUE.equals(modificado)) {
 			resp = this.buscarPerfilConCapacidades(idPerfil);
 		}
 		
@@ -579,7 +625,7 @@ public class UsuarioService {
 	private CapacidadUsuariosRes buscarPerfilConCapacidades(Integer idPerfil) {
 		log.info("UsuarioService.buscarPerfilConCapacidades");
 		
-		log.info("idPerfil: " + idPerfil);
+		log.info("idPerfil: {}" , idPerfil);
 		CapacidadUsuariosRes cureps = null;
 
 		if (idPerfil != null) {
@@ -625,7 +671,7 @@ public class UsuarioService {
 	public PerfilUsuario consultaPrefil(String usuario) {
 		log.info("consultaPrefil");
 		
-		log.info("usuario: " + usuario);
+		log.info("usuario: {}" , usuario);
 		
 		PerfilUsuario pf = null;
 		
@@ -652,7 +698,7 @@ public class UsuarioService {
 					
 					List<InfoUsuario> listUsuarios = this.getUsuarios(user.getNombre(), user.getApellidoPaterno(), user.getApellidoMaterno(), null, user.getUsuario(), null);
 					
-					if(listUsuarios !=null && listUsuarios.size() != 0) {
+					if(!listUsuarios.isEmpty()) {
 						
 						pf.setActivo(listUsuarios.get(0).isActivo());
 						pf.setApellidoMaterno(listUsuarios.get(0).getApellidoMaterno());
