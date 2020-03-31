@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiParam;
 import mx.com.nmp.usuarios.model.BadRequest;
 import mx.com.nmp.usuarios.model.CapacidadUsuariosReq;
 import mx.com.nmp.usuarios.model.CapacidadUsuariosRes;
-import mx.com.nmp.usuarios.model.ConflictRequest;
 import mx.com.nmp.usuarios.model.ConsultaHistoricoRes;
 import mx.com.nmp.usuarios.model.ConsultaUsuarioRes;
 import mx.com.nmp.usuarios.model.CrearHistoricoRes;
@@ -16,7 +15,6 @@ import mx.com.nmp.usuarios.model.InfoUsuario;
 import mx.com.nmp.usuarios.model.InternalServerError;
 import mx.com.nmp.usuarios.model.InvalidAuthentication;
 import mx.com.nmp.usuarios.model.ModCapacidadUsuario;
-import mx.com.nmp.usuarios.model.NotFound;
 import mx.com.nmp.usuarios.model.PerfilUsuario;
 import mx.com.nmp.usuarios.model.ReqEstatus;
 import mx.com.nmp.usuarios.model.ReqHistorico;
@@ -34,16 +32,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+
+import mx.com.nmp.usuarios.utils.Constantes;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-05T00:59:45.211Z")
 
@@ -85,6 +81,16 @@ public class UsuariosApiController implements UsuariosApi {
 		
 		log.info("Consulta Usuario.");
 		
+		String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+    	
+    	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
+    	}
+		
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			try {
@@ -102,8 +108,8 @@ public class UsuariosApiController implements UsuariosApi {
 				if (usuario == null || origen == null || destino == null) {
 					log.error("Error en el mensaje de petición, verifique la información");
 					BadRequest br = new BadRequest();
-					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCodigo("NMP-MDA-400");
+					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
@@ -150,8 +156,8 @@ public class UsuariosApiController implements UsuariosApi {
 			} catch (Exception e) {
 				log.error("Couldn't serialize response for content type application/json", e);
 				InternalServerError ie = new InternalServerError();
-				ie.setCodigo("NMP-MDA-500");
-				ie.setMensaje("Error interno del servidor");
+				ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
@@ -175,6 +181,16 @@ public class UsuariosApiController implements UsuariosApi {
 		
 		log.info("Agregar Capacidades al Perfil");
 		
+		String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+    	
+    	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
+    	}
+		
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			try {
@@ -186,8 +202,8 @@ public class UsuariosApiController implements UsuariosApi {
 				if (usuario == null || origen == null || destino == null) {
 					log.error("Error en el mensaje de petición, verifique la información");
 					BadRequest br = new BadRequest();
-					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCodigo("NMP-MDA-400");
+					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
@@ -209,8 +225,8 @@ public class UsuariosApiController implements UsuariosApi {
 					return new ResponseEntity<CapacidadUsuariosRes>(resp, HttpStatus.OK);
 				} else {
 					InternalServerError ie = new InternalServerError();
-					ie.setCodigo("NMP-MDA-500");
-					ie.setMensaje("Error interno del servidor");
+					ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+    				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 					
 					return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 				}
@@ -244,6 +260,16 @@ public class UsuariosApiController implements UsuariosApi {
 		
 		log.info("Modificar las capacidades de un perfil");
 		
+		String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+    	
+    	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
+    	}
+		
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			try {
@@ -251,8 +277,8 @@ public class UsuariosApiController implements UsuariosApi {
 				if (usuario == null || origen == null || destino == null) {
 					log.error("Error en el mensaje de petición, verifique la información");
 					BadRequest br = new BadRequest();
-					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCodigo("NMP-MDA-400");
+					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
@@ -274,16 +300,16 @@ public class UsuariosApiController implements UsuariosApi {
 					return new ResponseEntity<CapacidadUsuariosRes>(resp, HttpStatus.OK);
 				} else {
 					InternalServerError ie = new InternalServerError();
-					ie.setCodigo("NMP-MDA-500");
-					ie.setMensaje("Error interno del servidor");
+					ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+    				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 					
 					return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 				}
 			} catch (Exception e) {
 				log.error("Couldn't serialize response for content type application/json", e);
 				InternalServerError ie = new InternalServerError();
-				ie.setCodigo("NMP-MDA-500");
-				ie.setMensaje("Error interno del servidor");
+				ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
@@ -307,6 +333,16 @@ public class UsuariosApiController implements UsuariosApi {
 		
 		log.info("Eliminar Usuario.");
 		
+		String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+    	
+    	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
+    	}
+		
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			try {
@@ -318,8 +354,8 @@ public class UsuariosApiController implements UsuariosApi {
 				if (usuario == null || origen == null || destino == null) {
 					log.error("Error en el mensaje de petición, verifique la información");
 					BadRequest br = new BadRequest();
-					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCodigo("NMP-MDA-400");
+					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
@@ -327,8 +363,8 @@ public class UsuariosApiController implements UsuariosApi {
 				if (idUsuario == null) {
 					log.error("Error en el mensaje de petición, verifique la información");
 					BadRequest br = new BadRequest();
-					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCodigo("NMP-MDA-400");
+					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				} else {
@@ -348,8 +384,8 @@ public class UsuariosApiController implements UsuariosApi {
 			} catch (Exception e) {
 				log.error("Couldn't serialize response for content type application/json", e);
 				InternalServerError ie = new InternalServerError();
-				ie.setCodigo("NMP-MDA-500");
-				ie.setMensaje("Error interno del servidor");
+				ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
@@ -374,6 +410,16 @@ public class UsuariosApiController implements UsuariosApi {
 		
 		log.info("Modificar Usuario Estatus.");
 
+		String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+    	
+    	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
+    	}
+		
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			try {
@@ -387,8 +433,8 @@ public class UsuariosApiController implements UsuariosApi {
 				if (usuario == null || origen == null || destino == null) {
 					log.error("Error en el mensaje de petición, verifique la información");
 					BadRequest br = new BadRequest();
-					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCodigo("NMP-MDA-400");
+					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
@@ -408,16 +454,16 @@ public class UsuariosApiController implements UsuariosApi {
 				} else {
 					log.error("Error en el mensaje de petición, verifique la información");
 					BadRequest br = new BadRequest();
-					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCodigo("NMP-MDA-400");
+					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
 			} catch (Exception e) {
 				log.error("Couldn't serialize response for content type application/json", e);
 				InternalServerError ie = new InternalServerError();
-				ie.setCodigo("NMP-MDA-500");
-				ie.setMensaje("Error interno del servidor");
+				ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
@@ -439,6 +485,19 @@ public class UsuariosApiController implements UsuariosApi {
 			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
 			@ApiParam(value = "Identificador del usuario.", required = true) @PathVariable("idUsuario") String idUsuario,
 			@ApiParam(value = "petición para modificar el perfil a un usuario.") @Valid @RequestBody ReqPerfil modificarPerfilReq) {
+		
+		log.info("Modificar Perfil del usuario actual");
+		
+    	String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+    	
+    	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
+    	}
+		
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			try {
@@ -452,8 +511,8 @@ public class UsuariosApiController implements UsuariosApi {
 				if (usuario == null || origen == null || destino == null) {
 					log.error("Error en el mensaje de petición, verifique la información");
 					BadRequest br = new BadRequest();
-					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCodigo("NMP-MDA-400");
+					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
@@ -462,8 +521,8 @@ public class UsuariosApiController implements UsuariosApi {
 					resp = usuarioService.actualizarPerfilUsuario(new Integer(idUsuario), modificarPerfilReq.getIdPerfil());
 				} else {
 					BadRequest br = new BadRequest();
-					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCodigo("NMP-MDA-400");
+					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
@@ -472,8 +531,8 @@ public class UsuariosApiController implements UsuariosApi {
 					return new ResponseEntity<CapacidadUsuariosRes>(resp, HttpStatus.OK);
 				} else {
 					InternalServerError ie = new InternalServerError();
-					ie.setCodigo("NMP-MDA-500");
-					ie.setMensaje("Error interno del servidor");
+					ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+    				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 					
 					return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 				}
@@ -486,8 +545,8 @@ public class UsuariosApiController implements UsuariosApi {
 			} catch (Exception e) {
 				log.error("Couldn't serialize response for content type application/json", e);
 				InternalServerError ie = new InternalServerError();
-				ie.setCodigo("NMP-MDA-500");
-				ie.setMensaje("Error interno del servidor");
+				ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
@@ -511,6 +570,16 @@ public class UsuariosApiController implements UsuariosApi {
 			@NotNull @ApiParam(value = "identificador del usuario.", required = true) @Valid @RequestParam(value = "idUsuario", required = true) Integer idUsuario) {
 		log.info("Get Historial");
 
+    	String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+    	
+    	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
+    	}
+		
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			try {
@@ -523,8 +592,8 @@ public class UsuariosApiController implements UsuariosApi {
 					log.info("destino: " + destino);
 					
 					BadRequest br = new BadRequest();
-					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCodigo("NMP-MDA-400");
+					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
@@ -540,16 +609,16 @@ public class UsuariosApiController implements UsuariosApi {
 					}
 				} else {
 					BadRequest br = new BadRequest();
-					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCodigo("NMP-MDA-400");
+					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
 			} catch (Exception e) {
 				log.error("Couldn't serialize response for content type application/json", e);
 				InternalServerError ie = new InternalServerError();
-				ie.setCodigo("NMP-MDA-500");
-				ie.setMensaje("Error interno del servidor");
+				ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
@@ -572,6 +641,16 @@ public class UsuariosApiController implements UsuariosApi {
 			@ApiParam(value = "peticion para crear el registro histórico de un usuario en el portal.") @Valid @RequestBody ReqHistorico historicoEnvioReq) {
 		log.info("Agregar historico");
 
+    	String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+    	
+    	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
+    	}
+		
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			try {
@@ -582,8 +661,8 @@ public class UsuariosApiController implements UsuariosApi {
 					log.info("destino: " + destino);
 					
 					BadRequest br = new BadRequest();
-					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCodigo("NMP-MDA-400");
+					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
@@ -600,23 +679,23 @@ public class UsuariosApiController implements UsuariosApi {
 						return new ResponseEntity<CrearHistoricoRes>(resp, HttpStatus.OK);
 					} else {
 						InternalServerError ie = new InternalServerError();
-						ie.setCodigo("NMP-MDA-500");
-						ie.setMensaje("Error interno del servidor");
+						ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+        				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 						
 						return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 					}
 				} else {
 					BadRequest br = new BadRequest();
-					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCodigo("NMP-MDA-400");
+					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
 			} catch (Exception e) {
 				log.error("Couldn't serialize response for content type application/json", e);
 				InternalServerError ie = new InternalServerError();
-				ie.setCodigo("NMP-MDA-500");
-				ie.setMensaje("Error interno del servidor");
+				ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
@@ -632,34 +711,45 @@ public class UsuariosApiController implements UsuariosApi {
 	 * /usuarios/perfil
 	 * Consulta Perfil
 	 */
-    public ResponseEntity<?> usuariosPerfilGet(@ApiParam(value = "Usuario en el sistema origen que lanza la petición." ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición." ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información." ,required=true, allowableValues="Mongo, mockserver") @RequestHeader(value="destino", required=true) String destino) {
+    public ResponseEntity<?> usuariosPerfilGet(@ApiParam(value = "Usuario en el sistema origen que lanza la petición." ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición." ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información." ,required=true, allowableValues="Mongo, mockserver") @RequestHeader(value="destino", required=true) String destino, @RequestHeader(value="token", required=true)String token) {
     	log.info("Consultar Perfil Usuario");
+    	
+    	String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+    	
+    	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
+    	}
     	
     	String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-
-            	if (usuario == null || destino == null || origen == null) {
+            	
+            	if (usuario == null || destino == null || origen == null  || token == null) {
 					log.info("usuario: " + usuario);
 					log.info("origen: " + origen);
 					log.info("destino: " + destino);
+					log.info("token: " + token);
 					
 					BadRequest br = new BadRequest();
-					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCodigo("NMP-MDA-400");
+					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 				}
 
             	if(usuario != null && !usuario.equals("")) {
-            		PerfilUsuario resp = usuarioService.consultaPrefil(usuario);
+            		PerfilUsuario resp = usuarioService.consultaPrefil(usuario, token);
             		
             		if(resp != null) {
             			return new ResponseEntity<PerfilUsuario>(resp, HttpStatus.OK);
             		} else {
             			InternalServerError ie = new InternalServerError();
-        				ie.setCodigo("NMP-MDA-500");
-        				ie.setMensaje("Error interno del servidor");
+            			ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+        				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
         				
             			return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
             		}
@@ -668,8 +758,8 @@ public class UsuariosApiController implements UsuariosApi {
                 log.error("Couldn't serialize response for content type application/json", e);
                 
                 InternalServerError ie = new InternalServerError();
-				ie.setCodigo("NMP-MDA-500");
-				ie.setMensaje("Error interno del servidor");
+                ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
                 
                 return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -688,6 +778,16 @@ public class UsuariosApiController implements UsuariosApi {
     public ResponseEntity<?> usuariosPost(@ApiParam(value = "Usuario en el sistema origen que lanza la petición." ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición." ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información." ,required=true, allowableValues="Mongo, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = ""  )  @Valid @RequestBody InfoUsuario peticion) {
     	log.info("Crear Usuario");
     	
+    	String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+    	
+    	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
+    	}
+    	
     	String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
@@ -698,8 +798,8 @@ public class UsuariosApiController implements UsuariosApi {
 					log.info("destino: " + destino);
 					
 					BadRequest br = new BadRequest();
-					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCodigo("NMP-MDA-400");
+					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 				}
@@ -710,8 +810,8 @@ public class UsuariosApiController implements UsuariosApi {
             		
             		if(Boolean.TRUE.equals(usuarioService.validarUsuarioAdmin(peticion.getPerfil()))) {
                         InternalServerError ie = new InternalServerError();
-        				ie.setCodigo("NMP-MDA-500");
-        				ie.setMensaje("Ya existe un usuario Administrador.");
+        				ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+        				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR_ADMIN);
                         
                         return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 
@@ -726,24 +826,24 @@ public class UsuariosApiController implements UsuariosApi {
                 			return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
                 		} else {
                 			InternalServerError ie = new InternalServerError();
-            				ie.setCodigo("NMP-MDA-500");
-            				ie.setMensaje("Error interno del servidor");
+                			ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+            				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
                             
                             return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
                 		}
             		}
             	} else {
             		BadRequest br = new BadRequest();
-					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCodigo("NMP-MDA-400");
+					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
             	}
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 InternalServerError ie = new InternalServerError();
-				ie.setCodigo("NMP-MDA-500");
-				ie.setMensaje("Error interno del servidor");
+				ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
                 
                 return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
             }

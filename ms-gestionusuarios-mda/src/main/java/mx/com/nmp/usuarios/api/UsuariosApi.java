@@ -185,15 +185,14 @@ public interface UsuariosApi {
 			@ApiParam(value = "petición para modificar el perfil a un usuario.") @Valid @RequestBody ReqPerfil modificarPerfilReq);
 	
 	@ApiOperation(value = "Consulta el perfil del usuario", nickname = "usuariosPerfilGet", notes = "Recurso para la consulta del perfil del usuario en el AD y en Mongo DB", response = PerfilUsuario.class, authorizations = {
-	        @Authorization(value = "Bearer"),
-	        @Authorization(value = "apiKey")
-	    }, tags={ "Usuarios", })
-	    @ApiResponses(value = { 
-	        @ApiResponse(code = 200, message = "Consulta exitosa", response = PerfilUsuario.class) })
-	    @RequestMapping(value = "/usuarios/perfil",
-	        produces = { "application/json" }, 
-	        method = RequestMethod.GET)
-	ResponseEntity<?> usuariosPerfilGet(@ApiParam(value = "Usuario en el sistema origen que lanza la petición." ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición." ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información." ,required=true, allowableValues="Mongo, mockserver") @RequestHeader(value="destino", required=true) String destino);
+			@Authorization(value = "Bearer"), @Authorization(value = "apiKey") }, tags = { "Usuarios", })
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Consulta exitosa", response = PerfilUsuario.class) })
+	@RequestMapping(value = "/usuarios/perfil", produces = { "application/json" }, method = RequestMethod.GET)
+	ResponseEntity<?> usuariosPerfilGet(
+			@ApiParam(value = "Usuario en el sistema origen que lanza la petición.", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Sistema que origina la petición.", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
+			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
+			@ApiParam(value = "Access Token del usuario loggeado." ,required=true) @RequestHeader(value="token", required=true) String token);
 
 
 	    @ApiOperation(value = "Registra un usuario", nickname = "usuariosPost", notes = "Recurso utilizado para el registro de un usuario en Mongo DB", response = GeneralResponse.class, authorizations = {

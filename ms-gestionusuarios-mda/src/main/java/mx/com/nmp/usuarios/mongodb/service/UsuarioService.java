@@ -668,7 +668,7 @@ public class UsuarioService {
 	 * Consulta Perfil
 	 */
 	
-	public PerfilUsuario consultaPrefil(String usuario) {
+	public PerfilUsuario consultaPrefil(String usuario, String token) {
 		log.info("consultaPrefil");
 		
 		log.info("usuario: {}" , usuario);
@@ -687,7 +687,7 @@ public class UsuarioService {
 				
 				iuRequest.setFiltro(filtro);				
 				
-				IdentidadUsuarioResponseVO identidadUsuario = oagController.identidadUsuario(iuRequest);
+				IdentidadUsuarioResponseVO identidadUsuario = oagController.identidadUsuario(iuRequest, token);
 				
 				if(identidadUsuario != null) {
 					pf = new PerfilUsuario();

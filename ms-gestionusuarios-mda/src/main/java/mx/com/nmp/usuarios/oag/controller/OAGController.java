@@ -69,14 +69,14 @@ public class OAGController extends OAGBaseController {
 	}
 	
 	@PostMapping(path = "/identidadUsuario")
-	public IdentidadUsuarioResponseVO identidadUsuario(IdentidadUsuarioRequestVO request) {
+	public IdentidadUsuarioResponseVO identidadUsuario(IdentidadUsuarioRequestVO request, String oauthBearer) {
 		Unirest.setTimeouts(0, 0);
 		
 		IdentidadUsuarioResponseVO resp = null;
 		
 		String credenciales = usuario + ":" + password;
 		String autenticacionBasica = "Basic " + ConvertStringToBase64.encode(credenciales);
-		String oauthBearer = this.getToken();
+		//String oauthBearer = this.getToken();
 		
 		request.setGrupo(grupo);
 		
