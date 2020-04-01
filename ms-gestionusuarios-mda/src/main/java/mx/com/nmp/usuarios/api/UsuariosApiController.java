@@ -15,6 +15,7 @@ import mx.com.nmp.usuarios.model.InfoUsuario;
 import mx.com.nmp.usuarios.model.InternalServerError;
 import mx.com.nmp.usuarios.model.InvalidAuthentication;
 import mx.com.nmp.usuarios.model.ModCapacidadUsuario;
+import mx.com.nmp.usuarios.model.NotFound;
 import mx.com.nmp.usuarios.model.PerfilUsuario;
 import mx.com.nmp.usuarios.model.ReqEstatus;
 import mx.com.nmp.usuarios.model.ReqHistorico;
@@ -81,7 +82,7 @@ public class UsuariosApiController implements UsuariosApi {
 		
 		log.info("Consulta Usuario.");
 		
-		String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+		String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
     	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
     		InvalidAuthentication ia = new InvalidAuthentication();
@@ -91,8 +92,8 @@ public class UsuariosApiController implements UsuariosApi {
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
 		
-		String accept = request.getHeader("Accept");
-		if (accept != null && accept.contains("application/json")) {
+		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
 			try {
 
 				log.info("usuario: " + usuario);
@@ -130,14 +131,6 @@ public class UsuariosApiController implements UsuariosApi {
 						//List<InfoUsuario>
 						resp.setUsuarios(usuarios);
 						return new ResponseEntity<ConsultaUsuarioRes>(resp, HttpStatus.OK);
-						
-						/*
-						NotFound nf = new NotFound();
-						nf.setCodigo("No existe el recurso con la información proporcionada. Verificar y volver a enviar la petición.");
-						nf.setMensaje("NMP-MDA-404");
-						
-						return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
-						*/
 					}
 				}
 
@@ -161,8 +154,13 @@ public class UsuariosApiController implements UsuariosApi {
 				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
+		} else {
+			BadRequest br = new BadRequest();
+			br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+			br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+			
+			return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<ConsultaUsuarioRes>(HttpStatus.NOT_IMPLEMENTED);
 	}
 
 	/*
@@ -181,7 +179,7 @@ public class UsuariosApiController implements UsuariosApi {
 		
 		log.info("Agregar Capacidades al Perfil");
 		
-		String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+		String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
     	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
     		InvalidAuthentication ia = new InvalidAuthentication();
@@ -191,8 +189,8 @@ public class UsuariosApiController implements UsuariosApi {
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
 		
-		String accept = request.getHeader("Accept");
-		if (accept != null && accept.contains("application/json")) {
+		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
 			try {
 				log.info("usuario: " + usuario);
 				log.info("origen: " + origen);
@@ -239,9 +237,13 @@ public class UsuariosApiController implements UsuariosApi {
 				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
+		} else {
+			BadRequest br = new BadRequest();
+			br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+			br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+			
+			return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 		}
-
-		return new ResponseEntity<CapacidadUsuariosRes>(HttpStatus.NOT_IMPLEMENTED);
 	}
 
 	/*
@@ -260,7 +262,7 @@ public class UsuariosApiController implements UsuariosApi {
 		
 		log.info("Modificar las capacidades de un perfil");
 		
-		String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+		String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
     	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
     		InvalidAuthentication ia = new InvalidAuthentication();
@@ -270,8 +272,8 @@ public class UsuariosApiController implements UsuariosApi {
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
 		
-		String accept = request.getHeader("Accept");
-		if (accept != null && accept.contains("application/json")) {
+		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
 			try {
 				
 				if (usuario == null || origen == null || destino == null) {
@@ -286,6 +288,8 @@ public class UsuariosApiController implements UsuariosApi {
 				CapacidadUsuariosRes resp = null;
 				
 				if(idPerfil != null && !modCapacidadReq.isEmpty()) {
+					
+					log.info("Request : {}" , modCapacidadReq.toString());
 					
 					InternalServerError ie = usuarioService.validarCapacidadesMod(modCapacidadReq);
 					
@@ -313,9 +317,13 @@ public class UsuariosApiController implements UsuariosApi {
 				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
+		} else {
+			BadRequest br = new BadRequest();
+			br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+			br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+			
+			return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 		}
-
-		return new ResponseEntity<CapacidadUsuariosRes>(HttpStatus.NOT_IMPLEMENTED);
 	}
 	
 	/*
@@ -333,7 +341,7 @@ public class UsuariosApiController implements UsuariosApi {
 		
 		log.info("Eliminar Usuario.");
 		
-		String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+		String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
     	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
     		InvalidAuthentication ia = new InvalidAuthentication();
@@ -343,8 +351,8 @@ public class UsuariosApiController implements UsuariosApi {
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
 		
-		String accept = request.getHeader("Accept");
-		if (accept != null && accept.contains("application/json")) {
+		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
 			try {
 				log.info("usuario: " + usuario);
 				log.info("origen: " + origen);
@@ -368,17 +376,28 @@ public class UsuariosApiController implements UsuariosApi {
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				} else {
-					Boolean eliminado = usuarioService.deleteUsuario(idUsuario);
-					EliminarUsuariosRes resp = new EliminarUsuariosRes();
+					
+					if(Boolean.TRUE.equals(usuarioService.consultarIdUsuario(idUsuario))) {
+						Boolean eliminado = usuarioService.deleteUsuario(idUsuario);
+						EliminarUsuariosRes resp = new EliminarUsuariosRes();
 
-					if (eliminado) {
-						resp.setCode("200");
-						resp.setMessage("Usuario eliminado exitosamente");
-						return new ResponseEntity<EliminarUsuariosRes>(resp, HttpStatus.OK);
+						if (eliminado) {
+							resp.setCode(Constantes.SUCESS_CODE);
+							resp.setMessage(Constantes.SUCESS_MESSAGE_ELIMINAR_USUARIO);
+							return new ResponseEntity<EliminarUsuariosRes>(resp, HttpStatus.OK);
+						} else {
+							InternalServerError ie = new InternalServerError();
+							ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+							ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
+							
+							return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+						}
 					} else {
-						resp.setCode("200");
-						resp.setMessage("Usuario no eliminado");
-						return new ResponseEntity<EliminarUsuariosRes>(resp, HttpStatus.OK);
+						NotFound nf = new NotFound();
+						nf.codigo(Constantes.ERROR_CODE_NOT_FOUND);
+						nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND_USUARIO);
+						
+						return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
 					}
 				}
 			} catch (Exception e) {
@@ -389,9 +408,13 @@ public class UsuariosApiController implements UsuariosApi {
 				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
+		} else {
+			BadRequest br = new BadRequest();
+			br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+			br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+			
+			return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 		}
-
-		return new ResponseEntity<EliminarUsuariosRes>(HttpStatus.NOT_IMPLEMENTED);
 	}
 	
 	/*
@@ -410,7 +433,7 @@ public class UsuariosApiController implements UsuariosApi {
 		
 		log.info("Modificar Usuario Estatus.");
 
-		String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+		String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
     	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
     		InvalidAuthentication ia = new InvalidAuthentication();
@@ -420,8 +443,8 @@ public class UsuariosApiController implements UsuariosApi {
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
 		
-		String accept = request.getHeader("Accept");
-		if (accept != null && accept.contains("application/json")) {
+		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
 			try {
 
 				log.info("usuario: " + usuario);
@@ -446,8 +469,8 @@ public class UsuariosApiController implements UsuariosApi {
 						return new ResponseEntity<ResEstatus>(resp, HttpStatus.OK);
 					} else {
 						InternalServerError ie = new InternalServerError();
-						ie.setCodigo("NMP-MDA-404");
-						ie.setMensaje("Usuario no encontrado");
+						ie.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
+						ie.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND_USUARIO);
 						
 						return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 					}
@@ -467,9 +490,13 @@ public class UsuariosApiController implements UsuariosApi {
 				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
+		} else {
+			BadRequest br = new BadRequest();
+			br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+			br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+			
+			return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 		}
-
-		return new ResponseEntity<ResEstatus>(HttpStatus.NOT_IMPLEMENTED);
 	}
 
 	/*
@@ -488,7 +515,7 @@ public class UsuariosApiController implements UsuariosApi {
 		
 		log.info("Modificar Perfil del usuario actual");
 		
-    	String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+    	String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
     	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
     		InvalidAuthentication ia = new InvalidAuthentication();
@@ -498,8 +525,8 @@ public class UsuariosApiController implements UsuariosApi {
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
 		
-		String accept = request.getHeader("Accept");
-		if (accept != null && accept.contains("application/json")) {
+		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
 			try {
 				
 				CapacidadUsuariosRes resp = null;
@@ -537,11 +564,6 @@ public class UsuariosApiController implements UsuariosApi {
 					return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 				}
 				
-				/*
-				return new ResponseEntity<CapacidadUsuariosRes>(objectMapper.readValue(
-						"{  \"idPerfil\" : 3,  \"descripcionPerfil\" : \"Consultor\",  \"informacionPerfil\" : \"\"}",
-						CapacidadUsuariosRes.class), HttpStatus.NOT_IMPLEMENTED);
-				*/
 			} catch (Exception e) {
 				log.error("Couldn't serialize response for content type application/json", e);
 				InternalServerError ie = new InternalServerError();
@@ -550,9 +572,13 @@ public class UsuariosApiController implements UsuariosApi {
 				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
+		} else {
+			BadRequest br = new BadRequest();
+			br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+			br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+			
+			return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 		}
-
-		return new ResponseEntity<CapacidadUsuariosRes>(HttpStatus.NOT_IMPLEMENTED);
 	}
 	
 
@@ -568,9 +594,10 @@ public class UsuariosApiController implements UsuariosApi {
 			@ApiParam(value = "Sistema que origina la petición.", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
 			@NotNull @ApiParam(value = "identificador del usuario.", required = true) @Valid @RequestParam(value = "idUsuario", required = true) Integer idUsuario) {
+		
 		log.info("Get Historial");
 
-    	String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+    	String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
     	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
     		InvalidAuthentication ia = new InvalidAuthentication();
@@ -580,8 +607,8 @@ public class UsuariosApiController implements UsuariosApi {
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
 		
-		String accept = request.getHeader("Accept");
-		if (accept != null && accept.contains("application/json")) {
+		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
 			try {
 
 				ConsultaHistoricoRes resp = null;
@@ -604,8 +631,6 @@ public class UsuariosApiController implements UsuariosApi {
 					
 					if(resp != null) {
 						return new ResponseEntity<ConsultaHistoricoRes>(resp, HttpStatus.OK);
-					} else {
-						return new ResponseEntity<ConsultaHistoricoRes>(resp, HttpStatus.OK);
 					}
 				} else {
 					BadRequest br = new BadRequest();
@@ -623,8 +648,14 @@ public class UsuariosApiController implements UsuariosApi {
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
-
-		return new ResponseEntity<ConsultaHistoricoRes>(HttpStatus.NOT_IMPLEMENTED);
+		
+		
+		BadRequest br = new BadRequest();
+		br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+		br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+			
+		return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
+		
 	}
 	
 	/*
@@ -641,7 +672,7 @@ public class UsuariosApiController implements UsuariosApi {
 			@ApiParam(value = "peticion para crear el registro histórico de un usuario en el portal.") @Valid @RequestBody ReqHistorico historicoEnvioReq) {
 		log.info("Agregar historico");
 
-    	String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+    	String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
     	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
     		InvalidAuthentication ia = new InvalidAuthentication();
@@ -651,8 +682,8 @@ public class UsuariosApiController implements UsuariosApi {
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
 		
-		String accept = request.getHeader("Accept");
-		if (accept != null && accept.contains("application/json")) {
+		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
 			try {
 
 				if (usuario == null || destino == null || origen == null) {
@@ -673,14 +704,22 @@ public class UsuariosApiController implements UsuariosApi {
 					log.info("Accion: " + historicoEnvioReq.getAccion());
 					log.info("Fecha: " + historicoEnvioReq.getFecha());
 					
-					CrearHistoricoRes resp = usuarioService.crearHistorico(historicoEnvioReq.getAccion(), historicoEnvioReq.getFecha(), historicoEnvioReq.getIdPerfil(), historicoEnvioReq.getUsuario());
-					
-					if(resp != null) {
-						return new ResponseEntity<CrearHistoricoRes>(resp, HttpStatus.OK);
+					if(Boolean.TRUE.equals(usuarioService.consultarUsuario(historicoEnvioReq.getUsuario())) && Boolean.TRUE.equals(usuarioService.consultarPerfil(historicoEnvioReq.getIdPerfil()))) {
+						CrearHistoricoRes resp = usuarioService.crearHistorico(historicoEnvioReq.getAccion(), historicoEnvioReq.getFecha(), historicoEnvioReq.getIdPerfil(), historicoEnvioReq.getUsuario());
+						
+						if(resp != null) {
+							return new ResponseEntity<CrearHistoricoRes>(resp, HttpStatus.OK);
+						} else {
+							InternalServerError ie = new InternalServerError();
+							ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+	        				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
+							
+							return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+						}
 					} else {
 						InternalServerError ie = new InternalServerError();
 						ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
-        				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
+						ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR_PERFIL_USUARIO);
 						
 						return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 					}
@@ -699,9 +738,13 @@ public class UsuariosApiController implements UsuariosApi {
 				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
+		} else {
+			BadRequest br = new BadRequest();
+			br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+			br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+			
+			return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 		}
-
-		return new ResponseEntity<CrearHistoricoRes>(HttpStatus.NOT_IMPLEMENTED);
 	}
 	
 	/*
@@ -711,10 +754,15 @@ public class UsuariosApiController implements UsuariosApi {
 	 * /usuarios/perfil
 	 * Consulta Perfil
 	 */
-    public ResponseEntity<?> usuariosPerfilGet(@ApiParam(value = "Usuario en el sistema origen que lanza la petición." ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición." ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información." ,required=true, allowableValues="Mongo, mockserver") @RequestHeader(value="destino", required=true) String destino, @RequestHeader(value="token", required=true)String token) {
+	public ResponseEntity<?> usuariosPerfilGet(
+			@ApiParam(value = "Usuario en el sistema origen que lanza la petición.", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Sistema que origina la petición.", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
+			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
+			@RequestHeader(value = "token", required = true) String token) {
+		
     	log.info("Consultar Perfil Usuario");
     	
-    	String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+    	String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
     	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
     		InvalidAuthentication ia = new InvalidAuthentication();
@@ -724,8 +772,8 @@ public class UsuariosApiController implements UsuariosApi {
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
     	
-    	String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+    	String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
             try {
             	
             	if (usuario == null || destino == null || origen == null  || token == null) {
@@ -764,8 +812,12 @@ public class UsuariosApiController implements UsuariosApi {
                 return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-
-        return new ResponseEntity<PerfilUsuario>(HttpStatus.NOT_IMPLEMENTED);
+        
+        BadRequest br = new BadRequest();
+		br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+		br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+			
+		return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
     }
 
 	/*
@@ -775,10 +827,14 @@ public class UsuariosApiController implements UsuariosApi {
 	 * /usuarios
 	 * Crear Usuario
 	 */
-    public ResponseEntity<?> usuariosPost(@ApiParam(value = "Usuario en el sistema origen que lanza la petición." ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición." ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información." ,required=true, allowableValues="Mongo, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = ""  )  @Valid @RequestBody InfoUsuario peticion) {
+	public ResponseEntity<?> usuariosPost(
+			@ApiParam(value = "Usuario en el sistema origen que lanza la petición.", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Sistema que origina la petición.", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
+			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
+			@ApiParam(value = "") @Valid @RequestBody InfoUsuario peticion) {
     	log.info("Crear Usuario");
     	
-    	String apiKeyBluemix = request.getHeader("X-IBM-Client-Id");
+    	String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
     	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
     		InvalidAuthentication ia = new InvalidAuthentication();
@@ -788,8 +844,8 @@ public class UsuariosApiController implements UsuariosApi {
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
     	
-    	String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+    	String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
             try {
             	
             	if (usuario == null || destino == null || origen == null) {
@@ -847,9 +903,13 @@ public class UsuariosApiController implements UsuariosApi {
                 
                 return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        }
-
-        return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
+        } else {
+			BadRequest br = new BadRequest();
+			br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
+			br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+			
+			return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
+		}
     }
 	
 }

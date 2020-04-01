@@ -14,6 +14,11 @@ public class Constantes {
 	
 	public static final int STATUS_CODE_OK = 200;
 
+	public static final String SUCESS_CODE = "NMP-MDA-200";
+	public static final String SUCESS_MESSAGE = "Petición exitosamente";
+	public static final String SUCESS_MESSAGE_ELIMINAR_USUARIO = "Usuario eliminado exitosamente";
+	public static final String SUCESS_MESSAGE_ELIMINAR_USUARIO_FAIL = "Usuario no eliminado";
+	
 	public static final String ERROR_CODE_INVALID_AUTHENTICATION = "NMP-MDA-401";
 	public static final String ERROR_MESSAGE_INVALID_AUTHENTICATION = "Se ha producido un error de autorización";
 	
@@ -23,5 +28,11 @@ public class Constantes {
 	public static final String ERROR_CODE_INTERNAL_ERROR = "NMP-MDA-500";
 	public static final String ERROR_MESSAGE_INTERNAL_ERROR = "Error interno del servidor";
 	public static final String ERROR_MESSAGE_INTERNAL_ERROR_ADMIN = "Ya existe un usuario Administrador";
+	public static final String ERROR_MESSAGE_INTERNAL_ERROR_CAP_NO_VALIDAS = "Capacidades no válidas.";
+	public static final String ERROR_MESSAGE_INTERNAL_ERROR_PERFIL_USUARIO = "Perfil o usuario no existente";
+	
+	public static final String ERROR_CODE_NOT_FOUND = "NMP-MDA-404";
+	public static final String ERROR_MESSAGE_NOT_FOUND = "No existe el recurso con la información proporcionada. Verificar y volver a enviar la petición";
+	public static final String ERROR_MESSAGE_NOT_FOUND_USUARIO = "Usuario no existente";
 	
 }

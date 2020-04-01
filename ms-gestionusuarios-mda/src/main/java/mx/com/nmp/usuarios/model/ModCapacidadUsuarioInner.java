@@ -124,7 +124,7 @@ public class ModCapacidadUsuarioInner   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ModCapacidadUsuarioInner {\n");
+    sb.append(" {\n");
     
     sb.append("    idCapacidad: ").append(toIndentedString(idCapacidad)).append("\n");
     sb.append("}");

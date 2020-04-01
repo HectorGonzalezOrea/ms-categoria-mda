@@ -58,6 +58,7 @@ import mx.com.nmp.usuarios.oag.vo.FiltroVO;
 import mx.com.nmp.usuarios.oag.vo.IdentidadUsuarioRequestVO;
 import mx.com.nmp.usuarios.oag.vo.IdentidadUsuarioResponseVO;
 import mx.com.nmp.usuarios.oag.vo.UsuarioVO;
+import mx.com.nmp.usuarios.utils.Constantes;
 import mx.com.nmp.usuarios.utils.ConverterUtil;
 import mx.com.nmp.usuarios.mongodb.repository.PerfilCapacidadRepository;
 import mx.com.nmp.usuarios.mongodb.repository.CapacidadRepository;
@@ -115,6 +116,7 @@ public class UsuarioService {
 	/*
 	 * Crear Historico
 	 */
+	//public CrearHistoricoRes crearHistorico(AccionEnum accion, Date fecha, Integer idPerfil, String usuario) {
 	public CrearHistoricoRes crearHistorico(AccionEnum accion, Date fecha, Integer idPerfil, String usuario) {
 		log.info("UsuarioService.crearHistorico");
 		Boolean insertado = false;
@@ -122,7 +124,7 @@ public class UsuarioService {
 		CrearHistoricoRes resp = null;
 
 		HistorialEntity he = new HistorialEntity();
-
+		
 		if (accion != null && fecha != null && idPerfil != null && usuario != null) {
 			he.setAccion(accion.getValue());
 			he.setIdPerfil(idPerfil);
@@ -134,13 +136,13 @@ public class UsuarioService {
 			insertado = true;
 		}
 
-		if (insertado) {
+		if (Boolean.TRUE.equals(insertado)) {
 			resp = new CrearHistoricoRes();
 			Query query = new Query();
 			Criteria aux = Criteria.where(ID).is(he.get_id());
 			query.addCriteria(aux);
 
-			HistorialEntity historico = (HistorialEntity) mongoTemplate.findOne(query, HistorialEntity.class);
+			HistorialEntity historico = mongoTemplate.findOne(query, HistorialEntity.class);
 
 			if (historico != null) {
 				resp.setFecha(historico.getFecha());
@@ -153,7 +155,7 @@ public class UsuarioService {
 						resp.setPerfil(cureps);
 					}
 				}
-				log.info("resp" + resp.toString());
+				log.info("resp {} " , resp.toString());
 			}
 		}
 
@@ -211,6 +213,12 @@ public class UsuarioService {
 			}
 		}
 
+		if(chres == null) {
+			chres = new ConsultaHistoricoRes();
+			List<ResHistorico> listaHist = new ArrayList<>();
+			chres.setHistorial(listaHist);
+		}
+		
 		return chres;
 	}
 
@@ -255,7 +263,7 @@ public class UsuarioService {
 		Boolean eliminado = false;
 
 		if (idUsuario != null) {
-			UsuarioEntity usuario = (UsuarioEntity) usuarioRepository.findByIdUsuario(idUsuario);
+			UsuarioEntity usuario = usuarioRepository.findByIdUsuario(idUsuario);
 			if (usuario != null) {
 				usuarioRepository.delete(usuario);
 				eliminado = true;
@@ -495,16 +503,35 @@ public class UsuarioService {
 		InternalServerError ise = null;
 		
 		if(!capacidadUsuarioReq.isEmpty()) {
+			
+			StringBuilder sb = new StringBuilder();
+			sb.append(Constantes.ERROR_MESSAGE_INTERNAL_ERROR_CAP_NO_VALIDAS);
+			
 			for(CapacidadUsuariosReqInner capacidad : capacidadUsuarioReq) {
 				mx.com.nmp.usuarios.model.CapacidadUsuariosReqInner.IdCapacidadEnum idEnum = capacidad.getIdCapacidad();
-				CapacidadEntity cap = capacidadRepository.findByIdCapacidad(new Integer(idEnum.toString()));
-				if(cap == null) {
-					
+				
+				if(idEnum == null) {
 					ise = new InternalServerError();
-					ise.setCodigo("NMP-MDA-500");
-					ise.setMensaje("Capacidades no validas");
+					ise.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
 					
-					return ise;
+					//sb.append(capacidad.toString().replaceAll("\n", ""));
+					
+					ise.setMensaje(sb.toString());
+				} else {
+					Query query = new Query();
+					Criteria aux = Criteria.where(ID_CAPACIDAD).is(new Integer(idEnum.toString()));
+					query.addCriteria(aux);
+					
+					Boolean cap = mongoTemplate.exists(query, CapacidadEntity.class);
+					
+					if(Boolean.FALSE.equals(cap)) {
+						
+						ise = new InternalServerError();
+						ise.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+						sb.append(capacidad.toString().replaceAll("\n", ""));
+						
+						ise.setMensaje(sb.toString());
+					}
 				}
 			}
 		}
@@ -518,16 +545,37 @@ public class UsuarioService {
 		InternalServerError ise = null;
 		
 		if(!modCapacidadReq.isEmpty()) {
+			
+			StringBuilder sb = new StringBuilder();
+			sb.append(Constantes.ERROR_MESSAGE_INTERNAL_ERROR_CAP_NO_VALIDAS);
+			
 			for(ModCapacidadUsuarioInner capacidad : modCapacidadReq) {
+				
 				mx.com.nmp.usuarios.model.ModCapacidadUsuarioInner.IdCapacidadEnum idEnum = capacidad.getIdCapacidad();
-				CapacidadEntity cap = capacidadRepository.findByIdCapacidad(new Integer(idEnum.toString()));
-				if(cap == null) {
-					
+			
+				if(idEnum == null) {
 					ise = new InternalServerError();
-					ise.setCodigo("NMP-MDA-500");
-					ise.setMensaje("Capacidades no validas");
+					ise.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+
+					//sb.append(capacidad.toString().replaceAll("\n", ""));
 					
-					return ise;
+					ise.setMensaje(sb.toString());
+				} else {
+					Query query = new Query();
+					Criteria aux = Criteria.where(ID_CAPACIDAD).is(new Integer(idEnum.toString()));
+					query.addCriteria(aux);
+					
+					Boolean cap = mongoTemplate.exists(query, CapacidadEntity.class);
+					
+					if(Boolean.FALSE.equals(cap)) {
+						
+						ise = new InternalServerError();
+						ise.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+
+						sb.append(capacidad.toString().replaceAll("\n", ""));
+						
+						ise.setMensaje(sb.toString());
+					}
 				}
 			}
 		}
@@ -950,8 +998,64 @@ public class UsuarioService {
 			query.addCriteria(aux);
 		}
 		
-		log.info("Query: " + query.toString());
+		log.info("Query: {}" , query.toString());
 		return query;
 	}
-
+	
+	/*
+	 * ConsultarPerfil
+	 */
+	public Boolean consultarPerfil(Integer idPerfil) {
+		log.info("consultarPerfil");
+		
+		Boolean encontrado = false;
+		if(idPerfil != null) {
+			Query query = new Query();
+			Criteria aux = Criteria.where(ID_PERFIL).is(idPerfil);
+			query.addCriteria(aux);
+			
+			encontrado = mongoTemplate.exists(query, PerfilEntity.class);
+		}
+		
+		log.info("Encontrado: {}", encontrado);
+		
+		return encontrado;
+	}
+	
+	/*
+	 * Consultar usuario
+	 */
+	public Boolean consultarUsuario(String usuario) {
+		log.info("consultarUsuario");
+		
+		Boolean encontrado = false;
+		if(usuario != null) {
+			Query query = new Query();
+			Criteria aux = Criteria.where(USUARIO).is(usuario);
+			query.addCriteria(aux);
+			
+			encontrado = mongoTemplate.exists(query, UsuarioEntity.class);
+		}
+		
+		log.info("Encontrado: {}", encontrado);
+		
+		return encontrado;
+	}
+	
+	public Boolean consultarIdUsuario(Integer idUsuario) {
+		log.info("consultarUsuario");
+		
+		Boolean encontrado = false;
+		if(idUsuario != null) {
+			Query query = new Query();
+			Criteria aux = Criteria.where(ID_USUARIO).is(idUsuario);
+			query.addCriteria(aux);
+			
+			encontrado = mongoTemplate.exists(query, UsuarioEntity.class);
+		}
+		
+		log.info("Encontrado: {}", encontrado);
+		
+		return encontrado;
+	}
 }

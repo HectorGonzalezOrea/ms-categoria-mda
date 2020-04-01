@@ -219,7 +219,7 @@ public class CapacidadUsuariosReqInner   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CapacidadUsuariosReqInner {\n");
+    sb.append(" {\n");
     
     sb.append("    idCapacidad: ").append(toIndentedString(idCapacidad)).append("\n");
     sb.append("    descripcinCap: ").append(toIndentedString(descripcinCap)).append("\n");
