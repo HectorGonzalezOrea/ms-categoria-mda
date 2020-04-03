@@ -6,6 +6,6 @@ import mx.com.nmp.gestionescenarios.mongodb.entity.GestionEscenarioEntity;
 
 public interface EscenariosRepository extends MongoRepository<GestionEscenarioEntity, String> {
 	
-	//GestionEscenarioEntity findById(Integer idRegla);
+	GestionEscenarioEntity findByIdRegla(Integer idRegla);
 
 }

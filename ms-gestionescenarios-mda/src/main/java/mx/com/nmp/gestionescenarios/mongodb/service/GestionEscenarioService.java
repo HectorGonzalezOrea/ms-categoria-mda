@@ -135,6 +135,7 @@ public class GestionEscenarioService {
 				
 			}
 			reglas.add(infoRegla);	
+			
 		}
 		
 		return reglas;
@@ -311,21 +312,39 @@ public class GestionEscenarioService {
 	/*
 	 * Eliminar una regla
 	 */
-	
-	/*public InfoRegla eliminaRegla(Integer idRegla) {
+	public InfoRegla eliminaRegla(Integer idRegla) {
 		log.info("GestionEscenarioService.eliminarRegla");
 		Boolean eliminado = false;
 		InfoRegla infoRegla = null;
 		
 		if(idRegla != null) {
 			
-			GestionEscenarioEntity escenario = (GestionEscenarioEntity) escenariosRepository.findById(idRegla);
+			GestionEscenarioEntity escenario = (GestionEscenarioEntity) escenariosRepository.findByIdRegla(idRegla);
 			if(escenario != null) {
 				infoRegla = new InfoRegla();
 				
 				infoRegla.setId(escenario.getIdRegla());
 				infoRegla.setNombre(escenario.getNombre());
 				infoRegla.setAforo(escenario.getAforo());
+				infoRegla.setBolsas(escenario.getBolsas());
+				infoRegla.setCanalComercializacion(escenario.getCanalComercializacion());
+				infoRegla.setCanalIngresoActual(escenario.getCanalIngresoActual());
+				infoRegla.setCandadoInferior(escenario.getCandadoInferior());
+				infoRegla.setClasificacionClientes(escenario.getClasificacionClientes());
+				infoRegla.setCompraCumplido(escenario.getCompraCumplido());
+				infoRegla.setDiasAlmoneda(escenario.getDiasAlmoneda());
+				infoRegla.setEstatus(escenario.getEstatus());
+				infoRegla.setEstatusPartida(escenario.getEstatusPartida());
+				infoRegla.setFactor(escenario.getFactor());
+				infoRegla.setFechaAplicacion(escenario.getFechaAplicacion());
+				infoRegla.setMonedas(escenario.getMonedas());
+				infoRegla.setNivelAgrupacion(escenario.getNivelAgrupacion());
+				infoRegla.setOrigen(escenario.getOrigen());
+				infoRegla.setRamo(escenario.getRamo());
+				infoRegla.setReglasDescuento(escenario.getReglasDescuento());
+				infoRegla.setSubramo(escenario.getSubramo());
+				infoRegla.setSucursales(escenario.getSucursales());
+
 				
 				escenariosRepository.delete(escenario);
 				eliminado =true;
@@ -336,7 +355,7 @@ public class GestionEscenarioService {
 		
 		return infoRegla;
 		
-	}*/
+	}
 	
 	
 	
@@ -623,6 +642,21 @@ public class GestionEscenarioService {
 		log.info("Query: " + query.toString());
 		return query;
 		
+	}
+	
+	/*
+	 * Consulta idRegla
+	 */
+	
+	public Boolean consultaIdRegla(Integer idRegla) {
+		Boolean encontrado = false;
+		Query query = new Query();
+		Criteria aux = Criteria.where(ID).is(idRegla);
+		query.addCriteria(aux);
+		encontrado = mongoTemplate.exists(query, GestionEscenarioEntity.class);
+		log.info("Resultado: {}", encontrado);
+		
+		return encontrado;
 	}
 
 }
