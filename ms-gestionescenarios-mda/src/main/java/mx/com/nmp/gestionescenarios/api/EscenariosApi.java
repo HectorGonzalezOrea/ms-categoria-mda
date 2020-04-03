@@ -71,63 +71,6 @@ public interface EscenariosApi {
         method = RequestMethod.POST)
     ResponseEntity<GeneralResponse> escenariosAnclaOroDolarPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody ModificarValorAnclaOroDolar peticion);
 
-
-    @ApiOperation(value = "Obtener la lista de bolsas configuradas", nickname = "escenariosBolsasGet", notes = "Obtener la lista de bolsas configuradas por el usuario mediante los parámetros:   * Bolsa   * Nombre de la Bolsa   * Ramo   * Subramo   * Factor ### Seguridad Para poder realizar el consumo del recuros deberá de estar autorizado. Para esto tiene que enviar la llave en el encabezado HTTP: * 'X-API-KEY: eyJ4NXQjUzI1NiI6IkFTS1ESG42` ", response = ListaBolsas.class, authorizations = {
-        @Authorization(value = "apiKey")
-    }, tags={  })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Consulta de Bolsas Exitosa", response = ListaBolsas.class),
-        @ApiResponse(code = 400, message = "Error en el mensaje de petición, verifique la información", response = BadRequest.class),
-        @ApiResponse(code = 401, message = "Error de autorización en el uso del recurso", response = InvalidAuthentication.class),
-        @ApiResponse(code = 500, message = "Error interno del servidor", response = InternalServerError.class) })
-    @RequestMapping(value = "/escenarios/bolsas",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<ListaBolsas> escenariosBolsasGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Bolsa a buscar") @Valid @RequestParam(value = "bolsa", required = false) String bolsa,@ApiParam(value = "Nombre de la Bolsa") @Valid @RequestParam(value = "nombre", required = false) String nombre,@ApiParam(value = "Ramo configurado en la Bolsa") @Valid @RequestParam(value = "ramo", required = false) String ramo,@ApiParam(value = "Subramo configurado en la Bolsa") @Valid @RequestParam(value = "subramo", required = false) String subramo,@ApiParam(value = "Factor configurado en la Bolsa") @Valid @RequestParam(value = "factor", required = false) String factor);
-
-
-    @ApiOperation(value = "Eliminar una Bolsa", nickname = "escenariosBolsasIdBolsaDelete", notes = "Elimina la configuración de una bolsa mediante el identificador de esta ### Seguridad Para poder realizar el consumo del recuros deberá de estar autorizado. Para esto tiene que enviar la llave en el encabezado HTTP: * 'X-API-KEY: eyJ4NXQjUzI1NiI6IkFTS1ESG42` ", response = GeneralResponse.class, authorizations = {
-        @Authorization(value = "apiKey")
-    }, tags={  })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Eliminación exitosa", response = GeneralResponse.class),
-        @ApiResponse(code = 400, message = "Error en el mensaje de petición, verifique la información", response = BadRequest.class),
-        @ApiResponse(code = 401, message = "Error de autorización en el uso del recurso", response = InvalidAuthentication.class),
-        @ApiResponse(code = 500, message = "Error interno del servidor", response = InternalServerError.class) })
-    @RequestMapping(value = "/escenarios/bolsas/{idBolsa}",
-        produces = { "application/json" }, 
-        method = RequestMethod.DELETE)
-    ResponseEntity<GeneralResponse> escenariosBolsasIdBolsaDelete(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Identificador de la Bolsa a eliminar",required=true) @PathVariable("idBolsa") Integer idBolsa);
-
-
-    @ApiOperation(value = "Actualizar la configuración de una Bolsa", nickname = "escenariosBolsasPatch", notes = "Actualizar la configuración de una Bolsa ### Seguridad Para poder realizar el consumo del recuros deberá de estar autorizado. Para esto tiene que enviar la llave en el encabezado HTTP: * 'X-API-KEY: eyJ4NXQjUzI1NiI6IkFTS1ESG42` ", response = GeneralResponse.class, authorizations = {
-        @Authorization(value = "apiKey")
-    }, tags={  })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Modificación exitosa", response = GeneralResponse.class),
-        @ApiResponse(code = 400, message = "Error en el mensaje de petición, verifique la información", response = BadRequest.class),
-        @ApiResponse(code = 401, message = "Error de autorización en el uso del recurso", response = InvalidAuthentication.class),
-        @ApiResponse(code = 500, message = "Error interno del servidor", response = InternalServerError.class) })
-    @RequestMapping(value = "/escenarios/bolsas",
-        produces = { "application/json" }, 
-        method = RequestMethod.PATCH)
-    ResponseEntity<GeneralResponse> escenariosBolsasPatch(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody Bolsa peticion);
-
-
-    @ApiOperation(value = "Almacenar una bolsa de sucursales", nickname = "escenariosBolsasPost", notes = "Almacena una bolsa de sucurales, con esto podrá ser utilizada dentro de la configuración de reglas ### Seguridad Para poder realizar el consumo del recuros deberá de estar autorizado. Para esto tiene que enviar la llave en el encabezado HTTP: * 'X-API-KEY: eyJ4NXQjUzI1NiI6IkFTS1ESG42` ", response = GeneralResponse.class, authorizations = {
-        @Authorization(value = "apiKey")
-    }, tags={  })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Alta exitosa", response = GeneralResponse.class),
-        @ApiResponse(code = 400, message = "Error en el mensaje de petición, verifique la información", response = BadRequest.class),
-        @ApiResponse(code = 401, message = "Error de autorización en el uso del recurso", response = InvalidAuthentication.class),
-        @ApiResponse(code = 500, message = "Error interno del servidor", response = InternalServerError.class) })
-    @RequestMapping(value = "/escenarios/bolsas",
-        produces = { "application/json" }, 
-        method = RequestMethod.POST)
-    ResponseEntity<GeneralResponse> escenariosBolsasPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody Bolsa peticion);
-
-
     @ApiOperation(value = "Almacenar o procesar los documentos excel de consolidados", nickname = "escenariosConsolidadosArchivoPost", notes = "Almacena o procesa el archivo Excel que contiene la información de consolidados. Cuando se realiza un ajuste emergente, el archivo es almacenado hasta su ejecución, después se elimina de la lista de archivos consolidados.  ### Seguridad Para poder realizar el consumo del recuros deberá de estar autorizado. Para esto tiene que enviar la llave en el encabezado HTTP: * 'X-API-KEY: eyJ4NXQjUzI1NiI6IkFTS1ESG42` ", response = GeneralResponse.class, authorizations = {
         @Authorization(value = "apiKey")
     }, tags={  })

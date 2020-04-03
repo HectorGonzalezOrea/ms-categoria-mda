@@ -102,62 +102,6 @@ public class EscenariosApiController implements EscenariosApi {
         return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<ListaBolsas> escenariosBolsasGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Bolsa a buscar") @Valid @RequestParam(value = "bolsa", required = false) String bolsa,@ApiParam(value = "Nombre de la Bolsa") @Valid @RequestParam(value = "nombre", required = false) String nombre,@ApiParam(value = "Ramo configurado en la Bolsa") @Valid @RequestParam(value = "ramo", required = false) String ramo,@ApiParam(value = "Subramo configurado en la Bolsa") @Valid @RequestParam(value = "subramo", required = false) String subramo,@ApiParam(value = "Factor configurado en la Bolsa") @Valid @RequestParam(value = "factor", required = false) String factor) {
-        String accept = request.getHeader(HEADER_ACCEPT_KEY);
-        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
-            try {
-                return new ResponseEntity<ListaBolsas>(objectMapper.readValue("\"\"", ListaBolsas.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<ListaBolsas>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<ListaBolsas>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    public ResponseEntity<GeneralResponse> escenariosBolsasIdBolsaDelete(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Identificador de la Bolsa a eliminar",required=true) @PathVariable("idBolsa") Integer idBolsa) {
-        String accept = request.getHeader(HEADER_ACCEPT_KEY);
-        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
-            try {
-                return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<GeneralResponse>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    public ResponseEntity<GeneralResponse> escenariosBolsasPatch(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody Bolsa peticion) {
-        String accept = request.getHeader(HEADER_ACCEPT_KEY);
-        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
-            try {
-                return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<GeneralResponse>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    public ResponseEntity<GeneralResponse> escenariosBolsasPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody Bolsa peticion) {
-        String accept = request.getHeader(HEADER_ACCEPT_KEY);
-        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
-            try {
-                return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<GeneralResponse>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
     /*
      * Almacenar o procesar los documentos excel de consolidados
      */
@@ -308,7 +252,7 @@ public class EscenariosApiController implements EscenariosApi {
             		
             		List<InfoGeneralRegla> reglas = gestionEscenarioService.consultaReglaSinFiltro();
             		ListaInfoGeneralRegla resp = new ListaInfoGeneralRegla ();
-            		
+            		log.info("Reglas: {}", reglas);
             		if(reglas!= null) {
             			log.info("Si hubo considencias.");
             			resp.addAll(reglas);
@@ -348,16 +292,17 @@ public class EscenariosApiController implements EscenariosApi {
         String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
-            	/*if(idRegla!=null) {
+            	
+            	if(idRegla!=null) {
             		log.info("Eliminar Regla");
             		
             		InfoRegla eliminar = gestionEscenarioService.eliminaRegla(idRegla);
             		if(eliminar!= null) {
             			
+            			return new ResponseEntity<InfoRegla>(eliminar, HttpStatus.OK);
             		}
-            	}*/
-                return new ResponseEntity<InfoRegla>(objectMapper.readValue("\"\"", InfoRegla.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+            	}
+            } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<InfoRegla>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -373,22 +318,26 @@ public class EscenariosApiController implements EscenariosApi {
             	
             	if (idRegla!= null) {
             		
-            		InfoRegla regla = gestionEscenarioService.consultaReglaId(idRegla);
-            		
-            		if(regla==null) {
-            			
-            			log.info("No hubo coincidencias");
-            			return new ResponseEntity<InfoRegla>(regla,HttpStatus.OK);
+            		Boolean encontrar = gestionEscenarioService.consultaIdRegla(idRegla);
+            		log.info("Resultado de existencia: {}", encontrar);
+            		if (encontrar) {
+            			InfoRegla regla = gestionEscenarioService.consultaReglaId(idRegla);
+                			try {
+                				log.info("Si hubo coincidencias");
+                    			return new ResponseEntity<InfoRegla>(regla,HttpStatus.OK);
+                			}
+                			catch(Exception e) {
+                				log.error("Exception : {}", e);
+                			}
+                			
+                			
+                		
             		}else {
-            			try {
-            				log.info("Si hubo coincidencias");
-                			return new ResponseEntity<InfoRegla>(regla,HttpStatus.OK);
-            			}
-            			catch(Exception e) {
-            				log.error("Exception : {}", e);
-            			}
-            			
-            			
+            			log.info("No hubo coincidencias");
+            			BadRequest bd=new BadRequest();
+            			bd.setCode("NMP-MDA-404");
+            			bd.setMessage("No se encontro el idRegla");
+            			return new ResponseEntity<BadRequest>(bd,HttpStatus.NOT_FOUND);
             		}
             		
             	}
