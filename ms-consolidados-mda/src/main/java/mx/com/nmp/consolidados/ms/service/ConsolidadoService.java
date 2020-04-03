@@ -154,7 +154,7 @@ public class ConsolidadoService {
 		log.info("consolidados : {} ", consolidados.size());
 
 		for (ArchivoEntity consolidado : consolidados) {
-			String requestId = consolidado.getRequestIdCalenzarizacion();
+			String requestId = consolidado.getRequestIdCalendarizacion();
 			
 			log.info("requestId : {} ", requestId);
 			if (requestId != null && !requestId.equals("")) {

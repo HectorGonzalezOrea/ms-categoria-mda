@@ -26,7 +26,7 @@ public class ArchivoEntity {
 	private Date fechaAplicacion;
 	private Integer prioridad;
 	private String nombreArchivo;
-	private String requestIdCalenzarizacion;
+	private String requestIdCalendarizacion;
 	
 	public ObjectId get_id() {
 		return _id;
@@ -85,10 +85,10 @@ public class ArchivoEntity {
 	public static String getSequenceName() {
 		return SEQUENCE_NAME;
 	}
-	public String getRequestIdCalenzarizacion() {
-		return requestIdCalenzarizacion;
+	public String getRequestIdCalendarizacion() {
+		return requestIdCalendarizacion;
 	}
-	public void setRequestIdCalenzarizacion(String requestIdCalenzarizacion) {
-		this.requestIdCalenzarizacion = requestIdCalenzarizacion;
+	public void setRequestIdCalenzarizacion(String requestIdCalendarizacion) {
+		this.requestIdCalendarizacion = requestIdCalendarizacion;
 	}
 }

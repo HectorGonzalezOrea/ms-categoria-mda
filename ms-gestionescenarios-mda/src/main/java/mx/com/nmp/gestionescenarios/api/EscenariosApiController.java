@@ -38,6 +38,20 @@ import mx.com.nmp.gestionescenarios.model.ModificarValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.model.ValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.mongodb.service.GestionEscenarioService;
 import mx.com.nmp.gestionescenarios.model.InternalServerError;
+import mx.com.nmp.gestionescenarios.model.InvalidAuthentication;
+
+import static mx.com.nmp.gestionescenarios.utils.Constantes.HEADER_APIKEY_KEY;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.HEADER_ACCEPT_KEY;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.HEADER_ACCEPT_VALUE;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.CADENA_VACIA;
+
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_CODE_INVALID_AUTHENTICATION;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_CODE_INTERNAL_SERVER_ERROR;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INTERNAL_SERVER_ERROR;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_CODE_BAD_REQUEST;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_BAD_REQUEST;
+
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-20T16:07:47.599Z")
 
 @Controller
@@ -61,8 +75,8 @@ public class EscenariosApiController implements EscenariosApi {
     }
 
     public ResponseEntity<ValorAnclaOroDolar> escenariosAnclaOroDolarGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
                 return new ResponseEntity<ValorAnclaOroDolar>(objectMapper.readValue("{  \"valorAnclaDolar\" : 19.4523,  \"valorAnclaOro\" : 800.02}", ValorAnclaOroDolar.class), HttpStatus.NOT_IMPLEMENTED);
             } catch (IOException e) {
@@ -75,8 +89,8 @@ public class EscenariosApiController implements EscenariosApi {
     }
 
     public ResponseEntity<GeneralResponse> escenariosAnclaOroDolarPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody ModificarValorAnclaOroDolar peticion) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
                 return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
             } catch (IOException e) {
@@ -89,8 +103,8 @@ public class EscenariosApiController implements EscenariosApi {
     }
 
     public ResponseEntity<ListaBolsas> escenariosBolsasGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Bolsa a buscar") @Valid @RequestParam(value = "bolsa", required = false) String bolsa,@ApiParam(value = "Nombre de la Bolsa") @Valid @RequestParam(value = "nombre", required = false) String nombre,@ApiParam(value = "Ramo configurado en la Bolsa") @Valid @RequestParam(value = "ramo", required = false) String ramo,@ApiParam(value = "Subramo configurado en la Bolsa") @Valid @RequestParam(value = "subramo", required = false) String subramo,@ApiParam(value = "Factor configurado en la Bolsa") @Valid @RequestParam(value = "factor", required = false) String factor) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
                 return new ResponseEntity<ListaBolsas>(objectMapper.readValue("\"\"", ListaBolsas.class), HttpStatus.NOT_IMPLEMENTED);
             } catch (IOException e) {
@@ -103,8 +117,8 @@ public class EscenariosApiController implements EscenariosApi {
     }
 
     public ResponseEntity<GeneralResponse> escenariosBolsasIdBolsaDelete(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Identificador de la Bolsa a eliminar",required=true) @PathVariable("idBolsa") Integer idBolsa) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
                 return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
             } catch (IOException e) {
@@ -117,8 +131,8 @@ public class EscenariosApiController implements EscenariosApi {
     }
 
     public ResponseEntity<GeneralResponse> escenariosBolsasPatch(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody Bolsa peticion) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
                 return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
             } catch (IOException e) {
@@ -131,8 +145,8 @@ public class EscenariosApiController implements EscenariosApi {
     }
 
     public ResponseEntity<GeneralResponse> escenariosBolsasPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody Bolsa peticion) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
                 return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
             } catch (IOException e) {
@@ -144,14 +158,50 @@ public class EscenariosApiController implements EscenariosApi {
         return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<GeneralResponse> escenariosConsolidadosArchivoPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Archivo CSV de consolidados") @Valid @RequestPart(value="adjunto", required=true) MultipartFile adjunto,@ApiParam(value = "Fecha de vigencia para el ajuste" ,required=true) @RequestHeader(value="vigencia", required=true) LocalDate vigencia,@ApiParam(value = "Nombre del ajuste" ,required=true) @RequestHeader(value="nombreAjuste", required=true) String nombreAjuste,@ApiParam(value = "Flag para indicar si el ajuste es emergente" ,required=true) @RequestHeader(value="emergente", required=true) Boolean emergente) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+    /*
+     * Almacenar o procesar los documentos excel de consolidados
+     */
+	public ResponseEntity<?> escenariosConsolidadosArchivoPost(
+			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Archivo CSV de consolidados") @Valid @RequestPart(value = "adjunto", required = true) MultipartFile adjunto,
+			@ApiParam(value = "Fecha de vigencia para el ajuste", required = true) @RequestHeader(value = "vigencia", required = true) LocalDate vigencia,
+			@ApiParam(value = "Nombre del ajuste", required = true) @RequestHeader(value = "nombreAjuste", required = true) String nombreAjuste,
+			@ApiParam(value = "Flag para indicar si el ajuste es emergente", required = true) @RequestHeader(value = "emergente", required = true) Boolean emergente) {
+        
+    	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+    	
+    	if(apiKey != null && !apiKey.equals(CADENA_VACIA)) {
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+    	}
+    	
+    	String accept = request.getHeader(HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
+            	
+            	
+            	if(usuario == null || adjunto == null || vigencia == null || nombreAjuste == null || emergente == null) {
+            		BadRequest br = new BadRequest();
+            		
+            		br.setCode(ERROR_CODE_BAD_REQUEST);
+            		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+            		
+            		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+            	} else {
+            		
+            	}
                 return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
             } catch (IOException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<GeneralResponse>(HttpStatus.INTERNAL_SERVER_ERROR);
+                
+                InternalServerError ise = new InternalServerError();
+                ise.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
+                ise.setMessage(ERROR_MESSAGE_INTERNAL_SERVER_ERROR);
+                
+                return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
@@ -159,8 +209,8 @@ public class EscenariosApiController implements EscenariosApi {
     }
 
     public ResponseEntity<ListaMonedas> escenariosMonedasGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@NotNull @ApiParam(value = "Flag para indicar si se consultan las monedas oro o sin oro", required = true) @Valid @RequestParam(value = "oro", required = true) Boolean oro) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
                 return new ResponseEntity<ListaMonedas>(objectMapper.readValue("\"\"", ListaMonedas.class), HttpStatus.NOT_IMPLEMENTED);
             } catch (IOException e) {
@@ -173,8 +223,8 @@ public class EscenariosApiController implements EscenariosApi {
     }
 
     public ResponseEntity<GeneralResponse> escenariosMonedasPatch(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody ListaMonedas peticion) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
                 return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
             } catch (IOException e) {
@@ -187,8 +237,8 @@ public class EscenariosApiController implements EscenariosApi {
     }
 
     public ResponseEntity<GeneralResponse> escenariosMonedasPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody ListaMonedas peticion) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
                 return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
             } catch (IOException e) {
@@ -201,8 +251,8 @@ public class EscenariosApiController implements EscenariosApi {
     }
 
     public ResponseEntity<GeneralResponse> escenariosPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody Escenarios peticion) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
                 return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
             } catch (IOException e) {
@@ -215,8 +265,8 @@ public class EscenariosApiController implements EscenariosApi {
     }
 
     public ResponseEntity<?> escenariosReglasEstatusPut(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody EstatusRegla peticion) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
             	if(peticion != null) {
             		log.info("Peticion : {}", peticion.toString());
@@ -251,8 +301,8 @@ public class EscenariosApiController implements EscenariosApi {
     		@ApiParam(value = "Estatus de la partida") @Valid @RequestParam(value = "estatusPartida", required = false) String estatusPartida,
     		@ApiParam(value = "Canal de comrcialización") @Valid @RequestParam(value = "canalComrcializacion", required = false) String canalComercializacion,
     		@ApiParam(value = "Fecha de aplicación") @Valid @RequestParam(value = "fechaAplicacion", required = false) String fechaAplicacion) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
             	if(nombre == null && ramo == null && subramo == null && factor == null && origen == null && clasificacionClientes == null && estatusPartida == null && canalComercializacion== null && fechaAplicacion == null) {
             		
@@ -295,8 +345,8 @@ public class EscenariosApiController implements EscenariosApi {
     }
 
     public ResponseEntity<InfoRegla> escenariosReglasIdReglaDelete(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "",required=true) @PathVariable("idRegla") Integer idRegla) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
             	/*if(idRegla!=null) {
             		log.info("Eliminar Regla");
@@ -317,8 +367,8 @@ public class EscenariosApiController implements EscenariosApi {
     }
 
     public ResponseEntity<?> escenariosReglasIdReglaGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "",required=true) @PathVariable("idRegla") Integer idRegla) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
             	
             	if (idRegla!= null) {
@@ -352,8 +402,8 @@ public class EscenariosApiController implements EscenariosApi {
     }
 
     public ResponseEntity<?> escenariosReglasPatch(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody InfoRegla peticion) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
             	
             	if(peticion != null) {
@@ -381,8 +431,8 @@ public class EscenariosApiController implements EscenariosApi {
     }
 
     public ResponseEntity<?> escenariosReglasPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody InfoRegla peticion) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
         	GeneralResponse gr = new GeneralResponse ();
             try {
             	if(peticion != null) {
