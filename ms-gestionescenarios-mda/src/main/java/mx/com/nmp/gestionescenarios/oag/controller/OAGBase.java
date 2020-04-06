@@ -7,7 +7,7 @@ public class OAGBase {
 	@Value("${oag.urlBase}")
 	protected String urlBase;
 	
-	@Value("$oag.usuario}")
+	@Value("${oag.usuario}")
 	protected String usuarioAuth;
 	
 	@Value("${oag.password}")

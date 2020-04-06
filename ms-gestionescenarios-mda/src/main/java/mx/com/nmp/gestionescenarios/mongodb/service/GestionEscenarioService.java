@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import mx.com.nmp.gestionescenarios.mongodb.service.SequenceGeneratorService;
 import mx.com.nmp.gestionescenarios.model.EstatusRegla;
@@ -17,6 +18,7 @@ import mx.com.nmp.gestionescenarios.model.InfoGeneralRegla;
 import mx.com.nmp.gestionescenarios.model.InfoRegla;
 import mx.com.nmp.gestionescenarios.model.ListaInfoGeneralRegla;
 import mx.com.nmp.gestionescenarios.mongodb.entity.GestionEscenarioEntity;
+import mx.com.nmp.gestionescenarios.mongodb.repository.ConsolidadoEntity;
 import mx.com.nmp.gestionescenarios.mongodb.repository.EscenariosRepository;
 import mx.com.nmp.gestionescenarios.mongodb.repository.OrigenRepository;
 
@@ -37,8 +39,8 @@ public class GestionEscenarioService {
 	public static final String CANAL_COMERCIALIZACION = "canalComercializacion";
 	public static final String FECHA_APLICACION = "fechaAplicacion";
 	
-	
-	
+	public static final String ID_ARCHIVO = "idArchivo";
+	public static final String REQUEST_ID_CALENDARIZACION = "requestIdCalendarizacion";
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -647,8 +649,9 @@ public class GestionEscenarioService {
 	/*
 	 * Consulta idRegla
 	 */
-	
 	public Boolean consultaIdRegla(Integer idRegla) {
+		log.info("consultaIdRegla");
+		
 		Boolean encontrado = false;
 		Query query = new Query();
 		Criteria aux = Criteria.where(ID).is(idRegla);
@@ -658,5 +661,23 @@ public class GestionEscenarioService {
 		
 		return encontrado;
 	}
-
+	
+	/*
+	 * Actualiza idRequest en Consolidado
+	 */
+	public void actualizarConsolidado(List<Integer> idConsolidado, Integer idRequest) {
+		log.info("actualizarConsolidado");
+		
+		try {
+			Query query = new Query();
+			query.addCriteria(Criteria.where(ID_ARCHIVO).in(idConsolidado));
+			Update update = new Update();
+			update.set(REQUEST_ID_CALENDARIZACION, idRequest.toString());
+			
+			mongoTemplate.updateMulti(query, update, ConsolidadoEntity.class);	
+		} catch (Exception e) {
+			log.info("Exception: {}", e);
+		}
+	}
+	
 }

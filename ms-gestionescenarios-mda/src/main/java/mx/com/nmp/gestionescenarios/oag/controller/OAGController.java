@@ -13,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.net.HttpHeaders;
 import com.mashape.unirest.http.HttpResponse;
@@ -25,6 +26,7 @@ import mx.com.nmp.gestionescenarios.oag.vo.GetTokenResponseVO;
 import mx.com.nmp.gestionescenarios.utils.ConvertStringToBase64;
 import mx.com.nmp.gestionescenarios.utils.ConverterUtil;
 
+@RestController
 public class OAGController extends OAGBase {
 
 	private static final Logger log = LoggerFactory.getLogger(OAGController.class);
@@ -34,11 +36,27 @@ public class OAGController extends OAGBase {
 		
 		String accessToken = "";
 		String credenciales = usuarioAuth + ":" + passwordAuth;
+		
+		log.info("credenciales : {}" , credenciales);
+		
 		String autenticacionBasica = BASIC + ConvertStringToBase64.encode(credenciales);
+		
 		Unirest.setTimeouts(0, 0);
 		
 		try {
-			HttpResponse<String> response = Unirest.post(urlBase + servicioGetToken)
+			
+			String url = urlBase + servicioGetToken;
+			
+			log.info("url : {}" , url);
+			log.info("{} : {}" , HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
+			log.info("{} : {}" , HEADER_USUARIO_OAG, headerUsuario);
+			log.info("{} : {}" , HEADER_ID_CONSUMIDOR, headerIdConsumidor);
+			log.info("{} : {}" , HEADER_ID_DESTINO, headerIdDestino);
+			log.info("{} : {}" , HttpHeaders.AUTHORIZATION, autenticacionBasica);
+			log.info("{} : {}" , GRANT_TYPE, grantType);
+			log.info("{} : {}" , SCOPE, scope);
+			
+			HttpResponse<String> response = Unirest.post(url)
 			  .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED)
 			  .header(HEADER_USUARIO_OAG, headerUsuario)
 			  .header(HEADER_ID_CONSUMIDOR, headerIdConsumidor)
@@ -66,6 +84,9 @@ public class OAGController extends OAGBase {
 		log.info("calendarizarEscenario");
 		
 		String credenciales = usuarioAuth + ":" + passwordAuth;
+		
+		log.info("credenciales : {}" , credenciales);
+		
 		String autenticacionBasica = BASIC + ConvertStringToBase64.encode(credenciales);
 		
 		String accessToken = this.getToken();
@@ -76,7 +97,19 @@ public class OAGController extends OAGBase {
 		
 		Unirest.setTimeouts(0, 0);
 		try {
-			HttpResponse<String> response = Unirest.post(urlBase + servicioCalendarizacion)
+			
+			String url = urlBase + servicioCalendarizacion;
+			
+			log.info("url : {}" , url);
+			log.info("{} : {}" , HEADER_USUARIO_OAG, headerUsuario);
+			log.info("{} : {}" , HEADER_ID_CONSUMIDOR, headerIdConsumidor);
+			log.info("{} : {}" , HEADER_ID_DESTINO, headerIdDestino);
+			log.info("{} : {}" , HEADER_OAUTH_BEARER, accessToken);
+			log.info("{} : {}" , HttpHeaders.AUTHORIZATION, autenticacionBasica);
+			log.info("{} : {}" , HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+			log.info("Body : {}" , requestJson);
+			
+			HttpResponse<String> response = Unirest.post(url)
 			  .header(HEADER_USUARIO_OAG, headerUsuario)
 			  .header(HEADER_OAUTH_BEARER, accessToken)
 			  .header(HEADER_ID_CONSUMIDOR, headerIdConsumidor)

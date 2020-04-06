@@ -37,6 +37,7 @@ import mx.com.nmp.gestionescenarios.model.ListaMonedas;
 import mx.com.nmp.gestionescenarios.model.ModificarValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.model.ValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.mongodb.service.GestionEscenarioService;
+import mx.com.nmp.gestionescenarios.service.EscenariosService;
 import mx.com.nmp.gestionescenarios.model.InternalServerError;
 import mx.com.nmp.gestionescenarios.model.InvalidAuthentication;
 
@@ -51,6 +52,7 @@ import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_CODE_INTERNAL_
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INTERNAL_SERVER_ERROR;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_CODE_BAD_REQUEST;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_BAD_REQUEST;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.SUCCESS_MESSAGE_OK;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-20T16:07:47.599Z")
 
@@ -66,7 +68,8 @@ public class EscenariosApiController implements EscenariosApi {
     @Autowired
     private GestionEscenarioService gestionEscenarioService;
     
-    
+    @Autowired
+    private EscenariosService escenariosService;
 
     @org.springframework.beans.factory.annotation.Autowired
     public EscenariosApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -108,16 +111,21 @@ public class EscenariosApiController implements EscenariosApi {
 	public ResponseEntity<?> escenariosConsolidadosArchivoPost(
 			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = "Archivo CSV de consolidados") @Valid @RequestPart(value = "adjunto", required = true) MultipartFile adjunto,
-			@ApiParam(value = "Fecha de vigencia para el ajuste", required = true) @RequestHeader(value = "vigencia", required = true) LocalDate vigencia,
+			@ApiParam(value = "Fecha de vigencia para el ajuste", required = true) @RequestHeader(value = "vigencia", required = true) String vigencia,
 			@ApiParam(value = "Nombre del ajuste", required = true) @RequestHeader(value = "nombreAjuste", required = true) String nombreAjuste,
 			@ApiParam(value = "Flag para indicar si el ajuste es emergente", required = true) @RequestHeader(value = "emergente", required = true) Boolean emergente) {
         
+		log.info("escenariosConsolidadosArchivoPost");
+		
     	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
     	
-    	if(apiKey != null && !apiKey.equals(CADENA_VACIA)) {
+    	if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
+    		
     		InvalidAuthentication ia = new InvalidAuthentication();
     		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
     		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.error("InvalidAuthentication {}" , ia.toString());
     		
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
     	}
@@ -125,7 +133,6 @@ public class EscenariosApiController implements EscenariosApi {
     	String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
-            	
             	
             	if(usuario == null || adjunto == null || vigencia == null || nombreAjuste == null || emergente == null) {
             		BadRequest br = new BadRequest();
@@ -136,9 +143,29 @@ public class EscenariosApiController implements EscenariosApi {
             		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
             	} else {
             		
+            		log.info("usuario: {}" , usuario);
+            		log.info("adjunto: {}" , adjunto);
+            		log.info("adjunto getContentType: {}" , adjunto.getContentType());
+            		log.info("adjunto getName: {}" , adjunto.getName());
+            		log.info("adjunto getOriginalFilename: {}" , adjunto.getOriginalFilename());
+            		
+            		log.info("vigencia: {}" , vigencia);
+            		log.info("nombreAjuste: {}" , nombreAjuste);
+            		log.info("emergente: {}" , emergente);
+            		
+            		InternalServerError ise = escenariosService.almacenarProcesarConsolidado(usuario, vigencia.toString(), emergente, nombreAjuste, adjunto);
+            		if(ise == null) {
+            			GeneralResponse gr = new GeneralResponse();
+            			
+            			gr.setMessage(SUCCESS_MESSAGE_OK);
+            			
+            			return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK);
+            		} else {
+            			return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
+            		}
             	}
-                return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+                //return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
+            } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 
                 InternalServerError ise = new InternalServerError();
@@ -147,9 +174,14 @@ public class EscenariosApiController implements EscenariosApi {
                 
                 return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
             }
+        } else {
+        	BadRequest br = new BadRequest();
+    		
+    		br.setCode(ERROR_CODE_BAD_REQUEST);
+    		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+    		
+    		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
         }
-
-        return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
     }
 
     public ResponseEntity<ListaMonedas> escenariosMonedasGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@NotNull @ApiParam(value = "Flag para indicar si se consultan las monedas oro o sin oro", required = true) @Valid @RequestParam(value = "oro", required = true) Boolean oro) {

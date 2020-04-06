@@ -13,4 +13,10 @@ public abstract class AjustePreciosConsolidadosBase {
 	@Value("${ms.ajusteprecios.apikey.value}")
 	protected String apiKey;
 	
+	@Value("${ms.ajusteprecios.header.origen}")
+	protected String origen;
+	
+	@Value("${ms.ajusteprecios.header.destino}")
+	protected String destino;
+	
 }

@@ -11,6 +11,8 @@ public final class Constantes {
 	public static final String HEADER_ACCEPT_VALUE = "application/json";
 	public static final String CADENA_VACIA = "";
 	
+	public static final String SUCCESS_MESSAGE_OK = "Exitoso";
+	
 	public static final String ERROR_CODE_BAD_REQUEST = "NMP-MDA-400";
 	public static final String ERROR_MESSAGE_BAD_REQUEST = "El cuerpo de la petición no está bien formado, verifique su información";
 	
@@ -19,6 +21,9 @@ public final class Constantes {
 	
 	public static final String ERROR_CODE_INTERNAL_SERVER_ERROR = "NMP-MDA-500";
 	public static final String ERROR_MESSAGE_INTERNAL_SERVER_ERROR = "Error interno del servidor. Falla de comunicación.";
+	public static final String ERROR_MESSAGE_INTERNAL_SERVER_ERROR_ALMACENAR_O_PROCESAR = "Error interno del servidor. Ocurrio un error en el procesamiento.";
+	
+	public static final String METHOD_POST = "POST";
 	
 	public static final String HEADER_USUARIO = "usuario";
 	public static final String HEADER_ORIGEN = "origen";
@@ -36,6 +41,12 @@ public final class Constantes {
 	public static final String GRANT_TYPE = "grant_type";
 	public static final String SCOPE = "scope";
 	public static final int STATUS_CODE_OK = 200;
+	
+	public static final String FECHA_APLICACION = "fechaAplicacion";
+	
+	public static final String TMP = "tmp/";
+	public static final String FORMATO_FECHA = "dd/MM/yyyy";
+	public static final String FORMATO_FECHA_HORA = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 	
 }
 
