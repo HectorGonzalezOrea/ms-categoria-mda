@@ -267,6 +267,9 @@ public class EscenariosApiController implements EscenariosApi {
     return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
     }
 
+    /*
+     * Consultar reglas por nombre, ramo, subramo, factor, origen, clasificacionClientes, estatusPartida, canalComercializacion, fechaAplicacion
+     */
     public ResponseEntity<?> escenariosReglasGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,
     		@ApiParam(value = "Nombre de las reglas a buscar") @Valid @RequestParam(value = "nombre", required = false) String nombre,
     		@ApiParam(value = "Ramo de las reglas a buscar") @Valid @RequestParam(value = "ramo", required = false) String ramo,
@@ -277,6 +280,9 @@ public class EscenariosApiController implements EscenariosApi {
     		@ApiParam(value = "Estatus de la partida") @Valid @RequestParam(value = "estatusPartida", required = false) String estatusPartida,
     		@ApiParam(value = "Canal de comrcialización") @Valid @RequestParam(value = "canalComrcializacion", required = false) String canalComercializacion,
     		@ApiParam(value = "Fecha de aplicación") @Valid @RequestParam(value = "fechaAplicacion", required = false) String fechaAplicacion) {
+    	
+    	log.info("escenariosReglasGet");
+    	
         String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
@@ -320,7 +326,10 @@ public class EscenariosApiController implements EscenariosApi {
         return new ResponseEntity<ListaInfoGeneralRegla>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<InfoRegla> escenariosReglasIdReglaDelete(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "",required=true) @PathVariable("idRegla") Integer idRegla) {
+	public ResponseEntity<InfoRegla> escenariosReglasIdReglaDelete(
+			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "", required = true) @PathVariable("idRegla") Integer idRegla) {
+		
         String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
@@ -343,7 +352,15 @@ public class EscenariosApiController implements EscenariosApi {
         return new ResponseEntity<InfoRegla>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<?> escenariosReglasIdReglaGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "",required=true) @PathVariable("idRegla") Integer idRegla) {
+    /*
+     * 
+     */
+	public ResponseEntity<?> escenariosReglasIdReglaGet(
+			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "", required = true) @PathVariable("idRegla") Integer idRegla) {
+		
+		
+		
         String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
@@ -382,7 +399,15 @@ public class EscenariosApiController implements EscenariosApi {
         return new ResponseEntity<InfoRegla>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<?> escenariosReglasPatch(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody InfoRegla peticion) {
+    /*
+     * 
+     */
+	public ResponseEntity<?> escenariosReglasPatch(
+			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Cuerpo de la petición", required = true) @Valid @RequestBody InfoRegla peticion) {
+		
+		
+		
         String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
@@ -411,6 +436,9 @@ public class EscenariosApiController implements EscenariosApi {
         return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
     }
 
+    /*
+     * 
+     */
     public ResponseEntity<?> escenariosReglasPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody InfoRegla peticion) {
         String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
