@@ -148,10 +148,12 @@ public class GestionEscenarioService {
 
 		if (CollectionUtils.isNotEmpty(busquedaList)) {
 			reglas = new ArrayList<>();
-			InfoGeneralRegla infoRegla = new InfoGeneralRegla();
+			InfoGeneralRegla infoRegla = null;
 
 			for (GestionEscenarioEntity aux : busquedaList) {
 
+				infoRegla = new InfoGeneralRegla();
+				
 				infoRegla.setId(aux.getIdRegla());
 				infoRegla.setNombre(aux.getNombre());
 				infoRegla.setOrigen(aux.getOrigen());
@@ -165,13 +167,9 @@ public class GestionEscenarioService {
 				infoRegla.setFechaAplicacion(aux.getFechaAplicacion());
 				infoRegla.setSucursales(aux.getSucursales());
 				reglas.add(infoRegla);
-
 			}
-			
 		}
-
 		return reglas;
-
 	}
 
 	/*
