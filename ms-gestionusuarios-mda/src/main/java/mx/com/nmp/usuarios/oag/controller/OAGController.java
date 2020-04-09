@@ -7,12 +7,12 @@ import static mx.com.nmp.usuarios.utils.Constantes.HEADER_USUARIO;
 import static mx.com.nmp.usuarios.utils.Constantes.SCOPE;
 import static mx.com.nmp.usuarios.utils.Constantes.STATUS_CODE_OK;
 import static mx.com.nmp.usuarios.utils.Constantes.HEADER_OAUTH_BEARER;
+import static mx.com.nmp.usuarios.utils.Constantes.STATUS_CODE_NA;
 
 import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.net.HttpHeaders;
@@ -23,6 +23,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import mx.com.nmp.usuarios.oag.vo.GetTokenResponseVO;
 import mx.com.nmp.usuarios.oag.vo.IdentidadUsuarioRequestVO;
 import mx.com.nmp.usuarios.oag.vo.IdentidadUsuarioResponseVO;
+import mx.com.nmp.usuarios.oag.vo.TokenProviderErrorVO;
 import mx.com.nmp.usuarios.utils.ConvertStringToBase64;
 import mx.com.nmp.usuarios.utils.ConverterUtil;
 
@@ -31,7 +32,6 @@ public class OAGController extends OAGBaseController {
 
 	private static final Logger log = LoggerFactory.getLogger(OAGController.class);
 	
-	@PostMapping(path = "/getToken")
 	public String getToken() {
 		log.info("getToken");
 		
@@ -54,22 +54,23 @@ public class OAGController extends OAGBaseController {
 			
 			int statusCode = response.getStatus();
 			
-			log.info("Status Code Response: " + statusCode);
-			log.info("Body Response: " + response.getBody());
+			log.info("Status Code Response: {}" , statusCode);
+			log.info("Body Response: {}" , response.getBody());
 			
 			if (statusCode == STATUS_CODE_OK) {
-				GetTokenResponseVO resp = ConverterUtil.StringJsonToObjectGetTokenResponseVO(response.getBody());
+				GetTokenResponseVO resp = ConverterUtil.stringJsonToObjectGetTokenResponseVO(response.getBody());
 				accessToken = resp.getAccess_token();
 			}
 		} catch (UnirestException e) {
-			e.printStackTrace();
+			log.error("UnirestException, {}", e);
 		}
 		
 		return accessToken;
 	}
 	
-	@PostMapping(path = "/identidadUsuario")
-	public IdentidadUsuarioResponseVO identidadUsuario(IdentidadUsuarioRequestVO request, String oauthBearer) {
+	public Object identidadUsuario(IdentidadUsuarioRequestVO request, String oauthBearer, String userLoggeado) {
+		log.info("identidadUsuario");
+		
 		Unirest.setTimeouts(0, 0);
 		
 		IdentidadUsuarioResponseVO resp = null;
@@ -80,14 +81,21 @@ public class OAGController extends OAGBaseController {
 		
 		request.setGrupo(grupo);
 		
-		log.info("Oauth Bearer: " + oauthBearer);
+		log.info("HttpHeaders.CONTENT_TYPE: {}" , MediaType.APPLICATION_JSON);
+		log.info("usuario: {}" , userLoggeado);
+		log.info("Oauth Bearer: {}" , oauthBearer);
+		log.info("headerIdDestinor: {}" , headerIdDestino);
+		log.info("headerIdConsumidor: {}" , headerIdConsumidor);
+		log.info("autenticacionBasica: {}" , autenticacionBasica);
 		
 		String iRequestJson = ConverterUtil.messageToJson(request);
+		
+		log.info("iRequestJson: {}" , iRequestJson);
 		
 		try {
 			HttpResponse<String> response = Unirest.post(urlBase + servicioIdentidad)
 			  .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-			  .header(HEADER_USUARIO, "usuario")
+			  .header(HEADER_USUARIO, usuario)
 			  .header(HEADER_OAUTH_BEARER, oauthBearer)
 			  .header(HEADER_ID_DESTINO, headerIdDestino)
 			  .header(HEADER_ID_CONSUMIDOR, headerIdConsumidor)
@@ -101,11 +109,15 @@ public class OAGController extends OAGBaseController {
 			log.info("Body Response: {} " , response.getBody());
 			
 			if (statusCode == STATUS_CODE_OK) {
-				resp = ConverterUtil.StringJsonToObjectIdentidadUsuarioResponseVO(response.getBody());
+				return ConverterUtil.stringJsonToObjectIdentidadUsuarioResponseVO(response.getBody());
+			}
+			
+			if (statusCode == STATUS_CODE_NA) {
+				return ConverterUtil.stringJsonToObjectTokenProviderErrorVO(response.getBody());
 			}
 			
 		} catch (UnirestException e) {
-			e.printStackTrace();
+			log.error("UnirestException, {}", e);
 		}
 		return resp;
 	}

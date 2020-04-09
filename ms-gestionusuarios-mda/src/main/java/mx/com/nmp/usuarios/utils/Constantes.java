@@ -12,6 +12,7 @@ public class Constantes {
 	public static final String SCOPE = "scope";
 	public static final String HEADER_OAUTH_BEARER = "oauth.bearer";
 	
+	public static final int STATUS_CODE_NA = 401;
 	public static final int STATUS_CODE_OK = 200;
 
 	public static final String SUCESS_CODE = "NMP-MDA-200";

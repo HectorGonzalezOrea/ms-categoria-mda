@@ -22,6 +22,8 @@ import mx.com.nmp.usuarios.model.ReqHistorico;
 import mx.com.nmp.usuarios.model.ReqPerfil;
 import mx.com.nmp.usuarios.model.ResEstatus;
 import mx.com.nmp.usuarios.mongodb.service.UsuarioService;
+import mx.com.nmp.usuarios.oag.vo.IdentidadUsuarioResponseVO;
+import mx.com.nmp.usuarios.oag.vo.TokenProviderErrorVO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mx.com.nmp.usuarios.utils.Constantes;
+import mx.com.nmp.usuarios.utils.ConverterUtil;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-05T00:59:45.211Z")
 
@@ -80,7 +83,9 @@ public class UsuariosApiController implements UsuariosApi {
 			@ApiParam(value = "Username registrado en el directorio activo.") @Valid @RequestParam(value = "usuario", required = false) String usuario2,
 			@ApiParam(value = "Username registrado en el directorio activo.") @Valid @RequestParam(value = "idPerfil", required = false) Integer idPerfil) {
 		
+		log.info("*********************************************************");
 		log.info("Consulta Usuario.");
+		log.info("*********************************************************");
 		
 		String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
@@ -88,6 +93,8 @@ public class UsuariosApiController implements UsuariosApi {
     		InvalidAuthentication ia = new InvalidAuthentication();
     		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
     		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.info("{}" , ConverterUtil.messageToJson(ia));
     		
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
@@ -112,6 +119,8 @@ public class UsuariosApiController implements UsuariosApi {
 					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
+					log.info("{}" , ConverterUtil.messageToJson(br));
+					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
 
@@ -127,10 +136,13 @@ public class UsuariosApiController implements UsuariosApi {
 					} else {
 						log.info("No concidencias.");
 						
-						usuarios = new ArrayList<InfoUsuario>();
-						//List<InfoUsuario>
-						resp.setUsuarios(usuarios);
-						return new ResponseEntity<ConsultaUsuarioRes>(resp, HttpStatus.OK);
+						NotFound nf = new NotFound();
+            			nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
+        				nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
+        				
+        				log.info("{}" , ConverterUtil.messageToJson(nf));
+        				
+            			return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
 					}
 				}
 
@@ -144,7 +156,13 @@ public class UsuariosApiController implements UsuariosApi {
 					return new ResponseEntity<ConsultaUsuarioRes>(resp, HttpStatus.OK);
 				} else {
 					log.info("No concidencias.");
-					return new ResponseEntity<ConsultaUsuarioRes>(resp, HttpStatus.OK);
+					NotFound nf = new NotFound();
+        			nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
+    				nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
+    				
+    				log.info("{}" , ConverterUtil.messageToJson(nf));
+    				
+        			return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
 				}
 			} catch (Exception e) {
 				log.error("Couldn't serialize response for content type application/json", e);
@@ -152,12 +170,16 @@ public class UsuariosApiController implements UsuariosApi {
 				ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
 				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 				
+				log.info("{}" , ConverterUtil.messageToJson(ie));
+				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		} else {
 			BadRequest br = new BadRequest();
 			br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 			br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+			
+			log.info("{}" , ConverterUtil.messageToJson(br));
 			
 			return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 		}
@@ -167,7 +189,7 @@ public class UsuariosApiController implements UsuariosApi {
 	 * (non-Javadoc)
 	 * @see mx.com.nmp.usuarios.api.UsuariosApi#capacidadUsuarioPOST(java.lang.String, java.lang.String, java.lang.String, java.lang.String, mx.com.nmp.usuarios.model.CapacidadUsuariosReq)
 	 * POST
-	 * /usuarios/{idPerfil}/capacidades
+	 * /perfil/{idPerfil}/capacidades
 	 * Capacidades que puede tener un perfil previamente registrado.
 	 */
 	public ResponseEntity<?> capacidadUsuarioPOST(
@@ -177,7 +199,9 @@ public class UsuariosApiController implements UsuariosApi {
 			@ApiParam(value = "Identificador del perfil.", required = true) @PathVariable("idPerfil") String idPerfil,
 			@ApiParam(value = "") @Valid @RequestBody CapacidadUsuariosReq capacidadUsuarioReq) {
 		
+		log.info("*********************************************************");
 		log.info("Agregar Capacidades al Perfil");
+		log.info("*********************************************************");
 		
 		String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
@@ -185,6 +209,8 @@ public class UsuariosApiController implements UsuariosApi {
     		InvalidAuthentication ia = new InvalidAuthentication();
     		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
     		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.info("{}" , ConverterUtil.messageToJson(ia));
     		
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
@@ -202,6 +228,8 @@ public class UsuariosApiController implements UsuariosApi {
 					BadRequest br = new BadRequest();
 					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+					
+					log.info("{}" , ConverterUtil.messageToJson(br));
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
@@ -226,6 +254,8 @@ public class UsuariosApiController implements UsuariosApi {
 					ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
     				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 					
+    				log.info("{}" , ConverterUtil.messageToJson(ie));
+    				
 					return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 				}
 
@@ -235,12 +265,16 @@ public class UsuariosApiController implements UsuariosApi {
 				ie.setCodigo("NMP-MDA-500");
 				ie.setMensaje("Error interno del servidor");
 				
+				log.info("{}" , ConverterUtil.messageToJson(ie));
+				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		} else {
 			BadRequest br = new BadRequest();
 			br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 			br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+			
+			log.info("{}" , ConverterUtil.messageToJson(br));
 			
 			return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 		}
@@ -260,7 +294,9 @@ public class UsuariosApiController implements UsuariosApi {
 			@ApiParam(value = "Identificador del perfil.", required = true) @PathVariable("idPerfil") String idPerfil,
 			@ApiParam(value = "") @Valid @RequestBody ModCapacidadUsuario modCapacidadReq) {
 		
+		log.info("*********************************************************");
 		log.info("Modificar las capacidades de un perfil");
+		log.info("*********************************************************");
 		
 		String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
@@ -268,6 +304,8 @@ public class UsuariosApiController implements UsuariosApi {
     		InvalidAuthentication ia = new InvalidAuthentication();
     		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
     		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.info("{}" , ConverterUtil.messageToJson(ia));
     		
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
@@ -294,6 +332,8 @@ public class UsuariosApiController implements UsuariosApi {
 					InternalServerError ie = usuarioService.validarCapacidadesMod(modCapacidadReq);
 					
 					if(ie != null) {
+						
+						log.info("{}" , ConverterUtil.messageToJson(ie));
 						return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 					} else {
 						resp = usuarioService.modificarPerfilCapacidad(new Integer(idPerfil), modCapacidadReq);
@@ -307,6 +347,8 @@ public class UsuariosApiController implements UsuariosApi {
 					ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
     				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 					
+    				log.info("{}" , ConverterUtil.messageToJson(ie));
+    				
 					return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 				}
 			} catch (Exception e) {
@@ -315,12 +357,16 @@ public class UsuariosApiController implements UsuariosApi {
 				ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
 				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 				
+				log.info("{}" , ConverterUtil.messageToJson(ie));
+				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		} else {
 			BadRequest br = new BadRequest();
 			br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 			br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+			
+			log.info("{}" , ConverterUtil.messageToJson(br));
 			
 			return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 		}
@@ -339,7 +385,9 @@ public class UsuariosApiController implements UsuariosApi {
 			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
 			@ApiParam(value = "identificador para eliminar a un usuario.", required = true) @PathVariable("idUsuario") Integer idUsuario) {
 		
+		log.info("*********************************************************");
 		log.info("Eliminar Usuario.");
+		log.info("*********************************************************");
 		
 		String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
@@ -347,6 +395,8 @@ public class UsuariosApiController implements UsuariosApi {
     		InvalidAuthentication ia = new InvalidAuthentication();
     		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
     		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.info("{}" , ConverterUtil.messageToJson(ia));
     		
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
@@ -365,6 +415,8 @@ public class UsuariosApiController implements UsuariosApi {
 					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
+					log.info("{}" , ConverterUtil.messageToJson(br));
+					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
 
@@ -373,6 +425,8 @@ public class UsuariosApiController implements UsuariosApi {
 					BadRequest br = new BadRequest();
 					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+					
+					log.info("{}" , ConverterUtil.messageToJson(br));
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				} else {
@@ -390,12 +444,16 @@ public class UsuariosApiController implements UsuariosApi {
 							ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
 							ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 							
+							log.info("{}" , ConverterUtil.messageToJson(ie));
+							
 							return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 						}
 					} else {
 						NotFound nf = new NotFound();
 						nf.codigo(Constantes.ERROR_CODE_NOT_FOUND);
 						nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND_USUARIO);
+						
+						log.info("{}" , ConverterUtil.messageToJson(nf));
 						
 						return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
 					}
@@ -406,12 +464,16 @@ public class UsuariosApiController implements UsuariosApi {
 				ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
 				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 				
+				log.info("{}" , ConverterUtil.messageToJson(ie));
+				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		} else {
 			BadRequest br = new BadRequest();
 			br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 			br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+			
+			log.info("{}" , ConverterUtil.messageToJson(br));
 			
 			return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 		}
@@ -431,14 +493,18 @@ public class UsuariosApiController implements UsuariosApi {
 			@ApiParam(value = "Identificador del usuario.", required = true) @PathVariable("idUsuario") String idUsuario,
 			@ApiParam(value = "peticion para modificar el estatus de un usuario.") @Valid @RequestBody ReqEstatus modificaEstatusReq) {
 		
+		log.info("*********************************************************");
 		log.info("Modificar Usuario Estatus.");
-
+		log.info("*********************************************************");
+		
 		String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
     	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
     		InvalidAuthentication ia = new InvalidAuthentication();
     		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
     		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.info("{}" , ConverterUtil.messageToJson(ia));
     		
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
@@ -459,6 +525,8 @@ public class UsuariosApiController implements UsuariosApi {
 					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
+					log.info("{}" , ConverterUtil.messageToJson(br));
+					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
 
@@ -472,6 +540,8 @@ public class UsuariosApiController implements UsuariosApi {
 						ie.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
 						ie.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND_USUARIO);
 						
+						log.info("{}" , ConverterUtil.messageToJson(ie));
+						
 						return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 					}
 				} else {
@@ -479,6 +549,8 @@ public class UsuariosApiController implements UsuariosApi {
 					BadRequest br = new BadRequest();
 					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+					
+					log.info("{}" , ConverterUtil.messageToJson(br));
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
@@ -488,12 +560,16 @@ public class UsuariosApiController implements UsuariosApi {
 				ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
 				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 				
+				log.info("{}" , ConverterUtil.messageToJson(ie));
+				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		} else {
 			BadRequest br = new BadRequest();
 			br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 			br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+			
+			log.info("{}" , ConverterUtil.messageToJson(br));
 			
 			return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 		}
@@ -503,7 +579,7 @@ public class UsuariosApiController implements UsuariosApi {
 	 * (non-Javadoc)
 	 * @see mx.com.nmp.usuarios.api.UsuariosApi#modificarUsuariosPUT(java.lang.String, java.lang.String, java.lang.String, java.lang.String, mx.com.nmp.usuarios.model.ReqPerfil)
 	 * PUT
-	 * /usuarios/{idUsuario}/perfil
+	 * /perfil/{idUsuario}/perfil
 	 * Modifica el perfil de un usuario actual.
 	 */
 	public ResponseEntity<?> modificarUsuariosPUT(
@@ -513,7 +589,9 @@ public class UsuariosApiController implements UsuariosApi {
 			@ApiParam(value = "Identificador del usuario.", required = true) @PathVariable("idUsuario") String idUsuario,
 			@ApiParam(value = "petición para modificar el perfil a un usuario.") @Valid @RequestBody ReqPerfil modificarPerfilReq) {
 		
+		log.info("*********************************************************");
 		log.info("Modificar Perfil del usuario actual");
+		log.info("*********************************************************");
 		
     	String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
@@ -521,6 +599,8 @@ public class UsuariosApiController implements UsuariosApi {
     		InvalidAuthentication ia = new InvalidAuthentication();
     		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
     		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.info("{}" , ConverterUtil.messageToJson(ia));
     		
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
@@ -541,6 +621,8 @@ public class UsuariosApiController implements UsuariosApi {
 					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
+					log.info("{}" , ConverterUtil.messageToJson(br));
+					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
 				
@@ -550,6 +632,8 @@ public class UsuariosApiController implements UsuariosApi {
 					BadRequest br = new BadRequest();
 					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+					
+					log.info("{}" , ConverterUtil.messageToJson(br));
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
@@ -561,6 +645,8 @@ public class UsuariosApiController implements UsuariosApi {
 					ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
     				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 					
+    				log.info("{}" , ConverterUtil.messageToJson(ie));
+    				
 					return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 				}
 				
@@ -570,6 +656,8 @@ public class UsuariosApiController implements UsuariosApi {
 				ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
 				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 				
+				log.info("{}" , ConverterUtil.messageToJson(ie));
+				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		} else {
@@ -577,11 +665,12 @@ public class UsuariosApiController implements UsuariosApi {
 			br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 			br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 			
+			log.info("{}" , ConverterUtil.messageToJson(br));
+			
 			return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 		}
 	}
 	
-
 	/*
 	 * (non-Javadoc)
 	 * @see mx.com.nmp.usuarios.api.UsuariosApi#historialUsuarioGET(String, String, String, Integer)
@@ -595,14 +684,18 @@ public class UsuariosApiController implements UsuariosApi {
 			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
 			@NotNull @ApiParam(value = "identificador del usuario.", required = true) @Valid @RequestParam(value = "idUsuario", required = true) Integer idUsuario) {
 		
+		log.info("*********************************************************");
 		log.info("Get Historial");
-
+		log.info("*********************************************************");
+		
     	String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
     	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
     		InvalidAuthentication ia = new InvalidAuthentication();
     		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
     		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.info("{}" , ConverterUtil.messageToJson(ia));
     		
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
@@ -622,6 +715,8 @@ public class UsuariosApiController implements UsuariosApi {
 					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
+					log.info("{}" , ConverterUtil.messageToJson(br));
+					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
 
@@ -637,6 +732,8 @@ public class UsuariosApiController implements UsuariosApi {
 					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
+					log.info("{}" , ConverterUtil.messageToJson(br));
+					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
 			} catch (Exception e) {
@@ -645,15 +742,18 @@ public class UsuariosApiController implements UsuariosApi {
 				ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
 				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 				
+				log.info("{}" , ConverterUtil.messageToJson(ie));
+				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
-		
-		
+
 		BadRequest br = new BadRequest();
 		br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 		br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
-			
+		
+		log.info("{}" , ConverterUtil.messageToJson(br));
+		
 		return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 		
 	}
@@ -670,7 +770,10 @@ public class UsuariosApiController implements UsuariosApi {
 			@ApiParam(value = "Sistema que origina la petición.", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
 			@ApiParam(value = "peticion para crear el registro histórico de un usuario en el portal.") @Valid @RequestBody ReqHistorico historicoEnvioReq) {
+		
+		log.info("*********************************************************");
 		log.info("Agregar historico");
+		log.info("*********************************************************");
 
     	String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
@@ -678,6 +781,8 @@ public class UsuariosApiController implements UsuariosApi {
     		InvalidAuthentication ia = new InvalidAuthentication();
     		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
     		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.info("{}" , ConverterUtil.messageToJson(ia));
     		
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
@@ -694,6 +799,8 @@ public class UsuariosApiController implements UsuariosApi {
 					BadRequest br = new BadRequest();
 					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+					
+					log.info("{}" , ConverterUtil.messageToJson(br));
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
@@ -714,6 +821,8 @@ public class UsuariosApiController implements UsuariosApi {
 							ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
 	        				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 							
+	        				log.info("{}" , ConverterUtil.messageToJson(ie));
+	        				
 							return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 						}
 					} else {
@@ -721,12 +830,16 @@ public class UsuariosApiController implements UsuariosApi {
 						ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
 						ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR_PERFIL_USUARIO);
 						
+						log.info("{}" , ConverterUtil.messageToJson(ie));
+						
 						return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 					}
 				} else {
 					BadRequest br = new BadRequest();
 					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+					
+					log.info("{}" , ConverterUtil.messageToJson(br));
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 				}
@@ -736,12 +849,16 @@ public class UsuariosApiController implements UsuariosApi {
 				ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
 				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 				
+				log.info("{}" , ConverterUtil.messageToJson(ie));
+				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		} else {
 			BadRequest br = new BadRequest();
 			br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 			br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+			
+			log.info("{}" , ConverterUtil.messageToJson(br));
 			
 			return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 		}
@@ -758,9 +875,11 @@ public class UsuariosApiController implements UsuariosApi {
 			@ApiParam(value = "Usuario en el sistema origen que lanza la petición.", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = "Sistema que origina la petición.", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
-			@RequestHeader(value = "token", required = true) String token) {
+			@RequestHeader(value = "oauth_bearer", required = true) String oauth_bearer) {
 		
+		log.info("*********************************************************");
     	log.info("Consultar Perfil Usuario");
+    	log.info("*********************************************************");
     	
     	String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
@@ -769,6 +888,8 @@ public class UsuariosApiController implements UsuariosApi {
     		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
     		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
     		
+    		log.info("{}" , ConverterUtil.messageToJson(ia));
+    		
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
     	
@@ -776,31 +897,53 @@ public class UsuariosApiController implements UsuariosApi {
         if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
             try {
             	
-            	if (usuario == null || destino == null || origen == null  || token == null) {
-					log.info("usuario: " + usuario);
-					log.info("origen: " + origen);
-					log.info("destino: " + destino);
-					log.info("token: " + token);
-					
+            	log.info("usuario: " + usuario);
+				log.info("origen: " + origen);
+				log.info("destino: " + destino);
+				log.info("oauth_bearer: " + oauth_bearer);
+            	
+            	if (usuario == null || destino == null || origen == null  || oauth_bearer == null) {
 					BadRequest br = new BadRequest();
 					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+					
+					log.info("{}" , ConverterUtil.messageToJson(br));
 					
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 				}
 
             	if(usuario != null && !usuario.equals("")) {
-            		PerfilUsuario resp = usuarioService.consultaPrefil(usuario, token);
+            		Object obj =  usuarioService.consultaPrefil(usuario, oauth_bearer);
             		
-            		if(resp != null) {
-            			return new ResponseEntity<PerfilUsuario>(resp, HttpStatus.OK);
+            		if(obj != null) {
+            			if(obj instanceof PerfilUsuario) {
+            				
+            				PerfilUsuario resp = (PerfilUsuario) obj;
+            				log.info("{}" , resp);
+                			return new ResponseEntity<PerfilUsuario>(resp, HttpStatus.OK);
+            			} else if(obj instanceof TokenProviderErrorVO) {
+            				
+            				TokenProviderErrorVO tpeVo = (TokenProviderErrorVO) obj;
+            				
+            				InternalServerError ie = new InternalServerError();
+                            ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+            				ie.setMensaje(tpeVo.getDescripcionError());
+                            
+            				log.info("{}" , ConverterUtil.messageToJson(ie));
+            				
+                            return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+            			}
             		} else {
-            			InternalServerError ie = new InternalServerError();
-            			ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
-        				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
+            			NotFound nf = new NotFound();
+            			nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
+        				nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
         				
-            			return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+        				log.info("{}" , ConverterUtil.messageToJson(nf));
+        				
+            			return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
             		}
+            		
+            		//PerfilUsuario resp = usuarioService.consultaPrefil(usuario, oauth_bearer);
             	}
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
@@ -809,6 +952,8 @@ public class UsuariosApiController implements UsuariosApi {
                 ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
 				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
                 
+				log.info("{}" , ConverterUtil.messageToJson(ie));
+				
                 return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
@@ -817,6 +962,8 @@ public class UsuariosApiController implements UsuariosApi {
 		br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 		br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 			
+		log.info("{}" , ConverterUtil.messageToJson(br));
+		
 		return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
     }
 
@@ -832,14 +979,19 @@ public class UsuariosApiController implements UsuariosApi {
 			@ApiParam(value = "Sistema que origina la petición.", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
 			@ApiParam(value = "") @Valid @RequestBody InfoUsuario peticion) {
-    	log.info("Crear Usuario");
     	
+		log.info("*********************************************************");
+		log.info("Crear Usuario");
+		log.info("*********************************************************");
+		
     	String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
     	
     	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
     		InvalidAuthentication ia = new InvalidAuthentication();
     		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
     		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.info("{}" , ConverterUtil.messageToJson(ia));
     		
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
@@ -857,6 +1009,8 @@ public class UsuariosApiController implements UsuariosApi {
 					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 					
+					log.info("{}" , ConverterUtil.messageToJson(br));
+					
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 				}
             	
@@ -869,6 +1023,8 @@ public class UsuariosApiController implements UsuariosApi {
         				ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
         				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR_ADMIN);
                         
+        				log.info("{}" , ConverterUtil.messageToJson(ie));
+        				
                         return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 
             			
@@ -885,6 +1041,8 @@ public class UsuariosApiController implements UsuariosApi {
                 			ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
             				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
                             
+            				log.info("{}" , ConverterUtil.messageToJson(ie));
+            				
                             return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
                 		}
             		}
@@ -892,6 +1050,8 @@ public class UsuariosApiController implements UsuariosApi {
             		BadRequest br = new BadRequest();
 					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+					
+					log.info("{}" , ConverterUtil.messageToJson(br));
 					
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
             	}
@@ -901,12 +1061,16 @@ public class UsuariosApiController implements UsuariosApi {
 				ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
 				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
                 
+				log.info("{}" , ConverterUtil.messageToJson(ie));
+				
                 return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
 			BadRequest br = new BadRequest();
 			br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 			br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+			
+			log.info("{}" , ConverterUtil.messageToJson(br));
 			
 			return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 		}

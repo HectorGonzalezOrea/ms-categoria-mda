@@ -166,6 +166,7 @@ public class GestionEscenarioService {
 				infoRegla.setEstatus(aux.getEstatus());
 				infoRegla.setFechaAplicacion(aux.getFechaAplicacion());
 				infoRegla.setSucursales(aux.getSucursales());
+				
 				reglas.add(infoRegla);
 			}
 		}
