@@ -7,8 +7,14 @@ public abstract class AjustePreciosConsolidadosBase {
 	@Value("${ms.ajusteprecios.urlBase}")
 	protected String urlBase;
 	
-	@Value("${ms.ajusteprecios.servicio.ajustePrecios}")
-	protected String servicio;
+	@Value("${ms.ajusteprecios.servicio.consolidados.registrar}")
+	protected String servicioRegsitrarConsolidados;
+
+	@Value("${ms.ajusteprecios.servicio.consolidados.consultar}")
+	protected String servicioConsultaronsolidados;
+	
+	@Value("${ms.ajusteprecios.servicio.consolidados.procesar}")
+	protected String servicioProcesarConsolidados;
 	
 	@Value("${ms.ajusteprecios.apikey.value}")
 	protected String apiKey;

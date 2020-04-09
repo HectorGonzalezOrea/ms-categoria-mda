@@ -57,7 +57,6 @@ public class AjustePreciosConsolidadosController extends AjustePreciosConsolidad
 	 * Registrar Consolidado
 	 *
 	*/
-	
 	public List<Integer> registrarConsolidado(String usuario, String vigencia, String ajuste, Boolean emergente, MultipartFile adjunto) {
 
 		log.info("registrarConsolidado");
@@ -76,7 +75,7 @@ public class AjustePreciosConsolidadosController extends AjustePreciosConsolidad
 				.build();
 
 		Request request = new Request.Builder()
-				.url(urlBase + servicio)
+				.url(urlBase + servicioRegsitrarConsolidados)
 				.method(METHOD_POST, requestBody)
 				.addHeader(HEADER_USUARIO, usuario)
 				.addHeader(HEADER_ORIGEN, origen)
@@ -116,66 +115,8 @@ public class AjustePreciosConsolidadosController extends AjustePreciosConsolidad
 
 		return listIdConsolidado;
 	}
-	/*
-	public List<Integer> registrarConsolidado(String usuario, String origen, String destino, String vigencia, String ajuste, Boolean emergente, MultipartFile adjunto) {
-		log.info("registrarConsolidado");
-		
-		log.info("adjunto.getResource().getFilename(): {}" , adjunto.getResource().getFilename());
-		log.info("adjunto.getResource().getFilename(): {}" , adjunto.getResource().getDescription());
-		log.info("adjunto.getResource().getFilename(): {}" , adjunto.getResource().getFilename());
-		
-		List<Integer> listIdConsolidado = null;
-		
-		//File f = ConverterUtil.convertMultipartFileToFile(adjunto);
-		
-		File f = new File("D:\\Documentos\\eclipse\\wks_nmp\\nmp\\MS_MotorDescuentos\\ms-gestionescenarios-mda\\tmp" + adjunto.getOriginalFilename());
-		//InputStream file = null;
-		
-		Unirest.setTimeouts(0, 0);
-		try {
-			
-			HttpResponse<String> response = Unirest.post(urlBase + servicio)
-			  .header(HEADER_USUARIO, usuario)
-			  .header(HEADER_ORIGEN, origen)
-			  .header(HEADER_DESTINO, destino)
-			  .header(HEADER_VIGENCIA, vigencia)
-			  .header(HEADER_NOMBRE_AJUSTE, ajuste)
-			  .header(HEADER_EMERGENTE, emergente.toString())
-			  .header(HEADER_APIKEY_KEY, apiKey)
-			  .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA)
-			  .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
-			  //.field(BODY_ADJUNTO, new File("tmp/" + adjunto.getOriginalFilename()), MediaType.APPLICATION_JSON)
-			  //.field(BODY_ADJUNTO, file, adjunto.getOriginalFilename())
-			  //.field(BODY_ADJUNTO, adjunto, MediaType.MULTIPART_FORM_DATA)
-			  .field(BODY_ADJUNTO, f)
-			  .asString();
-			  
-			log.info("Estatus {}" , response.getStatus());
-			log.info("Response {}" , response.getBody());
-			
-			if(response.getStatus() == 200) {
-				
-				Date fecha = new Date();
-				String fechaAplicacion = new SimpleDateFormat("dd-MM-yyyy").format(fecha);
-				
-				log.info("Date: {}" , fechaAplicacion);
-				
-				ConsultarConsolidadoResponseVO consolidadoList = this.consultarConsolidado(usuario, origen, destino, fechaAplicacion);
-				if(consolidadoList != null) { 
-					consolidadoList
-					.stream()
-					.forEach( c -> {
-						listIdConsolidado.add(c.getIdArchivo());
-					});
-				}
-			}
-		} catch (UnirestException e) {
-			log.error("UnirestException: {}" , e);
-		}
-		
-		return listIdConsolidado;
-	}
-	*/
+	
+	
 	/*
 	 * Consultar Consolidado
 	 */
@@ -191,7 +132,7 @@ public class AjustePreciosConsolidadosController extends AjustePreciosConsolidad
 			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(FECHA_APLICACION, fechaAplicacion);
 			
-			HttpResponse<String> response = Unirest.get(urlBase + servicio)
+			HttpResponse<String> response = Unirest.get(urlBase + servicioConsultaronsolidados)
 			  .header(HEADER_USUARIO, usuario)
 			  .header(HEADER_ORIGEN, origen)
 			  .header(HEADER_DESTINO, destino)
@@ -227,7 +168,7 @@ public class AjustePreciosConsolidadosController extends AjustePreciosConsolidad
 			Map<String, Object> parameters = new HashMap<>();
 			parameters.put(FECHA_APLICACION, fechaAplicacion);
 			
-			HttpResponse<String> response = Unirest.post(urlBase + servicio)
+			HttpResponse<String> response = Unirest.post(urlBase + servicioProcesarConsolidados)
 			.header(HEADER_USUARIO, usuario)
 			.header(HEADER_ORIGEN, origen)
 			.header(HEADER_DESTINO, destino)
@@ -250,50 +191,5 @@ public class AjustePreciosConsolidadosController extends AjustePreciosConsolidad
 		
 		return procesado;
 	}
-	
-	/*
-	 public Boolean procesarConsolidados(String usuario, String fechaAplicacion) {
-		log.info("procesarConsolidados");
-		
-		Boolean procesado = false;
-		
-		OkHttpClient client = new OkHttpClient().newBuilder()
-				  .build();
-			
-				okhttp3.MediaType mediaType = okhttp3.MediaType.parse(MediaType.APPLICATION_JSON);
-				RequestBody body = RequestBody.create(mediaType, "");
-				
-				//Map<String, Object> parameters = new HashMap<>();
-				//parameters.put(FECHA_APLICACION, fechaAplicacion);
-				
-				Request request = new Request.Builder()
-				  .url(urlBase + servicio + "?" + FECHA_APLICACION + "=" + fechaAplicacion)
-				  .method(METHOD_POST, body)
-				  .addHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
-				  .addHeader(HEADER_USUARIO, usuario)
-				  .addHeader(HEADER_ORIGEN, origen)
-				  .addHeader(HEADER_DESTINO, destino)
-				  .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-				  .addHeader(HEADER_APIKEY_KEY, apiKey)
-				  .build();
-				
-				try {
-					Response response = client.newCall(request).execute();
-					
-					log.info("Estatus {}" , response.code());
-					log.info("Response {}" , response.body().string());
-					
-					if(response.code() == 200) {
-						procesado = true;
-					}
-					
-				} catch (IOException e) {
-					log.error("IOException {}" , e);
-				}
-				
-		return procesado;
-	}
-	 */
-	
 	
 }

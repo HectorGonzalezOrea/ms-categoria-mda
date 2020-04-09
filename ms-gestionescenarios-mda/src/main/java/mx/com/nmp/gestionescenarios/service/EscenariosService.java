@@ -44,7 +44,9 @@ public class EscenariosService {
 	 * Almacenar y procesar Consolidado
 	 */
 	public InternalServerError almacenarProcesarConsolidado(String usuario, String vigencia, Boolean emergente, String ajuste, MultipartFile adjunto) {
+		log.info("+++++++++++++++++++++++++++");
 		log.info("almacenarProcesarConsolidado");
+		log.info("+++++++++++++++++++++++++++");
 		
 		List<Integer> listIdConsolidado = this.registrarConsoidado(usuario, vigencia, ajuste, emergente, adjunto);
 		

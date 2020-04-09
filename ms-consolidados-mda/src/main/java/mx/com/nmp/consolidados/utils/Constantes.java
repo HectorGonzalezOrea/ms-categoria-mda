@@ -6,6 +6,10 @@ public final class Constantes {
 		throw new UnsupportedOperationException();
 	}
 	
+	public static final String HEADER_ACCEPT = "Accept";
+	public static final String HEADER_APP_JSON = "application/json";
+	public static final String ERROR_CODE_INVALID_AUTHENTICATION = "NMP-MDA-401";
+	public static final String ERROR_MESSAGE_INVALID_AUTHENTICATION = "Se ha producido un error de autorización.";
 	public static final String HEADER_APIKEY_KEY = "X-IBM-Client-Id";
 	public static final String HEADER_USUARIO = "usuario";
 	public static final String HEADER_ID_CONSUMIDOR = "idConsumidor";

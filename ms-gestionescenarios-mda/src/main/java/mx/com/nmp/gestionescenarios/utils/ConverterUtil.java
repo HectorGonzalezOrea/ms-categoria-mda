@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 import mx.com.nmp.gestionescenarios.oag.vo.GetTokenResponseVO;
 import mx.com.nmp.gestionescenarios.oag.vo.CalendarizarEscanarioResponseVO;
 import mx.com.nmp.gestionescenarios.oag.vo.ConsultarConsolidadoResponseVO;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.TMP;
 
 public class ConverterUtil {
 
@@ -63,7 +64,7 @@ public class ConverterUtil {
 	public static void convertMultipartFileToFile(MultipartFile file) {
 		log.info("convertMultipartFileToFile");
 		
-		File convFile = new File("tmp/" + file.getOriginalFilename());
+		File convFile = new File(TMP + file.getOriginalFilename());
 		try {
 			convFile.createNewFile();
 			FileOutputStream fos = new FileOutputStream(convFile);
