@@ -3,6 +3,8 @@ package mx.com.nmp.escenariosdinamicos.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.*;
+import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosRes;
+import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosResInner;
 import mx.com.nmp.escenariosdinamicos.model.BadRequest;
 import mx.com.nmp.escenariosdinamicos.model.ConflictRequest;
 import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosReq;
@@ -58,6 +60,29 @@ public class EscenariosApiController implements EscenariosApi {
         this.request = request;
     }
 
+	public ResponseEntity<?> consultarEscenariosGET(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="MongoDB, mockserver") @RequestHeader(value="destino", required=true) String destino) {
+        String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains("application/json")) {
+            try {
+            	List<ConsultarEscenariosResInner> escenario = escenarioService.consultaEscenario();
+            	ConsultarEscenariosRes escenariosRes = new ConsultarEscenariosRes();
+            	if(escenario!=null) {
+            		log.info("Si hubo considencias.");
+            		escenariosRes.addAll(escenario);
+            		return new ResponseEntity<ConsultarEscenariosRes>(escenariosRes, HttpStatus.OK);
+            	}else {
+            		log.info("No concidencias.");
+            		return new ResponseEntity<ConsultarEscenariosRes>(escenariosRes, HttpStatus.OK);
+            	}
+            } catch (Exception e) {
+                log.error("Couldn't serialize response for content type application/json", e);
+                return new ResponseEntity<ConsultarEscenariosRes>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        return new ResponseEntity<ConsultarEscenariosRes>(HttpStatus.NOT_IMPLEMENTED);
+    }
+	
     public ResponseEntity<?> crearEscenariosPOST(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  )  @Valid @RequestBody CrearEscenariosReq crearEscenariosRequest) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {

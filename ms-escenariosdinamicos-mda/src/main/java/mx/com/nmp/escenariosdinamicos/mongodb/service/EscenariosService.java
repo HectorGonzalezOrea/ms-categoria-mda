@@ -1,5 +1,6 @@
 package mx.com.nmp.escenariosdinamicos.mongodb.service;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDate;
 
-
+import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosRes;
+import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosResInner;
 import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosReq;
 import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosReq;
@@ -21,6 +23,9 @@ import mx.com.nmp.escenariosdinamicos.oag.controller.OAGController;
 import mx.com.nmp.escenariosdinamicos.oag.vo.EnviarNotificacionRequestVO;
 import static mx.com.nmp.escenariosdinamicos.utils.Constantes.ASUNTO_MESSAGE;
 import static mx.com.nmp.escenariosdinamicos.utils.Constantes.CONTENIDO;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -100,6 +105,40 @@ public class EscenariosService {
 			
 		return cer;
 		
+	}
+	
+	/*
+	 * Consulta de escenarios
+	 */
+	
+	public List<ConsultarEscenariosResInner> consultaEscenario() {
+		log.info("EscenariosService.consultaEscenario");
+		
+		List<EscenarioEntity> busquedaList = mongoTemplate.findAll(EscenarioEntity.class);
+		List<ConsultarEscenariosResInner> cer = null;
+		
+		if (CollectionUtils.isNotEmpty(busquedaList)) {
+			cer = new ArrayList<ConsultarEscenariosResInner>();
+			ConsultarEscenariosResInner ceri = null; 
+			
+			for(EscenarioEntity aux:busquedaList) {
+				ceri = new ConsultarEscenariosResInner();
+				
+				ceri.setIdRegla(aux.getIdRegla());
+				ceri.setIdEscenario(aux.getIdEscenario());
+				ceri.setDiaUno(aux.getDiaUno());
+				ceri.setDiaDos(aux.getDiaDos());
+				ceri.setDiaTres(aux.getDiaTres());
+				
+				cer.add(ceri);
+				
+			}
+			
+		}
+		
+		
+		
+		return cer;
 	}
 	
 	/*
