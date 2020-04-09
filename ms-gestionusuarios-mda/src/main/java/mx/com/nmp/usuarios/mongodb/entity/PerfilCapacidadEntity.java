@@ -9,7 +9,7 @@ public class PerfilCapacidadEntity {
 
 	@Id
 	private ObjectId _id;
-	private Integer idPerfil;
+	private Integer perfil;
 	private Integer idCapacidad;
 	
 	public ObjectId get_id() {
@@ -18,11 +18,11 @@ public class PerfilCapacidadEntity {
 	public void set_id(ObjectId _id) {
 		this._id = _id;
 	}
-	public Integer getIdPerfil() {
-		return idPerfil;
+	public Integer getPerfil() {
+		return perfil;
 	}
-	public void setIdPerfil(Integer idPerfil) {
-		this.idPerfil = idPerfil;
+	public void setPerfil(Integer perfil) {
+		this.perfil = perfil;
 	}
 	public Integer getIdCapacidad() {
 		return idCapacidad;
@@ -30,4 +30,5 @@ public class PerfilCapacidadEntity {
 	public void setIdCapacidad(Integer idCapacidad) {
 		this.idCapacidad = idCapacidad;
 	}
+	
 }

@@ -39,5 +39,10 @@ public class PerfilEntity {
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
 	}
-
+	
+	@Override
+	public String toString() {
+		return "PerfilEntity [_id=" + _id + ", idPerfil=" + idPerfil + ", nombre=" + nombre + ", descripcion="
+				+ descripcion + "]";
+	}
 }

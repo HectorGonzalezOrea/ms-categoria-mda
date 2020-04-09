@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import javassist.expr.Instanceof;
 import mx.com.nmp.usuarios.model.CapacidadUsuariosReq;
 import mx.com.nmp.usuarios.model.CapacidadUsuariosReqInner;
 import mx.com.nmp.usuarios.model.CapacidadUsuariosRes;
@@ -57,6 +58,7 @@ import mx.com.nmp.usuarios.oag.controller.OAGController;
 import mx.com.nmp.usuarios.oag.vo.FiltroVO;
 import mx.com.nmp.usuarios.oag.vo.IdentidadUsuarioRequestVO;
 import mx.com.nmp.usuarios.oag.vo.IdentidadUsuarioResponseVO;
+import mx.com.nmp.usuarios.oag.vo.TokenProviderErrorVO;
 import mx.com.nmp.usuarios.oag.vo.UsuarioVO;
 import mx.com.nmp.usuarios.utils.Constantes;
 import mx.com.nmp.usuarios.utils.ConverterUtil;
@@ -242,10 +244,10 @@ public class UsuarioService {
 		}
 
 		ResEstatus resp = null;
-		if(actualizar) {
+		if(Boolean.TRUE.equals(actualizar)) {
 			resp = new ResEstatus();
 			resp.setIdUsuario(idUsuario);
-			if(activo) {
+			if(Boolean.TRUE.equals(activo)) {
 				resp.setDescripcion(DescripcionEnum.ACTIVO);
 			} else {
 				resp.setDescripcion(DescripcionEnum.INACTIVO);
@@ -599,7 +601,7 @@ public class UsuarioService {
 			log.info("perfil: {}" , perfil);
 
 			if (perfil != null) {
-				List<PerfilCapacidadEntity> pcList = perfilCapacidadRepository.findByIdPerfil(idPerfil);
+				List<PerfilCapacidadEntity> pcList = perfilCapacidadRepository.findByPerfil(idPerfil);
 				
 				// se limpia
 				for(PerfilCapacidadEntity pc : pcList) {
@@ -677,23 +679,29 @@ public class UsuarioService {
 		CapacidadUsuariosRes cureps = null;
 
 		if (idPerfil != null) {
-			PerfilEntity pe = (PerfilEntity) perfilRepository.findByIdPerfil(idPerfil);
+			PerfilEntity pe = perfilRepository.findByIdPerfil(idPerfil);
 			if (pe != null) {
+				
+				log.info("{}" , pe);
+				
 				cureps = new CapacidadUsuariosRes();
 				cureps.setIdPerfil(pe.getIdPerfil());
 				cureps.setDescripcionPerfil(DescripcionPerfilEnum.fromValue(pe.getDescripcion()));
 
 				ArrayList<PerfilCapacidadEntity> perfilCapacidadList = (ArrayList<PerfilCapacidadEntity>) perfilCapacidadRepository
-						.findByIdPerfil(idPerfil);
+						.findByPerfil(idPerfil);
 
+				log.info("{}" , perfilCapacidadList.size());
+				
 				if (CollectionUtils.isNotEmpty(perfilCapacidadList)) {
+					
 					CapacidadEntity ce = null;
 					CapacidadUsuariosReq cureq = new CapacidadUsuariosReq();
 					CapacidadUsuariosReqInner curi = null;
 
 					for (PerfilCapacidadEntity pce : perfilCapacidadList) {
 						if (pce.getIdCapacidad() != null) {
-							ce = (CapacidadEntity) capacidadRepository.findByIdCapacidad(pce.getIdCapacidad());
+							ce = capacidadRepository.findByIdCapacidad(pce.getIdCapacidad());
 
 							if (ce != null) {
 								curi = new CapacidadUsuariosReqInner();
@@ -716,7 +724,7 @@ public class UsuarioService {
 	 * Consulta Perfil
 	 */
 	
-	public PerfilUsuario consultaPrefil(String usuario, String token) {
+	public Object consultaPrefil(String usuario, String token) {
 		log.info("consultaPrefil");
 		
 		log.info("usuario: {}" , usuario);
@@ -724,7 +732,9 @@ public class UsuarioService {
 		PerfilUsuario pf = null;
 		
 		if(usuario != null && !usuario.equals("")) {
-			UsuarioEntity user = (UsuarioEntity) usuarioRepository.findByUsuario(usuario);
+			UsuarioEntity user = usuarioRepository.findByUsuario(usuario);
+			
+			log.info("Concidencias del usuario en Mongo: {}" , user);
 			
 			if(user != null) {
 				IdentidadUsuarioRequestVO iuRequest = new IdentidadUsuarioRequestVO();
@@ -735,37 +745,108 @@ public class UsuarioService {
 				
 				iuRequest.setFiltro(filtro);				
 				
-				IdentidadUsuarioResponseVO identidadUsuario = oagController.identidadUsuario(iuRequest, token);
+				Object oAux = oagController.identidadUsuario(iuRequest, token, usuario);
 				
-				if(identidadUsuario != null) {
-					pf = new PerfilUsuario();
+				IdentidadUsuarioResponseVO identidadUsuario = null;
+				TokenProviderErrorVO tpeVo = null;
+				
+				if(oAux != null) {
+					if(oAux instanceof IdentidadUsuarioResponseVO)
+						identidadUsuario = (IdentidadUsuarioResponseVO) oAux;
+					else if(oAux instanceof TokenProviderErrorVO) {
+						tpeVo = (TokenProviderErrorVO) oAux;
 					
-					UsuarioVO uvo = identidadUsuario.getUsuario().get(0);
+						return tpeVo;
+					}
 					
-					pf.setNombreDistinguido(uvo.getNombreDistintivo());
-					
-					List<InfoUsuario> listUsuarios = this.getUsuarios(user.getNombre(), user.getApellidoPaterno(), user.getApellidoMaterno(), null, user.getUsuario(), null);
-					
-					if(!listUsuarios.isEmpty()) {
-						
-						pf.setActivo(listUsuarios.get(0).isActivo());
-						pf.setApellidoMaterno(listUsuarios.get(0).getApellidoMaterno());
-						pf.setApellidoPaterno(listUsuarios.get(0).getApellidoPaterno());
-						pf.setDepartamentoArea(listUsuarios.get(0).getDepartamentoArea());
-						pf.setDireccion(listUsuarios.get(0).getDireccion());
-						pf.setGerencia(listUsuarios.get(0).getGerencia());
-						pf.setIdUsuario(listUsuarios.get(0).getIdUsuario());
-						pf.setNombre(listUsuarios.get(0).getNombre());
-						pf.setPerfil(listUsuarios.get(0).getPerfil());
-						// No viene en la respuesta del OAG
-						//pf.setMiembroDe(miembroDe);
-						pf.setPuesto(listUsuarios.get(0).getPuesto());
-						pf.setSubdireccion(listUsuarios.get(0).getSubdireccion());
-						pf.setUsuario(listUsuarios.get(0).getUsuario());
+					if (identidadUsuario != null && this.validarIdentidadUsuario(identidadUsuario)) {
+						UsuarioVO uvo = identidadUsuario.getUsuario().get(0);
+
+						pf = this.validarDatosPerfil(uvo);
+
+						List<InfoUsuario> listUsuarios = this.getUsuarios(user.getNombre(), user.getApellidoPaterno(),
+								user.getApellidoMaterno(), null, user.getUsuario(), null);
+
+						if (!listUsuarios.isEmpty()) {
+
+							pf.setActivo(listUsuarios.get(0).isActivo());
+							pf.setApellidoMaterno(listUsuarios.get(0).getApellidoMaterno());
+							pf.setApellidoPaterno(listUsuarios.get(0).getApellidoPaterno());
+							pf.setDepartamentoArea(listUsuarios.get(0).getDepartamentoArea());
+							pf.setDireccion(listUsuarios.get(0).getDireccion());
+							pf.setGerencia(listUsuarios.get(0).getGerencia());
+							pf.setIdUsuario(listUsuarios.get(0).getIdUsuario());
+							pf.setNombre(listUsuarios.get(0).getNombre());
+							pf.setPerfil(listUsuarios.get(0).getPerfil());
+							pf.setPuesto(listUsuarios.get(0).getPuesto());
+							pf.setSubdireccion(listUsuarios.get(0).getSubdireccion());
+							pf.setUsuario(listUsuarios.get(0).getUsuario());
+						}
 					}
 				}
 			}
 		}
+		
+		return pf;
+	}
+	
+	/*
+	 * Validar identidadUsuario
+	 */
+	private Boolean validarIdentidadUsuario(IdentidadUsuarioResponseVO identidadUsuario) {
+		log.info("validarIdentidadUsuario");
+		
+		return !identidadUsuario.getUsuario().isEmpty();
+	}
+	
+	
+	/*
+	 * Validar datos del perfil
+	 */
+	private PerfilUsuario validarDatosPerfil(UsuarioVO uvo) {
+		log.info("validarDatosPerfil");
+		
+		PerfilUsuario pf = new PerfilUsuario();
+		
+		if(uvo.getNombreDistintivo() != null) 
+			pf.setNombreDistinguido(uvo.getNombreDistintivo());
+		
+		// No viene "miembroDe" en la respuesta del OAG
+		List<String> miembroDe = new ArrayList<>();
+		pf.setMiembroDe(miembroDe);
+		
+		if(uvo.getNombreDominio() != null)
+			pf.setNombreDominio(uvo.getNombreDominio());
+		if(uvo.getNombreCompleto() != null)
+			pf.setNombreCompleto(uvo.getNombreCompleto());
+		if(uvo.getDescripcion() != null)
+			pf.setDescripcion(uvo.getDescripcion());
+		if(uvo.getGuid() != null)
+			pf.setGuid(uvo.getGuid());
+		if(uvo.getTipoIdentidad() != null)
+			pf.setTipoIdentidad(uvo.getTipoIdentidad());
+		if(uvo.getCorreo() != null)
+			pf.setCorreo(uvo.getCorreo());
+		if(uvo.getTelefonoOficina() != null)
+			pf.setTelefonoOficina(uvo.getTelefonoOficina());
+		if(uvo.getTelefonoTrabajo() != null)
+			pf.setTelefonoTrabajo(uvo.getTelefonoTrabajo());
+		if(uvo.getTelefono() != null)
+			pf.setTelefono(uvo.getTelefono());
+		if(uvo.getTelefonoMovil() != null)
+			pf.setTelefonoMovil(uvo.getTelefonoMovil());
+		if(uvo.getLocalizador() != null)
+			pf.setLocalizador(uvo.getLocalizador());
+		if(uvo.getFax() != null)
+			pf.setFax(uvo.getFax());
+		if(uvo.getJefe() != null)
+			pf.setJefe(uvo.getJefe());
+		if(uvo.getZona() != null)
+			pf.setZona(uvo.getZona());
+		if(uvo.getPreferenciasIdioma() != null)
+			pf.setPreferenciasIdioma(uvo.getPreferenciasIdioma());
+		if(uvo.getPreferenciasNotificacion() != null)
+			pf.setPreferenciasNotificacion(uvo.getPreferenciasNotificacion());
 		
 		return pf;
 	}
@@ -810,23 +891,23 @@ public class UsuarioService {
 				usuario.setApellidoPaterno(request.getApellidoPaterno());
 				
 				String davoJson = ConverterUtil.messageToJson(request.getDepartamentoArea());
-				DepatamentoAreaVO davo = ConverterUtil.StringJsonToObjectDepatamentoAreaVO(davoJson);
+				DepatamentoAreaVO davo = ConverterUtil.stringJsonToObjectDepatamentoAreaVO(davoJson);
 				usuario.setDepartamentoArea(davo.getId());
 				
 				String dvoJson = ConverterUtil.messageToJson(request.getDireccion());
-				DireccionVO dvo = ConverterUtil.StringJsonToObjectDireccionVO(dvoJson);
+				DireccionVO dvo = ConverterUtil.stringJsonToObjectDireccionVO(dvoJson);
 				usuario.setDireccion(dvo.getId());
 				
 				String gvoJson = ConverterUtil.messageToJson(request.getDepartamentoArea());
-				GerenciaVO gvo = ConverterUtil.StringJsonToObjectGerenciaVO(gvoJson);
+				GerenciaVO gvo = ConverterUtil.stringJsonToObjectGerenciaVO(gvoJson);
 				usuario.setGerencia(gvo.getId());
 				
 				String pvoJson = ConverterUtil.messageToJson(request.getDepartamentoArea());
-				PuestoVO pvo = ConverterUtil.StringJsonToObjectPuestoVO(pvoJson);
+				PuestoVO pvo = ConverterUtil.stringJsonToObjectPuestoVO(pvoJson);
 				usuario.setPuesto(pvo.getId());
 				
 				String sdvoJson = ConverterUtil.messageToJson(request.getDepartamentoArea());
-				SubdireccionVO sdvo = ConverterUtil.StringJsonToObjectSubdireccionVO(sdvoJson);
+				SubdireccionVO sdvo = ConverterUtil.stringJsonToObjectSubdireccionVO(sdvoJson);
 				usuario.setSubdireccion(sdvo.getId());
 				
 				usuario.setUsuario(request.getUsuario());

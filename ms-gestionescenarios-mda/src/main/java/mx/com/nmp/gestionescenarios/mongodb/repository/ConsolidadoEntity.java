@@ -1,4 +1,4 @@
-package mx.com.nmp.consolidados.mongodb.entity;
+package mx.com.nmp.gestionescenarios.mongodb.repository;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,7 +11,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 
 @Document(collection = "Consolidados")
-public class ArchivoEntity {
+public class ConsolidadoEntity {
 	
 	@Transient
     public static final String SEQUENCE_NAME = "consolidado_sequence";

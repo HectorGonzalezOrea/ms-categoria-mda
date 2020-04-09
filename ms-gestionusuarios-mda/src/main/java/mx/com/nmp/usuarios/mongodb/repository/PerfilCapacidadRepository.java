@@ -9,6 +9,6 @@ import mx.com.nmp.usuarios.mongodb.entity.UsuarioEntity;
 
 public interface PerfilCapacidadRepository extends MongoRepository<PerfilCapacidadEntity, String> {
 
-	List<PerfilCapacidadEntity> findByIdPerfil(Integer idPerfil);
+	List<PerfilCapacidadEntity> findByPerfil(Integer perfil);
 	
 }

@@ -56,7 +56,7 @@ public interface UsuariosApi {
 			@ApiResponse(code = 404, message = "Recurso no disponible", response = NotFound.class),
 			@ApiResponse(code = 409, message = "Conflicto con el mensaje de petición, verifique la información.", response = ConflictRequest.class),
 			@ApiResponse(code = 500, message = "Error interno del servidor.", response = InternalServerError.class) })
-	@RequestMapping(value = "/usuarios/{idPerfil}/capacidades", produces = {
+	@RequestMapping(value = "/perfil/{idPerfil}/capacidades", produces = {
 			"application/json" }, method = RequestMethod.POST)
 	ResponseEntity<?> capacidadUsuarioPOST(
 			@ApiParam(value = "Usuario en el sistema origen que lanza la petición.", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
@@ -157,7 +157,7 @@ public interface UsuariosApi {
 			@ApiResponse(code = 404, message = "Recurso no disponible", response = NotFound.class),
 			@ApiResponse(code = 409, message = "Conflicto con el mensaje de petición, verifique la información.", response = ConflictRequest.class),
 			@ApiResponse(code = 500, message = "Error interno del servidor.", response = InternalServerError.class) })
-	@RequestMapping(value = "/usuarios/{idPerfil}/capacidades", produces = {
+	@RequestMapping(value = "/perfil/{idPerfil}/capacidades", produces = {
 			"application/json" }, method = RequestMethod.PUT)
 	ResponseEntity<?> modCapacidadPOST(
 			@ApiParam(value = "Usuario en el sistema origen que lanza la petición.", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
@@ -192,7 +192,7 @@ public interface UsuariosApi {
 			@ApiParam(value = "Usuario en el sistema origen que lanza la petición.", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = "Sistema que origina la petición.", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
-			@ApiParam(value = "Access Token del usuario loggeado." ,required=true) @RequestHeader(value="token", required=true) String token);
+			@ApiParam(value = "Access Token del usuario loggeado." ,required=true) @RequestHeader(value="oauth_bearer", required=true) String oauth_bearer);
 
 
 	    @ApiOperation(value = "Registra un usuario", nickname = "usuariosPost", notes = "Recurso utilizado para el registro de un usuario en Mongo DB", response = GeneralResponse.class, authorizations = {

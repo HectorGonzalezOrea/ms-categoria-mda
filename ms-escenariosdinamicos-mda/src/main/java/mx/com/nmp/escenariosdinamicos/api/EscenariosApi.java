@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.BadRequest;
 import mx.com.nmp.escenariosdinamicos.model.ConflictRequest;
 import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosReq;
@@ -38,6 +39,20 @@ import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoRes;
 
 @Api(value = "escenarios", description = "the escenarios API")
 public interface EscenariosApi {
+
+    @ApiOperation(value = "Consultar escenarios", nickname = "consultarEscenariosGET", notes = "Permite consultar los escenarios existentes dentro de la base de datos de Mongo. ", response = ConsultarEscenariosRes.class, authorizations = {
+        @Authorization(value = "apiKey")
+    }, tags={ "Escenarios dinámicos", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Consulta exitosa", response = ConsultarEscenariosRes.class),
+        @ApiResponse(code = 400, message = "Error en el mensaje de petición, verifique la información", response = BadRequest.class),
+        @ApiResponse(code = 401, message = "Error de autorización en el uso del recurso", response = InvalidAuthentication.class),
+        @ApiResponse(code = 500, message = "Error interno del servidor", response = InternalServerError.class) })
+    @RequestMapping(value = "/escenarios/dinamicos",
+        produces = { "application/json" }, 
+        method = RequestMethod.GET)
+    ResponseEntity<?> consultarEscenariosGET(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="MongoDB, mockserver") @RequestHeader(value="destino", required=true) String destino);
+
 
     @ApiOperation(value = "Crear escenario", nickname = "crearEscenariosPOST", notes = "Permite la creación de un nuevo escenario. Los escenarios administrados por el motor de descuentos no se verán reflejados de forma inmediata, para ello deberá iniciarse un flujo de solicitud a mesa de ayuda para agregar el nuevo escenario a través del envió de un correo electrónico con el detalle del nuevo escenario. El consumidor deberá enviar los valores del comportamiento esperado de los `últimos 3 días`. Los valores posibles para los comportamientos son:    * 0 = Día sin venta   * X = Día con venta (Diferente de 0)   * S = Sube la venta   * M = Se mantiene la venta   * B = Baja la venta  Adicional deberá enviar la regla a aplicar para la suma de comportamientos de estos días. Los valores posibles para las reglas son:    * PB = Precio bajo   * PM = Precio medio   * PA = Precio alto    Como respuesta, el consumidor recibirá el identificador del escenario. En caso de que la combinación de los valores enviados ya este registrado se retornará un mensaje de advertencia.  ", response = CrearEscenariosRes.class, authorizations = {
         @Authorization(value = "apiKey")

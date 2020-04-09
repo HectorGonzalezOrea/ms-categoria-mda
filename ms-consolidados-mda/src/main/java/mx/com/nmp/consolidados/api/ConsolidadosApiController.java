@@ -111,7 +111,9 @@ public class ConsolidadosApiController implements ConsolidadosApi {
     		@ApiParam(value = "Destino final de la informaci\u00F3n" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,
     		@NotNull @ApiParam(value = "Fecha de ejecuci\u00F3n del proceso de consolidados", required = true) @Valid @RequestParam(value = "fechaAplicacion", required = true) String fechaAplicacion,
     		@NotNull @ApiParam(value = "Prioridad en la ejecuci\u00F3n del archivo", required = false) @Valid @RequestParam(value = "idPrioridad", required = false) String idPrioridad) {
+    		
     		LOG.info("ConsolidadosApiController.consultaConsolidadosArchivosGET");
+    		
     		BadRequest badReq=null;
     		if(usuario==null||origen==null||destino==null||fechaAplicacion==null) {
     			badReq=new BadRequest();
@@ -131,7 +133,12 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 			return new ResponseEntity<ConsultarArchivoConsolidadoRes>(response, HttpStatus.OK);
     }
 
-    public ResponseEntity<?> eliminarArchivoConsolidadoDELETE(@ApiParam(value = "Usuario en el sistema origen que lanza la petici\u00F3n" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petici\u00F3n" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la informaci\u00F3n" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Identificador del archivo",required=true) @PathVariable("idArchivo") String idArchivo) {
+	public ResponseEntity<?> eliminarArchivoConsolidadoDELETE(
+			@ApiParam(value = "Usuario en el sistema origen que lanza la petici\u00F3n", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Sistema que origina la petici\u00F3n", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
+			@ApiParam(value = "Destino final de la informaci\u00F3n", required = true, allowableValues = "bluemix, mockserver") @RequestHeader(value = "destino", required = true) String destino,
+			@ApiParam(value = "Identificador del archivo", required = true) @PathVariable("idArchivo") String idArchivo) {
+    		
     	LOG.info("Elimina archivos consolidados.");
     	
     	String accept = request.getHeader("Accept");
@@ -177,14 +184,18 @@ public class ConsolidadosApiController implements ConsolidadosApi {
         return new ResponseEntity<SuccessfulResponse>(HttpStatus.NOT_IMPLEMENTED);
     }
 
+	/*
+	 * Procesar consolidado
+	 */
     public ResponseEntity<?> procesarConsolidadoPOST(
     		@ApiParam(value = "Usuario en el sistema origen que lanza la petici\u00F3n" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,
     		@ApiParam(value = "Sistema que origina la petici\u00F3n" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,
     		@ApiParam(value = "Destino final de la informaci\u00F3n" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,
     		@NotNull @ApiParam(value = "Fecha de ejecuci\u00F3n del proceso de consolidados", required = true) @Valid @RequestParam(value = "fechaAplicacion", required = true) String fechaAplicacion) {
-        String accept = request.getHeader("Accept");
         
         LOG.info("procesarConsolidadoPOST");
+        
+        String accept = request.getHeader("Accept");
         
         if (accept != null && accept.contains("application/json")) {
         	try {
@@ -227,8 +238,10 @@ public class ConsolidadosApiController implements ConsolidadosApi {
     		@ApiParam(value = "Archivo CSV de consolidados") @Valid @RequestPart(value="adjunto", required=true) MultipartFile adjunto,
     		@ApiParam(value = "Fecha de vigencia para el ajuste" ,required=true) @RequestHeader(value="vigencia", required=true) String vigencia,
     		@ApiParam(value = "Nombre del ajuste" ,required=true) @RequestHeader(value="nombreAjuste", required=true) String nombreAjuste,@ApiParam(value = "Flag para indicar si el ajuste es emergente" ,required=true) @RequestHeader(value="emergente", required=true) Boolean emergente) {
-        LOG.info("ConsolidadosApiController.registrarConsolidadoPOST");
-        LOG.info("usuario "+usuario);
+        
+    	LOG.info("ConsolidadosApiController.registrarConsolidadoPOST");
+        
+    	LOG.info("usuario "+usuario);
         LOG.info("origen "+origen);
         LOG.info("destino "+destino);
         LOG.info("adjunto "+adjunto.getOriginalFilename());
