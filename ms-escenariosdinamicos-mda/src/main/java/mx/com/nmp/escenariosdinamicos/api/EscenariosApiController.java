@@ -1,24 +1,10 @@
 package mx.com.nmp.escenariosdinamicos.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.ArrayList;
 
-import io.swagger.annotations.*;
-import mx.com.nmp.escenariosdinamicos.model.BadRequest;
-import mx.com.nmp.escenariosdinamicos.model.ConflictRequest;
-import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosReq;
-import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosRes;
-import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoReq;
-import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoRes;
-import mx.com.nmp.escenariosdinamicos.model.EliminarEscenariosRes;
-import mx.com.nmp.escenariosdinamicos.model.InternalServerError;
-import mx.com.nmp.escenariosdinamicos.model.InvalidAuthentication;
-import mx.com.nmp.escenariosdinamicos.model.ModEscenariosReq;
-import mx.com.nmp.escenariosdinamicos.model.ModEscenariosRes;
-import mx.com.nmp.escenariosdinamicos.model.NotFound;
-import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoReq;
-import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoRes;
-import mx.com.nmp.escenariosdinamicos.mongodb.entity.EscenarioEntity;
-import mx.com.nmp.escenariosdinamicos.mongodb.service.EscenariosService;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,15 +15,22 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.*;
-import javax.validation.Valid;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.swagger.annotations.ApiParam;
+import mx.com.nmp.escenariosdinamicos.model.BadRequest;
+import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosReq;
+import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosRes;
+import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoReq;
+import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoRes;
+import mx.com.nmp.escenariosdinamicos.model.EliminarEscenariosRes;
+import mx.com.nmp.escenariosdinamicos.model.ModEscenariosReq;
+import mx.com.nmp.escenariosdinamicos.model.ModEscenariosRes;
+import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
+import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoRes;
+import mx.com.nmp.escenariosdinamicos.mongodb.service.ElasticService;
+import mx.com.nmp.escenariosdinamicos.mongodb.service.EscenariosService;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-04T01:28:01.968Z")
 
 @Controller
@@ -51,6 +44,8 @@ public class EscenariosApiController implements EscenariosApi {
     
     @Autowired
     private EscenariosService escenarioService;
+    @Autowired
+    private ElasticService elasticService;
 
     @org.springframework.beans.factory.annotation.Autowired
     public EscenariosApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -164,18 +159,26 @@ public class EscenariosApiController implements EscenariosApi {
         return new ResponseEntity<EliminarEscenariosRes>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<SimularEscenarioDinamicoRes> simularEscenariosDinamicosPOST(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  )  @Valid @RequestBody SimularEscenarioDinamicoReq crearEscenariosRequest) {
+    public ResponseEntity<SimularEscenarioDinamicoRes> simularEscenariosDinamicosPOST(
+    		@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,
+    		@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,
+    		@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino//,
+    		//@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  ) @Valid @RequestBody SimularEscenarioDinamicoReq crearEscenariosReques
+    		) {
+    	SimularEscenarioDinamicoRes response=new SimularEscenarioDinamicoRes();
+    	ArrayList<PartidaPrecioFinal> lstPartidaPrecioFinal=new ArrayList();
         String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<SimularEscenarioDinamicoRes>(objectMapper.readValue("\"\"", SimularEscenarioDinamicoRes.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<SimularEscenarioDinamicoRes>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+        System.out.println("antes de entrar");
+			try {
+				elasticService.firstTestElastic();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			System.out.println("despues de entrar");
+			response.addAll(lstPartidaPrecioFinal);
+			return new ResponseEntity<SimularEscenarioDinamicoRes>(response, HttpStatus.OK);
 
-        return new ResponseEntity<SimularEscenarioDinamicoRes>(HttpStatus.NOT_IMPLEMENTED);
+        //return new ResponseEntity<SimularEscenarioDinamicoRes>(HttpStatus.NOT_IMPLEMENTED);
     }
 
 }
