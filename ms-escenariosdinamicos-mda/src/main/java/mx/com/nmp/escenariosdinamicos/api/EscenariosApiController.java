@@ -196,10 +196,12 @@ public class EscenariosApiController implements EscenariosApi {
     		) {
     	SimularEscenarioDinamicoRes response=new SimularEscenarioDinamicoRes();
     	ArrayList<PartidaPrecioFinal> lstPartidaPrecioFinal=new ArrayList();
-        String accept = request.getHeader("Accept");
         System.out.println("obtencion de indices");
+        String indexPcGarantias=null;
+        String indexPcVentas=null;
 			try {
-				elasticService.scrollElastic(elasticProperties.getIndexVenta());
+				indexPcVentas=elasticService.scrollElastic(elasticProperties.getIndexVenta());
+				indexPcGarantias=elasticService.scrollElastic(elasticProperties.getIndexVenta());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

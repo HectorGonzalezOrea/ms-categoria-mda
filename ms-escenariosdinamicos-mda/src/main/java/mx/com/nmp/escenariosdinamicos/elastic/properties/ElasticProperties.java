@@ -14,11 +14,12 @@ public class ElasticProperties {
 	@Value("${spring.elasticsearch.password}")
 	private String password;
 	@Value("${spring.elasticsearch.indexgarantias}")
-	private String index;
+	private String indexGarantia;
 	@Value("${spring.elasticsearch.scheme}")
 	private String scheme;
 	@Value("${spring.elasticsearch.indexventas}")
 	private String indexVenta;
+	
 	public String getHost() {
 		return host;
 	}
@@ -31,8 +32,8 @@ public class ElasticProperties {
 	public String getPassword() {
 		return password;
 	}
-	public String getIndex() {
-		return index;
+	public String getIndexGarantia() {
+		return indexGarantia;
 	}
 	public String getScheme() {
 		return scheme;
