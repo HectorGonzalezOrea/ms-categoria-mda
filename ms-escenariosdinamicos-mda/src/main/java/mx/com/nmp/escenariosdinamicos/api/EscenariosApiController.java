@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.ApiParam;
+import mx.com.nmp.escenariosdinamicos.elastic.properties.ElasticProperties;
 import mx.com.nmp.escenariosdinamicos.model.BadRequest;
 import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosResInner;
@@ -49,6 +50,8 @@ public class EscenariosApiController implements EscenariosApi {
     private EscenariosService escenarioService;
     @Autowired
     private ElasticService elasticService;
+    @Autowired
+    private ElasticProperties elasticProperties;
 
     @org.springframework.beans.factory.annotation.Autowired
     public EscenariosApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -194,13 +197,12 @@ public class EscenariosApiController implements EscenariosApi {
     	SimularEscenarioDinamicoRes response=new SimularEscenarioDinamicoRes();
     	ArrayList<PartidaPrecioFinal> lstPartidaPrecioFinal=new ArrayList();
         String accept = request.getHeader("Accept");
-        System.out.println("antes de entrar");
-//			try {
-//				elasticService.firstTestElastic();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-			System.out.println("despues de entrar");
+        System.out.println("obtencion de indices");
+			try {
+				elasticService.scrollElastic(elasticProperties.getIndexVenta());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			response.addAll(lstPartidaPrecioFinal);
 			return new ResponseEntity<SimularEscenarioDinamicoRes>(response, HttpStatus.OK);
 

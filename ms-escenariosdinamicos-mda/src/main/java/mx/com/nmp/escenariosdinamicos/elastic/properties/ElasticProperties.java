@@ -13,45 +13,31 @@ public class ElasticProperties {
 	private String user;
 	@Value("${spring.elasticsearch.password}")
 	private String password;
-	@Value("${spring.elasticsearch.index}")
+	@Value("${spring.elasticsearch.indexgarantias}")
 	private String index;
 	@Value("${spring.elasticsearch.scheme}")
 	private String scheme;
+	@Value("${spring.elasticsearch.indexventas}")
+	private String indexVenta;
 	public String getHost() {
 		return host;
-	}
-	public void setHost(String host) {
-		this.host = host;
 	}
 	public String getPort() {
 		return port;
 	}
-	public void setPort(String port) {
-		this.port = port;
-	}
 	public String getUser() {
 		return user;
-	}
-	public void setUser(String user) {
-		this.user = user;
 	}
 	public String getPassword() {
 		return password;
 	}
-	public void setPassword(String password) {
-		this.password = password;
-	}
 	public String getIndex() {
 		return index;
-	}
-	public void setIndex(String index) {
-		this.index = index;
 	}
 	public String getScheme() {
 		return scheme;
 	}
-	public void setScheme(String scheme) {
-		this.scheme = scheme;
+	public String getIndexVenta() {
+		return indexVenta;
 	}
-
 }

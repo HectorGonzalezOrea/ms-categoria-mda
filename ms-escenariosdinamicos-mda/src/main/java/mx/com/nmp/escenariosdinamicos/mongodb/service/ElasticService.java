@@ -51,12 +51,13 @@ public class ElasticService {
 	        restHighLevelClient = null;
 	    }
 	
-	public void firstTestElastic() throws IOException{
+	public String scrollElastic(String index) throws IOException{
 		System.out.println("Entrando a metodo elastic");
+		String response=null;
 		final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));//el seteo del intervalo
 		SearchRequest searchRequest = new SearchRequest();
 		searchRequest.scroll(scroll);
-		searchRequest.indices("pc_mda_ventas_midas_dev_tmp");//se agrega index de elastic
+		searchRequest.indices(index);//se agrega index de elastic
 		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 		searchSourceBuilder.size(2);//cuantos resultados se recuperan?
 		searchRequest.source(searchSourceBuilder);
@@ -80,15 +81,16 @@ public class ElasticService {
 		    searchResponse = getConnectionElastic().scroll(scrollRequest, RequestOptions.DEFAULT);
 		    scrollId = searchResponse.getScrollId();
 		    searchHits = searchResponse.getHits().getHits();//se recupera otro grupode resultados
-		    String sourceAsString = hit.getSourceAsString();
+		    response = hit.getSourceAsString();
 		    System.out.println("*********************");
-		    System.out.println(sourceAsString);
+		    System.out.println(response);
 		    System.out.println("*********************");
 		}
 	
 		ClearScrollRequest clearScrollRequest = new ClearScrollRequest(); //limpia el contexto cuando se completa
 		clearScrollRequest.addScrollId(scrollId);
 		ClearScrollResponse clearScrollResponse = getConnectionElastic().clearScroll(clearScrollRequest, RequestOptions.DEFAULT);
-		boolean succeeded = clearScrollResponse.isSucceeded();
+		//boolean succeeded = clearScrollResponse.isSucceeded();
+		return response;
 	}
 }
