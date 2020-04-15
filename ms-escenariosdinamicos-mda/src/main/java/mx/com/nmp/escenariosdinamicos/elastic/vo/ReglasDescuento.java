@@ -1,4 +1,4 @@
-package mx.com.nmp.escenariosdinamicos.oag.vo;
+package mx.com.nmp.escenariosdinamicos.elastic.vo;
 
 import java.util.List;
 

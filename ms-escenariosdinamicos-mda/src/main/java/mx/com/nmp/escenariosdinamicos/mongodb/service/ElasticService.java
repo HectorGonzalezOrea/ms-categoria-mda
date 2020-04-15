@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 
 import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
 import mx.com.nmp.escenariosdinamicos.elastic.properties.ElasticProperties;
-import mx.com.nmp.escenariosdinamicos.oag.vo.IndexGarantiaVO;
+import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
 @Service
 public class ElasticService {
 	

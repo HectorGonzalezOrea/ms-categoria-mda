@@ -2,10 +2,12 @@ package mx.com.nmp.escenariosdinamicos.cast;
 
 import java.io.IOException;
 import org.springframework.stereotype.Repository;
-import mx.com.nmp.escenariosdinamicos.oag.vo.IndexGarantiaVO;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
 
 @Repository
 public class CastObjectGeneric {

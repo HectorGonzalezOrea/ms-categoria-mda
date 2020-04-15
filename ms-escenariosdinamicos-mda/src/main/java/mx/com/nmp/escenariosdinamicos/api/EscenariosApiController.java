@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiParam;
 import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
 import mx.com.nmp.escenariosdinamicos.elastic.properties.ElasticProperties;
+import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
 import mx.com.nmp.escenariosdinamicos.model.BadRequest;
 import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosResInner;
@@ -36,7 +37,6 @@ import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
 import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoRes;
 import mx.com.nmp.escenariosdinamicos.mongodb.service.ElasticService;
 import mx.com.nmp.escenariosdinamicos.mongodb.service.EscenariosService;
-import mx.com.nmp.escenariosdinamicos.oag.vo.IndexGarantiaVO;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-04T01:28:01.968Z")
 
 @Controller
@@ -54,8 +54,6 @@ public class EscenariosApiController implements EscenariosApi {
     private ElasticService elasticService;
     @Autowired
     private ElasticProperties elasticProperties;
-    @Autowired
-    private CastObjectGeneric castObject;
 
     @org.springframework.beans.factory.annotation.Autowired
     public EscenariosApiController(ObjectMapper objectMapper, HttpServletRequest request) {
