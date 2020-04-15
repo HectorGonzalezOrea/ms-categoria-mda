@@ -71,7 +71,7 @@ public class ConsolidadoService {
 	@Value("${oag.resource.oauth.enviarCorreo.de}")
 	protected String de;
 	
-	public static final String FECHA = "fechaAplicacion";
+	public static final String FECHA = "vigencia";
 	private static final String SEQUENCE = "consolidado_sequence";
 	public static final String ID_ARCHIVO = "idArchivo";
 	public static final String PRIORIDAD = "prioridad";
@@ -120,13 +120,13 @@ public class ConsolidadoService {
 		return insertado;
 	}
 
-	public ArrayList<ConsultarArchivoConsolidadoResInner> getConsolidados(String fechaAplicacion) {
+	public ArrayList<ConsultarArchivoConsolidadoResInner> getConsolidados(String vigencia) {
 		log.info("entrando a ConsolidadoService.getConsolidados");
 		ArrayList<ConsultarArchivoConsolidadoResInner> lstConsolidados = new ArrayList<>();
 
 		Date fechaAplicaciondate = null;
 		try {
-			fechaAplicaciondate = new SimpleDateFormat("dd/MM/yyyy").parse(fechaAplicacion);
+			fechaAplicaciondate = new SimpleDateFormat("dd/MM/yyyy").parse(vigencia);
 		} catch (ParseException e) {
 			log.info("ParseException : {}", e);
 		}
@@ -528,10 +528,10 @@ public class ConsolidadoService {
 	 * Consulta consolidados por fecha
 	 */
 	@SuppressWarnings("deprecation")
-	private List<ArchivoEntity> consultaArhivoConsolidadoByDate(Date fechaAplicacion) {
-		Date fechaAplicacionInicioDia = CastConsolidados.resetTimeToDown(fechaAplicacion);
+	private List<ArchivoEntity> consultaArhivoConsolidadoByDate(Date vigencia) {
+		Date fechaAplicacionInicioDia = CastConsolidados.resetTimeToDown(vigencia);
 		log.info("fecha inicio dia: {}", fechaAplicacionInicioDia);
-		Date fechaAplicacionFinDia = CastConsolidados.resetTimeToUp(fechaAplicacion);
+		Date fechaAplicacionFinDia = CastConsolidados.resetTimeToUp(vigencia);
 		log.info("fecha fin dia: {}", fechaAplicacionFinDia);
 		Query q = new Query();
 		q.addCriteria(Criteria.where(FECHA).gte(fechaAplicacionInicioDia).lt(fechaAplicacionFinDia));

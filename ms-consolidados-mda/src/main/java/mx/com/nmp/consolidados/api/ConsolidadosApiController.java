@@ -152,7 +152,7 @@ public class ConsolidadosApiController implements ConsolidadosApi {
     		@ApiParam(value = "Usuario en el sistema origen que lanza la peticion" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,
     		@ApiParam(value = "Sistema que origina la petici\u00F3n" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,
     		@ApiParam(value = "Destino final de la informaci\u00F3n" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,
-    		@NotNull @ApiParam(value = "Fecha de ejecuci\u00F3n del proceso de consolidados", required = true) @Valid @RequestParam(value = "fechaAplicacion", required = true) String fechaAplicacion,
+    		@NotNull @ApiParam(value = "Fecha de ejecuci\u00F3n del proceso de consolidados", required = true) @Valid @RequestParam(value = "vigencia", required = true) String vigencia,
     		@NotNull @ApiParam(value = "Prioridad en la ejecuci\u00F3n del archivo", required = false) @Valid @RequestParam(value = "idPrioridad", required = false) String idPrioridad) {
     		
 		log.info("ConsolidadosApiController.consultaConsolidadosArchivosGET");
@@ -173,7 +173,7 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 		if (accept != null && accept.contains(HEADER_APP_JSON)) {
 
 			BadRequest badReq = null;
-			if (usuario == null || origen == null || destino == null || fechaAplicacion == null) {
+			if (usuario == null || origen == null || destino == null || vigencia == null) {
 				badReq = new BadRequest();
 				badReq.setCodigo(Common.ERROR_GUARDAR);
 				badReq.setMensaje(Common.ERROR_MENSAJE);
@@ -183,10 +183,10 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 
 			log.info(usuario);
 			log.info(origen);
-			log.info(fechaAplicacion);
+			log.info(vigencia);
 			log.info(idPrioridad);
 
-			ArrayList<ConsultarArchivoConsolidadoResInner> result = consolidadoService.getConsolidados(fechaAplicacion);
+			ArrayList<ConsultarArchivoConsolidadoResInner> result = consolidadoService.getConsolidados(vigencia);
 			ConsultarArchivoConsolidadoRes response = new ConsultarArchivoConsolidadoRes();
 			if (!result.isEmpty()) {
 				response.addAll(result);
