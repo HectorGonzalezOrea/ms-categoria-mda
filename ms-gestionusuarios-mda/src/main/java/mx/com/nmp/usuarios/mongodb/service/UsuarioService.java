@@ -815,6 +815,8 @@ public class UsuarioService {
 		List<String> miembroDe = new ArrayList<>();
 		pf.setMemberOf(miembroDe);
 		
+		if(uvo.getIdUsuario() != null)
+			pf.setName(uvo.getIdUsuario());
 		if(uvo.getNombreDominio() != null)
 			pf.setRealmName(uvo.getNombreDominio());
 		if(uvo.getNombreCompleto() != null)
