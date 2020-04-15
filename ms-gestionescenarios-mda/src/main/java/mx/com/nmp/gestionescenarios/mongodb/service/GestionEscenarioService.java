@@ -281,11 +281,22 @@ public class GestionEscenarioService {
 				ir.setOrigen(ges.getOrigen());
 				ir.setRamo(ges.getRamo());
 				ir.setSubramo(ges.getSubramo());
+				ir.setFactor(ges.getFactor());
 				ir.setClasificacionClientes(ges.getClasificacionClientes());
 				ir.setBolsas(ges.getBolsas());
 				ir.setSucursales(ges.getSucursales());
 				ir.setCanalComercializacion(ges.getCanalComercializacion());
 				ir.setFechaAplicacion(ges.getFechaAplicacion());
+				ir.setEstatus(ges.getEstatus());
+				ir.setCompraCumplido(ges.getCompraCumplido());
+				ir.setAforo(ges.getAforo());
+				ir.setEstatusPartida(ges.getEstatusPartida());
+				ir.setMonedas(ges.getMonedas());
+				ir.setCanalIngresoActual(ges.getCanalIngresoActual());
+				ir.setDiasAlmoneda(ges.getDiasAlmoneda());
+				ir.setNivelAgrupacion(ges.getNivelAgrupacion());
+				ir.setReglasDescuento(ges.getReglasDescuento());
+				ir.setCandadoInferior(ges.getCandadoInferior());
 
 			}
 
