@@ -58,6 +58,7 @@ import mx.com.nmp.usuarios.oag.controller.OAGController;
 import mx.com.nmp.usuarios.oag.vo.FiltroVO;
 import mx.com.nmp.usuarios.oag.vo.IdentidadUsuarioRequestVO;
 import mx.com.nmp.usuarios.oag.vo.IdentidadUsuarioResponseVO;
+import mx.com.nmp.usuarios.oag.vo.ProfileVO;
 import mx.com.nmp.usuarios.oag.vo.TokenProviderErrorVO;
 import mx.com.nmp.usuarios.oag.vo.UsuarioVO;
 import mx.com.nmp.usuarios.utils.Constantes;
@@ -723,7 +724,6 @@ public class UsuarioService {
 	/*
 	 * Consulta Perfil
 	 */
-	
 	public Object consultaPrefil(String usuario, String token) {
 		log.info("consultaPrefil");
 		
@@ -791,6 +791,60 @@ public class UsuarioService {
 	}
 	
 	/*
+	 * Consulta Perfil por token
+	 */
+	public Object consultaPrefilByToken(String token) {
+		Object oAux = oagController.identidadUsuario(token);
+		
+		PerfilUsuario pf = null;
+		
+		ProfileVO identidadUsuario = null;
+		TokenProviderErrorVO tpeVo = null;
+		
+		if(oAux != null) {
+			if(oAux instanceof ProfileVO)
+				identidadUsuario = (ProfileVO) oAux;
+			else if(oAux instanceof TokenProviderErrorVO) {
+				tpeVo = (TokenProviderErrorVO) oAux;
+			
+				return tpeVo;
+			}
+		}
+		
+		if(identidadUsuario != null && identidadUsuario.getSamaccountname() != null) {
+			UsuarioEntity user = usuarioRepository.findByUsuario(identidadUsuario.getSamaccountname());
+			if(user != null) {
+				
+				pf = this.validarDatosPerfil2(identidadUsuario);
+
+				List<InfoUsuario> listUsuarios = this.getUsuarios(user.getNombre(), user.getApellidoPaterno(),
+						user.getApellidoMaterno(), null, user.getUsuario(), null);
+
+				log.info("{}" , listUsuarios);
+				
+				if (!listUsuarios.isEmpty() && listUsuarios.get(0) != null) {
+					
+					InfoUsuario iu = listUsuarios.get(0);
+					pf.setActivo(iu.isActivo());
+					pf.setApellidoMaterno(iu.getApellidoMaterno());
+					pf.setApellidoPaterno(iu.getApellidoPaterno());
+					pf.setDepartamentoArea(iu.getDepartamentoArea());
+					pf.setDireccion(iu.getDireccion());
+					pf.setGerencia(iu.getGerencia());
+					pf.setIdUsuario(iu.getIdUsuario());
+					pf.setNombre(iu.getNombre());
+					pf.setPerfil(iu.getPerfil());
+					pf.setPuesto(iu.getPuesto());
+					pf.setSubdireccion(iu.getSubdireccion());
+					pf.setUsuario(iu.getUsuario());
+				}
+			}
+		}
+		
+		return pf;
+	}
+	
+	/*
 	 * Validar identidadUsuario
 	 */
 	private Boolean validarIdentidadUsuario(IdentidadUsuarioResponseVO identidadUsuario) {
@@ -799,6 +853,41 @@ public class UsuarioService {
 		return !identidadUsuario.getUsuario().isEmpty();
 	}
 	
+	private PerfilUsuario validarDatosPerfil2(ProfileVO uvo) {
+		log.info("validarDatosPerfil2");
+		
+		PerfilUsuario pf = new PerfilUsuario();
+		
+		if(uvo.getCommonname() != null) 
+			pf.setCommonname(uvo.getCommonname());
+		if(uvo.getDepartment() != null) 
+			pf.setDepartment(uvo.getDepartment());
+		if(uvo.getDescription() != null) 
+			pf.setDescription(uvo.getDescription());
+		if(uvo.getDistinguishedname() != null) 
+			pf.setDistinguishedname(uvo.getDistinguishedname());
+		if(uvo.getFirstname() != null) 
+			pf.setFirstName(uvo.getFirstname());
+		if(uvo.getLastname() != null) 
+			pf.setLastName(uvo.getLastname());
+		if(uvo.getMail() != null) 
+			pf.setMail(uvo.getMail());
+		if(uvo.getMemberof() != null) 
+			pf.setMemberOf(uvo.getMemberof());
+		
+		if(uvo.getPhysicaldeliveryofficename() != null) 
+			pf.setPhysicaldeliveryofficename(uvo.getPhysicaldeliveryofficename());
+		if(uvo.getSamaccountname() != null) 
+			pf.setSamaccountname(uvo.getSamaccountname());
+		if(uvo.getTitle() != null) 
+			pf.setTitle(uvo.getTitle());
+		if(uvo.getUid() != null) 
+			pf.setUid(uvo.getUid());
+		if(uvo.getUri() != null) 
+			pf.setUri(uvo.getUri());
+		
+		return pf;
+	}
 	
 	/*
 	 * Validar datos del perfil
@@ -808,6 +897,7 @@ public class UsuarioService {
 		
 		PerfilUsuario pf = new PerfilUsuario();
 		
+		/*
 		if(uvo.getNombreDistintivo() != null) 
 			pf.setUniqueName(uvo.getNombreDistintivo());
 		
@@ -857,7 +947,7 @@ public class UsuarioService {
 			pf.setLanguagePreference(uvo.getPreferenciasIdioma());
 		if(uvo.getPreferenciasNotificacion() != null)
 			pf.setNotificationPreferences(uvo.getPreferenciasNotificacion());
-		
+		*/
 		return pf;
 	}
 	

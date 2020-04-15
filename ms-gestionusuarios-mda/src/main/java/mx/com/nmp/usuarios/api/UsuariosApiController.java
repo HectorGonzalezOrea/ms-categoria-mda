@@ -872,7 +872,7 @@ public class UsuariosApiController implements UsuariosApi {
 	 * Consulta Perfil
 	 */
 	public ResponseEntity<?> usuariosPerfilGet(
-			@ApiParam(value = "Usuario en el sistema origen que lanza la petición.", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Usuario en el sistema origen que lanza la petición.", required = false) @RequestHeader(value = "usuario", required = false) String usuario,
 			@ApiParam(value = "Sistema que origina la petición.", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
 			@RequestHeader(value = "oauth_bearer", required = true) String oauth_bearer) {
@@ -902,7 +902,7 @@ public class UsuariosApiController implements UsuariosApi {
 				log.info("destino: " + destino);
 				log.info("oauth_bearer: " + oauth_bearer);
             	
-            	if (usuario == null || destino == null || origen == null  || oauth_bearer == null) {
+            	if (destino == null || origen == null  || oauth_bearer == null) {
 					BadRequest br = new BadRequest();
 					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
 					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
@@ -912,8 +912,8 @@ public class UsuariosApiController implements UsuariosApi {
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 				}
 
-            	if(usuario != null && !usuario.equals("")) {
-            		Object obj =  usuarioService.consultaPrefil(usuario, oauth_bearer);
+            	if(oauth_bearer != null && !oauth_bearer.equals("")) {
+            		Object obj =  usuarioService.consultaPrefilByToken(oauth_bearer);
             		
             		if(obj != null) {
             			if(obj instanceof PerfilUsuario) {
@@ -942,8 +942,6 @@ public class UsuariosApiController implements UsuariosApi {
         				
             			return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
             		}
-            		
-            		//PerfilUsuario resp = usuarioService.consultaPrefil(usuario, oauth_bearer);
             	}
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);

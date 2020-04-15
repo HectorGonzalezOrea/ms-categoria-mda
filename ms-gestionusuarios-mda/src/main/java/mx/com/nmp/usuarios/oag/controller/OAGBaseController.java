@@ -16,6 +16,9 @@ public class OAGBaseController {
 	@Value("${oag.servicio.identidad.grupo.filtro}")
 	protected String servicioIdentidad;
 	
+	@Value("${oag.servicio.identidad}")
+	protected String servicioProfile;
+	
 	@Value("${oag.resource.identidad.grupo}")
 	protected String grupo;
 	

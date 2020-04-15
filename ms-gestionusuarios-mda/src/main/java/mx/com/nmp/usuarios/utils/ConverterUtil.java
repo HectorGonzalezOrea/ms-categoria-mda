@@ -15,6 +15,7 @@ import mx.com.nmp.usuarios.mongodb.vo.PuestoVO;
 import mx.com.nmp.usuarios.mongodb.vo.SubdireccionVO;
 import mx.com.nmp.usuarios.oag.vo.GetTokenResponseVO;
 import mx.com.nmp.usuarios.oag.vo.IdentidadUsuarioResponseVO;
+import mx.com.nmp.usuarios.oag.vo.ProfileVO;
 import mx.com.nmp.usuarios.oag.vo.TokenProviderErrorVO;
 
 public class ConverterUtil {
@@ -43,6 +44,18 @@ public class ConverterUtil {
 		IdentidadUsuarioResponseVO obj = null;
 		try {
 			obj = mapper.readValue(json, IdentidadUsuarioResponseVO.class);
+
+		} catch (IOException e) {
+			log.error("IOException: {}" , e);
+		}
+		return obj;
+	}
+	
+	public static ProfileVO stringJsonToObjectProfileVO(String json) {
+		ObjectMapper mapper = new ObjectMapper();
+		ProfileVO obj = null;
+		try {
+			obj = mapper.readValue(json, ProfileVO.class);
 
 		} catch (IOException e) {
 			log.error("IOException: {}" , e);
