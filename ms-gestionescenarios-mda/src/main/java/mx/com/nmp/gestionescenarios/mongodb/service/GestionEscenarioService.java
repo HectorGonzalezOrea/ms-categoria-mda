@@ -31,14 +31,14 @@ public class GestionEscenarioService {
 	public static final String ID = "_id";
 
 	public static final String NOMBRE = "nombre";
-	public static final String RAMO = "ramo";
-	public static final String SUBRAMO = "subramo";
-	public static final String FACTOR = "factor";
-	public static final String ORIGEN = "origen";
-	public static final String CLASIF_CLIENTES = "clasificacionClientes";
-	public static final String ESTATUS_PARTIDA = "estatusPartida";
-	public static final String CANAL_COMERCIALIZACION = "canalComercializacion";
-	public static final String FECHA_APLICACION = "fechaAplicacion";
+	public static final String RAMO = "ramo.id";
+	public static final String SUBRAMO = "subramo.id";
+	public static final String FACTOR = "factor.id";
+	public static final String ORIGEN = "origen.id";
+	public static final String CLASIF_CLIENTES = "clasificacionClientes.id";
+	public static final String ESTATUS = "estatus.id";
+	public static final String CANAL = "canalComercializacion.idCanal";
+	public static final String FECHA_APLICACION = "fechaAplicacion.fechas";
 
 	public static final String ID_ARCHIVO = "idArchivo";
 	public static final String REQUEST_ID_CALENDARIZACION = "requestIdCalendarizacion";
@@ -166,7 +166,6 @@ public class GestionEscenarioService {
 				infoRegla.setEstatus(aux.getEstatus());
 				infoRegla.setFechaAplicacion(aux.getFechaAplicacion());
 				infoRegla.setSucursales(aux.getSucursales());
-				
 				reglas.add(infoRegla);
 			}
 		}
@@ -369,10 +368,10 @@ public class GestionEscenarioService {
 				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
 			}
 			if (estatusPartida != null) {
-				aux.and(ESTATUS_PARTIDA).is(estatusPartida);
+				aux.and(ESTATUS).is(estatusPartida);
 			}
 			if (canalComercializacion != null) {
-				aux.and(CANAL_COMERCIALIZACION).is(canalComercializacion);
+				aux.and(CANAL).is(canalComercializacion);
 			}
 			if (fechaAplicacion != null) {
 				aux.and(FECHA_APLICACION).is(fechaAplicacion);
@@ -399,10 +398,10 @@ public class GestionEscenarioService {
 				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
 			}
 			if (estatusPartida != null) {
-				aux.and(ESTATUS_PARTIDA).is(estatusPartida);
+				aux.and(ESTATUS).is(estatusPartida);
 			}
 			if (canalComercializacion != null) {
-				aux.and(CANAL_COMERCIALIZACION).is(canalComercializacion);
+				aux.and(CANAL).is(canalComercializacion);
 			}
 			if (fechaAplicacion != null) {
 				aux.and(FECHA_APLICACION).is(fechaAplicacion);
@@ -429,10 +428,10 @@ public class GestionEscenarioService {
 				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
 			}
 			if (estatusPartida != null) {
-				aux.and(ESTATUS_PARTIDA).is(estatusPartida);
+				aux.and(ESTATUS).is(estatusPartida);
 			}
 			if (canalComercializacion != null) {
-				aux.and(CANAL_COMERCIALIZACION).is(canalComercializacion);
+				aux.and(CANAL).is(canalComercializacion);
 			}
 			if (fechaAplicacion != null) {
 				aux.and(FECHA_APLICACION).is(fechaAplicacion);
@@ -459,10 +458,10 @@ public class GestionEscenarioService {
 				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
 			}
 			if (estatusPartida != null) {
-				aux.and(ESTATUS_PARTIDA).is(estatusPartida);
+				aux.and(ESTATUS).is(estatusPartida);
 			}
 			if (canalComercializacion != null) {
-				aux.and(CANAL_COMERCIALIZACION).is(canalComercializacion);
+				aux.and(CANAL).is(canalComercializacion);
 			}
 			if (fechaAplicacion != null) {
 				aux.and(FECHA_APLICACION).is(fechaAplicacion);
@@ -489,10 +488,10 @@ public class GestionEscenarioService {
 				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
 			}
 			if (estatusPartida != null) {
-				aux.and(ESTATUS_PARTIDA).is(estatusPartida);
+				aux.and(ESTATUS).is(estatusPartida);
 			}
 			if (canalComercializacion != null) {
-				aux.and(CANAL_COMERCIALIZACION).is(canalComercializacion);
+				aux.and(CANAL).is(canalComercializacion);
 			}
 			if (fechaAplicacion != null) {
 				aux.and(FECHA_APLICACION).is(fechaAplicacion);
@@ -501,7 +500,7 @@ public class GestionEscenarioService {
 		}
 
 		if (estatusPartida != null) {
-			Criteria aux = Criteria.where(ESTATUS_PARTIDA).is(estatusPartida);
+			Criteria aux = Criteria.where(ESTATUS).is(estatusPartida);
 
 			if (nombre != null) {
 				aux.and(NOMBRE).is(nombre);
@@ -522,7 +521,7 @@ public class GestionEscenarioService {
 				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
 			}
 			if (canalComercializacion != null) {
-				aux.and(CANAL_COMERCIALIZACION).is(canalComercializacion);
+				aux.and(CANAL).is(canalComercializacion);
 			}
 			if (fechaAplicacion != null) {
 				aux.and(FECHA_APLICACION).is(fechaAplicacion);
@@ -549,10 +548,10 @@ public class GestionEscenarioService {
 				aux.and(ORIGEN).is(origen);
 			}
 			if (estatusPartida != null) {
-				aux.and(ESTATUS_PARTIDA).is(estatusPartida);
+				aux.and(ESTATUS).is(estatusPartida);
 			}
 			if (canalComercializacion != null) {
-				aux.and(CANAL_COMERCIALIZACION).is(canalComercializacion);
+				aux.and(CANAL).is(canalComercializacion);
 			}
 			if (fechaAplicacion != null) {
 				aux.and(FECHA_APLICACION).is(fechaAplicacion);
@@ -561,7 +560,7 @@ public class GestionEscenarioService {
 		}
 
 		if (canalComercializacion != null) {
-			Criteria aux = Criteria.where(CANAL_COMERCIALIZACION).is(canalComercializacion);
+			Criteria aux = Criteria.where(CANAL).is(canalComercializacion);
 
 			if (nombre != null) {
 				aux.and(NOMBRE).is(nombre);
@@ -579,7 +578,7 @@ public class GestionEscenarioService {
 				aux.and(ORIGEN).is(origen);
 			}
 			if (estatusPartida != null) {
-				aux.and(ESTATUS_PARTIDA).is(estatusPartida);
+				aux.and(ESTATUS).is(estatusPartida);
 			}
 			if (clasificacionClientes != null) {
 				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
@@ -609,13 +608,13 @@ public class GestionEscenarioService {
 				aux.and(ORIGEN).is(origen);
 			}
 			if (estatusPartida != null) {
-				aux.and(ESTATUS_PARTIDA).is(estatusPartida);
+				aux.and(ESTATUS).is(estatusPartida);
 			}
 			if (clasificacionClientes != null) {
 				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
 			}
 			if (canalComercializacion != null) {
-				aux.and(CANAL_COMERCIALIZACION).is(canalComercializacion);
+				aux.and(CANAL).is(canalComercializacion);
 			}
 			query.addCriteria(aux);
 		}
