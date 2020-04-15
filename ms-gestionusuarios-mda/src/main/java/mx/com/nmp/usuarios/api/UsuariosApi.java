@@ -189,7 +189,7 @@ public interface UsuariosApi {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Consulta exitosa", response = PerfilUsuario.class) })
 	@RequestMapping(value = "/usuarios/perfil", produces = { "application/json" }, method = RequestMethod.GET)
 	ResponseEntity<?> usuariosPerfilGet(
-			@ApiParam(value = "Usuario en el sistema origen que lanza la petición.", required = false) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Usuario en el sistema origen que lanza la petición.", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = "Sistema que origina la petición.", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
 			@ApiParam(value = "Access Token del usuario loggeado." ,required=true) @RequestHeader(value="oauth_bearer", required=true) String oauth_bearer);
