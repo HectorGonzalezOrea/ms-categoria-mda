@@ -182,7 +182,7 @@ public interface EscenariosApi {
     @RequestMapping(value = "/escenarios/reglas/{idRegla}",
         produces = { "application/json" }, 
         method = RequestMethod.DELETE)
-    ResponseEntity<InfoRegla> escenariosReglasIdReglaDelete(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "",required=true) @PathVariable("idRegla") Integer idRegla);
+    ResponseEntity<?> escenariosReglasIdReglaDelete(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "",required=true) @PathVariable("idRegla") Integer idRegla);
 
 
     @ApiOperation(value = "Obtener la configuración de una regla", nickname = "escenariosReglasIdReglaGet", notes = "Obtiene la configuración de una regla por medio del parámetro idRegla ### Seguridad Para poder realizar el consumo del recuros deberá de estar autorizado. Para esto tiene que enviar la llave en el encabezado HTTP: * 'X-API-KEY: eyJ4NXQjUzI1NiI6IkFTS1ESG42` ", response = InfoRegla.class, authorizations = {

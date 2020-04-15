@@ -273,7 +273,25 @@ public class EscenariosApiController implements EscenariosApi {
      * 
      */
     public ResponseEntity<?> escenariosReglasEstatusPut(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody EstatusRegla peticion) {
-        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+        
+    	log.info("*************************************************************");
+		log.info("escenariosReglasEstatusPut");
+		log.info("*************************************************************");
+		
+    	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+    	
+    	if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
+    		
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.error("{}" , ia);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+    	}
+    	
+    	String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
             	if(peticion != null) {
@@ -284,8 +302,10 @@ public class EscenariosApiController implements EscenariosApi {
             		return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK);
             	}else {
             		BadRequest br = new BadRequest();
-					br.setMessage("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCode("NMP-MDA-400");
+            		br.setCode(ERROR_CODE_BAD_REQUEST);
+            		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+            		
+            		log.error("{}" , br);
 					
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
             	}
@@ -313,7 +333,24 @@ public class EscenariosApiController implements EscenariosApi {
     		@ApiParam(value = "Canal de comrcialización") @Valid @RequestParam(value = "canalComrcializacion", required = false) String canalComercializacion,
     		@ApiParam(value = "Fecha de aplicación") @Valid @RequestParam(value = "fechaAplicacion", required = false) String fechaAplicacion) {
     	
-    	log.info("escenariosReglasGet");
+    	
+    	
+    	log.info("*************************************************************");
+		log.info("escenariosReglasGet");
+		log.info("*************************************************************");
+		
+    	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+    	
+    	if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
+    		
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.error("{}" , ia);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+    	}
     	
         String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
@@ -361,9 +398,26 @@ public class EscenariosApiController implements EscenariosApi {
     /*
      * 
      */
-	public ResponseEntity<InfoRegla> escenariosReglasIdReglaDelete(
+	public ResponseEntity<?> escenariosReglasIdReglaDelete(
 			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = "", required = true) @PathVariable("idRegla") Integer idRegla) {
+		
+		log.info("*************************************************************");
+		log.info("escenrariosReglasIdDelete");
+		log.info("*************************************************************");
+		
+    	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+    	
+    	if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
+    		
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.error("{}" , ia);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+    	}
 		
         String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
@@ -376,6 +430,12 @@ public class EscenariosApiController implements EscenariosApi {
             		if(eliminar!= null) {
             			
             			return new ResponseEntity<InfoRegla>(eliminar, HttpStatus.OK);
+            		}else {
+            			log.info("No hubo coincidencias");
+            			BadRequest bd=new BadRequest();
+            			bd.setCode("NMP-MDA-404");
+            			bd.setMessage("No se encontro el idRegla");
+            			return new ResponseEntity<BadRequest>(bd,HttpStatus.NOT_FOUND);
             		}
             	}
             } catch (Exception e) {
@@ -394,7 +454,22 @@ public class EscenariosApiController implements EscenariosApi {
 			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = "", required = true) @PathVariable("idRegla") Integer idRegla) {
 		
+		log.info("*************************************************************");
+		log.info("escenariosReglasIdReglaGet");
+		log.info("*************************************************************");
 		
+    	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+    	
+    	if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
+    		
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.error("{}" , ia);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+    	}
 		
         String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
@@ -441,7 +516,22 @@ public class EscenariosApiController implements EscenariosApi {
 			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = "Cuerpo de la petición", required = true) @Valid @RequestBody InfoRegla peticion) {
 		
+		log.info("*************************************************************");
+		log.info("escenariosReglasPatch");
+		log.info("*************************************************************");
 		
+    	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+    	
+    	if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
+    		
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.error("{}" , ia);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+    	}
 		
         String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
@@ -455,8 +545,10 @@ public class EscenariosApiController implements EscenariosApi {
             		return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK);
             	}else {
             		BadRequest br = new BadRequest();
-					br.setMessage("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCode("NMP-MDA-400");
+            		br.setCode(ERROR_CODE_BAD_REQUEST);
+            		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+            		
+            		log.error("{}" , br);
 					
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
             	}
@@ -475,7 +567,25 @@ public class EscenariosApiController implements EscenariosApi {
      * 
      */
     public ResponseEntity<?> escenariosReglasPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody InfoRegla peticion) {
-        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+       
+    	log.info("*************************************************************");
+		log.info("escenariosReglasPost");
+		log.info("*************************************************************");
+		
+    	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+    	
+    	if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
+    		
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.error("{}" , ia);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+    	}
+    	
+    	String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
         	GeneralResponse gr = new GeneralResponse ();
             try {
@@ -487,8 +597,10 @@ public class EscenariosApiController implements EscenariosApi {
             		
             	}else {
             		BadRequest br = new BadRequest();
-					br.setMessage("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCode("NMP-MDA-400");
+            		br.setCode(ERROR_CODE_BAD_REQUEST);
+            		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+            		
+            		log.error("{}" , br);
 					
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
             	}
