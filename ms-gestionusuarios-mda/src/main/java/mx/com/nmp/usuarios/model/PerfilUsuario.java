@@ -20,167 +20,182 @@ import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-01-14T18:11:19.533Z")
 
 public class PerfilUsuario extends InfoUsuario {
-	@JsonProperty("nombreDistinguido")
-	private String nombreDistinguido = null;
+	@JsonProperty("name")
+	private String name = null;
 
-	@JsonProperty("miembroDe")
+	@JsonProperty("realmName")
+	private String realmName = null;
+
+	@JsonProperty("displayName")
+	private String displayName = null;
+
+	@JsonProperty("memberOf")
 	@Valid
-	private List<String> miembroDe = null;
+	private List<String> memberOf = null;
 
-	@JsonProperty("nombreDominio")
-	private String nombreDominio = null;
-
-	@JsonProperty("nombreCompleto")
-	private String nombreCompleto = null;
-
-	@JsonProperty("descripcion")
-	private String descripcion = null;
+	@JsonProperty("description")
+	private String description = null;
 
 	@JsonProperty("guid")
 	private String guid = null;
 
-	@JsonProperty("tipoIdentidad")
-	private String tipoIdentidad = null;
+	@JsonProperty("uniqueName")
+	private String uniqueName = null;
 
-	@JsonProperty("correo")
-	private String correo = null;
+	@JsonProperty("identityType")
+	private String identityType = null;
 
-	@JsonProperty("telefonoOficina")
-	private String telefonoOficina = null;
+	@JsonProperty("email")
+	private String email = null;
 
-	@JsonProperty("telefonoTrabajo")
-	private String telefonoTrabajo = null;
+	@JsonProperty("title")
+	private String title = null;
 
-	@JsonProperty("telefono")
-	private String telefono = null;
+	@JsonProperty("firstName")
+	private String firstName = null;
 
-	@JsonProperty("telefonoMovil")
-	private String telefonoMovil = null;
+	@JsonProperty("middleName")
+	private String middleName = null;
 
-	@JsonProperty("localizador")
-	private String localizador = null;
+	@JsonProperty("lastName")
+	private String lastName = null;
+
+	@JsonProperty("workPhone")
+	private String workPhone = null;
+
+	@JsonProperty("workNumber")
+	private String workNumber = null;
+
+	@JsonProperty("homePhone")
+	private String homePhone = null;
+
+	@JsonProperty("mobile")
+	private String mobile = null;
+
+	@JsonProperty("pager")
+	private String pager = null;
 
 	@JsonProperty("fax")
 	private String fax = null;
 
-	@JsonProperty("jefe")
-	private String jefe = null;
+	@JsonProperty("manager")
+	private String manager = null;
 
-	@JsonProperty("zona")
-	private String zona = null;
+	@JsonProperty("timeZone")
+	private String timeZone = null;
 
-	@JsonProperty("preferenciasIdioma")
-	private String preferenciasIdioma = null;
+	@JsonProperty("languagePreference")
+	private String languagePreference = null;
 
-	@JsonProperty("preferenciasNotificacion")
-	private String preferenciasNotificacion = null;
+	@JsonProperty("notificationPreferences")
+	private String notificationPreferences = null;
 
-	public PerfilUsuario nombreDistinguido(String nombreDistinguido) {
-		this.nombreDistinguido = nombreDistinguido;
+	public PerfilUsuario name(String name) {
+		this.name = name;
 		return this;
 	}
 
 	/**
-	 * Nombre distinguido del usuario
+	 * Nombre del usuario (oauth2/profile)
 	 * 
-	 * @return nombreDistinguido
+	 * @return name
 	 **/
-	@ApiModelProperty(example = "CN=Juan Perez Hernandez,OU=SPS,OU=Consultores,OU=Usuarios,DC=nmp,DC=com,DC=mx", value = "Nombre distinguido del usuario")
+	@ApiModelProperty(example = "Juan Perez Hernandez", value = "Nombre del usuario (oauth2/profile)")
 
-	public String getNombreDistinguido() {
-		return nombreDistinguido;
+	public String getName() {
+		return name;
 	}
 
-	public void setNombreDistinguido(String nombreDistinguido) {
-		this.nombreDistinguido = nombreDistinguido;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public PerfilUsuario miembroDe(List<String> miembroDe) {
-		this.miembroDe = miembroDe;
+	public PerfilUsuario realmName(String realmName) {
+		this.realmName = realmName;
 		return this;
 	}
 
-	public PerfilUsuario addMiembroDeItem(String miembroDeItem) {
-		if (this.miembroDe == null) {
-			this.miembroDe = new ArrayList<String>();
+	/**
+	 * Nombre de Dominio del usuario (oauth2/profile)
+	 * 
+	 * @return realmName
+	 **/
+	@ApiModelProperty(example = "CN=Juan Perez Hernandez,OU=SPS,OU=Consultores,OU=Usuarios,DC=nmp,DC=com,DC=mx", value = "Nombre de Dominio del usuario (oauth2/profile)")
+
+	public String getRealmName() {
+		return realmName;
+	}
+
+	public void setRealmName(String realmName) {
+		this.realmName = realmName;
+	}
+
+	public PerfilUsuario displayName(String displayName) {
+		this.displayName = displayName;
+		return this;
+	}
+
+	/**
+	 * Nombre completo del usuario (oauth2/profile)
+	 * 
+	 * @return displayName
+	 **/
+	@ApiModelProperty(example = "Juan Perez Hernandez", value = "Nombre completo del usuario (oauth2/profile)")
+
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
+
+	public PerfilUsuario memberOf(List<String> memberOf) {
+		this.memberOf = memberOf;
+		return this;
+	}
+
+	public PerfilUsuario addMemberOfItem(String memberOfItem) {
+		if (this.memberOf == null) {
+			this.memberOf = new ArrayList<String>();
 		}
-		this.miembroDe.add(miembroDeItem);
+		this.memberOf.add(memberOfItem);
 		return this;
 	}
 
 	/**
-	 * Información de los grupos a los que pertenece el usuario
+	 * Información de los grupos a los que pertenece el usuario (oauth2/profile)
 	 * 
-	 * @return miembroDe
+	 * @return memberOf
 	 **/
-	@ApiModelProperty(value = "Información de los grupos a los que pertenece el usuario")
+	@ApiModelProperty(value = "Información de los grupos a los que pertenece el usuario (oauth2/profile)")
 
-	public List<String> getMiembroDe() {
-		return miembroDe;
+	public List<String> getMemberOf() {
+		return memberOf;
 	}
 
-	public void setMiembroDe(List<String> miembroDe) {
-		this.miembroDe = miembroDe;
+	public void setMemberOf(List<String> memberOf) {
+		this.memberOf = memberOf;
 	}
 
-	public PerfilUsuario nombreDominio(String nombreDominio) {
-		this.nombreDominio = nombreDominio;
+	public PerfilUsuario description(String description) {
+		this.description = description;
 		return this;
 	}
 
 	/**
-	 * Nombre de Dominio del usuario
+	 * Descripción del usuario (oauth2/profile)
 	 * 
-	 * @return nombreDominio
+	 * @return description
 	 **/
-	@ApiModelProperty(example = "CN=Juan Perez Hernandez,OU=SPS,OU=Consultores,OU=Usuarios,DC=nmp,DC=com,DC=mx", value = "Nombre de Dominio del usuario")
+	@ApiModelProperty(example = "Descripción", value = "Descripción del usuario (oauth2/profile)")
 
-	public String getNombreDominio() {
-		return nombreDominio;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setNombreDominio(String nombreDominio) {
-		this.nombreDominio = nombreDominio;
-	}
-
-	public PerfilUsuario nombreCompleto(String nombreCompleto) {
-		this.nombreCompleto = nombreCompleto;
-		return this;
-	}
-
-	/**
-	 * Nombre completo del usuario
-	 * 
-	 * @return nombreCompleto
-	 **/
-	@ApiModelProperty(example = "Juan Perez Hernandez", value = "Nombre completo del usuario")
-
-	public String getNombreCompleto() {
-		return nombreCompleto;
-	}
-
-	public void setNombreCompleto(String nombreCompleto) {
-		this.nombreCompleto = nombreCompleto;
-	}
-
-	public PerfilUsuario descripcion(String descripcion) {
-		this.descripcion = descripcion;
-		return this;
-	}
-
-	/**
-	 * Descripción del usuario
-	 * 
-	 * @return descripcion
-	 **/
-	@ApiModelProperty(example = "Descripción", value = "Descripción del usuario")
-
-	public String getDescripcion() {
-		return descripcion;
-	}
-
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public PerfilUsuario guid(String guid) {
@@ -189,11 +204,11 @@ public class PerfilUsuario extends InfoUsuario {
 	}
 
 	/**
-	 * GUID
+	 * GUID (oauth2/profile)
 	 * 
 	 * @return guid
 	 **/
-	@ApiModelProperty(example = "b0c21bfc537e466b6e323dcc5fe0b23f", value = "GUID")
+	@ApiModelProperty(example = "b0c21bfc537e466b6e323dcc5fe0b23f", value = "GUID (oauth2/profile)")
 
 	public String getGuid() {
 		return guid;
@@ -203,144 +218,244 @@ public class PerfilUsuario extends InfoUsuario {
 		this.guid = guid;
 	}
 
-	public PerfilUsuario tipoIdentidad(String tipoIdentidad) {
-		this.tipoIdentidad = tipoIdentidad;
+	public PerfilUsuario uniqueName(String uniqueName) {
+		this.uniqueName = uniqueName;
 		return this;
 	}
 
 	/**
-	 * Tipo de identidad
+	 * Nombre distinguido del usuario (oauth2/profile)
 	 * 
-	 * @return tipoIdentidad
+	 * @return uniqueName
 	 **/
-	@ApiModelProperty(example = "user", value = "Tipo de identidad")
+	@ApiModelProperty(example = "CN=Juan Perez Hernandez,OU=SPS,OU=Consultores,OU=Usuarios,DC=nmp,DC=com,DC=mx", value = "Nombre distinguido del usuario (oauth2/profile)")
 
-	public String getTipoIdentidad() {
-		return tipoIdentidad;
+	public String getUniqueName() {
+		return uniqueName;
 	}
 
-	public void setTipoIdentidad(String tipoIdentidad) {
-		this.tipoIdentidad = tipoIdentidad;
+	public void setUniqueName(String uniqueName) {
+		this.uniqueName = uniqueName;
 	}
 
-	public PerfilUsuario correo(String correo) {
-		this.correo = correo;
+	public PerfilUsuario identityType(String identityType) {
+		this.identityType = identityType;
 		return this;
 	}
 
 	/**
-	 * Correo del usuario
+	 * Tipo de identidad (oauth2/profile)
 	 * 
-	 * @return correo
+	 * @return identityType
 	 **/
-	@ApiModelProperty(example = "jperezh@montepiedad.com.mx", value = "Correo del usuario")
+	@ApiModelProperty(example = "user", value = "Tipo de identidad (oauth2/profile)")
 
-	public String getCorreo() {
-		return correo;
+	public String getIdentityType() {
+		return identityType;
 	}
 
-	public void setCorreo(String correo) {
-		this.correo = correo;
+	public void setIdentityType(String identityType) {
+		this.identityType = identityType;
 	}
 
-	public PerfilUsuario telefonoOficina(String telefonoOficina) {
-		this.telefonoOficina = telefonoOficina;
+	public PerfilUsuario email(String email) {
+		this.email = email;
 		return this;
 	}
 
 	/**
-	 * Teléfono de la Oficina del usuario
+	 * Correo del usuario (oauth2/profile)
 	 * 
-	 * @return telefonoOficina
+	 * @return email
 	 **/
-	@ApiModelProperty(value = "Teléfono de la Oficina del usuario")
+	@ApiModelProperty(example = "jperezh@montepiedad.com.mx", value = "Correo del usuario (oauth2/profile)")
 
-	public String getTelefonoOficina() {
-		return telefonoOficina;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setTelefonoOficina(String telefonoOficina) {
-		this.telefonoOficina = telefonoOficina;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
-	public PerfilUsuario telefonoTrabajo(String telefonoTrabajo) {
-		this.telefonoTrabajo = telefonoTrabajo;
+	public PerfilUsuario title(String title) {
+		this.title = title;
 		return this;
 	}
 
 	/**
-	 * Teléfono de trabajo del usuario
+	 * Titulo del usuario (oauth2/profile)
 	 * 
-	 * @return telefonoTrabajo
+	 * @return title
 	 **/
-	@ApiModelProperty(value = "Teléfono de trabajo del usuario")
+	@ApiModelProperty(example = "Consultor", value = "Titulo del usuario (oauth2/profile)")
 
-	public String getTelefonoTrabajo() {
-		return telefonoTrabajo;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setTelefonoTrabajo(String telefonoTrabajo) {
-		this.telefonoTrabajo = telefonoTrabajo;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
-	public PerfilUsuario telefono(String telefono) {
-		this.telefono = telefono;
+	public PerfilUsuario firstName(String firstName) {
+		this.firstName = firstName;
 		return this;
 	}
 
 	/**
-	 * Teléfono del usuario
+	 * Primer nombre usuario (oauth2/profile)
 	 * 
-	 * @return telefono
+	 * @return firstName
 	 **/
-	@ApiModelProperty(value = "Teléfono del usuario")
+	@ApiModelProperty(example = "Juan", value = "Primer nombre usuario (oauth2/profile)")
 
-	public String getTelefono() {
-		return telefono;
+	public String getFirstName() {
+		return firstName;
 	}
 
-	public void setTelefono(String telefono) {
-		this.telefono = telefono;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 
-	public PerfilUsuario telefonoMovil(String telefonoMovil) {
-		this.telefonoMovil = telefonoMovil;
+	public PerfilUsuario middleName(String middleName) {
+		this.middleName = middleName;
 		return this;
 	}
 
 	/**
-	 * Teléfono Móvil del usuario
+	 * Segundo nombre usuario (oauth2/profile)
 	 * 
-	 * @return telefonoMovil
+	 * @return middleName
 	 **/
-	@ApiModelProperty(value = "Teléfono Móvil del usuario")
+	@ApiModelProperty(example = "", value = "Segundo nombre usuario (oauth2/profile)")
 
-	public String getTelefonoMovil() {
-		return telefonoMovil;
+	public String getMiddleName() {
+		return middleName;
 	}
 
-	public void setTelefonoMovil(String telefonoMovil) {
-		this.telefonoMovil = telefonoMovil;
+	public void setMiddleName(String middleName) {
+		this.middleName = middleName;
 	}
 
-	public PerfilUsuario localizador(String localizador) {
-		this.localizador = localizador;
+	public PerfilUsuario lastName(String lastName) {
+		this.lastName = lastName;
 		return this;
 	}
 
 	/**
-	 * Localizador del usuario
+	 * Apellido del usuario (oauth2/profile)
 	 * 
-	 * @return localizador
+	 * @return lastName
 	 **/
-	@ApiModelProperty(value = "Localizador del usuario")
+	@ApiModelProperty(example = "Perez Hernandez", value = "Apellido del usuario (oauth2/profile)")
 
-	public String getLocalizador() {
-		return localizador;
+	public String getLastName() {
+		return lastName;
 	}
 
-	public void setLocalizador(String localizador) {
-		this.localizador = localizador;
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public PerfilUsuario workPhone(String workPhone) {
+		this.workPhone = workPhone;
+		return this;
+	}
+
+	/**
+	 * Teléfono de la Oficina del usuario (oauth2/profile)
+	 * 
+	 * @return workPhone
+	 **/
+	@ApiModelProperty(value = "Teléfono de la Oficina del usuario (oauth2/profile)")
+
+	public String getWorkPhone() {
+		return workPhone;
+	}
+
+	public void setWorkPhone(String workPhone) {
+		this.workPhone = workPhone;
+	}
+
+	public PerfilUsuario workNumber(String workNumber) {
+		this.workNumber = workNumber;
+		return this;
+	}
+
+	/**
+	 * Teléfono de trabajo del usuario (oauth2/profile)
+	 * 
+	 * @return workNumber
+	 **/
+	@ApiModelProperty(value = "Teléfono de trabajo del usuario (oauth2/profile)")
+
+	public String getWorkNumber() {
+		return workNumber;
+	}
+
+	public void setWorkNumber(String workNumber) {
+		this.workNumber = workNumber;
+	}
+
+	public PerfilUsuario homePhone(String homePhone) {
+		this.homePhone = homePhone;
+		return this;
+	}
+
+	/**
+	 * Teléfono del usuario (oauth2/profile)
+	 * 
+	 * @return homePhone
+	 **/
+	@ApiModelProperty(value = "Teléfono del usuario (oauth2/profile)")
+
+	public String getHomePhone() {
+		return homePhone;
+	}
+
+	public void setHomePhone(String homePhone) {
+		this.homePhone = homePhone;
+	}
+
+	public PerfilUsuario mobile(String mobile) {
+		this.mobile = mobile;
+		return this;
+	}
+
+	/**
+	 * Teléfono Móvil del usuario (oauth2/profile)
+	 * 
+	 * @return mobile
+	 **/
+	@ApiModelProperty(value = "Teléfono Móvil del usuario (oauth2/profile)")
+
+	public String getMobile() {
+		return mobile;
+	}
+
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
+
+	public PerfilUsuario pager(String pager) {
+		this.pager = pager;
+		return this;
+	}
+
+	/**
+	 * Localizador del usuario (oauth2/profile)
+	 * 
+	 * @return pager
+	 **/
+	@ApiModelProperty(value = "Localizador del usuario (oauth2/profile)")
+
+	public String getPager() {
+		return pager;
+	}
+
+	public void setPager(String pager) {
+		this.pager = pager;
 	}
 
 	public PerfilUsuario fax(String fax) {
@@ -349,11 +464,11 @@ public class PerfilUsuario extends InfoUsuario {
 	}
 
 	/**
-	 * Fax del usuario
+	 * Fax del usuario (oauth2/profile)
 	 * 
 	 * @return fax
 	 **/
-	@ApiModelProperty(value = "Fax del usuario")
+	@ApiModelProperty(value = "Fax del usuario (oauth2/profile)")
 
 	public String getFax() {
 		return fax;
@@ -363,84 +478,84 @@ public class PerfilUsuario extends InfoUsuario {
 		this.fax = fax;
 	}
 
-	public PerfilUsuario jefe(String jefe) {
-		this.jefe = jefe;
+	public PerfilUsuario manager(String manager) {
+		this.manager = manager;
 		return this;
 	}
 
 	/**
-	 * Jefe del usuario
+	 * Jefe del usuario (oauth2/profile)
 	 * 
-	 * @return jefe
+	 * @return manager
 	 **/
-	@ApiModelProperty(example = "jperezhe", value = "Jefe del usuario")
+	@ApiModelProperty(example = "jperezhe", value = "Jefe del usuario (oauth2/profile)")
 
-	public String getJefe() {
-		return jefe;
+	public String getManager() {
+		return manager;
 	}
 
-	public void setJefe(String jefe) {
-		this.jefe = jefe;
+	public void setManager(String manager) {
+		this.manager = manager;
 	}
 
-	public PerfilUsuario zona(String zona) {
-		this.zona = zona;
+	public PerfilUsuario timeZone(String timeZone) {
+		this.timeZone = timeZone;
 		return this;
 	}
 
 	/**
-	 * Zona
+	 * Zona (oauth2/profile)
 	 * 
-	 * @return zona
+	 * @return timeZone
 	 **/
-	@ApiModelProperty(value = "Zona")
+	@ApiModelProperty(value = "Zona (oauth2/profile)")
 
-	public String getZona() {
-		return zona;
+	public String getTimeZone() {
+		return timeZone;
 	}
 
-	public void setZona(String zona) {
-		this.zona = zona;
+	public void setTimeZone(String timeZone) {
+		this.timeZone = timeZone;
 	}
 
-	public PerfilUsuario preferenciasIdioma(String preferenciasIdioma) {
-		this.preferenciasIdioma = preferenciasIdioma;
+	public PerfilUsuario languagePreference(String languagePreference) {
+		this.languagePreference = languagePreference;
 		return this;
 	}
 
 	/**
-	 * Preferencias de idioma
+	 * Preferencias de idioma (oauth2/profile)
 	 * 
-	 * @return preferenciasIdioma
+	 * @return languagePreference
 	 **/
-	@ApiModelProperty(value = "Preferencias de idioma")
+	@ApiModelProperty(value = "Preferencias de idioma (oauth2/profile)")
 
-	public String getPreferenciasIdioma() {
-		return preferenciasIdioma;
+	public String getLanguagePreference() {
+		return languagePreference;
 	}
 
-	public void setPreferenciasIdioma(String preferenciasIdioma) {
-		this.preferenciasIdioma = preferenciasIdioma;
+	public void setLanguagePreference(String languagePreference) {
+		this.languagePreference = languagePreference;
 	}
 
-	public PerfilUsuario preferenciasNotificacion(String preferenciasNotificacion) {
-		this.preferenciasNotificacion = preferenciasNotificacion;
+	public PerfilUsuario notificationPreferences(String notificationPreferences) {
+		this.notificationPreferences = notificationPreferences;
 		return this;
 	}
 
 	/**
-	 * Preferencias de notificaciones
+	 * Preferencias de notificaciones (oauth2/profile)
 	 * 
-	 * @return preferenciasNotificacion
+	 * @return notificationPreferences
 	 **/
-	@ApiModelProperty(value = "Preferencias de notificaciones")
+	@ApiModelProperty(value = "Preferencias de notificaciones (oauth2/profile)")
 
-	public String getPreferenciasNotificacion() {
-		return preferenciasNotificacion;
+	public String getNotificationPreferences() {
+		return notificationPreferences;
 	}
 
-	public void setPreferenciasNotificacion(String preferenciasNotificacion) {
-		this.preferenciasNotificacion = preferenciasNotificacion;
+	public void setNotificationPreferences(String notificationPreferences) {
+		this.notificationPreferences = notificationPreferences;
 	}
 
 	@Override
@@ -452,31 +567,33 @@ public class PerfilUsuario extends InfoUsuario {
 			return false;
 		}
 		PerfilUsuario perfilUsuario = (PerfilUsuario) o;
-		return Objects.equals(this.nombreDistinguido, perfilUsuario.nombreDistinguido)
-				&& Objects.equals(this.miembroDe, perfilUsuario.miembroDe)
-				&& Objects.equals(this.nombreDominio, perfilUsuario.nombreDominio)
-				&& Objects.equals(this.nombreCompleto, perfilUsuario.nombreCompleto)
-				&& Objects.equals(this.descripcion, perfilUsuario.descripcion)
+		return Objects.equals(this.name, perfilUsuario.name) && Objects.equals(this.realmName, perfilUsuario.realmName)
+				&& Objects.equals(this.displayName, perfilUsuario.displayName)
+				&& Objects.equals(this.memberOf, perfilUsuario.memberOf)
+				&& Objects.equals(this.description, perfilUsuario.description)
 				&& Objects.equals(this.guid, perfilUsuario.guid)
-				&& Objects.equals(this.tipoIdentidad, perfilUsuario.tipoIdentidad)
-				&& Objects.equals(this.correo, perfilUsuario.correo)
-				&& Objects.equals(this.telefonoOficina, perfilUsuario.telefonoOficina)
-				&& Objects.equals(this.telefonoTrabajo, perfilUsuario.telefonoTrabajo)
-				&& Objects.equals(this.telefono, perfilUsuario.telefono)
-				&& Objects.equals(this.telefonoMovil, perfilUsuario.telefonoMovil)
-				&& Objects.equals(this.localizador, perfilUsuario.localizador)
-				&& Objects.equals(this.fax, perfilUsuario.fax) && Objects.equals(this.jefe, perfilUsuario.jefe)
-				&& Objects.equals(this.zona, perfilUsuario.zona)
-				&& Objects.equals(this.preferenciasIdioma, perfilUsuario.preferenciasIdioma)
-				&& Objects.equals(this.preferenciasNotificacion, perfilUsuario.preferenciasNotificacion)
+				&& Objects.equals(this.uniqueName, perfilUsuario.uniqueName)
+				&& Objects.equals(this.identityType, perfilUsuario.identityType)
+				&& Objects.equals(this.email, perfilUsuario.email) && Objects.equals(this.title, perfilUsuario.title)
+				&& Objects.equals(this.firstName, perfilUsuario.firstName)
+				&& Objects.equals(this.middleName, perfilUsuario.middleName)
+				&& Objects.equals(this.lastName, perfilUsuario.lastName)
+				&& Objects.equals(this.workPhone, perfilUsuario.workPhone)
+				&& Objects.equals(this.workNumber, perfilUsuario.workNumber)
+				&& Objects.equals(this.homePhone, perfilUsuario.homePhone)
+				&& Objects.equals(this.mobile, perfilUsuario.mobile) && Objects.equals(this.pager, perfilUsuario.pager)
+				&& Objects.equals(this.fax, perfilUsuario.fax) && Objects.equals(this.manager, perfilUsuario.manager)
+				&& Objects.equals(this.timeZone, perfilUsuario.timeZone)
+				&& Objects.equals(this.languagePreference, perfilUsuario.languagePreference)
+				&& Objects.equals(this.notificationPreferences, perfilUsuario.notificationPreferences)
 				&& super.equals(o);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(nombreDistinguido, miembroDe, nombreDominio, nombreCompleto, descripcion, guid,
-				tipoIdentidad, correo, telefonoOficina, telefonoTrabajo, telefono, telefonoMovil, localizador, fax,
-				jefe, zona, preferenciasIdioma, preferenciasNotificacion, super.hashCode());
+		return Objects.hash(name, realmName, displayName, memberOf, description, guid, uniqueName, identityType, email,
+				title, firstName, middleName, lastName, workPhone, workNumber, homePhone, mobile, pager, fax, manager,
+				timeZone, languagePreference, notificationPreferences, super.hashCode());
 	}
 
 	@Override
@@ -484,24 +601,29 @@ public class PerfilUsuario extends InfoUsuario {
 		StringBuilder sb = new StringBuilder();
 		sb.append("class PerfilUsuario {\n");
 		sb.append("    ").append(toIndentedString(super.toString())).append("\n");
-		sb.append("    nombreDistinguido: ").append(toIndentedString(nombreDistinguido)).append("\n");
-		sb.append("    miembroDe: ").append(toIndentedString(miembroDe)).append("\n");
-		sb.append("    nombreDominio: ").append(toIndentedString(nombreDominio)).append("\n");
-		sb.append("    nombreCompleto: ").append(toIndentedString(nombreCompleto)).append("\n");
-		sb.append("    descripcion: ").append(toIndentedString(descripcion)).append("\n");
+		sb.append("    name: ").append(toIndentedString(name)).append("\n");
+		sb.append("    realmName: ").append(toIndentedString(realmName)).append("\n");
+		sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
+		sb.append("    memberOf: ").append(toIndentedString(memberOf)).append("\n");
+		sb.append("    description: ").append(toIndentedString(description)).append("\n");
 		sb.append("    guid: ").append(toIndentedString(guid)).append("\n");
-		sb.append("    tipoIdentidad: ").append(toIndentedString(tipoIdentidad)).append("\n");
-		sb.append("    correo: ").append(toIndentedString(correo)).append("\n");
-		sb.append("    telefonoOficina: ").append(toIndentedString(telefonoOficina)).append("\n");
-		sb.append("    telefonoTrabajo: ").append(toIndentedString(telefonoTrabajo)).append("\n");
-		sb.append("    telefono: ").append(toIndentedString(telefono)).append("\n");
-		sb.append("    telefonoMovil: ").append(toIndentedString(telefonoMovil)).append("\n");
-		sb.append("    localizador: ").append(toIndentedString(localizador)).append("\n");
+		sb.append("    uniqueName: ").append(toIndentedString(uniqueName)).append("\n");
+		sb.append("    identityType: ").append(toIndentedString(identityType)).append("\n");
+		sb.append("    email: ").append(toIndentedString(email)).append("\n");
+		sb.append("    title: ").append(toIndentedString(title)).append("\n");
+		sb.append("    firstName: ").append(toIndentedString(firstName)).append("\n");
+		sb.append("    middleName: ").append(toIndentedString(middleName)).append("\n");
+		sb.append("    lastName: ").append(toIndentedString(lastName)).append("\n");
+		sb.append("    workPhone: ").append(toIndentedString(workPhone)).append("\n");
+		sb.append("    workNumber: ").append(toIndentedString(workNumber)).append("\n");
+		sb.append("    homePhone: ").append(toIndentedString(homePhone)).append("\n");
+		sb.append("    mobile: ").append(toIndentedString(mobile)).append("\n");
+		sb.append("    pager: ").append(toIndentedString(pager)).append("\n");
 		sb.append("    fax: ").append(toIndentedString(fax)).append("\n");
-		sb.append("    jefe: ").append(toIndentedString(jefe)).append("\n");
-		sb.append("    zona: ").append(toIndentedString(zona)).append("\n");
-		sb.append("    preferenciasIdioma: ").append(toIndentedString(preferenciasIdioma)).append("\n");
-		sb.append("    preferenciasNotificacion: ").append(toIndentedString(preferenciasNotificacion)).append("\n");
+		sb.append("    manager: ").append(toIndentedString(manager)).append("\n");
+		sb.append("    timeZone: ").append(toIndentedString(timeZone)).append("\n");
+		sb.append("    languagePreference: ").append(toIndentedString(languagePreference)).append("\n");
+		sb.append("    notificationPreferences: ").append(toIndentedString(notificationPreferences)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

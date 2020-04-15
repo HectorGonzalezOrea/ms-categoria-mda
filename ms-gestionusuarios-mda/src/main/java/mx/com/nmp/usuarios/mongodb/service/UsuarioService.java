@@ -809,48 +809,59 @@ public class UsuarioService {
 		PerfilUsuario pf = new PerfilUsuario();
 		
 		if(uvo.getNombreDistintivo() != null) 
-			pf.setNombreDistinguido(uvo.getNombreDistintivo());
+			pf.setUniqueName(uvo.getNombreDistintivo());
 		
 		// No viene "miembroDe" en la respuesta del OAG
 		List<String> miembroDe = new ArrayList<>();
-		pf.setMiembroDe(miembroDe);
+		pf.setMemberOf(miembroDe);
 		
 		if(uvo.getNombreDominio() != null)
-			pf.setNombreDominio(uvo.getNombreDominio());
+			pf.setRealmName(uvo.getNombreDominio());
 		if(uvo.getNombreCompleto() != null)
-			pf.setNombreCompleto(uvo.getNombreCompleto());
+			pf.setDisplayName(uvo.getNombreCompleto());
 		if(uvo.getDescripcion() != null)
-			pf.setDescripcion(uvo.getDescripcion());
+			pf.setDescription(uvo.getDescripcion());
 		if(uvo.getGuid() != null)
 			pf.setGuid(uvo.getGuid());
 		if(uvo.getTipoIdentidad() != null)
-			pf.setTipoIdentidad(uvo.getTipoIdentidad());
+			pf.setIdentityType(uvo.getTipoIdentidad());
 		if(uvo.getCorreo() != null)
-			pf.setCorreo(uvo.getCorreo());
+			pf.setEmail(uvo.getCorreo());
+		if(uvo.getPuesto() != null)
+			pf.setTitle(uvo.getPuesto());
+		if(uvo.getNombre() != null)
+			pf.setFirstName(uvo.getNombre());
+		if(uvo.getSegundoNombre() != null)
+			pf.setMiddleName(uvo.getSegundoNombre());
+		if(uvo.getApellidos() != null)
+			pf.setLastName(uvo.getApellidos());
 		if(uvo.getTelefonoOficina() != null)
-			pf.setTelefonoOficina(uvo.getTelefonoOficina());
+			pf.setWorkPhone(uvo.getTelefonoOficina());
 		if(uvo.getTelefonoTrabajo() != null)
-			pf.setTelefonoTrabajo(uvo.getTelefonoTrabajo());
+			pf.setWorkNumber(uvo.getTelefonoTrabajo());
 		if(uvo.getTelefono() != null)
-			pf.setTelefono(uvo.getTelefono());
+			pf.setHomePhone(uvo.getTelefono());
 		if(uvo.getTelefonoMovil() != null)
-			pf.setTelefonoMovil(uvo.getTelefonoMovil());
+			pf.setMobile(uvo.getTelefonoMovil());
 		if(uvo.getLocalizador() != null)
-			pf.setLocalizador(uvo.getLocalizador());
+			pf.setPager(uvo.getLocalizador());
 		if(uvo.getFax() != null)
 			pf.setFax(uvo.getFax());
 		if(uvo.getJefe() != null)
-			pf.setJefe(uvo.getJefe());
+			pf.setManager(uvo.getJefe());
 		if(uvo.getZona() != null)
-			pf.setZona(uvo.getZona());
+			pf.setTimeZone(uvo.getZona());
 		if(uvo.getPreferenciasIdioma() != null)
-			pf.setPreferenciasIdioma(uvo.getPreferenciasIdioma());
+			pf.setLanguagePreference(uvo.getPreferenciasIdioma());
 		if(uvo.getPreferenciasNotificacion() != null)
-			pf.setPreferenciasNotificacion(uvo.getPreferenciasNotificacion());
+			pf.setNotificationPreferences(uvo.getPreferenciasNotificacion());
 		
 		return pf;
 	}
 	
+	/*
+	 * Validar usuario Admin existente
+	 */
 	public Boolean validarUsuarioAdmin(CapacidadUsuariosRes perfil) {
 		log.info("validarUsuarioAdmin");
 		
