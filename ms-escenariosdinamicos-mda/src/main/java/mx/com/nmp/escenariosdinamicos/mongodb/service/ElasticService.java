@@ -1,6 +1,8 @@
 package mx.com.nmp.escenariosdinamicos.mongodb.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -23,7 +25,9 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
 import mx.com.nmp.escenariosdinamicos.elastic.properties.ElasticProperties;
+import mx.com.nmp.escenariosdinamicos.oag.vo.IndexGarantiaVO;
 @Service
 public class ElasticService {
 	
@@ -32,6 +36,9 @@ public class ElasticService {
 	//@Autowired
 	//private QueryBuilder qbm;
 	//indices a usar pc_mda_ventas_midas_dev_tmp,pc_garantias
+	
+	@Autowired
+	private CastObjectGeneric castObject;
 	 public synchronized RestHighLevelClient getConnectionElastic() {
 	        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 	        credentialsProvider.setCredentials(AuthScope.ANY,
@@ -51,9 +58,9 @@ public class ElasticService {
 	        restHighLevelClient = null;
 	    }
 	
-	public String scrollElastic(String index) throws IOException{
+	public List<IndexGarantiaVO> scrollElastic(String index) throws IOException{
 		System.out.println("Entrando a metodo elastic");
-		String response=null;
+		List<IndexGarantiaVO>lstIndexGarantia=new ArrayList<>();
 		final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));//el seteo del intervalo
 		SearchRequest searchRequest = new SearchRequest();
 		searchRequest.scroll(scroll);
@@ -61,14 +68,11 @@ public class ElasticService {
 		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 		searchSourceBuilder.size(2);//cuantos resultados se recuperan?
 		searchRequest.source(searchSourceBuilder);
-		
 		SearchResponse searchResponse = getConnectionElastic().search(searchRequest, RequestOptions.DEFAULT); //Inicialice el contexto de búsqueda enviando el SearchRequest inicial
 		String scrollId = searchResponse.getScrollId();//contexto de búsqueda que se mantiene vivo y que se necesitará en la siguiente
 		//llamada de desplazamiento de búsqueda
 		SearchHit[] searchHits = searchResponse.getHits().getHits();//recupera el primer lote de resultados de la busqueda
-	
 		//tratar de cambiar esta implementacion para poder extraer el contenido de cada documento
-		
 		//while (searchHits != null && searchHits.length > 0) { //creo que aqui se tiene que agregar que sea 100
 			//se recuperan todos los resultados hasta que ya no se devuelvan docs
 		System.out.println(searchHits.length);
@@ -81,16 +85,17 @@ public class ElasticService {
 		    searchResponse = getConnectionElastic().scroll(scrollRequest, RequestOptions.DEFAULT);
 		    scrollId = searchResponse.getScrollId();
 		    searchHits = searchResponse.getHits().getHits();//se recupera otro grupode resultados
-		    response = hit.getSourceAsString();
+		    String response = hit.getSourceAsString();
 		    System.out.println("*********************");
 		    System.out.println(response);
+		    lstIndexGarantia.add(castObject.JsonFieldToObject(response));
 		    System.out.println("*********************");
 		}
-	
+		System.out.println("ListaObjetosJava "+lstIndexGarantia.size());
 		ClearScrollRequest clearScrollRequest = new ClearScrollRequest(); //limpia el contexto cuando se completa
 		clearScrollRequest.addScrollId(scrollId);
 		ClearScrollResponse clearScrollResponse = getConnectionElastic().clearScroll(clearScrollRequest, RequestOptions.DEFAULT);
 		//boolean succeeded = clearScrollResponse.isSucceeded();
-		return response;
+		return lstIndexGarantia;
 	}
 }
