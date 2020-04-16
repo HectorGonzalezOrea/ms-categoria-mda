@@ -13,7 +13,7 @@ public class IndexGarantiaVO {
 	@JsonProperty("precio_venta_inicial")
 	private String precioVentaInicial;
 	@JsonProperty("alhajas_avaluo_compl")
-	private String alhajasAvaluoCompl;
+	private Float alhajasAvaluoCompl;
 	@JsonProperty("avaluo_comerc")
 	private String avaluoComerc;
 	@JsonProperty("sku")
@@ -63,7 +63,7 @@ public class IndexGarantiaVO {
 	@JsonProperty("precio_venta_act")
 	private String precioVentaAct;
 	@JsonProperty("alhajas_gramaje")
-	private String alhajasGramaje;
+	private Float alhajasGramaje;
 	@JsonProperty("precio_venta_salida")
 	private String precioVentaSalida;
 	@JsonProperty("canal_venta_act")
@@ -83,11 +83,11 @@ public class IndexGarantiaVO {
 	@JsonProperty("expendio")
 	private String expendio;
 	@JsonProperty("alhajas_incremento")
-	private String alhajasIIncremento;
+	private Float alhajasIIncremento;
 	@JsonProperty("nota_prendaria")
 	private String notaPrendaria;
 	@JsonProperty("valor_monte_act")
-	private String valorMonteAct;
+	private Float valorMonteAct;
 	@JsonProperty("margen_venta")
 	private String margenVenta;
 	@JsonProperty("fecha_alta_inventario")
@@ -103,13 +103,13 @@ public class IndexGarantiaVO {
 	@JsonProperty("cp")
 	private String cp;
 	@JsonProperty("partida")
-	private String partida;
+	private Integer partida;
 	@JsonProperty("tipo_transaccion")
 	private String tipoTransaccion;
 	@JsonProperty("alhajas_kilates")
-	private String alhajasKilates;
+	private Float alhajasKilates;
 	@JsonProperty("alhajas_despl_comer")
-	private String alhajasDesplComer;
+	private Float alhajasDesplComer;
 	@JsonProperty("alhajas_metal")
 	private String alhajasMetal;
 	@JsonProperty("refrendos")
@@ -130,7 +130,7 @@ public class IndexGarantiaVO {
 	public String getPrecioVentaInicial() {
 		return precioVentaInicial;
 	}
-	public String getAlhajasAvaluoCompl() {
+	public Float getAlhajasAvaluoCompl() {
 		return alhajasAvaluoCompl;
 	}
 	public String getAvaluoComerc() {
@@ -205,7 +205,7 @@ public class IndexGarantiaVO {
 	public String getPrecioVentaAct() {
 		return precioVentaAct;
 	}
-	public String getAlhajasGramaje() {
+	public Float getAlhajasGramaje() {
 		return alhajasGramaje;
 	}
 	public String getPrecioVentaSalida() {
@@ -235,13 +235,13 @@ public class IndexGarantiaVO {
 	public String getExpendio() {
 		return expendio;
 	}
-	public String getAlhajasIIncremento() {
+	public Float getAlhajasIIncremento() {
 		return alhajasIIncremento;
 	}
 	public String getNotaPrendaria() {
 		return notaPrendaria;
 	}
-	public String getValorMonteAct() {
+	public Float getValorMonteAct() {
 		return valorMonteAct;
 	}
 	public String getMargenVenta() {
@@ -265,16 +265,16 @@ public class IndexGarantiaVO {
 	public String getCp() {
 		return cp;
 	}
-	public String getPartida() {
+	public Integer getPartida() {
 		return partida;
 	}
 	public String getTipoTransaccion() {
 		return tipoTransaccion;
 	}
-	public String getAlhajasKilates() {
+	public Float getAlhajasKilates() {
 		return alhajasKilates;
 	}
-	public String getAlhajasDesplComer() {
+	public Float getAlhajasDesplComer() {
 		return alhajasDesplComer;
 	}
 	public String getAlhajasMetal() {
@@ -301,7 +301,7 @@ public class IndexGarantiaVO {
 	public void setPrecioVentaInicial(String precioVentaInicial) {
 		this.precioVentaInicial = precioVentaInicial;
 	}
-	public void setAlhajasAvaluoCompl(String alhajasAvaluoCompl) {
+	public void setAlhajasAvaluoCompl(Float alhajasAvaluoCompl) {
 		this.alhajasAvaluoCompl = alhajasAvaluoCompl;
 	}
 	public void setAvaluoComerc(String avaluoComerc) {
@@ -376,7 +376,7 @@ public class IndexGarantiaVO {
 	public void setPrecioVentaAct(String precioVentaAct) {
 		this.precioVentaAct = precioVentaAct;
 	}
-	public void setAlhajasGramaje(String alhajasGramaje) {
+	public void setAlhajasGramaje(Float alhajasGramaje) {
 		this.alhajasGramaje = alhajasGramaje;
 	}
 	public void setPrecioVentaSalida(String precioVentaSalida) {
@@ -406,13 +406,13 @@ public class IndexGarantiaVO {
 	public void setExpendio(String expendio) {
 		this.expendio = expendio;
 	}
-	public void setAlhajasIIncremento(String alhajasIIncremento) {
+	public void setAlhajasIIncremento(Float alhajasIIncremento) {
 		this.alhajasIIncremento = alhajasIIncremento;
 	}
 	public void setNotaPrendaria(String notaPrendaria) {
 		this.notaPrendaria = notaPrendaria;
 	}
-	public void setValorMonteAct(String valorMonteAct) {
+	public void setValorMonteAct(Float valorMonteAct) {
 		this.valorMonteAct = valorMonteAct;
 	}
 	public void setMargenVenta(String margenVenta) {
@@ -436,16 +436,16 @@ public class IndexGarantiaVO {
 	public void setCp(String cp) {
 		this.cp = cp;
 	}
-	public void setPartida(String partida) {
+	public void setPartida(Integer partida) {
 		this.partida = partida;
 	}
 	public void setTipoTransaccion(String tipoTransaccion) {
 		this.tipoTransaccion = tipoTransaccion;
 	}
-	public void setAlhajasKilates(String alhajasKilates) {
+	public void setAlhajasKilates(Float alhajasKilates) {
 		this.alhajasKilates = alhajasKilates;
 	}
-	public void setAlhajasDesplComer(String alhajasDesplComer) {
+	public void setAlhajasDesplComer(Float alhajasDesplComer) {
 		this.alhajasDesplComer = alhajasDesplComer;
 	}
 	public void setAlhajasMetal(String alhajasMetal) {

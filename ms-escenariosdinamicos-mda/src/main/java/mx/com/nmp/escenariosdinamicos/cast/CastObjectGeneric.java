@@ -61,14 +61,14 @@ public class CastObjectGeneric {
 			 System.out.println("Cast con lamda----");
 			 System.out.println(calculoValor.toString());
 			 return new CalculoValorVO(
-					 Integer.valueOf(calculoValor.getPartida()),
+					 calculoValor.getPartida()!=null?calculoValor.getPartida():0,
 					 calculoValor.getSku(),
-					 Float.valueOf(calculoValor.getValorMonteAct()),
-					 Float.valueOf(calculoValor.getAlhajasGramaje()),
-					 Float.valueOf(calculoValor.getAlhajasKilates()),
-					 Float.valueOf(calculoValor.getAlhajasIIncremento()),
-					 Float.valueOf(calculoValor.getAlhajasDesplComer()),
-					 Float.valueOf(calculoValor.getAlhajasAvaluoCompl())
+					 calculoValor.getValorMonteAct()!=null?calculoValor.getValorMonteAct():0,
+					 calculoValor.getAlhajasGramaje()!=null?calculoValor.getAlhajasGramaje():0,
+					 calculoValor.getAlhajasKilates()!=null?calculoValor.getAlhajasKilates():0,
+					 calculoValor.getAlhajasIIncremento()!=null?calculoValor.getAlhajasIIncremento():0,
+					 calculoValor.getAlhajasDesplComer()!=null?calculoValor.getAlhajasDesplComer():0,
+					 calculoValor.getAlhajasAvaluoCompl()!=null?calculoValor.getAlhajasAvaluoCompl():0
 					 ); 
 		 }).collect(Collectors.toList());
 		return lstCalculoValors;
