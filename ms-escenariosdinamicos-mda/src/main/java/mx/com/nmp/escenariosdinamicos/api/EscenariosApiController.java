@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.ApiParam;
-import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
+import mx.com.nmp.escenariosdinamicos.clienteservicios.service.ClientesMicroservicios;
 import mx.com.nmp.escenariosdinamicos.elastic.properties.ElasticProperties;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
 import mx.com.nmp.escenariosdinamicos.model.BadRequest;
@@ -54,6 +54,8 @@ public class EscenariosApiController implements EscenariosApi {
     private ElasticService elasticService;
     @Autowired
     private ElasticProperties elasticProperties;
+    @Autowired 
+    private ClientesMicroservicios clientesMicroservicios;
 
     @org.springframework.beans.factory.annotation.Autowired
     public EscenariosApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -204,6 +206,7 @@ public class EscenariosApiController implements EscenariosApi {
 			try {
 				lstIndexGarantia=elasticService.scrollElastic(elasticProperties.getIndexGarantia());
 				lstIndexGarantia.forEach(i->System.out.println(i.toString()));
+				clientesMicroservicios.actualizaPrecio(null);
 		} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -141,5 +141,25 @@
         	<groupId>org.elasticsearch.client</groupId>
         	<artifactId>elasticsearch-rest-client</artifactId>
         </dependency>
+		<dependency>
+		    <groupId>org.glassfish.jersey.core</groupId>
+		    <artifactId>jersey-common</artifactId>
+		</dependency>
+        <dependency>
+		    <groupId>org.glassfish.jersey.core</groupId>
+		    <artifactId>jersey-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.annotation</groupId>
+		    <artifactId>javax.annotation-api</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.glassfish.jersey.inject</groupId>
+		    <artifactId>jersey-hk2</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.glassfish.jersey.media</groupId>
+		    <artifactId>jersey-media-jaxb</artifactId>
+		</dependency>
     </dependencies>
 </project>
