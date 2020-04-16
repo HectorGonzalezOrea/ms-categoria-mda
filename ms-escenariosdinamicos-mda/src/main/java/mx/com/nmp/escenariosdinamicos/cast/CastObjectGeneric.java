@@ -14,8 +14,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.CalculoValorVO;
-import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.PartidaVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
+import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
 
 @Repository
 public class CastObjectGeneric {
@@ -40,11 +40,11 @@ public class CastObjectGeneric {
 		return json;
 	}
 	
-	public List<PartidaVO> castJsonToList(String jsonString) {
+	public List<PartidaPrecioFinal> castJsonToList(String jsonString) {
 		ObjectMapper mapper = new ObjectMapper();
-		List<PartidaVO> participantJsonList = null;
+		List<PartidaPrecioFinal> participantJsonList = null;
 		try {
-			participantJsonList = mapper.readValue(jsonString, new TypeReference<List<PartidaVO>>() {
+			participantJsonList = mapper.readValue(jsonString, new TypeReference<List<PartidaPrecioFinal>>() {
 			});
 		} catch (JsonParseException e) {
 			e.printStackTrace();

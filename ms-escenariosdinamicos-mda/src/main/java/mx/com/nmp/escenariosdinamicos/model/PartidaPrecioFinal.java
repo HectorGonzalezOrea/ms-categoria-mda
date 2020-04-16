@@ -18,13 +18,13 @@ public class PartidaPrecioFinal   {
   @JsonProperty("idPartida")
   private String idPartida = null;
 
-  @JsonProperty("sku")
+  @JsonProperty("SKU")
   private String sku = null;
 
   @JsonProperty("escenario")
   private String escenario = null;
 
-  @JsonProperty("precioFinal")
+  @JsonProperty("valorMonteActualizado")
   private Double precioFinal = null;
 
   public PartidaPrecioFinal idPartida(String idPartida) {

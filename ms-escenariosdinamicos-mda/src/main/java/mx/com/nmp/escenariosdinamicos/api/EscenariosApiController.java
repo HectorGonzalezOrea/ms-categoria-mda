@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiParam;
 import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
 import mx.com.nmp.escenariosdinamicos.clienteservicios.service.ClientesMicroservicios;
+import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.CalculoValorVO;
 import mx.com.nmp.escenariosdinamicos.elastic.properties.ElasticProperties;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
 import mx.com.nmp.escenariosdinamicos.model.BadRequest;
@@ -207,16 +208,26 @@ public class EscenariosApiController implements EscenariosApi {
         List<IndexGarantiaVO>lstIndexGarantia=null;
         	
 			try {
-				lstIndexGarantia=elasticService.scrollElastic(elasticProperties.getIndexGarantia());
-				lstIndexGarantia.forEach(i->System.out.println(i.toString()));
-				clientesMicroservicios.actualizaPrecio(castObjectGeneric.castGarantiasToCalculoValor(lstIndexGarantia));
-		} catch (IOException e) {
+				//lstIndexGarantia=elasticService.scrollElastic(elasticProperties.getIndexGarantia());
+				//lstIndexGarantia.forEach(i->System.out.println(i.toString()));
+				//clientesMicroservicios.actualizaPrecio(castObjectGeneric.castGarantiasToCalculoValor(lstIndexGarantia));
+				List<CalculoValorVO> lstIndexGarantiv1=fillValues();
+				lstIndexGarantiv1.forEach(x->System.out.println(x.toString()));
+				lstPartidaPrecioFinal=(ArrayList<PartidaPrecioFinal>) clientesMicroservicios.actualizaPrecio(lstIndexGarantiv1);
+		} catch (Exception e) {
 				e.printStackTrace();
 			}
 			response.addAll(lstPartidaPrecioFinal);
 			return new ResponseEntity<SimularEscenarioDinamicoRes>(response, HttpStatus.OK);
 
         //return new ResponseEntity<SimularEscenarioDinamicoRes>(HttpStatus.NOT_IMPLEMENTED);
+    }
+    
+    private List<CalculoValorVO> fillValues(){
+    	 List<CalculoValorVO> lst=new ArrayList<>();
+    	 CalculoValorVO calculoValorVO=new CalculoValorVO(143906442, "nmp-al-al-32080084",new Float(1415.00),new Float(2.000), new Float(14.00), new Float(15.00), new Float(5.00), new Float(0));
+    	 lst.add(calculoValorVO);
+		return lst;
     }
 
 }
