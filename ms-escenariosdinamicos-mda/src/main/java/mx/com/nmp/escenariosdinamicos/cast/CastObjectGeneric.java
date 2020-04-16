@@ -2,6 +2,7 @@ package mx.com.nmp.escenariosdinamicos.cast;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
@@ -53,5 +54,23 @@ public class CastObjectGeneric {
 			e.printStackTrace();
 		}
 		return participantJsonList;
+	}
+	//cast con lamda
+	public List<CalculoValorVO> castGarantiasToCalculoValor(List<IndexGarantiaVO> lstCalculoValor){
+		 List<CalculoValorVO> lstCalculoValors=lstCalculoValor.stream().map(calculoValor->{
+			 System.out.println("Cast con lamda----");
+			 System.out.println(calculoValor.toString());
+			 return new CalculoValorVO(
+					 Integer.valueOf(calculoValor.getPartida()),
+					 calculoValor.getSku(),
+					 Float.valueOf(calculoValor.getValorMonteAct()),
+					 Float.valueOf(calculoValor.getAlhajasGramaje()),
+					 Float.valueOf(calculoValor.getAlhajasKilates()),
+					 Float.valueOf(calculoValor.getAlhajasIIncremento()),
+					 Float.valueOf(calculoValor.getAlhajasDesplComer()),
+					 Float.valueOf(calculoValor.getAlhajasAvaluoCompl())
+					 ); 
+		 }).collect(Collectors.toList());
+		return lstCalculoValors;
 	}
 }

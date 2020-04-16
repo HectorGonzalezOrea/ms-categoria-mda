@@ -2,6 +2,7 @@ package mx.com.nmp.escenariosdinamicos.clienteservicios.service;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -10,15 +11,16 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import org.glassfish.jersey.client.ClientConfig;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
 
 import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
 import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.CalculoValorVO;
 import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.PartidaVO;
 import mx.com.nmp.escenariosdinamicos.constantes.Constantes.Common;
-@Service
+@RestController
 public class ClientesMicroservicios {
 	@Autowired
 	private CastObjectGeneric castObjectGeneric;
