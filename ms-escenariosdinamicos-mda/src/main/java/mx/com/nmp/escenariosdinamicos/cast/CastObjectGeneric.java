@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +17,7 @@ import com.google.gson.GsonBuilder;
 import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.CalculoValorVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
 import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
+import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseOAGDto;
 
 @Repository
 public class CastObjectGeneric {
@@ -73,4 +75,21 @@ public class CastObjectGeneric {
 		 }).collect(Collectors.toList());
 		return lstCalculoValors;
 	}
+	
+	
+	public ResponseOAGDto convertJsonToReponseOAFDto(String jsonString) {
+		ResponseOAGDto response= new ResponseOAGDto();
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			response=mapper.readValue(jsonString, ResponseOAGDto.class);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return response;
+	}
+
 }

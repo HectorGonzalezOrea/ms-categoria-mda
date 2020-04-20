@@ -1,4 +1,4 @@
-package mx.com.nmp.escenariosdinamicos.clienteservicios.service;
+package mx.com.nmp.escenariosdinamicos.clienteoag.service;
 
 import java.io.IOException;
 
