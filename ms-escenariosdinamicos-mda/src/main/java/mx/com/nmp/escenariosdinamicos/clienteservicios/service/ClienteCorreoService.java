@@ -39,6 +39,21 @@ public class ClienteCorreoService {
 	@Value("${oag.resource.oauth.getToken.header.idDestino}")
 	protected String headerIdDestino;
 	
+	@Value("${oag.urlBase}")
+	protected String urlBase;
+	
+	@Value("${oag.usuario}")
+	protected String usuario;
+	
+	@Value("${oag.password}")
+	protected String password;
+	
+	@Value("${oag.servicio.oauth.getToken}")
+	protected String servicioGetToken;
+	
+	@Value("${oag.resource.oauth.sendmail.endpoint}")
+	protected String servicioEnviarCorreo;
+	
 	public RespuestaVO sendEmailUser(EnviarNotificacionRequestVO request) {
 		log.info("Entrando al metodo sendEmailUser ");
 		RespuestaVO respuesta=new RespuestaVO();
@@ -52,10 +67,10 @@ public class ClienteCorreoService {
 		headers.add(Common.HEADER_ID_CONSUMIDOR,headerIdConsumidor);
 		headers.add(Common.HEADER_ID_DESTINO, headerIdDestino);
 		headers.add(Common.HEADER_OAUTH_BEARER,token);
-		headers.setBasicAuth( Common.OAG_USUARIO, Common.OAG_PASSWORD);		
+		headers.setBasicAuth(usuario, password);		
 		String requestJson = convertJson.messageToJson(request);
 		HttpEntity<String> entity = new HttpEntity<>(requestJson,headers);
-	    String response = restTemplate.postForObject(Common.URL_OAG_BASE+Common.ENDPOINT_ENVIAR_CORREO, entity,String.class);
+	    String response = restTemplate.postForObject(urlBase+servicioEnviarCorreo, entity,String.class);
 	    try {
 	    	if(StringUtils.isNotBlank(response)) {
 	    		root=objectMapper.readTree(response);
@@ -79,7 +94,7 @@ public class ClienteCorreoService {
 		RestTemplate restTemplate = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-		headers.setBasicAuth( Common.OAG_USUARIO, Common.OAG_PASSWORD);
+		headers.setBasicAuth(usuario, password);
 		headers.add(Common.HEADER_USUARIO,headerUsuario);
 		headers.add(Common.HEADER_ID_CONSUMIDOR,headerIdConsumidor);
 		headers.add(Common.HEADER_ID_DESTINO, headerIdDestino);
@@ -87,7 +102,7 @@ public class ClienteCorreoService {
 	    params.add(Common.GRANT_TYPE, "client_credentials");
 	    params.add(Common.SCOPE, "UserProfile.me");
 	    HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, headers);
-	    String result = restTemplate.postForObject(Common.URL_OAG_BASE+Common.ENDPOINT_GETTOKEN, requestEntity,String.class);
+	    String result = restTemplate.postForObject(urlBase+servicioGetToken, requestEntity,String.class);
 	    try {
 			root=objectMapper.readTree(result);
 			accessToken =  root.path("access_token").textValue();

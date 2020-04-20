@@ -25,9 +25,7 @@ public final class Constantes {
 		public static final String URL_VALOR_MONTE="https://dev1775-ms-valormonte-mda.mybluemix.net/NMP/MotorDescuentosAPI/v1/valorMonte";
 		public static final int STATUS_CODE_OK = 200;
 		
-		public static final String URL_OAG_BASE="https://iamdr.montepiedad.com.mx:4444";
-		public static final String OAG_USUARIO="portalinteligencia";
-		public static final String OAG_PASSWORD="sieTEIukdyYDo314QP";
+
 		public static final String HEADER_USUARIO = "usuario";
 		public static final String HEADER_ID_CONSUMIDOR = "idConsumidor";
 		public static final String HEADER_ID_DESTINO = "idDestino";
@@ -35,9 +33,7 @@ public final class Constantes {
 		public static final String GRANT_TYPE = "grant_type";
 		public static final String SCOPE = "scope";
 		public static final String HEADER_OAUTH_BEARER="oauth.bearer";
-		//Endpoint de los servicios.
-		public static final String ENDPOINT_GETTOKEN="/NMP/oauth2/v1";
-		public static final String ENDPOINT_ENVIAR_CORREO="/NMP/Utileria/EnvioCorreo/v2/";
+
 	}
 	
 
