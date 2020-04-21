@@ -1,4 +1,4 @@
-package mx.com.nmp.escenariosdinamicos.mongodb.service;
+package mx.com.nmp.escenariosdinamicos.elastic.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -75,6 +75,7 @@ public class ElasticService {
 		//tratar de cambiar esta implementacion para poder extraer el contenido de cada documento
 		//while (searchHits != null && searchHits.length > 0) { //creo que aqui se tiene que agregar que sea 100
 			//se recuperan todos los resultados hasta que ya no se devuelvan docs
+		System.out.println("antes del for");
 		System.out.println(searchHits.length);
 			for(SearchHit hit : searchHits){
 				System.out.println("entrando a bucle");

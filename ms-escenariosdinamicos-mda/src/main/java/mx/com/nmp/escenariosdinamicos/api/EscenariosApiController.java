@@ -24,6 +24,7 @@ import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
 import mx.com.nmp.escenariosdinamicos.clienteservicios.service.ClientesMicroservicios;
 import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.CalculoValorVO;
 import mx.com.nmp.escenariosdinamicos.elastic.properties.ElasticProperties;
+import mx.com.nmp.escenariosdinamicos.elastic.service.ElasticService;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
 import mx.com.nmp.escenariosdinamicos.model.BadRequest;
 import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosRes;
@@ -36,8 +37,8 @@ import mx.com.nmp.escenariosdinamicos.model.EliminarEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosReq;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
+import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoRes;
-import mx.com.nmp.escenariosdinamicos.mongodb.service.ElasticService;
 import mx.com.nmp.escenariosdinamicos.mongodb.service.EscenariosService;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-04T01:28:01.968Z")
 
@@ -199,8 +200,8 @@ public class EscenariosApiController implements EscenariosApi {
     public ResponseEntity<SimularEscenarioDinamicoRes> simularEscenariosDinamicosPOST(
     		@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,
     		@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,
-    		@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino//,
-    		//@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  ) @Valid @RequestBody SimularEscenarioDinamicoReq crearEscenariosReques
+    		@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,
+    		@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  ) @Valid @RequestBody SimularEscenarioDinamicoReq crearEscenariosReques
     		) {
     	SimularEscenarioDinamicoRes response=new SimularEscenarioDinamicoRes();
     	ArrayList<PartidaPrecioFinal> lstPartidaPrecioFinal=new ArrayList();
@@ -222,7 +223,7 @@ public class EscenariosApiController implements EscenariosApi {
 
         //return new ResponseEntity<SimularEscenarioDinamicoRes>(HttpStatus.NOT_IMPLEMENTED);
     }
-    //@Deprecated
+    @Deprecated
     private List<CalculoValorVO> fillValues(){
     	 List<CalculoValorVO> lst=new ArrayList<>();
     	 CalculoValorVO calculoValorVO=new CalculoValorVO(143906442, "nmp-al-al-32080084",new Float(1415.00),new Float(2.000), new Float(14.00), new Float(15.00), new Float(5.00), new Float(0));
