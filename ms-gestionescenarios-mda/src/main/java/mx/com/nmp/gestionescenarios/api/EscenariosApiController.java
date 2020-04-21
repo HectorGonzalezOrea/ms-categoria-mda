@@ -591,10 +591,22 @@ public class EscenariosApiController implements EscenariosApi {
             try {
             	if(peticion != null) {
             		log.info("Peticion : {}", peticion.toString());
-            		Boolean insert = gestionEscenarioService.almacenarRegla(peticion);
-            		gr.setMessage("Regla almacenada exitosamente");
-            		return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK);
+            		if(Boolean.TRUE.equals(gestionEscenarioService.consultaRegla(peticion.getNombre())) ) {
+            			BadRequest br = new BadRequest();
+                		br.setCode(ERROR_CODE_BAD_REQUEST);
+                		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+                		
+                		log.error("{}" , br);
+    					
+    					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
             		
+            	}
+            		else {
+                		Boolean insert = gestionEscenarioService.almacenarRegla(peticion);
+                		gr.setMessage("Regla almacenada exitosamente");
+                		return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK);
+                		
+                	}
             	}else {
             		BadRequest br = new BadRequest();
             		br.setCode(ERROR_CODE_BAD_REQUEST);
@@ -603,7 +615,9 @@ public class EscenariosApiController implements EscenariosApi {
             		log.error("{}" , br);
 					
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+            		
             	}
+            	
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<GeneralResponse>(HttpStatus.INTERNAL_SERVER_ERROR);
