@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public class GestionEscenarioService {
 	public static final String FECHA_APLICACION = "fechaAplicacion.fechas";
 
 	public static final String ID_ARCHIVO = "idArchivo";
-	public static final String ID_BOLSA_ANCLA = "_id";
+	public static final String ID_ANCLA = "_id";
 	public static final String ID_BOLSA_BOLSA = "_id";
 	public static final String REQUEST_ID_CALENDARIZACION = "requestIdCalendarizacion";
 
@@ -696,48 +697,79 @@ public class GestionEscenarioService {
 		return bolsa;
 	}
 	
-	public void solictarCambioAnclaOroDolar(ModificarValorAnclaOroDolar peticion) {
+	public ObjectId solictarCambioAnclaOroDolar(ModificarValorAnclaOroDolar peticion) {
 		log.info("solictarCambioAnclaOroDolar");
 		
 		if(peticion != null && peticion.getIdBolsa() != null) {
 			BolsasEntity bolsa = this.buscarBolsa(peticion.getIdBolsa());
 			if(bolsa != null) {
-				this.insertarAnclaOroDolar(peticion);
+				return this.insertarAnclaOroDolar(peticion);
 			} else {
 				log.info("bolsa no existente");
 			}
 		}
+		
+		return null;
 	}
 
 	/*
-	 * Buscar Bolsa
+	 * Insertar Ancla Oror Dolar
 	 */
-	public void insertarAnclaOroDolar(ModificarValorAnclaOroDolar peticion) {
+	public ObjectId insertarAnclaOroDolar(ModificarValorAnclaOroDolar peticion) {
 		log.info("insertarAnclaOroDolar");
 		
 		AnclaOroDolarEntity anclaOroDolar = new AnclaOroDolarEntity();
+		ObjectId id = null;
+				
 		try {
 			anclaOroDolar.setFechaAplicacion(new SimpleDateFormat("yyyy-MM-dd").parse(peticion.getFechaAplicacion().toString()));
 		} catch (ParseException e) {
 			log.error("ParseException: {}" , e);
 		}
 		
-		anclaOroDolar.setIdBolsa(peticion.getIdBolsa());
-		
 		List<Integer> intList = new ArrayList<>();
-		for(String s : peticion.getSucursales()) {
-			intList.add(Integer.valueOf(s));
+		if(peticion.getIdBolsa() != null) {
+			anclaOroDolar.setIdBolsa(peticion.getIdBolsa());
+			for(String s : peticion.getSucursales()) {
+				intList.add(Integer.valueOf(s));
+			}
 		}
-		
+
 		anclaOroDolar.setSucursales(intList);
-		anclaOroDolar.setValorAnclaDolar(peticion.getValorAnclaDolar().doubleValue());
-		anclaOroDolar.setValorAnclaOro(peticion.getValorAnclaOro().doubleValue());
+		anclaOroDolar.setValorAnclaDolar(peticion.getValorAnclaDolar());
+		anclaOroDolar.setValorAnclaOro(peticion.getValorAnclaOro());
 		
 		try {
 			mongoTemplate.save(anclaOroDolar);
+			id = anclaOroDolar.get_id();
+			
 		} catch (Exception e) {
 			log.error("Exception: {}" , e);
 		}
+		
+		return id;
+	}
+	
+	/*
+	 * Insertar Ancla Oror Dolar
+	 */
+	public AnclaOroDolarEntity consultarRequestIdAnclaOroDolar(ObjectId id) {
+		log.info("consultarRequestIdAnclaOroDolar");
+		
+		log.info("id ancla: {}", id);
+		
+		AnclaOroDolarEntity anclaOroDolar = null;
+		
+		try {
+			Query query = new Query();
+			query.addCriteria(Criteria.where(ID_ANCLA).in(id));
+			
+			anclaOroDolar = mongoTemplate.findOne(query, AnclaOroDolarEntity.class);
+		} catch (Exception e) {
+			log.info("Exception: {}", e);
+		}
+		
+		return anclaOroDolar;
 	}
 	
 }

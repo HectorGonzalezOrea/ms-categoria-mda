@@ -5,10 +5,16 @@ import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INTERN
 import static mx.com.nmp.gestionescenarios.utils.Constantes.FORMATO_FECHA;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.FORMATO_FECHA_HORA;
 
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ID_ESCENARIO_CONSOLIDADO;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ID_PETICION_ESCENARIO_CONSOLIDADO;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ID_ESCENARIO_ANCLA_ORO_DOLAR;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ID_PETICION_ESCENARIO_ANCLA_ORO_DOLAR;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import mx.com.nmp.gestionescenarios.model.InternalServerError;
 import mx.com.nmp.gestionescenarios.model.ModificarValorAnclaOroDolar;
+import mx.com.nmp.gestionescenarios.mongodb.entity.AnclaOroDolarEntity;
 import mx.com.nmp.gestionescenarios.mongodb.repository.EscenariosRepository;
 import mx.com.nmp.gestionescenarios.mongodb.service.GestionEscenarioService;
 import mx.com.nmp.gestionescenarios.ms.ajustepreciosconsolidados.AjustePreciosConsolidadosController;
@@ -56,7 +63,8 @@ public class EscenariosService {
 		
 		if(listIdConsolidado != null) {
 			if(Boolean.FALSE.equals(emergente)) {
-				Integer requestId = this.calendarizarEjecucion();
+				// Se calendariza la ejecución de los escenarios de consolidados
+				Integer requestId = this.calendarizarEjecucion(ID_PETICION_ESCENARIO_CONSOLIDADO, ID_ESCENARIO_CONSOLIDADO);
 				
 				if(requestId != null)
 					this.almacenarRegla(listIdConsolidado, requestId);
@@ -94,12 +102,12 @@ public class EscenariosService {
 	/*
 	 * calendarizar ejecución en OAG
 	 */
-	private Integer calendarizarEjecucion() {
+	private Integer calendarizarEjecucion(Integer idPeticion, Integer idEjecutarEscenario) {
 		log.info("calendarizarEjecucion");
 		
 		IniciarEjecucionEscenarioRequestVO ieerVo = new IniciarEjecucionEscenarioRequestVO();
 		// Escenario de Consolidados
-		ieerVo.setId(Integer.valueOf(2));
+		ieerVo.setId(Integer.valueOf(idEjecutarEscenario));
 		
 		PeticionEscenarioVO peVo = new PeticionEscenarioVO();
 		peVo.setIniciarEjecucionEscenarioRequest(ieerVo);
@@ -107,7 +115,7 @@ public class EscenariosService {
 		CalendarizarEscanarioRequestVO requestVo = new CalendarizarEscanarioRequestVO();
 		
 		// Escenario de Consolidados
-		requestVo.setId(Integer.valueOf(2));
+		requestVo.setId(Integer.valueOf(idPeticion));
 		requestVo.setPeticionEscenario(peVo);
 		
 		Date fechaActual = new Date();
@@ -147,12 +155,41 @@ public class EscenariosService {
 		
 	}
 	
+	/*
+	 * 
+	 */
 	public void solictarCambioAnclaOroDolar(ModificarValorAnclaOroDolar peticion) {
 		log.info("solictarCambioAnclaOroDolar");
 		
 		if(peticion != null) {
-			gestionEscenarioMongoService.solictarCambioAnclaOroDolar(peticion);
+			ObjectId idAncla = gestionEscenarioMongoService.solictarCambioAnclaOroDolar(peticion);
+			
+			if(idAncla != null) {
+				AnclaOroDolarEntity anclaOroDolar = gestionEscenarioMongoService.consultarRequestIdAnclaOroDolar(idAncla);
+				if(anclaOroDolar != null ) {
+					if(anclaOroDolar.getRequestId() != null) {
+						this.existeRequestIdAnclaOroDolar(anclaOroDolar.getRequestId());
+					} else {
+						this.noExisteRequestIdAnclaOroDolar();
+					}
+				}
+			}
 		}
+	}
+	
+	private void existeRequestIdAnclaOroDolar(Integer requestId) {
+		log.info("existeRequestIdAnclaOroDolar");
+		
+		log.info("requestId: {}", requestId);
+		
+		
+	}
+	
+	private void noExisteRequestIdAnclaOroDolar() {
+		log.info("noExisteRequestIdAnclaOroDolar");
+		
+		// Se calendariza la ejecución de los escenarios de consolidados
+		Integer requestId = this.calendarizarEjecucion(ID_PETICION_ESCENARIO_ANCLA_ORO_DOLAR, ID_ESCENARIO_ANCLA_ORO_DOLAR);
 		
 	}
 	

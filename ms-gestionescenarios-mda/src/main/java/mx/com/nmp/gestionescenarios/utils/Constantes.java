@@ -48,6 +48,12 @@ public final class Constantes {
 	public static final String FORMATO_FECHA = "dd/MM/yyyy";
 	public static final String FORMATO_FECHA_HORA = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 	
+	public static final Integer ID_PETICION_ESCENARIO_CONSOLIDADO = 2;
+	public static final Integer ID_ESCENARIO_CONSOLIDADO = 2;
+	
+	public static final Integer ID_PETICION_ESCENARIO_ANCLA_ORO_DOLAR = 3;
+	public static final Integer ID_ESCENARIO_ANCLA_ORO_DOLAR = 3;
+	
 }
 
 
