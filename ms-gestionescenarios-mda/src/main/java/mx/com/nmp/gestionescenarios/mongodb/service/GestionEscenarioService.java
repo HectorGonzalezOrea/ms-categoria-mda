@@ -20,10 +20,15 @@ import mx.com.nmp.gestionescenarios.model.EstatusRegla;
 import mx.com.nmp.gestionescenarios.model.InfoGeneralRegla;
 import mx.com.nmp.gestionescenarios.model.InfoRegla;
 import mx.com.nmp.gestionescenarios.model.ListaInfoGeneralRegla;
+import mx.com.nmp.gestionescenarios.model.ListaMonedas;
+import mx.com.nmp.gestionescenarios.model.ListaMonedasInner;
+import mx.com.nmp.gestionescenarios.model.Moneda;
 import mx.com.nmp.gestionescenarios.model.ModificarValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.mongodb.entity.AnclaOroDolarEntity;
 import mx.com.nmp.gestionescenarios.mongodb.entity.BolsasEntity;
+
 import mx.com.nmp.gestionescenarios.mongodb.entity.GestionEscenarioEntity;
+import mx.com.nmp.gestionescenarios.mongodb.entity.MonedasEntity;
 import mx.com.nmp.gestionescenarios.mongodb.repository.ConsolidadoEntity;
 import mx.com.nmp.gestionescenarios.mongodb.repository.EscenariosRepository;
 import mx.com.nmp.gestionescenarios.mongodb.repository.OrigenRepository;
@@ -34,6 +39,7 @@ public class GestionEscenarioService {
 	private static final Logger log = LoggerFactory.getLogger(GestionEscenarioService.class);
 	
 	private static final String GESTIONESCENARIO_SEQ_KEY = "gestionEscenario_sequence";
+	private static final String MONEDAS_SEQ_KEY = "monedas_sequence";
 	public static final String ID = "_id";
 
 	public static final String NOMBRE = "nombre";
@@ -95,6 +101,7 @@ public class GestionEscenarioService {
 			ges.setIdRegla(id);
 
 			try {
+				
 				mongoTemplate.insert(ges);
 				almacenado = true;
 			} catch (Exception e) {
@@ -103,6 +110,30 @@ public class GestionEscenarioService {
 		}
 		return almacenado;
 	}
+	
+	
+	/*
+	 * Validacion de regla
+	 */
+	
+	public Boolean consultaRegla(String nombre) {
+		log.info("consultaRegla");
+		
+		Boolean encontrado = false;
+		if(nombre != null) {
+			Query query = new Query();
+			Criteria aux = Criteria.where(NOMBRE).is(nombre);
+			query.addCriteria(aux);
+			
+			encontrado = mongoTemplate.exists(query, GestionEscenarioEntity.class);
+		}
+		
+		log.info("Encontrado: {}", encontrado);
+		
+		return encontrado;
+	}
+	
+	
 
 	/*
 	 * Consulta de Reglas GET /escenarios/reglas
@@ -678,6 +709,37 @@ public class GestionEscenarioService {
 	}
 	
 	/*
+	 *  Registrar valores de monedas
+	 */
+	
+	public Boolean registrarMonedas (ListaMonedasInner peticion) {
+		
+		Boolean insertado = null;
+		MonedasEntity moneda =null;
+		
+		if (peticion!= null) {
+			
+			moneda = new MonedasEntity ();
+			
+			moneda.setTipo(peticion.getTipo());
+			moneda.setOro(peticion.isOro());
+			moneda.setPrecio(peticion.getPrecio());
+			moneda.setFechaCreacion(peticion.getFechaCreacion());
+			moneda.setActualizadoPor(peticion.getActualizadoPor());
+			
+			Long id = sequenceGeneratorService.generateSequence(MONEDAS_SEQ_KEY);
+			moneda.setId(id);
+			
+			mongoTemplate.insert(moneda);
+			insertado = true;
+
+		}
+		
+		
+		return insertado;
+	}
+	
+	/*
 	 * Buscar Bolsa
 	 */
 	public BolsasEntity buscarBolsa(Integer idBolsa) {
@@ -708,7 +770,6 @@ public class GestionEscenarioService {
 				log.info("bolsa no existente");
 			}
 		}
-		
 		return null;
 	}
 

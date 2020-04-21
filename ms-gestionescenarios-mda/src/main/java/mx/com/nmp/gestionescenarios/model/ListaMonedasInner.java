@@ -16,7 +16,9 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-20T16:07:47.599Z")
 
-public class ListaMonedasInner   {
+public class ListaMonedasInner extends Moneda  {
+	
+	
   @JsonProperty("fechaCreacion")
   private LocalDate fechaCreacion = null;
 
@@ -89,7 +91,9 @@ public class ListaMonedasInner   {
   }
 
 
-  @Override
+ 
+
+@Override
   public boolean equals(java.lang.Object o) {
     if (this == o) {
       return true;

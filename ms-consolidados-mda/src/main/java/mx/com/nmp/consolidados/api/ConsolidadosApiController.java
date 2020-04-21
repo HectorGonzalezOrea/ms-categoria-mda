@@ -420,7 +420,7 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 				consolidado.setFechaAplicacion(new Date());
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
 				LocalDate localDate = LocalDate.parse(vigencia, formatter);
-				consolidado.setVigencia(localDate);
+				consolidado.setVigencia(new Date());
 				consolidado.setNombreAjuste(nombreAjuste);
 				consolidado.setAdjunto(util.convert(adjunto));
 				Boolean service = consolidadoService.crearConsolidado(consolidado);
