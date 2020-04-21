@@ -69,7 +69,8 @@ public interface EscenariosApi {
     @RequestMapping(value = "/escenarios/ancla/oroDolar",
         produces = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<GeneralResponse> escenariosAnclaOroDolarPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody ModificarValorAnclaOroDolar peticion);
+    //ResponseEntity<GeneralResponse> escenariosAnclaOroDolarPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody ModificarValorAnclaOroDolar peticion);
+    ResponseEntity<?> escenariosAnclaOroDolarPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody ModificarValorAnclaOroDolar peticion);
 
     @ApiOperation(value = "Almacenar o procesar los documentos excel de consolidados", nickname = "escenariosConsolidadosArchivoPost", notes = "Almacena o procesa el archivo Excel que contiene la información de consolidados. Cuando se realiza un ajuste emergente, el archivo es almacenado hasta su ejecución, después se elimina de la lista de archivos consolidados.  ### Seguridad Para poder realizar el consumo del recuros deberá de estar autorizado. Para esto tiene que enviar la llave en el encabezado HTTP: * 'X-API-KEY: eyJ4NXQjUzI1NiI6IkFTS1ESG42` ", response = GeneralResponse.class, authorizations = {
         @Authorization(value = "apiKey")

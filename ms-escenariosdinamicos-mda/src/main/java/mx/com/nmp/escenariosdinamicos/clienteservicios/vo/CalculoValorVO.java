@@ -23,6 +23,17 @@ public class CalculoValorVO {
 	@JsonProperty("avaluoComplementario")
 	private Float avaluoComplementario;
 	  
+	public CalculoValorVO(Integer idPartida,String SKU,Float valorAncla,Float gramaje,Float kilataje,Float incremento,Float desplazamiento,Float avaluoComplementario){
+		this.idPartida=idPartida;
+		this.SKU=SKU;
+		this.valorAncla=valorAncla;
+		this.gramaje=gramaje;
+		this.kilataje=kilataje;
+		this.incremento=incremento;
+		this.desplazamiento=desplazamiento;
+		this.avaluoComplementario=avaluoComplementario;
+	}
+	
 	public Integer getIdPartida() {
 		return idPartida;
 	}
@@ -71,4 +82,12 @@ public class CalculoValorVO {
 	public void setAvaluoComplementario(Float avaluoComplementario) {
 		this.avaluoComplementario = avaluoComplementario;
 	}
+
+	@Override
+	public String toString() {
+		return "CalculoValorVO [idPartida=" + idPartida + ", SKU=" + SKU + ", valorAncla=" + valorAncla + ", gramaje="
+				+ gramaje + ", kilataje=" + kilataje + ", incremento=" + incremento + ", desplazamiento="
+				+ desplazamiento + ", avaluoComplementario=" + avaluoComplementario + "]";
+	}
+	
 }

@@ -95,20 +95,70 @@ public class EscenariosApiController implements EscenariosApi {
     }
 
     /*
-     * 
+     * Solicitar cambio de valores ancla para Oro y Dolar
      */
-    public ResponseEntity<GeneralResponse> escenariosAnclaOroDolarPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody ModificarValorAnclaOroDolar peticion) {
-        String accept = request.getHeader(HEADER_ACCEPT_KEY);
-        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
-            try {
-                return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<GeneralResponse>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+    public ResponseEntity<?> escenariosAnclaOroDolarPost(
+			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Cuerpo de la petición", required = true) @Valid @RequestBody ModificarValorAnclaOroDolar peticion) {
+		
+		log.info("*************************************************************");
+		log.info("escenariosAnclaOroDolarPost");
+		log.info("*************************************************************");
+		
+		String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+    	
+    	if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
+    		
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.error("{}" , ia);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+    	}
+		
+		String accept = request.getHeader(HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
+			try {
+				if(usuario == null || peticion == null) {
+					BadRequest br = new BadRequest();
+		    		
+		    		br.setCode(ERROR_CODE_BAD_REQUEST);
+		    		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+		    		
+		    		log.error("{}" , br);
+		    		
+		    		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+				} else {
+					log.info("usuario: {}", usuario);
+					log.info("peticion: {}", peticion);
+					
+					escenariosService.solictarCambioAnclaOroDolar(peticion);
 
-        return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
+				}
+			} catch (Exception e) {
+				log.error("Couldn't serialize response for content type application/json", e);
+                
+                InternalServerError ise = new InternalServerError();
+                ise.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
+                ise.setMessage(ERROR_MESSAGE_INTERNAL_SERVER_ERROR);
+                
+                log.error("{}" , ise);
+                
+                return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		
+		BadRequest br = new BadRequest();
+
+		br.setCode(ERROR_CODE_BAD_REQUEST);
+		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+
+		log.error("{}", br);
+
+		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+
     }
 
     /*

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import mx.com.nmp.gestionescenarios.model.InternalServerError;
+import mx.com.nmp.gestionescenarios.model.ModificarValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.mongodb.repository.EscenariosRepository;
 import mx.com.nmp.gestionescenarios.mongodb.service.GestionEscenarioService;
 import mx.com.nmp.gestionescenarios.ms.ajustepreciosconsolidados.AjustePreciosConsolidadosController;
@@ -143,6 +144,15 @@ public class EscenariosService {
 		log.info("Date: {}" , fechaAplicacion);
 		
 		return ajustePreciosConsolidadosController.procesarConsolidados(usuario, fechaAplicacion);
+		
+	}
+	
+	public void solictarCambioAnclaOroDolar(ModificarValorAnclaOroDolar peticion) {
+		log.info("solictarCambioAnclaOroDolar");
+		
+		if(peticion != null) {
+			gestionEscenarioMongoService.solictarCambioAnclaOroDolar(peticion);
+		}
 		
 	}
 	

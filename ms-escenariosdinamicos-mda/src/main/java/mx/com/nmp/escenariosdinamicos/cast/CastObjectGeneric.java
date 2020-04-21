@@ -2,19 +2,24 @@ package mx.com.nmp.escenariosdinamicos.cast;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+
 import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.CalculoValorVO;
-import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.PartidaVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
+import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
+import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseOAGDto;
+import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseReglasArbitrajeOAGDto;
 
 @Repository
 public class CastObjectGeneric {
@@ -39,11 +44,11 @@ public class CastObjectGeneric {
 		return json;
 	}
 	
-	public List<PartidaVO> castJsonToList(String jsonString) {
+	public List<PartidaPrecioFinal> castJsonToList(String jsonString) {
 		ObjectMapper mapper = new ObjectMapper();
-		List<PartidaVO> participantJsonList = null;
+		List<PartidaPrecioFinal> participantJsonList = null;
 		try {
-			participantJsonList = mapper.readValue(jsonString, new TypeReference<List<PartidaVO>>() {
+			participantJsonList = mapper.readValue(jsonString, new TypeReference<List<PartidaPrecioFinal>>() {
 			});
 		} catch (JsonParseException e) {
 			e.printStackTrace();
@@ -54,4 +59,54 @@ public class CastObjectGeneric {
 		}
 		return participantJsonList;
 	}
+	//cast con lamda
+	public List<CalculoValorVO> castGarantiasToCalculoValor(List<IndexGarantiaVO> lstCalculoValor){
+		 List<CalculoValorVO> lstCalculoValors=lstCalculoValor.stream().map(calculoValor->{
+			 System.out.println("Cast con lamda----");
+			 System.out.println(calculoValor.toString());
+			 return new CalculoValorVO(
+					 calculoValor.getPartida()!=null?calculoValor.getPartida():0,
+					 calculoValor.getSku(),
+					 calculoValor.getValorMonteAct()!=null?calculoValor.getValorMonteAct():0,
+					 calculoValor.getAlhajasGramaje()!=null?calculoValor.getAlhajasGramaje():0,
+					 calculoValor.getAlhajasKilates()!=null?calculoValor.getAlhajasKilates():0,
+					 calculoValor.getAlhajasIIncremento()!=null?calculoValor.getAlhajasIIncremento():0,
+					 calculoValor.getAlhajasDesplComer()!=null?calculoValor.getAlhajasDesplComer():0,
+					 calculoValor.getAlhajasAvaluoCompl()!=null?calculoValor.getAlhajasAvaluoCompl():0
+					 ); 
+		 }).collect(Collectors.toList());
+		return lstCalculoValors;
+	}
+	
+	
+	public ResponseOAGDto convertJsonToReponseOAGDto(String jsonString) {
+		ResponseOAGDto response= new ResponseOAGDto();
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			response=mapper.readValue(jsonString, ResponseOAGDto.class);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return response;
+	}
+	
+	public ResponseReglasArbitrajeOAGDto convertJsonToReglasArbitraje(String jsonString) {
+		ResponseReglasArbitrajeOAGDto response=new ResponseReglasArbitrajeOAGDto();
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			response=mapper.readValue(jsonString, ResponseReglasArbitrajeOAGDto.class);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return response;
+	}
+
 }
