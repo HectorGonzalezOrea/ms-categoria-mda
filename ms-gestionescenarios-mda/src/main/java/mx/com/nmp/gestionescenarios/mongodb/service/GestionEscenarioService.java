@@ -1,5 +1,7 @@
 package mx.com.nmp.gestionescenarios.mongodb.service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +19,9 @@ import mx.com.nmp.gestionescenarios.model.EstatusRegla;
 import mx.com.nmp.gestionescenarios.model.InfoGeneralRegla;
 import mx.com.nmp.gestionescenarios.model.InfoRegla;
 import mx.com.nmp.gestionescenarios.model.ListaInfoGeneralRegla;
+import mx.com.nmp.gestionescenarios.model.ModificarValorAnclaOroDolar;
+import mx.com.nmp.gestionescenarios.mongodb.entity.AnclaOroDolarEntity;
+import mx.com.nmp.gestionescenarios.mongodb.entity.BolsasEntity;
 import mx.com.nmp.gestionescenarios.mongodb.entity.GestionEscenarioEntity;
 import mx.com.nmp.gestionescenarios.mongodb.repository.ConsolidadoEntity;
 import mx.com.nmp.gestionescenarios.mongodb.repository.EscenariosRepository;
@@ -41,6 +46,8 @@ public class GestionEscenarioService {
 	public static final String FECHA_APLICACION = "fechaAplicacion.fechas";
 
 	public static final String ID_ARCHIVO = "idArchivo";
+	public static final String ID_BOLSA_ANCLA = "_id";
+	public static final String ID_BOLSA_BOLSA = "_id";
 	public static final String REQUEST_ID_CALENDARIZACION = "requestIdCalendarizacion";
 
 	@Autowired
@@ -668,5 +675,69 @@ public class GestionEscenarioService {
 			log.info("Exception: {}", e);
 		}
 	}
+	
+	/*
+	 * Buscar Bolsa
+	 */
+	public BolsasEntity buscarBolsa(Integer idBolsa) {
+		log.info("buscarBolsa");
+		
+		BolsasEntity bolsa = null;
+		
+		try {
+			Query query = new Query();
+			query.addCriteria(Criteria.where(ID_BOLSA_BOLSA).in(idBolsa));
+			
+			bolsa = mongoTemplate.findOne(query, BolsasEntity.class);
+		} catch (Exception e) {
+			log.info("Exception: {}", e);
+		}
+		
+		return bolsa;
+	}
+	
+	public void solictarCambioAnclaOroDolar(ModificarValorAnclaOroDolar peticion) {
+		log.info("solictarCambioAnclaOroDolar");
+		
+		if(peticion != null && peticion.getIdBolsa() != null) {
+			BolsasEntity bolsa = this.buscarBolsa(peticion.getIdBolsa());
+			if(bolsa != null) {
+				this.insertarAnclaOroDolar(peticion);
+			} else {
+				log.info("bolsa no existente");
+			}
+		}
+	}
 
+	/*
+	 * Buscar Bolsa
+	 */
+	public void insertarAnclaOroDolar(ModificarValorAnclaOroDolar peticion) {
+		log.info("insertarAnclaOroDolar");
+		
+		AnclaOroDolarEntity anclaOroDolar = new AnclaOroDolarEntity();
+		try {
+			anclaOroDolar.setFechaAplicacion(new SimpleDateFormat("yyyy-MM-dd").parse(peticion.getFechaAplicacion().toString()));
+		} catch (ParseException e) {
+			log.error("ParseException: {}" , e);
+		}
+		
+		anclaOroDolar.setIdBolsa(peticion.getIdBolsa());
+		
+		List<Integer> intList = new ArrayList<>();
+		for(String s : peticion.getSucursales()) {
+			intList.add(Integer.valueOf(s));
+		}
+		
+		anclaOroDolar.setSucursales(intList);
+		anclaOroDolar.setValorAnclaDolar(peticion.getValorAnclaDolar().doubleValue());
+		anclaOroDolar.setValorAnclaOro(peticion.getValorAnclaOro().doubleValue());
+		
+		try {
+			mongoTemplate.save(anclaOroDolar);
+		} catch (Exception e) {
+			log.error("Exception: {}" , e);
+		}
+	}
+	
 }
