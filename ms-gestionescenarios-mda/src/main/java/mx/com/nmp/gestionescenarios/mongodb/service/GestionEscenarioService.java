@@ -1,9 +1,12 @@
 package mx.com.nmp.gestionescenarios.mongodb.service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +20,15 @@ import mx.com.nmp.gestionescenarios.model.EstatusRegla;
 import mx.com.nmp.gestionescenarios.model.InfoGeneralRegla;
 import mx.com.nmp.gestionescenarios.model.InfoRegla;
 import mx.com.nmp.gestionescenarios.model.ListaInfoGeneralRegla;
+import mx.com.nmp.gestionescenarios.model.ListaMonedas;
+import mx.com.nmp.gestionescenarios.model.ListaMonedasInner;
+import mx.com.nmp.gestionescenarios.model.Moneda;
+import mx.com.nmp.gestionescenarios.model.ModificarValorAnclaOroDolar;
+import mx.com.nmp.gestionescenarios.mongodb.entity.AnclaOroDolarEntity;
+import mx.com.nmp.gestionescenarios.mongodb.entity.BolsasEntity;
+
 import mx.com.nmp.gestionescenarios.mongodb.entity.GestionEscenarioEntity;
+import mx.com.nmp.gestionescenarios.mongodb.entity.MonedasEntity;
 import mx.com.nmp.gestionescenarios.mongodb.repository.ConsolidadoEntity;
 import mx.com.nmp.gestionescenarios.mongodb.repository.EscenariosRepository;
 import mx.com.nmp.gestionescenarios.mongodb.repository.OrigenRepository;
@@ -28,6 +39,7 @@ public class GestionEscenarioService {
 	private static final Logger log = LoggerFactory.getLogger(GestionEscenarioService.class);
 	
 	private static final String GESTIONESCENARIO_SEQ_KEY = "gestionEscenario_sequence";
+	private static final String MONEDAS_SEQ_KEY = "monedas_sequence";
 	public static final String ID = "_id";
 
 	public static final String NOMBRE = "nombre";
@@ -41,6 +53,8 @@ public class GestionEscenarioService {
 	public static final String FECHA_APLICACION = "fechaAplicacion.fechas";
 
 	public static final String ID_ARCHIVO = "idArchivo";
+	public static final String ID_ANCLA = "_id";
+	public static final String ID_BOLSA_BOLSA = "_id";
 	public static final String REQUEST_ID_CALENDARIZACION = "requestIdCalendarizacion";
 
 	@Autowired
@@ -87,6 +101,7 @@ public class GestionEscenarioService {
 			ges.setIdRegla(id);
 
 			try {
+				
 				mongoTemplate.insert(ges);
 				almacenado = true;
 			} catch (Exception e) {
@@ -95,6 +110,30 @@ public class GestionEscenarioService {
 		}
 		return almacenado;
 	}
+	
+	
+	/*
+	 * Validacion de regla
+	 */
+	
+	public Boolean consultaRegla(String nombre) {
+		log.info("consultaRegla");
+		
+		Boolean encontrado = false;
+		if(nombre != null) {
+			Query query = new Query();
+			Criteria aux = Criteria.where(NOMBRE).is(nombre);
+			query.addCriteria(aux);
+			
+			encontrado = mongoTemplate.exists(query, GestionEscenarioEntity.class);
+		}
+		
+		log.info("Encontrado: {}", encontrado);
+		
+		return encontrado;
+	}
+	
+	
 
 	/*
 	 * Consulta de Reglas GET /escenarios/reglas
@@ -668,5 +707,130 @@ public class GestionEscenarioService {
 			log.info("Exception: {}", e);
 		}
 	}
+	
+	/*
+	 *  Registrar valores de monedas
+	 */
+	
+	public Boolean registrarMonedas (ListaMonedasInner peticion) {
+		
+		Boolean insertado = null;
+		MonedasEntity moneda =null;
+		
+		if (peticion!= null) {
+			
+			moneda = new MonedasEntity ();
+			
+			moneda.setTipo(peticion.getTipo());
+			moneda.setOro(peticion.isOro());
+			moneda.setPrecio(peticion.getPrecio());
+			moneda.setFechaCreacion(peticion.getFechaCreacion());
+			moneda.setActualizadoPor(peticion.getActualizadoPor());
+			
+			Long id = sequenceGeneratorService.generateSequence(MONEDAS_SEQ_KEY);
+			moneda.setId(id);
+			
+			mongoTemplate.insert(moneda);
+			insertado = true;
 
+		}
+		
+		
+		return insertado;
+	}
+	
+	/*
+	 * Buscar Bolsa
+	 */
+	public BolsasEntity buscarBolsa(Integer idBolsa) {
+		log.info("buscarBolsa");
+		
+		BolsasEntity bolsa = null;
+		
+		try {
+			Query query = new Query();
+			query.addCriteria(Criteria.where(ID_BOLSA_BOLSA).in(idBolsa));
+			
+			bolsa = mongoTemplate.findOne(query, BolsasEntity.class);
+		} catch (Exception e) {
+			log.info("Exception: {}", e);
+		}
+		
+		return bolsa;
+	}
+	
+	public ObjectId solictarCambioAnclaOroDolar(ModificarValorAnclaOroDolar peticion) {
+		log.info("solictarCambioAnclaOroDolar");
+		
+		if(peticion != null && peticion.getIdBolsa() != null) {
+			BolsasEntity bolsa = this.buscarBolsa(peticion.getIdBolsa());
+			if(bolsa != null) {
+				return this.insertarAnclaOroDolar(peticion);
+			} else {
+				log.info("bolsa no existente");
+			}
+		}
+		return null;
+	}
+
+	/*
+	 * Insertar Ancla Oror Dolar
+	 */
+	public ObjectId insertarAnclaOroDolar(ModificarValorAnclaOroDolar peticion) {
+		log.info("insertarAnclaOroDolar");
+		
+		AnclaOroDolarEntity anclaOroDolar = new AnclaOroDolarEntity();
+		ObjectId id = null;
+				
+		try {
+			anclaOroDolar.setFechaAplicacion(new SimpleDateFormat("yyyy-MM-dd").parse(peticion.getFechaAplicacion().toString()));
+		} catch (ParseException e) {
+			log.error("ParseException: {}" , e);
+		}
+		
+		List<Integer> intList = new ArrayList<>();
+		if(peticion.getIdBolsa() != null) {
+			anclaOroDolar.setIdBolsa(peticion.getIdBolsa());
+			for(String s : peticion.getSucursales()) {
+				intList.add(Integer.valueOf(s));
+			}
+		}
+
+		anclaOroDolar.setSucursales(intList);
+		anclaOroDolar.setValorAnclaDolar(peticion.getValorAnclaDolar());
+		anclaOroDolar.setValorAnclaOro(peticion.getValorAnclaOro());
+		
+		try {
+			mongoTemplate.save(anclaOroDolar);
+			id = anclaOroDolar.get_id();
+			
+		} catch (Exception e) {
+			log.error("Exception: {}" , e);
+		}
+		
+		return id;
+	}
+	
+	/*
+	 * Insertar Ancla Oror Dolar
+	 */
+	public AnclaOroDolarEntity consultarRequestIdAnclaOroDolar(ObjectId id) {
+		log.info("consultarRequestIdAnclaOroDolar");
+		
+		log.info("id ancla: {}", id);
+		
+		AnclaOroDolarEntity anclaOroDolar = null;
+		
+		try {
+			Query query = new Query();
+			query.addCriteria(Criteria.where(ID_ANCLA).in(id));
+			
+			anclaOroDolar = mongoTemplate.findOne(query, AnclaOroDolarEntity.class);
+		} catch (Exception e) {
+			log.info("Exception: {}", e);
+		}
+		
+		return anclaOroDolar;
+	}
+	
 }

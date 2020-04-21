@@ -20,11 +20,12 @@ public class ArchivoEntity {
 	private ObjectId _id;
 	private Long idArchivo;
 	private String adjunto;
-	private LocalDate vigencia;
+	private Date vigencia;
 	private String nombreAjuste;
 	private Boolean emergente;
 	private Date fechaAplicacion;
 	private Integer prioridad;
+	private String nombreCliente;
 	private String nombreArchivo;
 	private String requestIdCalendarizacion;
 	
@@ -46,10 +47,10 @@ public class ArchivoEntity {
 	public void setAdjunto(String adjunto) {
 		this.adjunto = adjunto;
 	}
-	public LocalDate getVigencia() {
+	public Date getVigencia() {
 		return vigencia;
 	}
-	public void setVigencia(LocalDate vigencia) {
+	public void setVigencia(Date vigencia) {
 		this.vigencia = vigencia;
 	}
 	public String getNombreAjuste() {
@@ -75,6 +76,12 @@ public class ArchivoEntity {
 	}
 	public void setPrioridad(Integer prioridad) {
 		this.prioridad = prioridad;
+	}
+	public String getNombreCliente() {
+		return nombreCliente;
+	}
+	public void setNombreCliente(String nombreCliente) {
+		this.nombreCliente = nombreCliente;
 	}
 	public String getNombreArchivo() {
 		return nombreArchivo;

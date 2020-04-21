@@ -13,7 +13,7 @@ public class Consolidados {
 	@JsonProperty("adjunto")
 	private File adjunto;
 	@JsonProperty("vigencia")
-	private LocalDate vigencia;
+	private Date vigencia;
 	@JsonProperty("nombreAjuste")
 	private String nombreAjuste;
 	@JsonProperty("emergente")
@@ -33,10 +33,10 @@ public class Consolidados {
 	public void setAdjunto(File adjunto) {
 		this.adjunto = adjunto;
 	}
-	public LocalDate getVigencia() {
+	public Date getVigencia() {
 		return vigencia;
 	}
-	public void setVigencia(LocalDate vigencia) {
+	public void setVigencia(Date vigencia) {
 		this.vigencia = vigencia;
 	}
 	public String getNombreAjuste() {

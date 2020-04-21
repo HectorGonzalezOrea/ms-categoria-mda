@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
+import mx.com.nmp.escenariosdinamicos.clienteoag.service.ClientOAGService;
 import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.CalculoValorVO;
 import mx.com.nmp.escenariosdinamicos.constantes.Constantes.Common;
 import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
@@ -24,6 +25,8 @@ import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
 public class ClientesMicroservicios {
 	@Autowired
 	private CastObjectGeneric castObjectGeneric;
+	//@Autowired
+	//private ClientOAGService clientOAGService;
 	
 	 public List<PartidaPrecioFinal> actualizaPrecio(List<CalculoValorVO> lstPartidas){
 		 System.out.println("entrando al servicio actuliza precio cliente");
