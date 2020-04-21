@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -79,8 +80,10 @@ public class ClientOAGService {
 		  ResponseEntity<String> result = restTemplate.postForEntity(urlBase+endPointAjustePrecioPartidas, entity,String.class);
 		  
 		  ResponseOAGDto response= new ResponseOAGDto();
-		  if(result.getBody() !=null) {
-			  response= castObject.convertJsonToReponseOAGDto(result.getBody());
+		  if(result.getStatusCode() == HttpStatus.OK) {
+			  if(result.getBody() !=null) {
+				  response= castObject.convertJsonToReponseOAGDto(result.getBody());
+			  }
 		  }
 		  return response;
 	}
@@ -100,8 +103,10 @@ public class ClientOAGService {
 		  HttpEntity<String> entity = new HttpEntity<>(request,headers);
 		  ResponseEntity<String> result = restTemplate.postForEntity(urlBase+endPointReglasArbitraje, entity,String.class);
 		  ResponseReglasArbitrajeOAGDto response = new ResponseReglasArbitrajeOAGDto();
-		  if(result.getBody() !=null) {
-			  response=  castObject.convertJsonToReglasArbitraje(result.getBody());
+		  if(result.getStatusCode() == HttpStatus.OK) {
+			  if(result.getBody() !=null) {
+				  response=  castObject.convertJsonToReglasArbitraje(result.getBody());
+			  }
 		  }
 		  
 		return response;
