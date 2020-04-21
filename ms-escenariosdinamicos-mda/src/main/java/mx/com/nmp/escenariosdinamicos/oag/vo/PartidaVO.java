@@ -20,6 +20,8 @@ public class PartidaVO {
 	private Long candadoPA;
 	private Long candadoPM;
 	private Long candadoPB;
+	private Double precioVenta;
+	private Double montoPrestamo;
 
 	
 	public String getIdPartida() {
@@ -123,6 +125,18 @@ public class PartidaVO {
 	}
 	public void setCandadoPB(Long candadoPB) {
 		this.candadoPB = candadoPB;
+	}
+	public Double getPrecioVenta() {
+		return precioVenta;
+	}
+	public Double getMontoPrestamo() {
+		return montoPrestamo;
+	}
+	public void setPrecioVenta(Double precioVenta) {
+		this.precioVenta = precioVenta;
+	}
+	public void setMontoPrestamo(Double montoPrestamo) {
+		this.montoPrestamo = montoPrestamo;
 	}
 	
 

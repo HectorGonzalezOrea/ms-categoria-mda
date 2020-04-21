@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
 import mx.com.nmp.escenariosdinamicos.constantes.Constantes.Common;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseOAGDto;
+import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseReglasArbitrajeOAGDto;
 import mx.com.nmp.escenariosdinamicos.oag.vo.PartidaVO;
 
 
@@ -29,7 +30,7 @@ public class ClientOAGService {
 	
 	private static final Logger log = LoggerFactory.getLogger(ClientOAGService.class);
 	@Autowired
-	ClienteCorreoService emailSerive;
+	ClienteCorreoService clienteCorreo;
 	@Autowired
 	CastObjectGeneric castObject= new CastObjectGeneric();
 	
@@ -57,12 +58,15 @@ public class ClientOAGService {
 	@Value("${endpoint.motorDescuentos.ajustePreciosPartidas}")
 	protected String endPointAjustePrecioPartidas;
 	
+	@Value("${oag.resource.oauth.endPoint.reglas.arbitraje}")
+	protected String endPointReglasArbitraje;
+	
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	
 	public ResponseOAGDto actualizarPrecioPartida(PartidaVO partida) {
         log.info(":: Entrado al metodo  actualizarPrecioPartida ::");
 		  String request=formatRequest(partida);
-		  String token=emailSerive.getToken();
+		  String token=clienteCorreo.getToken();
 		  RestTemplate restTemplate = new RestTemplate();
 		  HttpHeaders headers = new HttpHeaders();
 		  headers.setContentType(MediaType.APPLICATION_JSON);
@@ -73,12 +77,41 @@ public class ClientOAGService {
 		  headers.setBasicAuth(usuario, password);	
 		  HttpEntity<String> entity = new HttpEntity<>(request,headers);
 		  ResponseEntity<String> result = restTemplate.postForEntity(urlBase+endPointAjustePrecioPartidas, entity,String.class);
+		  
 		  ResponseOAGDto response= new ResponseOAGDto();
 		  if(result.getBody() !=null) {
-			  response= castObject.convertJsonToReponseOAFDto(result.getBody());
+			  response= castObject.convertJsonToReponseOAGDto(result.getBody());
 		  }
 		  return response;
 	}
+	
+	public  ResponseReglasArbitrajeOAGDto aplicarReglaArbitraje(PartidaVO partida ) {
+		  log.info(":: Entrado al metodo aplicarReglaArbitraje  ::");
+		  String request=requestReglaArbitraje(partida);
+		  String token=clienteCorreo.getToken();
+		  RestTemplate restTemplate = new RestTemplate();
+		  HttpHeaders headers = new HttpHeaders();
+		  headers.setContentType(MediaType.APPLICATION_JSON);
+		  headers.add(Common.HEADER_USUARIO, headerUsuario);
+		  headers.add(Common.HEADER_ID_CONSUMIDOR, headerIdConsumidor);
+		  headers.add(Common.HEADER_ID_DESTINO, headerIdDestino);
+		  headers.add(Common.HEADER_OAUTH_BEARER,token);
+		  headers.setBasicAuth(usuario, password);	
+		  HttpEntity<String> entity = new HttpEntity<>(request,headers);
+		  ResponseEntity<String> result = restTemplate.postForEntity(urlBase+endPointReglasArbitraje, entity,String.class);
+		  ResponseReglasArbitrajeOAGDto response = new ResponseReglasArbitrajeOAGDto();
+		  if(result.getBody() !=null) {
+			  response=  castObject.convertJsonToReglasArbitraje(result.getBody());
+		  }
+		  
+		return response;
+	}
+	
+	
+	
+	
+	
+	
 	  private String formatRequest(PartidaVO partida) {
 		  log.info("Generando request json");
 		  JsonNode rootNode=objectMapper.createObjectNode();
@@ -109,6 +142,26 @@ public class ClientOAGService {
 		}
 		  
 		  return jsonString;
+	  }
+	  
+	  
+	  private String requestReglaArbitraje(PartidaVO vo ) {
+		  log.info("Generando request json reglas arbitraje");
+		  JsonNode rootNode=objectMapper.createObjectNode();
+		  JsonNode childNode = objectMapper.createObjectNode();
+		  String request=null;
+		 try {		  
+			  ((ObjectNode) childNode).put("idPartida", vo.getIdPartida());
+			  ((ObjectNode) childNode).put("sku", vo.getSku());
+			  ((ObjectNode) childNode).put("precioVenta", vo.getPrecioVenta());
+			  ((ObjectNode) childNode).put("montoPrestamo", vo.getMontoPrestamo());
+			  ((ObjectNode) rootNode).set("partida", childNode);
+			  request=objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
+		} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+			log.info("Error al genrar el request de reglas arbitraje "+e.getMessage());
+		}
+		  return request;
 	  }
 
 	

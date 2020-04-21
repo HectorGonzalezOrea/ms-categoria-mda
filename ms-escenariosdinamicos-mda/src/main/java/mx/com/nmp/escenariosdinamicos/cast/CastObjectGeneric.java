@@ -14,10 +14,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+
 import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.CalculoValorVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
 import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseOAGDto;
+import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseReglasArbitrajeOAGDto;
 
 @Repository
 public class CastObjectGeneric {
@@ -77,7 +79,7 @@ public class CastObjectGeneric {
 	}
 	
 	
-	public ResponseOAGDto convertJsonToReponseOAFDto(String jsonString) {
+	public ResponseOAGDto convertJsonToReponseOAGDto(String jsonString) {
 		ResponseOAGDto response= new ResponseOAGDto();
 		ObjectMapper mapper = new ObjectMapper();
 		try {
@@ -86,6 +88,21 @@ public class CastObjectGeneric {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return response;
+	}
+	
+	public ResponseReglasArbitrajeOAGDto convertJsonToReglasArbitraje(String jsonString) {
+		ResponseReglasArbitrajeOAGDto response=new ResponseReglasArbitrajeOAGDto();
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			response=mapper.readValue(jsonString, ResponseReglasArbitrajeOAGDto.class);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
