@@ -190,7 +190,15 @@ public class EscenariosService {
 				if(anclaOroDolar != null ) {
 					if(anclaOroDolar.getRequestId() != null) {
 						procesado = this.existeRequestIdAnclaOroDolar(anclaOroDolar.getRequestId());
+						if(Boolean.TRUE.equals(procesado)) {
+							log.info("Se elimino de manera correcta el requestId.");
+						} else {
+							log.info("No se pudo eliminar el requestId.");
+						}
+						// ya no existe el requestId, hay que generarlo y persistirlo
+						procesado = this.noExisteRequestIdAnclaOroDolar(idAncla);
 					} else {
+						// no existe el requestId, hay que generarlo y persistirlo
 						procesado = this.noExisteRequestIdAnclaOroDolar(idAncla);
 					}
 				}
