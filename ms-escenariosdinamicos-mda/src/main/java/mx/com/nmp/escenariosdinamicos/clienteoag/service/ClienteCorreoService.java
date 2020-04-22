@@ -7,7 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -70,12 +72,14 @@ public class ClienteCorreoService {
 		headers.setBasicAuth(usuario, password);		
 		String requestJson = convertJson.messageToJson(request);
 		HttpEntity<String> entity = new HttpEntity<>(requestJson,headers);
-	    String response = restTemplate.postForObject(urlBase+servicioEnviarCorreo, entity,String.class);
+		ResponseEntity<String> response = restTemplate.postForEntity(urlBase+servicioEnviarCorreo, entity,String.class);
 	    try {
-	    	if(StringUtils.isNotBlank(response)) {
-	    		root=objectMapper.readTree(response);
-				respuesta.setCodigo(root.path("respuesta").path("codigo").textValue());
-				respuesta.setMensaje(root.path("respuesta").path("mensaje").textValue());	    		
+	    	if(response.getStatusCode() == HttpStatus.OK) {
+		    	if(StringUtils.isNotBlank(response.getBody())) {
+		    		root=objectMapper.readTree(response.getBody());
+					respuesta.setCodigo(root.path("respuesta").path("codigo").textValue());
+					respuesta.setMensaje(root.path("respuesta").path("mensaje").textValue());	    		
+		    	}
 	    	}
 	    	
 	    } catch (JsonProcessingException e) {
@@ -102,10 +106,12 @@ public class ClienteCorreoService {
 	    params.add(Common.GRANT_TYPE, "client_credentials");
 	    params.add(Common.SCOPE, "UserProfile.me");
 	    HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, headers);
-	    String result = restTemplate.postForObject(urlBase+servicioGetToken, requestEntity,String.class);
+	    ResponseEntity<String>  result = restTemplate.postForEntity(urlBase+servicioGetToken, requestEntity,String.class);
 	    try {
-			root=objectMapper.readTree(result);
-			accessToken =  root.path("access_token").textValue();
+	    	if(result.getStatusCode() == HttpStatus.OK) {
+				root=objectMapper.readTree(result.getBody());
+				accessToken =  root.path("access_token").textValue();
+	    	}
 		} catch (JsonProcessingException e) {
 			log.info("Error al procesar el reponse "+e.getMessage());
 		} catch (IOException e) {
