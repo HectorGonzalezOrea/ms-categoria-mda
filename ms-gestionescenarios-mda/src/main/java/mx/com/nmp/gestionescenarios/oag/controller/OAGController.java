@@ -8,6 +8,7 @@ import static mx.com.nmp.gestionescenarios.utils.Constantes.HEADER_USUARIO_OAG;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.SCOPE;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.STATUS_CODE_OK;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.HEADER_OAUTH_BEARER;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.SLASH;
 
 import javax.ws.rs.core.MediaType;
 
@@ -20,8 +21,8 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-import mx.com.nmp.gestionescenarios.oag.vo.CalendarizarEscanarioRequestVO;
-import mx.com.nmp.gestionescenarios.oag.vo.CalendarizarEscanarioResponseVO;
+import mx.com.nmp.gestionescenarios.oag.vo.CalendarizarEscenarioRequestVO;
+import mx.com.nmp.gestionescenarios.oag.vo.CalendarizarEscenarioResponseVO;
 import mx.com.nmp.gestionescenarios.oag.vo.GetTokenResponseVO;
 import mx.com.nmp.gestionescenarios.utils.ConvertStringToBase64;
 import mx.com.nmp.gestionescenarios.utils.ConverterUtil;
@@ -31,8 +32,13 @@ public class OAGController extends OAGBase {
 
 	private static final Logger log = LoggerFactory.getLogger(OAGController.class);
 	
+	/*
+	 * Cliente del servicio de obtiene el access token
+	 */
 	public String getToken() {
+		log.info("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
 		log.info("getToken");
+		log.info("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
 		
 		String accessToken = "";
 		String credenciales = usuarioAuth + ":" + passwordAuth;
@@ -53,6 +59,7 @@ public class OAGController extends OAGBase {
 			log.info("{} : {}" , HEADER_ID_CONSUMIDOR, headerIdConsumidor);
 			log.info("{} : {}" , HEADER_ID_DESTINO, headerIdDestino);
 			log.info("{} : {}" , HttpHeaders.AUTHORIZATION, autenticacionBasica);
+			log.info("{} : {}" , HEADER_OAUTH_BEARER, accessToken);
 			log.info("{} : {}" , GRANT_TYPE, grantType);
 			log.info("{} : {}" , SCOPE, scope);
 			
@@ -80,8 +87,13 @@ public class OAGController extends OAGBase {
 		return accessToken;
 	}
 	
-	public CalendarizarEscanarioResponseVO calendarizarEscenario(CalendarizarEscanarioRequestVO request) {
+	/*
+	 * Cliente del servicio utilizado para calendarizar el escenario
+	 */
+	public CalendarizarEscenarioResponseVO calendarizarEscenario(CalendarizarEscenarioRequestVO request) {
+		log.info("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
 		log.info("calendarizarEscenario");
+		log.info("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
 		
 		String credenciales = usuarioAuth + ":" + passwordAuth;
 		
@@ -93,7 +105,7 @@ public class OAGController extends OAGBase {
 		
 		String requestJson = ConverterUtil.messageToJson(request);
 		
-		CalendarizarEscanarioResponseVO responseVO = null;
+		CalendarizarEscenarioResponseVO responseVO = null;
 		
 		Unirest.setTimeouts(0, 0);
 		try {
@@ -123,7 +135,7 @@ public class OAGController extends OAGBase {
 			log.info("Estatus: {}" , response.getBody());
 			
 			if(response.getStatus() == 200) {
-				responseVO = ConverterUtil.stringJsonToObjectCalendarizarEscanarioResponseVO(response.getBody());
+				responseVO = ConverterUtil.stringJsonToObjectCalendarizarEscenarioResponseVO(response.getBody());
 			}
 			
 		} catch (UnirestException e) {
@@ -131,6 +143,58 @@ public class OAGController extends OAGBase {
 		}
 
 		return responseVO;
+	}
+	
+	/*
+	 * Cliente del servicio utilizado para eliminar la calendarizacion
+	 */
+	public Boolean eliminarCalendarizacionEscenario(Integer idRequestCalendarizacion) {
+		log.info("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+		log.info("eliminarCalendarizacionEscenario");
+		log.info("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+		
+		String credenciales = usuarioAuth + ":" + passwordAuth;
+		
+		Boolean eliminado = false;
+		
+		log.info("credenciales : {}" , credenciales);
+		
+		String autenticacionBasica = BASIC + ConvertStringToBase64.encode(credenciales);
+		
+		String accessToken = this.getToken();
+		
+		Unirest.setTimeouts(0, 0);
+		try {
+			
+			String url = urlBase + servicioCalendarizacion + SLASH + idRequestCalendarizacion;
+			
+			log.info("url : {}" , url);
+			log.info("{} : {}" , HEADER_USUARIO_OAG, headerUsuario);
+			log.info("{} : {}" , HEADER_ID_CONSUMIDOR, headerIdConsumidor);
+			log.info("{} : {}" , HEADER_ID_DESTINO, headerIdDestino);
+			log.info("{} : {}" , HttpHeaders.AUTHORIZATION, autenticacionBasica);
+			log.info("{} : {}" , HEADER_OAUTH_BEARER, accessToken);
+			
+			HttpResponse<String> response = Unirest.delete(url)
+			  .header(HEADER_USUARIO_OAG, headerUsuario)
+			  .header(HEADER_OAUTH_BEARER, accessToken)
+			  .header(HEADER_ID_DESTINO, headerIdDestino)
+			  .header(HEADER_ID_CONSUMIDOR, headerIdConsumidor)
+			  .header(HttpHeaders.AUTHORIZATION, autenticacionBasica)
+			  .asString();
+
+			int statusCode = response.getStatus();
+			log.info("Status Code Response: {} " , statusCode);
+			log.info("Body Response: {} " , response.getBody());
+			
+			if (statusCode == STATUS_CODE_OK) {
+				eliminado = true;
+			}
+		} catch (UnirestException e) {
+			log.error("UnirestException {}" ,e);
+		}
+		
+		return eliminado;
 	}
 	
 }

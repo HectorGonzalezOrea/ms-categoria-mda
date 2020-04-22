@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "id", "fechaInicioPeticion", "peticionEscenario" })
-public class CalendarizarEscanarioRequestVO {
+public class CalendarizarEscenarioRequestVO {
 
 	@JsonProperty("id")
 	private Integer id;

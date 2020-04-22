@@ -759,6 +759,9 @@ public class GestionEscenarioService {
 		return bolsa;
 	}
 	
+	/*
+	 * Valida la información para insertar el ancla oro dolar
+	 */
 	public ObjectId solictarCambioAnclaOroDolar(ModificarValorAnclaOroDolar peticion) {
 		log.info("solictarCambioAnclaOroDolar");
 		
@@ -779,7 +782,11 @@ public class GestionEscenarioService {
 	public ObjectId insertarAnclaOroDolar(ModificarValorAnclaOroDolar peticion) {
 		log.info("insertarAnclaOroDolar");
 		
-		AnclaOroDolarEntity anclaOroDolar = new AnclaOroDolarEntity();
+		AnclaOroDolarEntity anclaOroDolar = this.consultarAnclaOroDolar();
+		if(anclaOroDolar == null) {
+			anclaOroDolar = new AnclaOroDolarEntity();
+		}
+		
 		ObjectId id = null;
 				
 		try {
@@ -812,7 +819,7 @@ public class GestionEscenarioService {
 	}
 	
 	/*
-	 * Insertar Ancla Oror Dolar
+	 * Consulta el request id para ancla oro dolar
 	 */
 	public AnclaOroDolarEntity consultarRequestIdAnclaOroDolar(ObjectId id) {
 		log.info("consultarRequestIdAnclaOroDolar");
@@ -831,6 +838,50 @@ public class GestionEscenarioService {
 		}
 		
 		return anclaOroDolar;
+	}
+	
+	/*
+	 * Actualiza el request id en la collection de anclaOroDolar
+	 */
+	public Boolean updateRequestIdAnclaOroDolar(ObjectId id, Integer requestId) {
+		log.info("consultarRequestIdAnclaOroDolar");
+		
+		AnclaOroDolarEntity anclaOroDolar = null;
+		Boolean procesado = false;
+		
+		try {
+			Query query = new Query();
+			query.addCriteria(Criteria.where(ID_ANCLA).in(id));
+			
+			anclaOroDolar = mongoTemplate.findOne(query, AnclaOroDolarEntity.class);
+			
+			if(anclaOroDolar != null) {
+				anclaOroDolar.setRequestId(requestId);
+				mongoTemplate.save(anclaOroDolar);
+				
+				procesado = true;
+			}
+			
+		} catch (Exception e) {
+			log.info("Exception: {}", e);
+		}
+		
+		return procesado;
+	}
+	
+	/*
+	 * Consultar Ancla Oro Dolar
+	 */
+	public AnclaOroDolarEntity consultarAnclaOroDolar() {
+		log.info("consultarAnclaOroDolar");
+		
+		List<AnclaOroDolarEntity> anclas = mongoTemplate.findAll(AnclaOroDolarEntity.class);
+		
+		if(!anclas.isEmpty()) {
+			return anclas.get(0);
+		}
+		
+		return null;
 	}
 	
 }

@@ -55,7 +55,8 @@ public interface EscenariosApi {
     @RequestMapping(value = "/escenarios/ancla/oroDolar",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<ValorAnclaOroDolar> escenariosAnclaOroDolarGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario);
+    ResponseEntity<?> escenariosAnclaOroDolarGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario);
+    //ResponseEntity<ValorAnclaOroDolar> escenariosAnclaOroDolarGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario);
 
 
     @ApiOperation(value = "Solicitar cambio de valores ancla para Oro y Dolar", nickname = "escenariosAnclaOroDolarPost", notes = "Solicitar cambio de valores anlca para Oro y Dolar al área encargada ### Seguridad Para poder realizar el consumo del recuros deberá de estar autorizado. Para esto tiene que enviar la llave en el encabezado HTTP: * 'X-API-KEY: eyJ4NXQjUzI1NiI6IkFTS1ESG42` ", response = GeneralResponse.class, authorizations = {
