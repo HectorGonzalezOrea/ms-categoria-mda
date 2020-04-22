@@ -53,6 +53,7 @@ import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INTERN
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_CODE_BAD_REQUEST;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_BAD_REQUEST;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.SUCCESS_MESSAGE_OK;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INTERNAL_SERVER_ERROR_NO_GENERIC;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-20T16:07:47.599Z")
 
@@ -78,21 +79,81 @@ public class EscenariosApiController implements EscenariosApi {
     }
 
     /*
-     * 
+     * Obtener el valor ancla de Oro y Dolar actual
      */
-    public ResponseEntity<ValorAnclaOroDolar> escenariosAnclaOroDolarGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario) {
-        String accept = request.getHeader(HEADER_ACCEPT_KEY);
-        if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
-            try {
-                return new ResponseEntity<ValorAnclaOroDolar>(objectMapper.readValue("{  \"valorAnclaDolar\" : 19.4523,  \"valorAnclaOro\" : 800.02}", ValorAnclaOroDolar.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<ValorAnclaOroDolar>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+    //public ResponseEntity<ValorAnclaOroDolar> escenariosAnclaOroDolarGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario) {
+	public ResponseEntity<?> escenariosAnclaOroDolarGet(
+			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario) {
+		log.info("*************************************************************");
+		log.info("escenariosAnclaOroDolarGet");
+		log.info("*************************************************************");
 
-        return new ResponseEntity<ValorAnclaOroDolar>(HttpStatus.NOT_IMPLEMENTED);
-    }
+		String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+
+		if (apiKey == null || apiKey.equals(CADENA_VACIA)) {
+
+			InvalidAuthentication ia = new InvalidAuthentication();
+			ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+			ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+
+			log.error("{}", ia);
+
+			return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+		}
+
+		String accept = request.getHeader(HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
+			try {
+				if (usuario == null) {
+					BadRequest br = new BadRequest();
+
+					br.setCode(ERROR_CODE_BAD_REQUEST);
+					br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+
+					log.error("{}", br);
+
+					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+				} else {
+					log.info("usuario: {}", usuario);
+
+					ValorAnclaOroDolar response = escenariosService.consultarAnclaOroDolar();
+					if(response != null) {
+						
+						log.info("{}", response);
+						
+						return new ResponseEntity<ValorAnclaOroDolar>(response, HttpStatus.OK);
+					} else {
+						InternalServerError ise = new InternalServerError();
+						ise.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
+						ise.setMessage(ERROR_MESSAGE_INTERNAL_SERVER_ERROR);
+
+						log.error("{}", ise);
+
+						return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
+					}
+				}
+			} catch (Exception e) {
+				InternalServerError ise = new InternalServerError();
+				ise.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
+				ise.setMessage(ERROR_MESSAGE_INTERNAL_SERVER_ERROR);
+
+				log.error("{}", ise);
+
+				return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		
+		BadRequest br = new BadRequest();
+
+		br.setCode(ERROR_CODE_BAD_REQUEST);
+		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+
+		log.error("{}", br);
+
+		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+
+		// return new ResponseEntity<ValorAnclaOroDolar>(HttpStatus.NOT_IMPLEMENTED);
+	}
 
     /*
      * Solicitar cambio de valores ancla para Oro y Dolar
@@ -134,8 +195,23 @@ public class EscenariosApiController implements EscenariosApi {
 					log.info("usuario: {}", usuario);
 					log.info("peticion: {}", peticion);
 					
-					escenariosService.solictarCambioAnclaOroDolar(peticion);
-
+					Boolean procesado = escenariosService.solictarCambioAnclaOroDolar(peticion);
+					if(Boolean.TRUE.equals(procesado)) {
+						GeneralResponse gr = new GeneralResponse();
+						gr.setMessage(SUCCESS_MESSAGE_OK);
+						
+						log.info("{}" , gr);
+		                
+		                return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK);
+					} else {
+						InternalServerError ise = new InternalServerError();
+		                ise.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
+		                ise.setMessage(ERROR_MESSAGE_INTERNAL_SERVER_ERROR_NO_GENERIC);
+		                
+		                log.error("{}" , ise);
+		                
+		                return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
+					}
 				}
 			} catch (Exception e) {
 				log.error("Couldn't serialize response for content type application/json", e);

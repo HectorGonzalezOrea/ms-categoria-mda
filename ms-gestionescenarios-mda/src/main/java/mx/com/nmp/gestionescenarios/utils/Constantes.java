@@ -21,6 +21,7 @@ public final class Constantes {
 	
 	public static final String ERROR_CODE_INTERNAL_SERVER_ERROR = "NMP-MDA-500";
 	public static final String ERROR_MESSAGE_INTERNAL_SERVER_ERROR = "Error interno del servidor. Falla de comunicación.";
+	public static final String ERROR_MESSAGE_INTERNAL_SERVER_ERROR_NO_GENERIC = "Error interno del servidor. No se proceso la petición correctamente.";
 	public static final String ERROR_MESSAGE_INTERNAL_SERVER_ERROR_ALMACENAR_O_PROCESAR = "Error interno del servidor. Ocurrio un error en el procesamiento.";
 	
 	public static final String METHOD_POST = "POST";
@@ -45,6 +46,7 @@ public final class Constantes {
 	public static final String FECHA_APLICACION = "fechaAplicacion";
 	
 	public static final String TMP = "tmp/";
+	public static final String SLASH = "/";
 	public static final String FORMATO_FECHA = "dd/MM/yyyy";
 	public static final String FORMATO_FECHA_HORA = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 	

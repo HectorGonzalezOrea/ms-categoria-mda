@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
 import mx.com.nmp.gestionescenarios.oag.vo.GetTokenResponseVO;
-import mx.com.nmp.gestionescenarios.oag.vo.CalendarizarEscanarioResponseVO;
+import mx.com.nmp.gestionescenarios.oag.vo.CalendarizarEscenarioResponseVO;
 import mx.com.nmp.gestionescenarios.oag.vo.ConsultarConsolidadoResponseVO;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.TMP;
 
@@ -37,11 +37,11 @@ public class ConverterUtil {
 		return obj;
 	}
 	
-	public static CalendarizarEscanarioResponseVO stringJsonToObjectCalendarizarEscanarioResponseVO(String json) {
+	public static CalendarizarEscenarioResponseVO stringJsonToObjectCalendarizarEscenarioResponseVO(String json) {
 		ObjectMapper mapper = new ObjectMapper();
-		CalendarizarEscanarioResponseVO obj = null;
+		CalendarizarEscenarioResponseVO obj = null;
 		try {
-			obj = mapper.readValue(json, CalendarizarEscanarioResponseVO.class);
+			obj = mapper.readValue(json, CalendarizarEscenarioResponseVO.class);
 
 		} catch (IOException ioe) {
 			log.error("IOException: {} " , ioe);

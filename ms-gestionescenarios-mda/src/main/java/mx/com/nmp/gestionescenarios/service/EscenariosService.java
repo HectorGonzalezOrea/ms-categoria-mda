@@ -24,13 +24,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import mx.com.nmp.gestionescenarios.model.InternalServerError;
 import mx.com.nmp.gestionescenarios.model.ModificarValorAnclaOroDolar;
+import mx.com.nmp.gestionescenarios.model.ValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.mongodb.entity.AnclaOroDolarEntity;
 import mx.com.nmp.gestionescenarios.mongodb.repository.EscenariosRepository;
 import mx.com.nmp.gestionescenarios.mongodb.service.GestionEscenarioService;
 import mx.com.nmp.gestionescenarios.ms.ajustepreciosconsolidados.AjustePreciosConsolidadosController;
 import mx.com.nmp.gestionescenarios.oag.controller.OAGController;
-import mx.com.nmp.gestionescenarios.oag.vo.CalendarizarEscanarioRequestVO;
-import mx.com.nmp.gestionescenarios.oag.vo.CalendarizarEscanarioResponseVO;
+import mx.com.nmp.gestionescenarios.oag.vo.CalendarizarEscenarioRequestVO;
+import mx.com.nmp.gestionescenarios.oag.vo.CalendarizarEscenarioResponseVO;
 import mx.com.nmp.gestionescenarios.oag.vo.IniciarEjecucionEscenarioRequestVO;
 import mx.com.nmp.gestionescenarios.oag.vo.PeticionEscenarioVO;
 
@@ -112,7 +113,7 @@ public class EscenariosService {
 		PeticionEscenarioVO peVo = new PeticionEscenarioVO();
 		peVo.setIniciarEjecucionEscenarioRequest(ieerVo);
 		
-		CalendarizarEscanarioRequestVO requestVo = new CalendarizarEscanarioRequestVO();
+		CalendarizarEscenarioRequestVO requestVo = new CalendarizarEscenarioRequestVO();
 		
 		// Escenario de Consolidados
 		requestVo.setId(Integer.valueOf(idPeticion));
@@ -122,7 +123,7 @@ public class EscenariosService {
 		String dt = new SimpleDateFormat(FORMATO_FECHA_HORA).format(fechaActual);
 		requestVo.setFechaInicioPeticion(dt);
 		
-		CalendarizarEscanarioResponseVO cerVo = oAGController.calendarizarEscenario(requestVo);
+		CalendarizarEscenarioResponseVO cerVo = oAGController.calendarizarEscenario(requestVo);
 		
 		if(cerVo != null) {
 			return cerVo.getIdPeticion();
@@ -156,10 +157,30 @@ public class EscenariosService {
 	}
 	
 	/*
-	 * 
+	 * Consultar ancla oro dolar
 	 */
-	public void solictarCambioAnclaOroDolar(ModificarValorAnclaOroDolar peticion) {
+	public ValorAnclaOroDolar consultarAnclaOroDolar() {
+		log.info("consultarCambioAnclaOroDolar");
+		
+		AnclaOroDolarEntity ancla = gestionEscenarioMongoService.consultarAnclaOroDolar();
+		ValorAnclaOroDolar vaod = null;
+		if(ancla != null) {
+			
+			vaod = new ValorAnclaOroDolar();
+			vaod.setValorAnclaDolar(ancla.getValorAnclaDolar());
+			vaod.setValorAnclaOro(ancla.getValorAnclaOro());
+		}
+		
+		return vaod;
+	}
+	
+	/*
+	 * Solicitar el cambio de ancla oro dolar con los datos enviados
+	 */
+	public Boolean solictarCambioAnclaOroDolar(ModificarValorAnclaOroDolar peticion) {
 		log.info("solictarCambioAnclaOroDolar");
+		
+		Boolean procesado = false;
 		
 		if(peticion != null) {
 			ObjectId idAncla = gestionEscenarioMongoService.solictarCambioAnclaOroDolar(peticion);
@@ -168,29 +189,43 @@ public class EscenariosService {
 				AnclaOroDolarEntity anclaOroDolar = gestionEscenarioMongoService.consultarRequestIdAnclaOroDolar(idAncla);
 				if(anclaOroDolar != null ) {
 					if(anclaOroDolar.getRequestId() != null) {
-						this.existeRequestIdAnclaOroDolar(anclaOroDolar.getRequestId());
+						procesado = this.existeRequestIdAnclaOroDolar(anclaOroDolar.getRequestId());
 					} else {
-						this.noExisteRequestIdAnclaOroDolar();
+						procesado = this.noExisteRequestIdAnclaOroDolar(idAncla);
 					}
 				}
 			}
 		}
+		
+		return procesado;
 	}
 	
-	private void existeRequestIdAnclaOroDolar(Integer requestId) {
+	/*
+	 * Existe el request id de ancla oro valor
+	 */
+	private Boolean existeRequestIdAnclaOroDolar(Integer requestId) {
 		log.info("existeRequestIdAnclaOroDolar");
 		
 		log.info("requestId: {}", requestId);
 		
-		
+		return oAGController.eliminarCalendarizacionEscenario(requestId);
 	}
 	
-	private void noExisteRequestIdAnclaOroDolar() {
+	/*
+	 * No existe el request id de ancla oro valor
+	 */
+	private Boolean noExisteRequestIdAnclaOroDolar(ObjectId id) {
 		log.info("noExisteRequestIdAnclaOroDolar");
 		
-		// Se calendariza la ejecución de los escenarios de consolidados
-		Integer requestId = this.calendarizarEjecucion(ID_PETICION_ESCENARIO_ANCLA_ORO_DOLAR, ID_ESCENARIO_ANCLA_ORO_DOLAR);
+		Boolean procesado = false;
 		
+		// Se calendariza la ejecución de los escenarios de ancla oro dolar
+		Integer requestId = this.calendarizarEjecucion(ID_PETICION_ESCENARIO_ANCLA_ORO_DOLAR, ID_ESCENARIO_ANCLA_ORO_DOLAR);
+		if(requestId != null) {
+			procesado = gestionEscenarioMongoService.updateRequestIdAnclaOroDolar(id, requestId);
+		}
+		
+		return procesado;
 	}
 	
 }
