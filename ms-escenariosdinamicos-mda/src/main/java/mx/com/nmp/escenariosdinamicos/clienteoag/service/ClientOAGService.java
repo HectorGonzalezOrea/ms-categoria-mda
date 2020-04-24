@@ -16,10 +16,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import com.google.gson.Gson;
 
 import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
 import mx.com.nmp.escenariosdinamicos.constantes.Constantes.Common;
+import mx.com.nmp.escenariosdinamicos.oag.dto.RequestReglaEscenarioDinamicoDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseOAGDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseReglasArbitrajeOAGDto;
 import mx.com.nmp.escenariosdinamicos.oag.vo.PartidaVO;
@@ -64,9 +65,9 @@ public class ClientOAGService {
 	
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	
-	public ResponseOAGDto actualizarPrecioPartida(PartidaVO partida) {
+	public ResponseOAGDto actualizarPrecioPartida(RequestReglaEscenarioDinamicoDto requestDto) {
         log.info(":: Entrado al metodo  actualizarPrecioPartida ::");
-		  String request=formatRequest(partida);
+        String request =  new Gson().toJson(requestDto);
 		  String token=clienteCorreo.getToken();
 		  RestTemplate restTemplate = new RestTemplate();
 		  HttpHeaders headers = new HttpHeaders();
