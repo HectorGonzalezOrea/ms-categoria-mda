@@ -11,7 +11,7 @@ public class CalculoValorVO {
 	@JsonProperty("SKU")
 	private String SKU;
 	@JsonProperty("valorAncla")
-	private Float valorAncla;
+	private Float valorAncla;//
 	@JsonProperty("gramaje")
 	private Float gramaje;
 	@JsonProperty("kilataje")

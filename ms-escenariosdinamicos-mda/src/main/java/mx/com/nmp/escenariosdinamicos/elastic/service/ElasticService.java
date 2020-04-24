@@ -2,6 +2,7 @@ package mx.com.nmp.escenariosdinamicos.elastic.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.http.HttpHost;
@@ -19,6 +20,8 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -28,6 +31,7 @@ import org.springframework.stereotype.Service;
 import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
 import mx.com.nmp.escenariosdinamicos.elastic.properties.ElasticProperties;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
+import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexVentasVO;
 @Service
 public class ElasticService {
 	
@@ -57,8 +61,8 @@ public class ElasticService {
 	        restHighLevelClient.close();
 	        restHighLevelClient = null;
 	    }
-	
-	public List<IndexGarantiaVO> scrollElastic(String index) throws IOException{
+	//scroll pc_garantias
+	public List<IndexGarantiaVO> scrollElasticGarantias(String index,String ramo,String subRamo) throws IOException{
 		System.out.println("Entrando a metodo elastic");
 		List<IndexGarantiaVO>lstIndexGarantia=new ArrayList<>();
 		final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));//el seteo del intervalo
@@ -66,6 +70,8 @@ public class ElasticService {
 		searchRequest.scroll(scroll);
 		searchRequest.indices(index);//se agrega index de elastic
 		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+		QueryBuilder query = QueryBuilders.queryStringQuery("ramo:'" + ramo + "' AND subramo:'" + subRamo + "'");
+		searchSourceBuilder.query(query);
 		searchSourceBuilder.size(2);//cuantos resultados se recuperan?
 		searchRequest.source(searchSourceBuilder);
 		SearchResponse searchResponse = getConnectionElastic().search(searchRequest, RequestOptions.DEFAULT); //Inicialice el contexto de búsqueda enviando el SearchRequest inicial
@@ -97,6 +103,42 @@ public class ElasticService {
 		clearScrollRequest.addScrollId(scrollId);
 		ClearScrollResponse clearScrollResponse = getConnectionElastic().clearScroll(clearScrollRequest, RequestOptions.DEFAULT);
 		//boolean succeeded = clearScrollResponse.isSucceeded();
+		return lstIndexGarantia;
+	}
+	//scroll ventas
+	public List<IndexVentasVO> scrollElasticVentas(String index,String ramo,String subRamo,Date fecha) throws IOException{
+		System.out.println("Entrando a metodo elastic");
+		List<IndexVentasVO>lstIndexGarantia=new ArrayList<>();
+		final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));
+		SearchRequest searchRequest = new SearchRequest();
+		searchRequest.scroll(scroll);
+		searchRequest.indices(index);
+		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+		//searchSourceBuilder.query(null); obtener ventas a partir de ramo subramo y de los ultimos 3 dias(fechaActual -3 Dias)
+		searchSourceBuilder.size(2);
+		searchRequest.source(searchSourceBuilder);
+		SearchResponse searchResponse = getConnectionElastic().search(searchRequest, RequestOptions.DEFAULT); 
+		String scrollId = searchResponse.getScrollId();
+		SearchHit[] searchHits = searchResponse.getHits().getHits();
+		System.out.println("antes del for");
+		System.out.println(searchHits.length);
+			for(SearchHit hit : searchHits){
+				System.out.println("entrando a bucle");
+		    SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
+		    scrollRequest.scroll(scroll);
+		    searchResponse = getConnectionElastic().scroll(scrollRequest, RequestOptions.DEFAULT);
+		    scrollId = searchResponse.getScrollId();
+		    searchHits = searchResponse.getHits().getHits();
+		    String response = hit.getSourceAsString();
+		    System.out.println("*********************");
+		    System.out.println(response);
+		    lstIndexGarantia.add(castObject.JsonFieldToObjectVenta(response));
+		    System.out.println("*********************");
+		}
+		System.out.println("ListaObjetosJava "+lstIndexGarantia.size());
+		ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
+		clearScrollRequest.addScrollId(scrollId);
+		ClearScrollResponse clearScrollResponse = getConnectionElastic().clearScroll(clearScrollRequest, RequestOptions.DEFAULT);
 		return lstIndexGarantia;
 	}
 }

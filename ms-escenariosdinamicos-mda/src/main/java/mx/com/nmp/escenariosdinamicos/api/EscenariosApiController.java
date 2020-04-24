@@ -2,6 +2,7 @@ package mx.com.nmp.escenariosdinamicos.api;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.ApiParam;
 import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
+import mx.com.nmp.escenariosdinamicos.clienteoag.service.ClientOAGService;
 import mx.com.nmp.escenariosdinamicos.clienteservicios.service.ClientesMicroservicios;
 import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.CalculoValorVO;
 import mx.com.nmp.escenariosdinamicos.elastic.properties.ElasticProperties;
@@ -61,6 +63,8 @@ public class EscenariosApiController implements EscenariosApi {
     private ClientesMicroservicios clientesMicroservicios;
     @Autowired
     private CastObjectGeneric castObjectGeneric;
+    @Autowired
+    private ClientOAGService clientOAGService;
 
     @org.springframework.beans.factory.annotation.Autowired
     public EscenariosApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -204,21 +208,24 @@ public class EscenariosApiController implements EscenariosApi {
     		@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  ) @Valid @RequestBody SimularEscenarioDinamicoReq crearEscenariosReques
     		) {
     	SimularEscenarioDinamicoRes response=new SimularEscenarioDinamicoRes();
-    	ArrayList<PartidaPrecioFinal> lstPartidaPrecioFinal=new ArrayList();
+    	ArrayList<PartidaPrecioFinal> lstPartidaPrecioValorMonte=new ArrayList<PartidaPrecioFinal>();
         System.out.println("obtencion de indices");
         List<IndexGarantiaVO>lstIndexGarantia=null;
-        	
+        //ResponseOAGDto responseClientAplicaReglaEscenarioDinamico=null;
 			try {
-				lstIndexGarantia=elasticService.scrollElastic(elasticProperties.getIndexGarantia());
+				Date fechaActual=new Date();//ultimos tres dias
+				lstIndexGarantia=elasticService.scrollElasticGarantias(elasticProperties.getIndexGarantia(),crearEscenariosReques.getInfoRegla().getRamo(),crearEscenariosReques.getInfoRegla().getSubramo().get(0));
 				lstIndexGarantia.forEach(i->System.out.println(i.toString()));
-				lstPartidaPrecioFinal=(ArrayList<PartidaPrecioFinal>)clientesMicroservicios.actualizaPrecio(castObjectGeneric.castGarantiasToCalculoValor(lstIndexGarantia));
+				lstPartidaPrecioValorMonte=(ArrayList<PartidaPrecioFinal>)clientesMicroservicios.calcularValorMonte(castObjectGeneric.castGarantiasToCalculoValor(lstIndexGarantia));
 				//List<CalculoValorVO> lstIndexGarantiv1=fillValues();
 				//lstIndexGarantiv1.forEach(x->System.out.println(x.toString()));
 				//lstPartidaPrecioFinal=(ArrayList<PartidaPrecioFinal>) clientesMicroservicios.actualizaPrecio(lstIndexGarantiv1);
+				//clientOAGService.actualizarPrecioPartida(castObjectGeneric.castPartidasToPartidaValorMonte(lstPartidaPrecioValorMonte));
+				elasticService.scrollElasticVentas(elasticProperties.getIndexVenta(),crearEscenariosReques.getInfoRegla().getRamo(),crearEscenariosReques.getInfoRegla().getSubramo().get(0),fechaActual);
 		} catch (Exception e) {
 				e.printStackTrace();
 			}
-			response.addAll(lstPartidaPrecioFinal);
+			response.addAll(lstPartidaPrecioValorMonte);
 			return new ResponseEntity<SimularEscenarioDinamicoRes>(response, HttpStatus.OK);
 
         //return new ResponseEntity<SimularEscenarioDinamicoRes>(HttpStatus.NOT_IMPLEMENTED);
