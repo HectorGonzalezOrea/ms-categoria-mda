@@ -1,6 +1,7 @@
 package mx.com.nmp.escenariosdinamicos.cast;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,10 +15,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-
 import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.CalculoValorVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexVentasVO;
+import mx.com.nmp.escenariosdinamicos.model.InfoRegla;
 import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseOAGDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseReglasArbitrajeOAGDto;
@@ -110,33 +111,42 @@ public class CastObjectGeneric {
 		return response;
 	}
 	
-//	public List<PartidaVO> castPartidasToPartidaValorMonte(List<PartidaPrecioFinal> lstResultServiceValorMonte){
-//		List<PartidaVO> lstPartidas=lstResultServiceValorMonte.stream().map(partidaVO->{
-//			System.out.println("castLamda");
-//			System.out.println(partidaVO.toString());
-//			return new PartidaVO(
-//					partidaVO.getIdPartida(),
-//					partidaVO.getSku(),
-//					null,//ventasDiaUno,
-//					null,//ventasDiaDos,
-//					null,//ventasDiaTres,
-//					null,//baseAjusteUnoPA,
-//					null,//baseAjusteUnoPM,
-//					null,//baseAjusteUnoPB,
-//					null,//baseAjusteDosPA,
-//					null,//baseAjusteDosPM,
-//					null,//baseAjusteDosPB,
-//					null,//precioFinal,
-//					null,//precioEtiqueta,
-//					null,//criterio,
-//					null,//candadoPA,
-//					null,//candadoPM,
-//					null,//candadoPB,
-//					null,//precioVenta
-//					null);//montoPrestamo
-//		}).collect(Collectors.toList());
-//		return lstPartidas;
-//	}
+	public List<PartidaVO> castPartidasToPartidaValorMonte(List<IndexVentasVO> lstResultServiceValorMonte,InfoRegla infoRegla){
+		List<PartidaVO> lstPartidas=null;
+		if (lstResultServiceValorMonte != null && !lstResultServiceValorMonte.isEmpty()) {
+			lstPartidas = new ArrayList<>();
+			for (IndexVentasVO entity : lstResultServiceValorMonte) {
+				lstPartidas.add(fillValues(entity,infoRegla));
+			}
+		}
+		return lstPartidas;
+	}
+	public PartidaVO fillValues(IndexVentasVO index,InfoRegla infoRegla){
+		PartidaVO partida=null;
+		if(index!=null){
+			partida=new PartidaVO();
+			partida.setIdPartida(index.getPartida());
+			partida.setSku(index.getSku());
+			partida.setVentasDiaUno(null);
+			partida.setVentasDiaDos(null);
+			partida.setVentasDiaTres(null);
+			partida.setBaseAjusteUnoPA(null);//simular.getReglasDescuento()-- deserializar este object
+			partida.setBaseAjusteUnoPM(null);//simular.getReglasDescuento()-- deserializar este object
+			partida.setBaseAjusteUnoPB(null);//simular.getReglasDescuento()-- deserializar este object
+			partida.setBaseAjusteDosPA(null);;//simular.getReglasDescuento()-- deserializar este object
+			partida.setBaseAjusteDosPM(null);//simular.getReglasDescuento()-- deserializar este object
+			partida.setBaseAjusteDosPB(null);//simular.getReglasDescuento()-- deserializar este object
+			partida.setPrecioFinal(null);
+			partida.setPrecioEtiqueta(null);
+			partida.setCriterio(null);//infoRegla.getReglasDescuento() --deserializar este objeto
+			partida.setCandadoPA(null);//infoRegla.getCandadoInferior()
+			partida.setCandadoPM(null);//infoRegla.getCandadoInferior()
+			partida.setCandadoPB(null);//infoRegla.getCandadoInferior()
+			partida.setPrecioVenta(null);
+			partida.setMontoPrestamo(null);
+		}
+		return partida;
+	}
 	
 	public IndexVentasVO JsonFieldToObjectVenta(String jsonField) {
 		ObjectMapper mapper = new ObjectMapper();

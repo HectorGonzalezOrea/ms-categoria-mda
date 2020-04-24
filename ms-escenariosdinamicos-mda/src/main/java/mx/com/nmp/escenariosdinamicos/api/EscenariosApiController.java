@@ -28,6 +28,7 @@ import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.CalculoValorVO;
 import mx.com.nmp.escenariosdinamicos.elastic.properties.ElasticProperties;
 import mx.com.nmp.escenariosdinamicos.elastic.service.ElasticService;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
+import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexVentasVO;
 import mx.com.nmp.escenariosdinamicos.model.BadRequest;
 import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosResInner;
@@ -220,8 +221,8 @@ public class EscenariosApiController implements EscenariosApi {
 				//List<CalculoValorVO> lstIndexGarantiv1=fillValues();
 				//lstIndexGarantiv1.forEach(x->System.out.println(x.toString()));
 				//lstPartidaPrecioFinal=(ArrayList<PartidaPrecioFinal>) clientesMicroservicios.actualizaPrecio(lstIndexGarantiv1);
-				//clientOAGService.actualizarPrecioPartida(castObjectGeneric.castPartidasToPartidaValorMonte(lstPartidaPrecioValorMonte));
-				elasticService.scrollElasticVentas(elasticProperties.getIndexVenta(),crearEscenariosReques.getInfoRegla().getRamo(),crearEscenariosReques.getInfoRegla().getSubramo().get(0),fechaActual);
+				List<IndexVentasVO> ventas=elasticService.scrollElasticVentas(elasticProperties.getIndexVenta(),crearEscenariosReques.getInfoRegla().getRamo(),crearEscenariosReques.getInfoRegla().getSubramo().get(0),fechaActual);
+				//clientOAGService.actualizarPrecioPartida(castObjectGeneric.castPartidasToPartidaValorMonte(ventas,crearEscenariosReques.getInfoRegla()));
 		} catch (Exception e) {
 				e.printStackTrace();
 			}
