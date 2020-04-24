@@ -22,29 +22,6 @@ public class PartidaVO {
 	private Long candadoPB;
 	private Double precioVenta;
 	private Double montoPrestamo;
-	public PartidaVO(String idPartida,String sku,Long ventasDiaUno,Long ventasDiaDos,Long ventasDiaTres,Long baseAjusteUnoPA,
-		Long baseAjusteUnoPM,Long baseAjusteUnoPB,Long baseAjusteDosPA,Long baseAjusteDosPM,Long baseAjusteDosPB,
-		Long precioFinal,Long precioEtiqueta,String criterio,Long candadoPA,Long candadoPM,Long candadoPB,Double precioVenta,Double montoPrestamo){
-		this.idPartida=idPartida;
-		this.sku=sku;
-		this.ventasDiaUno=ventasDiaUno;
-		this.ventasDiaDos=ventasDiaDos;
-		this.ventasDiaTres=ventasDiaTres;
-		this.baseAjusteUnoPA=baseAjusteUnoPA;
-		this.baseAjusteUnoPM=baseAjusteUnoPM;
-		this.baseAjusteUnoPB=baseAjusteUnoPB;
-		this.baseAjusteDosPA=baseAjusteDosPA;
-		this.baseAjusteDosPM=baseAjusteDosPM;
-		this.baseAjusteDosPB=baseAjusteDosPB;
-		this.precioFinal=precioFinal;
-		this.precioEtiqueta=precioEtiqueta;
-		this.criterio=criterio;
-		this.candadoPA=candadoPA;
-		this.candadoPM=candadoPM;
-		this.candadoPB=candadoPB;
-		this.precioVenta=precioVenta;
-		this.montoPrestamo=montoPrestamo;
-	}
 	public String getIdPartida() {
 		return idPartida;
 	}

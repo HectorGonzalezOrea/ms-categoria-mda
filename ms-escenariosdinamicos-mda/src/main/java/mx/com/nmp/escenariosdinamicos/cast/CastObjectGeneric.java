@@ -110,33 +110,33 @@ public class CastObjectGeneric {
 		return response;
 	}
 	
-	public List<PartidaVO> castPartidasToPartidaValorMonte(List<PartidaPrecioFinal> lstResultServiceValorMonte){
-		List<PartidaVO> lstPartidas=lstResultServiceValorMonte.stream().map(partidaVO->{
-			System.out.println("castLamda");
-			System.out.println(partidaVO.toString());
-			return new PartidaVO(
-					partidaVO.getIdPartida(),
-					partidaVO.getSku(),
-					null,//ventasDiaUno,
-					null,//ventasDiaDos,
-					null,//ventasDiaTres,
-					null,//baseAjusteUnoPA,
-					null,//baseAjusteUnoPM,
-					null,//baseAjusteUnoPB,
-					null,//baseAjusteDosPA,
-					null,//baseAjusteDosPM,
-					null,//baseAjusteDosPB,
-					null,//precioFinal,
-					null,//precioEtiqueta,
-					null,//criterio,
-					null,//candadoPA,
-					null,//candadoPM,
-					null,//candadoPB,
-					null,//precioVenta
-					null);//montoPrestamo
-		}).collect(Collectors.toList());
-		return lstPartidas;
-	}
+//	public List<PartidaVO> castPartidasToPartidaValorMonte(List<PartidaPrecioFinal> lstResultServiceValorMonte){
+//		List<PartidaVO> lstPartidas=lstResultServiceValorMonte.stream().map(partidaVO->{
+//			System.out.println("castLamda");
+//			System.out.println(partidaVO.toString());
+//			return new PartidaVO(
+//					partidaVO.getIdPartida(),
+//					partidaVO.getSku(),
+//					null,//ventasDiaUno,
+//					null,//ventasDiaDos,
+//					null,//ventasDiaTres,
+//					null,//baseAjusteUnoPA,
+//					null,//baseAjusteUnoPM,
+//					null,//baseAjusteUnoPB,
+//					null,//baseAjusteDosPA,
+//					null,//baseAjusteDosPM,
+//					null,//baseAjusteDosPB,
+//					null,//precioFinal,
+//					null,//precioEtiqueta,
+//					null,//criterio,
+//					null,//candadoPA,
+//					null,//candadoPM,
+//					null,//candadoPB,
+//					null,//precioVenta
+//					null);//montoPrestamo
+//		}).collect(Collectors.toList());
+//		return lstPartidas;
+//	}
 	
 	public IndexVentasVO JsonFieldToObjectVenta(String jsonField) {
 		ObjectMapper mapper = new ObjectMapper();
