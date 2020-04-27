@@ -11,19 +11,19 @@ public class CalculoValorVO {
 	@JsonProperty("SKU")
 	private String SKU;
 	@JsonProperty("valorAncla")
-	private Float valorAncla;//
+	private Double valorAncla;//
 	@JsonProperty("gramaje")
-	private Float gramaje;
+	private Double gramaje;
 	@JsonProperty("kilataje")
-	private Float kilataje;
+	private Double kilataje;
 	@JsonProperty("incremento")
-	private Float incremento;
+	private Double incremento;
 	@JsonProperty("desplazamiento")
-	private Float desplazamiento;
+	private Double desplazamiento;
 	@JsonProperty("avaluoComplementario")
-	private Float avaluoComplementario;
+	private Double avaluoComplementario;
 	  
-	public CalculoValorVO(Integer idPartida,String SKU,Float valorAncla,Float gramaje,Float kilataje,Float incremento,Float desplazamiento,Float avaluoComplementario){
+	public CalculoValorVO(Integer idPartida,String SKU,Double valorAncla,Double gramaje,Double kilataje,Double incremento,Double desplazamiento,Double avaluoComplementario){
 		this.idPartida=idPartida;
 		this.SKU=SKU;
 		this.valorAncla=valorAncla;
@@ -40,22 +40,22 @@ public class CalculoValorVO {
 	public String getSKU() {
 		return SKU;
 	}
-	public Float getValorAncla() {
+	public Double getValorAncla() {
 		return valorAncla;
 	}
-	public Float getGramaje() {
+	public Double getGramaje() {
 		return gramaje;
 	}
-	public Float getKilataje() {
+	public Double getKilataje() {
 		return kilataje;
 	}
-	public Float getIncremento() {
+	public Double getIncremento() {
 		return incremento;
 	}
-	public Float getDesplazamiento() {
+	public Double getDesplazamiento() {
 		return desplazamiento;
 	}
-	public Float getAvaluoComplementario() {
+	public Double getAvaluoComplementario() {
 		return avaluoComplementario;
 	}
 	public void setIdPartida(Integer idPartida) {
@@ -64,22 +64,22 @@ public class CalculoValorVO {
 	public void setSKU(String sKU) {
 		SKU = sKU;
 	}
-	public void setValorAncla(Float valorAncla) {
+	public void setValorAncla(Double valorAncla) {
 		this.valorAncla = valorAncla;
 	}
-	public void setGramaje(Float gramaje) {
+	public void setGramaje(Double gramaje) {
 		this.gramaje = gramaje;
 	}
-	public void setKilataje(Float kilataje) {
+	public void setKilataje(Double kilataje) {
 		this.kilataje = kilataje;
 	}
-	public void setIncremento(Float incremento) {
+	public void setIncremento(Double incremento) {
 		this.incremento = incremento;
 	}
-	public void setDesplazamiento(Float desplazamiento) {
+	public void setDesplazamiento(Double desplazamiento) {
 		this.desplazamiento = desplazamiento;
 	}
-	public void setAvaluoComplementario(Float avaluoComplementario) {
+	public void setAvaluoComplementario(Double avaluoComplementario) {
 		this.avaluoComplementario = avaluoComplementario;
 	}
 

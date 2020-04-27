@@ -136,13 +136,13 @@ public class CastObjectGeneric {
 			if(infoRegla!=null&&infoRegla.getReglasDescuento()!=null&&infoRegla.getReglasDescuento().getPrimerBaseAjuste()!=null){//primer ajuste
 				for (CommonBaseAjuste item : infoRegla.getReglasDescuento().getPrimerBaseAjuste()) {
 					if(item.getTipoPrecio().equals(Common.PRECIO_ALTO)){
-						partida.setBaseAjusteUnoPA(null);//simular.getReglasDescuento()-- deserializar este object
+						//partida.setBaseAjusteUnoPA(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
 					}
 					if(item.getTipoPrecio().equals(Common.PRECIO_MEDIO)){
-						partida.setBaseAjusteUnoPM(null);//simular.getReglasDescuento()-- deserializar este object
+						//partida.setBaseAjusteUnoPM(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
 					}
 					if(item.getTipoPrecio().equals(Common.PRECIO_BAJO)){
-						partida.setBaseAjusteUnoPB(null);//simular.getReglasDescuento()-- deserializar este object
+						//partida.setBaseAjusteUnoPB(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
 					}
 				}
 			}
@@ -161,7 +161,7 @@ public class CastObjectGeneric {
 			}
 			partida.setPrecioFinal(null);
 			partida.setPrecioEtiqueta(null);
-			partida.setCriterio(null);//infoRegla.getReglasDescuento() --deserializar este objeto
+			partida.setCriterio(infoRegla.getReglasDescuento().getCriterio().getDescripcion());//infoRegla.getReglasDescuento() --deserializar este objeto
 			partida.setCandadoPA(null);//infoRegla.getCandadoInferior()
 			partida.setCandadoPM(null);//infoRegla.getCandadoInferior()
 			partida.setCandadoPB(null);//infoRegla.getCandadoInferior()
@@ -196,25 +196,25 @@ public class CastObjectGeneric {
 	private Double retornaPrecioPorTipoBaseAjuste(IndexGarantiaVO index,CommonAjuste tipoAjuste){
 		Double valorARetornar=null;
 		if(tipoAjuste.getDescripcion().equals(Common.AVALUO_TECNICO)){
-			valorARetornar=Double.valueOf(index.getAvaluoTecOrigen());
+			valorARetornar=index.getAvaluoTecOrigen();
 		}
 		if(tipoAjuste.getDescripcion().equals(Common.VALOR_MONTE_ACTUALIZADO)){
-			valorARetornar=Double.valueOf(index.getValorMonteAct());
+			valorARetornar=index.getValorMonteAct();
 		}
 		if(tipoAjuste.getDescripcion().equals(Common.PRECIO_ETIQUETA)){
-			valorARetornar=Double.valueOf(null);
+			valorARetornar=(null);
 		}
 		if(tipoAjuste.getDescripcion().equals(Common.PRECIO_ACTUAL)){
-			valorARetornar=Double.valueOf(index.getPrecioVentaAct());
+			valorARetornar=index.getPrecioVentaAct();
 		}
 		if(tipoAjuste.getDescripcion().equals(Common.PRESTAMO)){
-			valorARetornar=Double.valueOf(index.getImportePrestamo());
+			valorARetornar=index.getImportePrestamo();
 		}
 		if(tipoAjuste.getDescripcion().equals(Common.AVALUO_COMERCIAL)){
-			valorARetornar=Double.valueOf(index.getAvaluoComerc());
+			valorARetornar=index.getAvaluoComerc();
 		}
 		if(tipoAjuste.getDescripcion().equals(Common.PRECIO_MERCADO)){
-			valorARetornar=Double.valueOf(null);
+			valorARetornar=(null);
 		}
 		return valorARetornar;
 	}

@@ -27,8 +27,15 @@ import mx.com.nmp.escenariosdinamicos.clienteservicios.service.ClientesMicroserv
 import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.CalculoValorVO;
 import mx.com.nmp.escenariosdinamicos.elastic.properties.ElasticProperties;
 import mx.com.nmp.escenariosdinamicos.elastic.service.ElasticService;
+import mx.com.nmp.escenariosdinamicos.elastic.vo.AforoVO;
+import mx.com.nmp.escenariosdinamicos.elastic.vo.CanalComercializacionVO;
+import mx.com.nmp.escenariosdinamicos.elastic.vo.CatalogoVO;
+import mx.com.nmp.escenariosdinamicos.elastic.vo.DiasAlmonedaVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexVentasVO;
+import mx.com.nmp.escenariosdinamicos.elastic.vo.InformacionAjusteVO;
+import mx.com.nmp.escenariosdinamicos.elastic.vo.ReglasDescuento;
+import mx.com.nmp.escenariosdinamicos.elastic.vo.SimulaEscenarioDinamicoVO;
 import mx.com.nmp.escenariosdinamicos.model.BadRequest;
 import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosResInner;
@@ -37,6 +44,7 @@ import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoRes;
 import mx.com.nmp.escenariosdinamicos.model.EliminarEscenariosRes;
+import mx.com.nmp.escenariosdinamicos.model.InfoRegla;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosReq;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
@@ -218,17 +226,13 @@ public class EscenariosApiController implements EscenariosApi {
         List<PartidaVO> castIndexToVO=null;
         //ResponseOAGDto responseClientAplicaReglaEscenarioDinamico=null;
 			try {
-				Date fechaActual=new Date();//ultimos tres dias
+				//Date fechaActual=new Date();//ultimos tres dias
 				lstIndexGarantia=elasticService.scrollElasticGarantias(elasticProperties.getIndexGarantia(),crearEscenariosReques.getInfoRegla().getRamo(),crearEscenariosReques.getInfoRegla().getSubramo().get(0));
 				lstIndexGarantia.forEach(i->System.out.println(i.toString()));
 				lstPartidaPrecioValorMonte=(ArrayList<PartidaPrecioFinal>)clientesMicroservicios.calcularValorMonte(castObjectGeneric.castGarantiasToCalculoValor(lstIndexGarantia));
-				//List<CalculoValorVO> lstIndexGarantiv1=fillValues();
-				//lstIndexGarantiv1.forEach(x->System.out.println(x.toString()));
-				//lstPartidaPrecioFinal=(ArrayList<PartidaPrecioFinal>) clientesMicroservicios.actualizaPrecio(lstIndexGarantiv1);
-				//List<IndexVentasVO> ventas=elasticService.scrollElasticVentas(elasticProperties.getIndexVenta(),crearEscenariosReques.getInfoRegla().getRamo(),crearEscenariosReques.getInfoRegla().getSubramo().get(0),fechaActual);
 				castIndexToVO=castObjectGeneric.castPartidasToPartidaValorMonte(lstIndexGarantia,crearEscenariosReques.getInfoRegla());
 				wrapperReglaEscenarioDinamico.setPartida(castIndexToVO);
-				clientOAGService.actualizarPrecioPartida(wrapperReglaEscenarioDinamico);
+				//clientOAGService.actualizarPrecioPartida(wrapperReglaEscenarioDinamico);
 		} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -237,12 +241,87 @@ public class EscenariosApiController implements EscenariosApi {
 
         //return new ResponseEntity<SimularEscenarioDinamicoRes>(HttpStatus.NOT_IMPLEMENTED);
     }
-    @Deprecated
-    private List<CalculoValorVO> fillValues(){
-    	 List<CalculoValorVO> lst=new ArrayList<>();
-    	 CalculoValorVO calculoValorVO=new CalculoValorVO(143906442, "nmp-al-al-32080084",new Float(1415.00),new Float(2.000), new Float(14.00), new Float(15.00), new Float(5.00), new Float(0));
-    	 lst.add(calculoValorVO);
-		return lst;
-    }
 
+//    @Deprecated
+//    private List<CalculoValorVO> fillValues(){
+//    	 List<CalculoValorVO> lst=new ArrayList<>();
+//    	 CalculoValorVO calculoValorVO=new CalculoValorVO(143906442, "nmp-al-al-32080084",new Float(1415.00),new Float(2.000), new Float(14.00), new Float(15.00), new Float(5.00), new Float(0));
+//    	 lst.add(calculoValorVO);
+//		return lst;
+//    }
+//    private SimulaEscenarioDinamicoVO llenaValoresRequest(){
+//    	SimulaEscenarioDinamicoVO llena=new SimulaEscenarioDinamicoVO();
+//    	llena.setId(1);
+//    	llena.setNombre("Reloj Rolex");
+//    	CatalogoVO origen=new CatalogoVO();
+//    	origen.setId(0);
+//    	origen.setDescripcion("Oxxo");
+//    	llena.setOrigen(origen);
+//    	llena.setRamo("Al");
+//    	List<String> ls=new ArrayList<>();ls.add("Alaja");
+//    	llena.setSubramo(ls);
+//    	List<String> factor=new ArrayList<>();ls.add("Factor");
+//    	llena.setFactor(factor);
+//    	List<String> clasificacionClientes=new ArrayList<>();ls.add("ClasificacionClienteds");
+//    	llena.setClasificacionClientes(clasificacionClientes);
+//    	List<CatalogoVO> bolsas=new ArrayList<>();CatalogoVO bolsa=new CatalogoVO();bolsa.setId(2);bolsa.setDescripcion("BolsaBodegaAurrera");bolsas.add(bolsa);
+//    	llena.setBolsas(bolsas);
+//    	List<String> sucursales=new ArrayList<>();ls.add("SucursalBa");
+//    	llena.setSucursales(sucursales);
+//    	List<CanalComercializacionVO> canalComerciazacion=new ArrayList<>();CanalComercializacionVO ca=new CanalComercializacionVO();canalComerciazacion.add(ca);
+//    	ca.setIdCanal(3);ca.setCanal("Amazon");
+//    	llena.setCanalComerciazacion(canalComerciazacion);
+//    	llena.setCompraCumplido(true);
+//    	AforoVO aforo=new AforoVO();aforo.setMaximo(10);aforo.setMinimo(1);
+//    	llena.setAforo(aforo);
+//    	List<CatalogoVO> estatusPartida=new ArrayList<>();CatalogoVO p=new CatalogoVO();p.setId(4);bolsa.setDescripcion("Activo");estatusPartida.add(p);
+//    	llena.setEstatusPartida(estatusPartida);
+//    	List<CatalogoVO> canalIngresoActual=new ArrayList<>();CatalogoVO c=new CatalogoVO();c.setId(5);c.setDescripcion("Canal");canalIngresoActual.add(c);
+//    	llena.setCanalIngresoActual(canalIngresoActual);
+//    	DiasAlmonedaVO diasAlmoneda=new DiasAlmonedaVO();diasAlmoneda.setRangoMaximo(11);diasAlmoneda.setRangoMinimo(2);
+//    	llena.setDiasAlmoneda(diasAlmoneda);
+//    	List<CatalogoVO> tipoMonedas=new ArrayList<>();CatalogoVO m=new CatalogoVO();c.setId(6);c.setDescripcion("USD");tipoMonedas.add(m);
+//    	llena.setTipoMonedas(tipoMonedas);
+//    	CatalogoVO agrupacion=new CatalogoVO();agrupacion.setDescripcion("Agrupacion");agrupacion.setId(7);
+//    	llena.setNivelAgrupacion(agrupacion);
+//    	
+//    	ReglasDescuento reglasDescuento=new ReglasDescuento();
+//    	reglasDescuento.setFactorPrecioFinal(11);
+//    	List<InformacionAjusteVO> primerBaseAjuste=new ArrayList<>();
+//    	InformacionAjusteVO a=new InformacionAjusteVO();
+//    	CatalogoVO baseAjuste=new CatalogoVO();
+//    	baseAjuste.setDescripcion("baseAJUSTES");baseAjuste.setId(9);
+//    	a.setBaseAjuste(baseAjuste);
+//    	a.setFactorAjuste(8);
+//    	a.setTipoPrecio("precioAjustado");
+//    	primerBaseAjuste.add(a);
+//    	reglasDescuento.setPrimerBaseAjuste(primerBaseAjuste);
+//    	
+//    	List<InformacionAjusteVO> secondBaseAjuste=new ArrayList<>();
+//    	CatalogoVO SecondbaseAjuste=new CatalogoVO();
+//    	SecondbaseAjuste.setDescripcion("baseAJUSTES2");SecondbaseAjuste.setId(10);
+//    	a.setBaseAjuste(SecondbaseAjuste);
+//    	a.setFactorAjuste(8);
+//    	a.setTipoPrecio("precioAjustado2");
+//    	secondBaseAjuste.add(a);
+//    	reglasDescuento.setSegundaBaseAjuste(secondBaseAjuste);
+//    	CatalogoVO regl=new CatalogoVO();
+//    	regl.setId(12);regl.setDescripcion("Maximo");
+//    	reglasDescuento.setCriterio(regl);
+//    	llena.setReglasDescuento(reglasDescuento);
+//    	List<InformacionAjusteVO> ajus=new ArrayList<>();InformacionAjusteVO in=new InformacionAjusteVO();CatalogoVO x=new CatalogoVO();x.setDescripcion("baseAjusteCandado");x.setId(22);;
+//    	in.setBaseAjuste(x);in.setFactorAjuste(50);in.setTipoPrecio("PM");
+//    	ajus.add(in);
+//    	llena.setCandadoInferior(ajus);
+//    	return llena;
+//    }
+//    private List<IndexGarantiaVO> simulaConsultaIndex(){
+//    	 List<IndexGarantiaVO> ls=new ArrayList<>();
+//    	 IndexGarantiaVO p=new IndexGarantiaVO();
+//    	 p.setSku("nmp-al-al-32080084");
+//    	 p.setPartida(143906442);
+//    	 ls.add(p);
+//    	 return ls;
+//    }
 }
+
