@@ -111,21 +111,21 @@ public class CastObjectGeneric {
 		return response;
 	}
 	
-	public List<PartidaVO> castPartidasToPartidaValorMonte(List<IndexVentasVO> lstResultServiceValorMonte,InfoRegla infoRegla){
+	public List<PartidaVO> castPartidasToPartidaValorMonte(List<IndexGarantiaVO> lstResultServiceValorMonte,InfoRegla infoRegla){
 		List<PartidaVO> lstPartidas=null;
 		if (lstResultServiceValorMonte != null && !lstResultServiceValorMonte.isEmpty()) {
 			lstPartidas = new ArrayList<>();
-			for (IndexVentasVO entity : lstResultServiceValorMonte) {
+			for (IndexGarantiaVO entity : lstResultServiceValorMonte) {
 				lstPartidas.add(fillValues(entity,infoRegla));
 			}
 		}
 		return lstPartidas;
 	}
-	public PartidaVO fillValues(IndexVentasVO index,InfoRegla infoRegla){
+	public PartidaVO fillValues(IndexGarantiaVO index,InfoRegla infoRegla){
 		PartidaVO partida=null;
 		if(index!=null){
 			partida=new PartidaVO();
-			partida.setIdPartida(index.getPartida());
+			partida.setIdPartida(String.valueOf(index.getPartida()));
 			partida.setSku(index.getSku());
 			partida.setVentasDiaUno(null);
 			partida.setVentasDiaDos(null);

@@ -43,6 +43,8 @@ import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
 import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoRes;
 import mx.com.nmp.escenariosdinamicos.mongodb.service.EscenariosService;
+import mx.com.nmp.escenariosdinamicos.oag.dto.RequestReglaEscenarioDinamicoDto;
+import mx.com.nmp.escenariosdinamicos.oag.vo.PartidaVO;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-04T01:28:01.968Z")
 
 @Controller
@@ -212,6 +214,8 @@ public class EscenariosApiController implements EscenariosApi {
     	ArrayList<PartidaPrecioFinal> lstPartidaPrecioValorMonte=new ArrayList<PartidaPrecioFinal>();
         System.out.println("obtencion de indices");
         List<IndexGarantiaVO>lstIndexGarantia=null;
+        RequestReglaEscenarioDinamicoDto wrapperReglaEscenarioDinamico=new RequestReglaEscenarioDinamicoDto();
+        List<PartidaVO> castIndexToVO=null;
         //ResponseOAGDto responseClientAplicaReglaEscenarioDinamico=null;
 			try {
 				Date fechaActual=new Date();//ultimos tres dias
@@ -221,8 +225,10 @@ public class EscenariosApiController implements EscenariosApi {
 				//List<CalculoValorVO> lstIndexGarantiv1=fillValues();
 				//lstIndexGarantiv1.forEach(x->System.out.println(x.toString()));
 				//lstPartidaPrecioFinal=(ArrayList<PartidaPrecioFinal>) clientesMicroservicios.actualizaPrecio(lstIndexGarantiv1);
-				List<IndexVentasVO> ventas=elasticService.scrollElasticVentas(elasticProperties.getIndexVenta(),crearEscenariosReques.getInfoRegla().getRamo(),crearEscenariosReques.getInfoRegla().getSubramo().get(0),fechaActual);
-				//clientOAGService.actualizarPrecioPartida(castObjectGeneric.castPartidasToPartidaValorMonte(ventas,crearEscenariosReques.getInfoRegla()));
+				//List<IndexVentasVO> ventas=elasticService.scrollElasticVentas(elasticProperties.getIndexVenta(),crearEscenariosReques.getInfoRegla().getRamo(),crearEscenariosReques.getInfoRegla().getSubramo().get(0),fechaActual);
+				castIndexToVO=castObjectGeneric.castPartidasToPartidaValorMonte(lstIndexGarantia,crearEscenariosReques.getInfoRegla());
+				wrapperReglaEscenarioDinamico.setPartida(castIndexToVO);
+				clientOAGService.actualizarPrecioPartida(wrapperReglaEscenarioDinamico);
 		} catch (Exception e) {
 				e.printStackTrace();
 			}
