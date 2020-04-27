@@ -21,7 +21,7 @@ public class InfoRegla extends InfoGeneralRegla  {
   private Object nivelAgrupacion = null;
 
   @JsonProperty("reglasDescuento")
-  private Object reglasDescuento = null;
+  private ReglasDescuentoVO reglasDescuento = null;
 
   @JsonProperty("candadoInferior")
   private Object candadoInferior = null;
@@ -46,7 +46,7 @@ public class InfoRegla extends InfoGeneralRegla  {
     this.nivelAgrupacion = nivelAgrupacion;
   }
 
-  public InfoRegla reglasDescuento(Object reglasDescuento) {
+  public InfoRegla reglasDescuento(ReglasDescuentoVO reglasDescuento) {
     this.reglasDescuento = reglasDescuento;
     return this;
   }
@@ -62,7 +62,7 @@ public class InfoRegla extends InfoGeneralRegla  {
     return reglasDescuento;
   }
 
-  public void setReglasDescuento(Object reglasDescuento) {
+  public void setReglasDescuento(ReglasDescuentoVO reglasDescuento) {
     this.reglasDescuento = reglasDescuento;
   }
 
@@ -97,7 +97,7 @@ public class InfoRegla extends InfoGeneralRegla  {
     }
     InfoRegla infoRegla = (InfoRegla) o;
     return Objects.equals(this.nivelAgrupacion, infoRegla.nivelAgrupacion) &&
-        Objects.equals(this.reglasDescuento, infoRegla.reglasDescuento) &&
+      //  Objects.equals(this.reglasDescuento, infoRegla.reglasDescuento) &&
         Objects.equals(this.candadoInferior, infoRegla.candadoInferior) &&
         super.equals(o);
   }
@@ -113,7 +113,7 @@ public class InfoRegla extends InfoGeneralRegla  {
     sb.append("class InfoRegla {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
     sb.append("    nivelAgrupacion: ").append(toIndentedString(nivelAgrupacion)).append("\n");
-    sb.append("    reglasDescuento: ").append(toIndentedString(reglasDescuento)).append("\n");
+   // sb.append("    reglasDescuento: ").append(toIndentedString(reglasDescuento)).append("\n");
     sb.append("    candadoInferior: ").append(toIndentedString(candadoInferior)).append("\n");
     sb.append("}");
     return sb.toString();
