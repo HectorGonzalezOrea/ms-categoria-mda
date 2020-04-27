@@ -186,4 +186,13 @@ public class CastObjectGeneric {
 		}
 		return participantJsonList;
 	}
+	
+	private  Double calcularBaseAjuste(Double factorAjuste, Double precio  ) {
+		Double total=0D;
+		Double porcentaje= (factorAjuste/100);
+		total=precio*porcentaje;
+		return total;
+	}
 }
+
+
