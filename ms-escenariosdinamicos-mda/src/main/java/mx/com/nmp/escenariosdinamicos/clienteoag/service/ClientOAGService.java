@@ -118,37 +118,7 @@ public class ClientOAGService {
 	
 	
 	
-	  private String formatRequest(PartidaVO partida) {
-		  log.info("Generando request json");
-		  JsonNode rootNode=objectMapper.createObjectNode();
-		  JsonNode childNode = objectMapper.createObjectNode();
-		  String jsonString=null;
-		  try {
-			  ((ObjectNode) childNode).put("idPartida", partida.getIdPartida());
-			  ((ObjectNode) childNode).put("sku", partida.getSku());
-			  ((ObjectNode) childNode).put("ventasDiaUno", partida.getVentasDiaUno());
-			  ((ObjectNode) childNode).put("ventasDiaDos", partida.getVentasDiaDos());
-			  ((ObjectNode) childNode).put("ventasDiaTres", partida.getVentasDiaTres());
-			  ((ObjectNode) childNode).put("baseAjusteUnoPA", partida.getBaseAjusteUnoPA());
-			  ((ObjectNode) childNode).put("baseAjusteUnoPM", partida.getBaseAjusteUnoPM());
-			  ((ObjectNode) childNode).put("baseAjusteUnoPB", partida.getBaseAjusteUnoPB());
-			  ((ObjectNode) childNode).put("baseAjusteDosPA", partida.getBaseAjusteDosPA());
-			  ((ObjectNode) childNode).put("baseAjusteDosPM", partida.getBaseAjusteDosPM());
-			  ((ObjectNode) childNode).put("baseAjusteDosPB", partida.getBaseAjusteDosPB());
-			  ((ObjectNode) childNode).put("precioFinal", partida.getPrecioFinal());
-			  ((ObjectNode) childNode).put("precioEtiqueta", partida.getPrecioEtiqueta());
-			  ((ObjectNode) childNode).put("criterio", partida.getCriterio());
-			  ((ObjectNode) childNode).put("candadoPA", partida.getCandadoPA());
-			  ((ObjectNode) childNode).put("candadoPM", partida.getCandadoPM());
-			  ((ObjectNode) childNode).put("candadoPB", partida.getCandadoPB());
-			  ((ObjectNode) rootNode).set("partida", childNode);
-			 jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
-		} catch (JsonProcessingException e) {
-			log.info("Error al genrar el request "+e.getMessage());
-		}
-		  
-		  return jsonString;
-	  }
+	 
 	  
 	  
 	  private String requestReglaArbitraje(PartidaVO vo ) {
