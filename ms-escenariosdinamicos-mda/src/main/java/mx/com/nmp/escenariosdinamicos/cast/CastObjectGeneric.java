@@ -16,8 +16,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.CalculoValorVO;
+import mx.com.nmp.escenariosdinamicos.constantes.Constantes;
+import mx.com.nmp.escenariosdinamicos.constantes.Constantes.Common;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexVentasVO;
+import mx.com.nmp.escenariosdinamicos.elastic.vo.ReglasDescuento;
+import mx.com.nmp.escenariosdinamicos.model.CommonBaseAjuste;
 import mx.com.nmp.escenariosdinamicos.model.InfoRegla;
 import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseOAGDto;
@@ -130,12 +134,32 @@ public class CastObjectGeneric {
 			partida.setVentasDiaUno(null);
 			partida.setVentasDiaDos(null);
 			partida.setVentasDiaTres(null);
-			partida.setBaseAjusteUnoPA(null);//simular.getReglasDescuento()-- deserializar este object
-			partida.setBaseAjusteUnoPM(null);//simular.getReglasDescuento()-- deserializar este object
-			partida.setBaseAjusteUnoPB(null);//simular.getReglasDescuento()-- deserializar este object
-			partida.setBaseAjusteDosPA(null);;//simular.getReglasDescuento()-- deserializar este object
-			partida.setBaseAjusteDosPM(null);//simular.getReglasDescuento()-- deserializar este object
-			partida.setBaseAjusteDosPB(null);//simular.getReglasDescuento()-- deserializar este object
+			if(infoRegla!=null&&infoRegla.getReglasDescuento()!=null&&infoRegla.getReglasDescuento().getPrimerBaseAjuste()!=null){//primer ajuste
+				for (CommonBaseAjuste item : infoRegla.getReglasDescuento().getPrimerBaseAjuste()) {
+					if(item.getTipoPrecio().equals(Common.PRECIO_ALTO)){
+						partida.setBaseAjusteUnoPA(null);//simular.getReglasDescuento()-- deserializar este object
+					}
+					if(item.getTipoPrecio().equals(Common.PRECIO_MEDIO)){
+						partida.setBaseAjusteUnoPM(null);//simular.getReglasDescuento()-- deserializar este object
+					}
+					if(item.getTipoPrecio().equals(Common.PRECIO_BAJO)){
+						partida.setBaseAjusteUnoPB(null);//simular.getReglasDescuento()-- deserializar este object
+					}
+				}
+			}
+			if(infoRegla!=null&&infoRegla.getReglasDescuento()!=null&&infoRegla.getReglasDescuento().getSegundaBaseAjuste()!=null){//primer ajuste
+				for (CommonBaseAjuste item : infoRegla.getReglasDescuento().getSegundaBaseAjuste()) {
+					if(item.getTipoPrecio().equals(Common.PRECIO_ALTO)){
+						partida.setBaseAjusteDosPA(null);;//simular.getReglasDescuento()-- deserializar este object
+					}
+					if(item.getTipoPrecio().equals(Common.PRECIO_MEDIO)){
+						partida.setBaseAjusteDosPM(null);//simular.getReglasDescuento()-- deserializar este object
+					}
+					if(item.getTipoPrecio().equals(Common.PRECIO_BAJO)){
+						partida.setBaseAjusteDosPB(null);//simular.getReglasDescuento()-- deserializar este object
+					}
+				}
+			}
 			partida.setPrecioFinal(null);
 			partida.setPrecioEtiqueta(null);
 			partida.setCriterio(null);//infoRegla.getReglasDescuento() --deserializar este objeto

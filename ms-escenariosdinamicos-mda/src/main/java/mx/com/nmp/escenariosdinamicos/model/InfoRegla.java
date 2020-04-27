@@ -58,7 +58,7 @@ public class InfoRegla extends InfoGeneralRegla  {
   @ApiModelProperty(value = "")
 
 
-  public Object getReglasDescuento() {
+  public ReglasDescuentoVO getReglasDescuento() {
     return reglasDescuento;
   }
 

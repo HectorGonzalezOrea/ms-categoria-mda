@@ -33,6 +33,10 @@ public final class Constantes {
 		public static final String GRANT_TYPE = "grant_type";
 		public static final String SCOPE = "scope";
 		public static final String HEADER_OAUTH_BEARER="oauth.bearer";
+		
+		public static final String PRECIO_MEDIO="PM";
+		public static final String PRECIO_ALTO="PA";
+		public static final String PRECIO_BAJO="PB";
 
 	}
 	
