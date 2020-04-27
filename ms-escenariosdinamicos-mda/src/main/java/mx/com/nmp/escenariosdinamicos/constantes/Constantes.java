@@ -37,7 +37,14 @@ public final class Constantes {
 		public static final String PRECIO_MEDIO="PM";
 		public static final String PRECIO_ALTO="PA";
 		public static final String PRECIO_BAJO="PB";
-
+		
+		public static final String AVALUO_TECNICO="avaluo_tec_origen";
+		public static final String VALOR_MONTE_ACTUALIZADO="valor_monte_act";
+		public static final String PRECIO_ETIQUETA="precio_etiqueta";
+		public static final String PRECIO_ACTUAL="precio_venta_act";
+		public static final String PRESTAMO="importe_prestamo";
+		public static final String AVALUO_COMERCIAL="avaluo_comerc";
+		public static final String PRECIO_MERCADO="precioMercado";
 	}
 	
 

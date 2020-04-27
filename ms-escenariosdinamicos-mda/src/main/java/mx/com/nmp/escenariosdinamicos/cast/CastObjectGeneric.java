@@ -16,11 +16,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.CalculoValorVO;
-import mx.com.nmp.escenariosdinamicos.constantes.Constantes;
 import mx.com.nmp.escenariosdinamicos.constantes.Constantes.Common;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexVentasVO;
-import mx.com.nmp.escenariosdinamicos.elastic.vo.ReglasDescuento;
+import mx.com.nmp.escenariosdinamicos.model.CommonAjuste;
 import mx.com.nmp.escenariosdinamicos.model.CommonBaseAjuste;
 import mx.com.nmp.escenariosdinamicos.model.InfoRegla;
 import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
@@ -192,6 +191,32 @@ public class CastObjectGeneric {
 		Double porcentaje= (factorAjuste/100);
 		total=precio*porcentaje;
 		return total;
+	}
+	
+	private Double retornaPrecioPorTipoBaseAjuste(IndexGarantiaVO index,CommonAjuste tipoAjuste){
+		Double valorARetornar=null;
+		if(tipoAjuste.getDescripcion().equals(Common.AVALUO_TECNICO)){
+			valorARetornar=Double.valueOf(index.getAvaluoTecOrigen());
+		}
+		if(tipoAjuste.getDescripcion().equals(Common.VALOR_MONTE_ACTUALIZADO)){
+			valorARetornar=Double.valueOf(index.getValorMonteAct());
+		}
+		if(tipoAjuste.getDescripcion().equals(Common.PRECIO_ETIQUETA)){
+			valorARetornar=Double.valueOf(null);
+		}
+		if(tipoAjuste.getDescripcion().equals(Common.PRECIO_ACTUAL)){
+			valorARetornar=Double.valueOf(index.getPrecioVentaAct());
+		}
+		if(tipoAjuste.getDescripcion().equals(Common.PRESTAMO)){
+			valorARetornar=Double.valueOf(index.getImportePrestamo());
+		}
+		if(tipoAjuste.getDescripcion().equals(Common.AVALUO_COMERCIAL)){
+			valorARetornar=Double.valueOf(index.getAvaluoComerc());
+		}
+		if(tipoAjuste.getDescripcion().equals(Common.PRECIO_MERCADO)){
+			valorARetornar=Double.valueOf(null);
+		}
+		return valorARetornar;
 	}
 }
 
