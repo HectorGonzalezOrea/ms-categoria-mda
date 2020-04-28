@@ -2,6 +2,9 @@ package mx.com.nmp.escenariosdinamicos.elastic.vo;
 
 import java.util.List;
 
+import mx.com.nmp.escenariosdinamicos.model.CatalogoVO;
+import mx.com.nmp.escenariosdinamicos.model.InformacionAjusteVO;
+
 public class SimulaEscenarioDinamicoVO {
 	private Integer id;
 	private String nombre;

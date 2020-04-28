@@ -1,4 +1,4 @@
-package mx.com.nmp.escenariosdinamicos.elastic.vo;
+package mx.com.nmp.escenariosdinamicos.model;
 
 public class CatalogoVO {
 	private Integer id;

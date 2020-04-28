@@ -1,5 +1,6 @@
 package mx.com.nmp.escenariosdinamicos.model;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.validation.annotation.Validated;
@@ -24,7 +25,7 @@ public class InfoRegla extends InfoGeneralRegla  {
   private ReglasDescuentoVO reglasDescuento = null;
 
   @JsonProperty("candadoInferior")
-  private Object candadoInferior = null;
+  private List<InformacionAjusteVO> candadoInferior;
 
   public InfoRegla nivelAgrupacion(Object nivelAgrupacion) {
     this.nivelAgrupacion = nivelAgrupacion;
@@ -66,7 +67,7 @@ public class InfoRegla extends InfoGeneralRegla  {
     this.reglasDescuento = reglasDescuento;
   }
 
-  public InfoRegla candadoInferior(Object candadoInferior) {
+  public InfoRegla candadoInferior(List<InformacionAjusteVO> candadoInferior) {
     this.candadoInferior = candadoInferior;
     return this;
   }
@@ -78,13 +79,13 @@ public class InfoRegla extends InfoGeneralRegla  {
   @ApiModelProperty(value = "")
 
 
-  public Object getCandadoInferior() {
-    return candadoInferior;
-  }
+  public List<InformacionAjusteVO> getCandadoInferior() {
+		return candadoInferior;
+	}
 
-  public void setCandadoInferior(Object candadoInferior) {
-    this.candadoInferior = candadoInferior;
-  }
+  public void setCandadoInferior(List<InformacionAjusteVO> candadoInferior) {
+		this.candadoInferior = candadoInferior;
+	}
 
 
   @Override

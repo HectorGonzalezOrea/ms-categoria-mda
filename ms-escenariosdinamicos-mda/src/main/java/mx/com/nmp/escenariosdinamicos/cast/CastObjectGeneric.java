@@ -22,6 +22,7 @@ import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexVentasVO;
 import mx.com.nmp.escenariosdinamicos.model.CommonAjuste;
 import mx.com.nmp.escenariosdinamicos.model.CommonBaseAjuste;
 import mx.com.nmp.escenariosdinamicos.model.InfoRegla;
+import mx.com.nmp.escenariosdinamicos.model.InformacionAjusteVO;
 import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseOAGDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseReglasArbitrajeOAGDto;
@@ -133,7 +134,7 @@ public class CastObjectGeneric {
 			partida.setVentasDiaUno(null);
 			partida.setVentasDiaDos(null);
 			partida.setVentasDiaTres(null);
-			if(infoRegla!=null&&infoRegla.getReglasDescuento()!=null&&infoRegla.getReglasDescuento().getPrimerBaseAjuste()!=null){//primer ajuste
+			if(infoRegla!=null&&infoRegla.getReglasDescuento()!=null&&infoRegla.getReglasDescuento().getPrimerBaseAjuste()!=null){//Primer Ajuste
 				for (CommonBaseAjuste item : infoRegla.getReglasDescuento().getPrimerBaseAjuste()) {
 					if(item.getTipoPrecio().equals(Common.PRECIO_ALTO)){
 						partida.setBaseAjusteUnoPA(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
@@ -146,7 +147,7 @@ public class CastObjectGeneric {
 					}
 				}
 			}
-			if(infoRegla!=null&&infoRegla.getReglasDescuento()!=null&&infoRegla.getReglasDescuento().getSegundaBaseAjuste()!=null){//primer ajuste
+			if(infoRegla!=null&&infoRegla.getReglasDescuento()!=null&&infoRegla.getReglasDescuento().getSegundaBaseAjuste()!=null){//Segungo Ajuste
 				for (CommonBaseAjuste item : infoRegla.getReglasDescuento().getSegundaBaseAjuste()) {
 					if(item.getTipoPrecio().equals(Common.PRECIO_ALTO)){
 						partida.setBaseAjusteDosPA(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
@@ -161,11 +162,21 @@ public class CastObjectGeneric {
 			}
 			partida.setPrecioFinal(null);
 			partida.setPrecioEtiqueta(null);
-			partida.setCriterio(infoRegla.getReglasDescuento().getCriterio().getDescripcion());//infoRegla.getReglasDescuento() --deserializar este objeto
-			partida.setCandadoPA(null);//infoRegla.getCandadoInferior()
-			partida.setCandadoPM(null);//infoRegla.getCandadoInferior()
-			partida.setCandadoPB(null);//infoRegla.getCandadoInferior()
-			partida.setPrecioVenta(null);
+			partida.setCriterio(infoRegla.getReglasDescuento().getCriterio().getDescripcion());
+			if(infoRegla!=null&&infoRegla.getCandadoInferior()!=null){//Candado inferior
+				for (InformacionAjusteVO factor : infoRegla.getCandadoInferior()) {
+					if(factor.getTipoPrecio().equals(Common.PRECIO_ALTO)){
+						partida.setCandadoPA(calcularBaseAjuste(Double.valueOf(factor.getFactorAjuste()), retornaPrecioPorTipoBaseAjuste(index, factor.getBaseAjuste())));
+					}
+					if(factor.getTipoPrecio().equals(Common.PRECIO_MEDIO)){
+						partida.setCandadoPM(calcularBaseAjuste(Double.valueOf(factor.getFactorAjuste()), retornaPrecioPorTipoBaseAjuste(index, factor.getBaseAjuste())));		
+					}
+					if(factor.getTipoPrecio().equals(Common.PRECIO_BAJO)){
+						partida.setCandadoPB(calcularBaseAjuste(Double.valueOf(factor.getFactorAjuste()), retornaPrecioPorTipoBaseAjuste(index, factor.getBaseAjuste())));
+					}
+				}
+			}
+			partida.setPrecioVenta(index.getPrecioVentaAct());
 			partida.setMontoPrestamo(index.getImportePrestamo());
 		}
 		return partida;

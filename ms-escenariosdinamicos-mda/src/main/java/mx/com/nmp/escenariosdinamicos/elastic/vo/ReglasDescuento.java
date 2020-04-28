@@ -2,6 +2,9 @@ package mx.com.nmp.escenariosdinamicos.elastic.vo;
 
 import java.util.List;
 
+import mx.com.nmp.escenariosdinamicos.model.CatalogoVO;
+import mx.com.nmp.escenariosdinamicos.model.InformacionAjusteVO;
+
 public class ReglasDescuento {
 	private List<InformacionAjusteVO> primerBaseAjuste;
 	private List<InformacionAjusteVO> segundaBaseAjuste;

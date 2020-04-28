@@ -29,14 +29,13 @@ import mx.com.nmp.escenariosdinamicos.elastic.properties.ElasticProperties;
 import mx.com.nmp.escenariosdinamicos.elastic.service.ElasticService;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.AforoVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.CanalComercializacionVO;
-import mx.com.nmp.escenariosdinamicos.elastic.vo.CatalogoVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.DiasAlmonedaVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexVentasVO;
-import mx.com.nmp.escenariosdinamicos.elastic.vo.InformacionAjusteVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.ReglasDescuento;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.SimulaEscenarioDinamicoVO;
 import mx.com.nmp.escenariosdinamicos.model.BadRequest;
+import mx.com.nmp.escenariosdinamicos.model.CatalogoVO;
 import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosResInner;
 import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosReq;
@@ -45,6 +44,7 @@ import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoRes;
 import mx.com.nmp.escenariosdinamicos.model.EliminarEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.InfoRegla;
+import mx.com.nmp.escenariosdinamicos.model.InformacionAjusteVO;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosReq;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
@@ -232,7 +232,7 @@ public class EscenariosApiController implements EscenariosApi {
 				lstPartidaPrecioValorMonte=(ArrayList<PartidaPrecioFinal>)clientesMicroservicios.calcularValorMonte(castObjectGeneric.castGarantiasToCalculoValor(lstIndexGarantia));
 				castIndexToVO=castObjectGeneric.castPartidasToPartidaValorMonte(lstIndexGarantia,crearEscenariosReques.getInfoRegla());
 				wrapperReglaEscenarioDinamico.setPartida(castIndexToVO);
-				//clientOAGService.actualizarPrecioPartida(wrapperReglaEscenarioDinamico);
+				clientOAGService.actualizarPrecioPartida(wrapperReglaEscenarioDinamico);
 		} catch (Exception e) {
 				e.printStackTrace();
 			}
