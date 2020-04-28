@@ -149,13 +149,13 @@ public class CastObjectGeneric {
 			if(infoRegla!=null&&infoRegla.getReglasDescuento()!=null&&infoRegla.getReglasDescuento().getSegundaBaseAjuste()!=null){//primer ajuste
 				for (CommonBaseAjuste item : infoRegla.getReglasDescuento().getSegundaBaseAjuste()) {
 					if(item.getTipoPrecio().equals(Common.PRECIO_ALTO)){
-						partida.setBaseAjusteDosPA(null);;//simular.getReglasDescuento()-- deserializar este object
+						//partida.setBaseAjusteDosPA(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
 					}
 					if(item.getTipoPrecio().equals(Common.PRECIO_MEDIO)){
-						partida.setBaseAjusteDosPM(null);//simular.getReglasDescuento()-- deserializar este object
+						//partida.setBaseAjusteDosPM(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
 					}
 					if(item.getTipoPrecio().equals(Common.PRECIO_BAJO)){
-						partida.setBaseAjusteDosPB(null);//simular.getReglasDescuento()-- deserializar este object
+						//partida.setBaseAjusteDosPB(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
 					}
 				}
 			}
@@ -195,25 +195,25 @@ public class CastObjectGeneric {
 	
 	private Double retornaPrecioPorTipoBaseAjuste(IndexGarantiaVO index,CommonAjuste tipoAjuste){
 		Double valorARetornar=null;
-		if(tipoAjuste.getDescripcion().equals(Common.AVALUO_TECNICO)){
+		if(Integer.valueOf(tipoAjuste.getId())==Common.AVALUO_TECNICO){
 			valorARetornar=index.getAvaluoTecOrigen();
 		}
-		if(tipoAjuste.getDescripcion().equals(Common.VALOR_MONTE_ACTUALIZADO)){
+		if(Integer.valueOf(tipoAjuste.getId())==Common.VALOR_MONTE_ACTUALIZADO){
 			valorARetornar=index.getValorMonteAct();
 		}
-		if(tipoAjuste.getDescripcion().equals(Common.PRECIO_ETIQUETA)){
+		if(Integer.valueOf(tipoAjuste.getId())==Common.PRECIO_ETIQUETA){
 			valorARetornar=(null);
 		}
-		if(tipoAjuste.getDescripcion().equals(Common.PRECIO_ACTUAL)){
+		if(Integer.valueOf(tipoAjuste.getId())==Common.PRECIO_ACTUAL){
 			valorARetornar=index.getPrecioVentaAct();
 		}
-		if(tipoAjuste.getDescripcion().equals(Common.PRESTAMO)){
+		if(Integer.valueOf(tipoAjuste.getId())==Common.PRESTAMO){
 			valorARetornar=index.getImportePrestamo();
 		}
-		if(tipoAjuste.getDescripcion().equals(Common.AVALUO_COMERCIAL)){
+		if(Integer.valueOf(tipoAjuste.getId())==Common.AVALUO_COMERCIAL){
 			valorARetornar=index.getAvaluoComerc();
 		}
-		if(tipoAjuste.getDescripcion().equals(Common.PRECIO_MERCADO)){
+		if(Integer.valueOf(tipoAjuste.getId())==Common.PRECIO_MERCADO){
 			valorARetornar=(null);
 		}
 		return valorARetornar;
