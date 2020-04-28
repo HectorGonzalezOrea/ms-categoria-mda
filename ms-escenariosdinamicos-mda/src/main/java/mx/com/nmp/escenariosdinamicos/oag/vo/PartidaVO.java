@@ -8,18 +8,18 @@ public class PartidaVO {
 	private Long ventasDiaUno;
 	private Long ventasDiaDos;
 	private Long ventasDiaTres;
-	private Long baseAjusteUnoPA;
-	private Long baseAjusteUnoPM;
-	private Long baseAjusteUnoPB;
-	private Long baseAjusteDosPA;
-	private Long baseAjusteDosPM;
-	private Long baseAjusteDosPB;
-	private Long precioFinal;
-	private Long precioEtiqueta;
+	private Double baseAjusteUnoPA;
+	private Double baseAjusteUnoPM;
+	private Double baseAjusteUnoPB;
+	private Double baseAjusteDosPA;
+	private Double baseAjusteDosPM;
+	private Double baseAjusteDosPB;
+	private Double precioFinal;
+	private Double precioEtiqueta;
 	private String criterio;
-	private Long candadoPA;
-	private Long candadoPM;
-	private Long candadoPB;
+	private Double candadoPA;
+	private Double candadoPM;
+	private Double candadoPB;
 	private Double precioVenta;
 	private Double montoPrestamo;
 	public String getIdPartida() {
@@ -52,52 +52,52 @@ public class PartidaVO {
 	public void setVentasDiaTres(Long ventasDiaTres) {
 		this.ventasDiaTres = ventasDiaTres;
 	}
-	public Long getBaseAjusteUnoPA() {
+	public Double getBaseAjusteUnoPA() {
 		return baseAjusteUnoPA;
 	}
-	public void setBaseAjusteUnoPA(Long baseAjusteUnoPA) {
+	public void setBaseAjusteUnoPA(Double baseAjusteUnoPA) {
 		this.baseAjusteUnoPA = baseAjusteUnoPA;
 	}
-	public Long getBaseAjusteUnoPM() {
+	public Double getBaseAjusteUnoPM() {
 		return baseAjusteUnoPM;
 	}
-	public void setBaseAjusteUnoPM(Long baseAjusteUnoPM) {
+	public void setBaseAjusteUnoPM(Double baseAjusteUnoPM) {
 		this.baseAjusteUnoPM = baseAjusteUnoPM;
 	}
-	public Long getBaseAjusteUnoPB() {
+	public Double getBaseAjusteUnoPB() {
 		return baseAjusteUnoPB;
 	}
-	public void setBaseAjusteUnoPB(Long baseAjusteUnoPB) {
+	public void setBaseAjusteUnoPB(Double baseAjusteUnoPB) {
 		this.baseAjusteUnoPB = baseAjusteUnoPB;
 	}
-	public Long getBaseAjusteDosPA() {
+	public Double getBaseAjusteDosPA() {
 		return baseAjusteDosPA;
 	}
-	public void setBaseAjusteDosPA(Long baseAjusteDosPA) {
+	public void setBaseAjusteDosPA(Double baseAjusteDosPA) {
 		this.baseAjusteDosPA = baseAjusteDosPA;
 	}
-	public Long getBaseAjusteDosPM() {
+	public Double getBaseAjusteDosPM() {
 		return baseAjusteDosPM;
 	}
-	public void setBaseAjusteDosPM(Long baseAjusteDosPM) {
+	public void setBaseAjusteDosPM(Double baseAjusteDosPM) {
 		this.baseAjusteDosPM = baseAjusteDosPM;
 	}
-	public Long getBaseAjusteDosPB() {
+	public Double getBaseAjusteDosPB() {
 		return baseAjusteDosPB;
 	}
-	public void setBaseAjusteDosPB(Long baseAjusteDosPB) {
+	public void setBaseAjusteDosPB(Double baseAjusteDosPB) {
 		this.baseAjusteDosPB = baseAjusteDosPB;
 	}
-	public Long getPrecioFinal() {
+	public Double getPrecioFinal() {
 		return precioFinal;
 	}
-	public void setPrecioFinal(Long precioFinal) {
+	public void setPrecioFinal(Double precioFinal) {
 		this.precioFinal = precioFinal;
 	}
-	public Long getPrecioEtiqueta() {
+	public Double getPrecioEtiqueta() {
 		return precioEtiqueta;
 	}
-	public void setPrecioEtiqueta(Long precioEtiqueta) {
+	public void setPrecioEtiqueta(Double precioEtiqueta) {
 		this.precioEtiqueta = precioEtiqueta;
 	}
 	public String getCriterio() {
@@ -106,22 +106,22 @@ public class PartidaVO {
 	public void setCriterio(String criterio) {
 		this.criterio = criterio;
 	}
-	public Long getCandadoPA() {
+	public Double getCandadoPA() {
 		return candadoPA;
 	}
-	public void setCandadoPA(Long candadoPA) {
+	public void setCandadoPA(Double candadoPA) {
 		this.candadoPA = candadoPA;
 	}
-	public Long getCandadoPM() {
+	public Double getCandadoPM() {
 		return candadoPM;
 	}
-	public void setCandadoPM(Long candadoPM) {
+	public void setCandadoPM(Double candadoPM) {
 		this.candadoPM = candadoPM;
 	}
-	public Long getCandadoPB() {
+	public Double getCandadoPB() {
 		return candadoPB;
 	}
-	public void setCandadoPB(Long candadoPB) {
+	public void setCandadoPB(Double candadoPB) {
 		this.candadoPB = candadoPB;
 	}
 	public Double getPrecioVenta() {
