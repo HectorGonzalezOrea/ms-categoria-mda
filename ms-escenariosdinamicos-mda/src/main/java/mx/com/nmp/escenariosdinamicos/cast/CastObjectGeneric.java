@@ -136,26 +136,26 @@ public class CastObjectGeneric {
 			if(infoRegla!=null&&infoRegla.getReglasDescuento()!=null&&infoRegla.getReglasDescuento().getPrimerBaseAjuste()!=null){//primer ajuste
 				for (CommonBaseAjuste item : infoRegla.getReglasDescuento().getPrimerBaseAjuste()) {
 					if(item.getTipoPrecio().equals(Common.PRECIO_ALTO)){
-						//partida.setBaseAjusteUnoPA(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
+						partida.setBaseAjusteUnoPA(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
 					}
 					if(item.getTipoPrecio().equals(Common.PRECIO_MEDIO)){
-						//partida.setBaseAjusteUnoPM(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
+						partida.setBaseAjusteUnoPM(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
 					}
 					if(item.getTipoPrecio().equals(Common.PRECIO_BAJO)){
-						//partida.setBaseAjusteUnoPB(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
+						partida.setBaseAjusteUnoPB(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
 					}
 				}
 			}
 			if(infoRegla!=null&&infoRegla.getReglasDescuento()!=null&&infoRegla.getReglasDescuento().getSegundaBaseAjuste()!=null){//primer ajuste
 				for (CommonBaseAjuste item : infoRegla.getReglasDescuento().getSegundaBaseAjuste()) {
 					if(item.getTipoPrecio().equals(Common.PRECIO_ALTO)){
-						//partida.setBaseAjusteDosPA(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
+						partida.setBaseAjusteDosPA(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
 					}
 					if(item.getTipoPrecio().equals(Common.PRECIO_MEDIO)){
-						//partida.setBaseAjusteDosPM(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
+						partida.setBaseAjusteDosPM(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
 					}
 					if(item.getTipoPrecio().equals(Common.PRECIO_BAJO)){
-						//partida.setBaseAjusteDosPB(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
+						partida.setBaseAjusteDosPB(calcularBaseAjuste(item.getFactorAjuste(), retornaPrecioPorTipoBaseAjuste(index, item.getBaseAjuste())));
 					}
 				}
 			}
@@ -166,7 +166,7 @@ public class CastObjectGeneric {
 			partida.setCandadoPM(null);//infoRegla.getCandadoInferior()
 			partida.setCandadoPB(null);//infoRegla.getCandadoInferior()
 			partida.setPrecioVenta(null);
-			partida.setMontoPrestamo(null);
+			partida.setMontoPrestamo(index.getImportePrestamo());
 		}
 		return partida;
 	}
