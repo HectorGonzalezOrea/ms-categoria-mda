@@ -215,7 +215,7 @@ public class CastObjectGeneric {
 			valorARetornar=index.getValorMonteAct();
 		}
 		if(Integer.valueOf(tipoAjuste.getId())==Common.PRECIO_ETIQUETA){
-			valorARetornar=(null);
+			valorARetornar=(Double.parseDouble(index.getPrecioVentaInicial()));
 		}
 		if(Integer.valueOf(tipoAjuste.getId())==Common.PRECIO_ACTUAL){
 			valorARetornar=index.getPrecioVentaAct();
