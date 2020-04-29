@@ -2,6 +2,6 @@ package mx.com.nmp.establecimientoprecios.apiproductos.vo;
 
 import java.util.ArrayList;
 
-public class ConsultaPartidaResponseVO extends ArrayList<ProductoMidasVO> {
+public class ConsultaPartidaResponseVO extends ArrayList<DatumVO> /*ArrayList<ProductoMidasVO>*/ {
 
 }
