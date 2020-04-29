@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+
 import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.CalculoValorVO;
 import mx.com.nmp.escenariosdinamicos.constantes.Constantes.Common;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
@@ -24,6 +25,7 @@ import mx.com.nmp.escenariosdinamicos.model.CommonBaseAjuste;
 import mx.com.nmp.escenariosdinamicos.model.InfoRegla;
 import mx.com.nmp.escenariosdinamicos.model.InformacionAjusteVO;
 import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
+import mx.com.nmp.escenariosdinamicos.oag.dto.RequestReglaEscenarioDinamicoDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseOAGDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseReglasArbitrajeOAGDto;
 import mx.com.nmp.escenariosdinamicos.oag.vo.PartidaVO;
@@ -228,6 +230,20 @@ public class CastObjectGeneric {
 			valorARetornar=(null);
 		}
 		return valorARetornar;
+	}
+	
+	public RequestReglaEscenarioDinamicoDto convertJsonToRequestEscenario(String jsonString) {
+		ObjectMapper mapper = new ObjectMapper();
+		RequestReglaEscenarioDinamicoDto request= new RequestReglaEscenarioDinamicoDto();
+		try {
+			request=mapper.readValue(jsonString, RequestReglaEscenarioDinamicoDto.class);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return request;
 	}
 }
 

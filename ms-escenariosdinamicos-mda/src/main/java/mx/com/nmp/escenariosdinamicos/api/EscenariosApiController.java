@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 
 import io.swagger.annotations.ApiParam;
 import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
@@ -50,6 +51,7 @@ import mx.com.nmp.escenariosdinamicos.model.ModEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
 import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoRes;
+import mx.com.nmp.escenariosdinamicos.model.component.ProducerMessageComponent;
 import mx.com.nmp.escenariosdinamicos.mongodb.service.EscenariosService;
 import mx.com.nmp.escenariosdinamicos.oag.dto.RequestReglaEscenarioDinamicoDto;
 import mx.com.nmp.escenariosdinamicos.oag.vo.PartidaVO;
@@ -76,6 +78,8 @@ public class EscenariosApiController implements EscenariosApi {
     private CastObjectGeneric castObjectGeneric;
     @Autowired
     private ClientOAGService clientOAGService;
+    @Autowired
+    private ProducerMessageComponent  producerMessage;
 
     @org.springframework.beans.factory.annotation.Autowired
     public EscenariosApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -164,8 +168,18 @@ public class EscenariosApiController implements EscenariosApi {
 
     public ResponseEntity<EjecutarEscenarioDinamicoRes> ejecutarEscenariosDinamicosPOST(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  )  @Valid @RequestBody EjecutarEscenarioDinamicoReq crearEscenariosRequest) {
         String accept = request.getHeader("Accept");
+        ArrayList<PartidaPrecioFinal> lstPartidaPrecioValorMonte=new ArrayList<PartidaPrecioFinal>();
+        List<IndexGarantiaVO>lstIndexGarantia=null;
+        RequestReglaEscenarioDinamicoDto requestReglaEscenarioDinamico=new RequestReglaEscenarioDinamicoDto();
+        List<PartidaVO> lstPartidaVO=null;
         if (accept != null && accept.contains("application/json")) {
             try {
+            	lstIndexGarantia=elasticService.scrollElasticGarantias(elasticProperties.getIndexGarantia(),crearEscenariosRequest.getInfoRegla().getRamo(),crearEscenariosRequest.getInfoRegla().getSubramo().get(0));
+            	lstPartidaVO=castObjectGeneric.castPartidasToPartidaValorMonte(lstIndexGarantia, crearEscenariosRequest.getInfoRegla());
+            	requestReglaEscenarioDinamico.setPartida(lstPartidaVO);
+            	 String jsonMessage=new Gson().toJson(requestReglaEscenarioDinamico);
+            	producerMessage.producerReglaEscenarioDinamico(jsonMessage);
+            	
                 return new ResponseEntity<EjecutarEscenarioDinamicoRes>(objectMapper.readValue("\"\"", EjecutarEscenarioDinamicoRes.class), HttpStatus.NOT_IMPLEMENTED);
             } catch (IOException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
@@ -232,7 +246,7 @@ public class EscenariosApiController implements EscenariosApi {
 				lstPartidaPrecioValorMonte=(ArrayList<PartidaPrecioFinal>)clientesMicroservicios.calcularValorMonte(castObjectGeneric.castGarantiasToCalculoValor(lstIndexGarantia));
 				castIndexToVO=castObjectGeneric.castPartidasToPartidaValorMonte(lstIndexGarantia,crearEscenariosReques.getInfoRegla());
 				wrapperReglaEscenarioDinamico.setPartida(castIndexToVO);
-				clientOAGService.actualizarPrecioPartida(wrapperReglaEscenarioDinamico);
+				clientOAGService.reglaEscenarioDinamico(wrapperReglaEscenarioDinamico);
 		} catch (Exception e) {
 				e.printStackTrace();
 			}

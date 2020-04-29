@@ -1,5 +1,7 @@
 package mx.com.nmp.escenariosdinamicos.clienteoag.service;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +20,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 
+
 import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
 import mx.com.nmp.escenariosdinamicos.constantes.Constantes.Common;
+import mx.com.nmp.escenariosdinamicos.model.component.ProducerMessageComponent;
 import mx.com.nmp.escenariosdinamicos.oag.dto.RequestReglaEscenarioDinamicoDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseOAGDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseReglasArbitrajeOAGDto;
@@ -35,6 +39,8 @@ public class ClientOAGService {
 	ClienteCorreoService clienteCorreo;
 	@Autowired
 	CastObjectGeneric castObject= new CastObjectGeneric();
+	@Autowired
+	ProducerMessageComponent pruducerMessage;
 	
 	@Value("${oag.resource.oauth.getToken.header.usuario}")
 	protected String headerUsuario;
@@ -65,7 +71,7 @@ public class ClientOAGService {
 	
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	
-	public ResponseOAGDto actualizarPrecioPartida(RequestReglaEscenarioDinamicoDto requestDto) {
+	public ResponseOAGDto reglaEscenarioDinamico(RequestReglaEscenarioDinamicoDto requestDto) {
         log.info(":: Entrado al metodo  actualizarPrecioPartida ::");
         String request =  new Gson().toJson(requestDto);
 		  String token=clienteCorreo.getToken();
@@ -84,14 +90,16 @@ public class ClientOAGService {
 		  if(result.getStatusCode() == HttpStatus.OK) {
 			  if(result.getBody() !=null) {
 				  response= castObject.convertJsonToReponseOAGDto(result.getBody());
+				  pruducerMessage.producerReglaArbitraje(result.getBody());
 			  }
 		  }
+		 
 		  return response;
 	}
 	
-	public  ResponseReglasArbitrajeOAGDto aplicarReglaArbitraje(PartidaVO partida ) {
+	public  ResponseReglasArbitrajeOAGDto aplicarReglaArbitraje(RequestReglaEscenarioDinamicoDto requestEscenario ) {
 		  log.info(":: Entrado al metodo aplicarReglaArbitraje  ::");
-		  String request=requestReglaArbitraje(partida);
+		  String request= new Gson().toJson(requestEscenario);
 		  String token=clienteCorreo.getToken();
 		  RestTemplate restTemplate = new RestTemplate();
 		  HttpHeaders headers = new HttpHeaders();
@@ -107,6 +115,7 @@ public class ClientOAGService {
 		  if(result.getStatusCode() == HttpStatus.OK) {
 			  if(result.getBody() !=null) {
 				  response=  castObject.convertJsonToReglasArbitraje(result.getBody());
+				  pruducerMessage.producerCambioPrecio(result.getBody());
 			  }
 		  }
 		  
