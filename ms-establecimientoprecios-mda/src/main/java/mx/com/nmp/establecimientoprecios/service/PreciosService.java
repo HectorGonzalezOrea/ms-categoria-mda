@@ -17,6 +17,7 @@ import mx.com.nmp.establecimientoprecios.apiproductos.vo.ActualizarPreciosReques
 import mx.com.nmp.establecimientoprecios.apiproductos.vo.ActualizarPreciosResponseVO;
 import mx.com.nmp.establecimientoprecios.apiproductos.vo.ConsultaPartidaRequestVO;
 import mx.com.nmp.establecimientoprecios.apiproductos.vo.ConsultaPartidaResponseVO;
+import mx.com.nmp.establecimientoprecios.apiproductos.vo.DatumVO;
 import mx.com.nmp.establecimientoprecios.apiproductos.vo.ProductoMidasVO;
 import mx.com.nmp.establecimientoprecios.model.GeneralResponse;
 import mx.com.nmp.establecimientoprecios.model.ListaPrecioPartidas;
@@ -72,7 +73,7 @@ public class PreciosService {
 			Boolean insertadoOAG = oagController.gestionPrecios(gpRequest);
 			
 			if (Boolean.TRUE.equals(insertadoOAG)) {
-				this.partidasPreciosAPIProductos(usuario, listaPrecioPartidas);
+				correcto = this.partidasPreciosAPIProductos(usuario, listaPrecioPartidas);
 			}
 		}
 
@@ -89,6 +90,7 @@ public class PreciosService {
 		ConsultaPartidaRequestVO cpRequest = new ConsultaPartidaRequestVO();
 		ActualizarPreciosRequestVO apRequest = new ActualizarPreciosRequestVO();
 		
+		List<DatumVO> data = new ArrayList<>();
 		for(ListaPrecioPartidasInner partida : listaPrecioPartidas) {
 			try {
 				cpRequest.setFolio(new Long(partida.getFolioPartida()));
@@ -97,11 +99,12 @@ public class PreciosService {
 				ConsultaPartidaResponseVO cpResp = apiProductosController.consultaPartida(cpRequest);
 				
 				if(cpResp != null) {
-					for(ProductoMidasVO pm : cpResp) {
-						pm.setPrecioVentaAct(partida.getPrecioModificado().toString());
-						pm.setPrecioVentaSalida(partida.getPrecioModificado().toString());
+					for(DatumVO producto : cpResp) {
+						producto.setPrecioVentaAct(partida.getPrecioModificado().toString());
+						producto.setPrecioVentaSalida(partida.getPrecioModificado().toString());
 						
-						apRequest.add(pm);
+						data.add(producto);
+						//apRequest.add(producto);
 					}
 				}
 			} catch (Exception e) {
@@ -109,10 +112,14 @@ public class PreciosService {
 			}
 		}
 		
-		Boolean actualizadoAPIProductos = apiProductosController.actualizarPartida(apRequest);
-		
-		if(Boolean.TRUE.equals(actualizadoAPIProductos)) {
-			correcto = this.partidasPreciosMSHP(usuario , listaPrecioPartidas);
+		if(!data.isEmpty()) {
+			apRequest.setData(data);
+			
+			Boolean actualizadoAPIProductos = apiProductosController.actualizarPartida(apRequest);
+			
+			if(Boolean.TRUE.equals(actualizadoAPIProductos)) {
+				correcto = this.partidasPreciosMSHP(usuario , listaPrecioPartidas);
+			}
 		}
 		
 		return correcto;

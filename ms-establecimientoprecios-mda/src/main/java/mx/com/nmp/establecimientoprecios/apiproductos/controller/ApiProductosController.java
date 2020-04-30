@@ -69,6 +69,8 @@ public class ApiProductosController extends ApiProductosBaseController {
 		ActualizarPreciosResponseVO resp = null;
 		String requestJson = ConverterUtil.messageToJson(request);
 		
+		log.info("Request Actualizar Partida {}", requestJson);
+		
 		Unirest.setTimeouts(0, 0);
 		
 		try {

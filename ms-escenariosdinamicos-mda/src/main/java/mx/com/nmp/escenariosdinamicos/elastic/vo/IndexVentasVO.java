@@ -64,7 +64,10 @@ public class IndexVentasVO {
 	private String tipoOperacionEtiqueta;
 	@JsonProperty("valor_unitario")
 	private String valorUnitario;
-	
+	//////////////////////valores que aun no se definen
+	private String partida;
+	private String sku;
+	//////////////////////////////////////////////
 	public String getCancelado() {
 		return cancelado;
 	}
@@ -239,6 +242,18 @@ public class IndexVentasVO {
 	public void setValorUnitario(String valorUnitario) {
 		this.valorUnitario = valorUnitario;
 	}
+	public String getPartida() {
+		return partida;
+	}
+	public String getSku() {
+		return sku;
+	}
+	public void setPartida(String partida) {
+		this.partida = partida;
+	}
+	public void setSku(String sku) {
+		this.sku = sku;
+	}
 	@Override
 	public String toString() {
 		return "IndexVentasVO [cancelado=" + cancelado + ", cantidad=" + cantidad + ", coImporte=" + coImporte
@@ -252,7 +267,9 @@ public class IndexVentasVO {
 				+ ", ivaComisionPase=" + ivaComisionPase + ", ivaInteresAlmoneda=" + ivaInteresAlmoneda
 				+ ", ivaInteresDeposito=" + ivaInteresDeposito + ", lugarExpedicion=" + lugarExpedicion
 				+ ", metodoPago=" + metodoPago + ", tasa=" + tasa + ", tipoComprobante=" + tipoComprobante
-				+ ", tipoOperacionEtiqueta=" + tipoOperacionEtiqueta + ", valorUnitario=" + valorUnitario + "]";
+				+ ", tipoOperacionEtiqueta=" + tipoOperacionEtiqueta + ", valorUnitario=" + valorUnitario + ", partida="
+				+ partida + ", sku=" + sku + "]";
 	}
+
 	
 }

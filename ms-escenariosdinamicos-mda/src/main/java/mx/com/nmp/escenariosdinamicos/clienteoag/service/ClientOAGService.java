@@ -1,5 +1,7 @@
 package mx.com.nmp.escenariosdinamicos.clienteoag.service;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +18,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.Gson;
 
 
 import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
 import mx.com.nmp.escenariosdinamicos.constantes.Constantes.Common;
+import mx.com.nmp.escenariosdinamicos.model.component.ProducerMessageComponent;
+import mx.com.nmp.escenariosdinamicos.oag.dto.RequestReglaEscenarioDinamicoDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseOAGDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseReglasArbitrajeOAGDto;
 import mx.com.nmp.escenariosdinamicos.oag.vo.PartidaVO;
@@ -34,6 +39,8 @@ public class ClientOAGService {
 	ClienteCorreoService clienteCorreo;
 	@Autowired
 	CastObjectGeneric castObject= new CastObjectGeneric();
+	@Autowired
+	ProducerMessageComponent pruducerMessage;
 	
 	@Value("${oag.resource.oauth.getToken.header.usuario}")
 	protected String headerUsuario;
@@ -64,9 +71,9 @@ public class ClientOAGService {
 	
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	
-	public ResponseOAGDto actualizarPrecioPartida(PartidaVO partida) {
+	public ResponseOAGDto reglaEscenarioDinamico(RequestReglaEscenarioDinamicoDto requestDto) {
         log.info(":: Entrado al metodo  actualizarPrecioPartida ::");
-		  String request=formatRequest(partida);
+        String request =  new Gson().toJson(requestDto);
 		  String token=clienteCorreo.getToken();
 		  RestTemplate restTemplate = new RestTemplate();
 		  HttpHeaders headers = new HttpHeaders();
@@ -83,14 +90,16 @@ public class ClientOAGService {
 		  if(result.getStatusCode() == HttpStatus.OK) {
 			  if(result.getBody() !=null) {
 				  response= castObject.convertJsonToReponseOAGDto(result.getBody());
+				  pruducerMessage.producerReglaArbitraje(result.getBody());
 			  }
 		  }
+		 
 		  return response;
 	}
 	
-	public  ResponseReglasArbitrajeOAGDto aplicarReglaArbitraje(PartidaVO partida ) {
+	public  ResponseReglasArbitrajeOAGDto aplicarReglaArbitraje(RequestReglaEscenarioDinamicoDto requestEscenario ) {
 		  log.info(":: Entrado al metodo aplicarReglaArbitraje  ::");
-		  String request=requestReglaArbitraje(partida);
+		  String request= new Gson().toJson(requestEscenario);
 		  String token=clienteCorreo.getToken();
 		  RestTemplate restTemplate = new RestTemplate();
 		  HttpHeaders headers = new HttpHeaders();
@@ -106,6 +115,7 @@ public class ClientOAGService {
 		  if(result.getStatusCode() == HttpStatus.OK) {
 			  if(result.getBody() !=null) {
 				  response=  castObject.convertJsonToReglasArbitraje(result.getBody());
+				  pruducerMessage.producerCambioPrecio(result.getBody());
 			  }
 		  }
 		  
@@ -117,37 +127,7 @@ public class ClientOAGService {
 	
 	
 	
-	  private String formatRequest(PartidaVO partida) {
-		  log.info("Generando request json");
-		  JsonNode rootNode=objectMapper.createObjectNode();
-		  JsonNode childNode = objectMapper.createObjectNode();
-		  String jsonString=null;
-		  try {
-			  ((ObjectNode) childNode).put("idPartida", partida.getIdPartida());
-			  ((ObjectNode) childNode).put("sku", partida.getSku());
-			  ((ObjectNode) childNode).put("ventasDiaUno", partida.getVentasDiaUno());
-			  ((ObjectNode) childNode).put("ventasDiaDos", partida.getVentasDiaDos());
-			  ((ObjectNode) childNode).put("ventasDiaTres", partida.getVentasDiaTres());
-			  ((ObjectNode) childNode).put("baseAjusteUnoPA", partida.getBaseAjusteUnoPA());
-			  ((ObjectNode) childNode).put("baseAjusteUnoPM", partida.getBaseAjusteUnoPM());
-			  ((ObjectNode) childNode).put("baseAjusteUnoPB", partida.getBaseAjusteUnoPB());
-			  ((ObjectNode) childNode).put("baseAjusteDosPA", partida.getBaseAjusteDosPA());
-			  ((ObjectNode) childNode).put("baseAjusteDosPM", partida.getBaseAjusteDosPM());
-			  ((ObjectNode) childNode).put("baseAjusteDosPB", partida.getBaseAjusteDosPB());
-			  ((ObjectNode) childNode).put("precioFinal", partida.getPrecioFinal());
-			  ((ObjectNode) childNode).put("precioEtiqueta", partida.getPrecioEtiqueta());
-			  ((ObjectNode) childNode).put("criterio", partida.getCriterio());
-			  ((ObjectNode) childNode).put("candadoPA", partida.getCandadoPA());
-			  ((ObjectNode) childNode).put("candadoPM", partida.getCandadoPM());
-			  ((ObjectNode) childNode).put("candadoPB", partida.getCandadoPB());
-			  ((ObjectNode) rootNode).set("partida", childNode);
-			 jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
-		} catch (JsonProcessingException e) {
-			log.info("Error al genrar el request "+e.getMessage());
-		}
-		  
-		  return jsonString;
-	  }
+	 
 	  
 	  
 	  private String requestReglaArbitraje(PartidaVO vo ) {

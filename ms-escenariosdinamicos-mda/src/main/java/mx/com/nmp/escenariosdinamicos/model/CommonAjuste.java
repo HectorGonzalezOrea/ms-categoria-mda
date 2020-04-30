@@ -1,19 +1,21 @@
-package mx.com.nmp.escenariosdinamicos.elastic.vo;
+package mx.com.nmp.escenariosdinamicos.model;
 
-public class CatalogoVO {
-	private Integer id;
+public class CommonAjuste {
+
+	private String id;
 	private String descripcion;
 	
-	public Integer getId() {
+	public String getId() {
 		return id;
-	}
-	public void setId(Integer id) {
-		this.id = id;
 	}
 	public String getDescripcion() {
 		return descripcion;
 	}
+	public void setId(String id) {
+		this.id = id;
+	}
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
 	}
+
 }

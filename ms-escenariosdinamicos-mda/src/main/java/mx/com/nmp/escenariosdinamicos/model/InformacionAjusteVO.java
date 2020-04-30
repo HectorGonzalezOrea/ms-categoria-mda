@@ -1,20 +1,20 @@
-package mx.com.nmp.escenariosdinamicos.elastic.vo;
+package mx.com.nmp.escenariosdinamicos.model;
 
 public class InformacionAjusteVO {
 	private String tipoPrecio;
-	private CatalogoVO baseAjuste;
+	private CommonAjuste baseAjuste;
 	private Integer factorAjuste;
 	
 	public String getTipoPrecio() {
 		return tipoPrecio;
 	}
-	public CatalogoVO getBaseAjuste() {
+	public CommonAjuste getBaseAjuste() {
 		return baseAjuste;
 	}
 	public void setTipoPrecio(String tipoPrecio) {
 		this.tipoPrecio = tipoPrecio;
 	}
-	public void setBaseAjuste(CatalogoVO baseAjuste) {
+	public void setBaseAjuste(CommonAjuste baseAjuste) {
 		this.baseAjuste = baseAjuste;
 	}
 	public Integer getFactorAjuste() {
