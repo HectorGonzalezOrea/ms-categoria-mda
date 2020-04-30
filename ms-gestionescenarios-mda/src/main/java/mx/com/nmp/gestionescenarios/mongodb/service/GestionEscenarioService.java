@@ -15,6 +15,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.threeten.bp.LocalDate;
+
 import mx.com.nmp.gestionescenarios.mongodb.service.SequenceGeneratorService;
 import mx.com.nmp.gestionescenarios.model.EstatusRegla;
 import mx.com.nmp.gestionescenarios.model.InfoGeneralRegla;
@@ -56,6 +58,7 @@ public class GestionEscenarioService {
 	public static final String ID_ANCLA = "_id";
 	public static final String ID_BOLSA_BOLSA = "_id";
 	public static final String REQUEST_ID_CALENDARIZACION = "requestIdCalendarizacion";
+	public static final String ID_MONEDA = "_id";
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -760,6 +763,26 @@ public class GestionEscenarioService {
 	}
 	
 	/*
+	 * Buscar Moneda
+	 */
+	public MonedasEntity buscarMoneda(Long id) {
+		log.info("buscarMoneda");
+		
+		MonedasEntity moneda = null;
+		
+		try {
+			Query query = new Query();
+			query.addCriteria(Criteria.where(ID_MONEDA).in(id));
+			
+			moneda = mongoTemplate.findOne(query, MonedasEntity.class);
+		} catch (Exception e) {
+			log.info("Exception: {}", e);
+		}
+		
+		return moneda;
+	}
+	
+	/*
 	 * Valida la información para insertar el ancla oro dolar
 	 */
 	public ObjectId solictarCambioAnclaOroDolar(ModificarValorAnclaOroDolar peticion) {
@@ -771,6 +794,26 @@ public class GestionEscenarioService {
 				return this.insertarAnclaOroDolar(peticion);
 			} else {
 				log.info("bolsa no existente");
+			}
+		}
+		return null;
+	}
+
+	
+	/*
+	 * Valida la información para insertar la Moneda
+	 */
+	public Long solictarCambioMoneda(ListaMonedas peticion) {
+		log.info("solictarCambioMoneda");
+		
+		if(peticion != null ) {
+			for(ListaMonedasInner lmi:peticion) {
+				MonedasEntity moneda = this.buscarMoneda(lmi.getId());
+				if(moneda != null) {
+					return this.updateMonedas(peticion);
+				} else {
+					log.info("Moneda no existente");
+				}
 			}
 		}
 		return null;
@@ -841,6 +884,29 @@ public class GestionEscenarioService {
 	}
 	
 	/*
+	 * Consulta el request id para Moneda
+	 */
+	public MonedasEntity consultarRequestIdMoneda(Long id) {
+		log.info("consultarRequestIdMoneda");
+		
+		log.info("id Moneda: {}", id);
+		
+		MonedasEntity moneda = null;
+		
+		try {
+			Query query = new Query();
+			query.addCriteria(Criteria.where(ID_MONEDA).in(id));
+			
+			moneda = mongoTemplate.findOne(query, MonedasEntity.class);
+		} catch (Exception e) {
+			log.info("Exception: {}", e);
+		}
+		
+		return moneda;
+	}
+	
+	
+	/*
 	 * Actualiza el request id en la collection de anclaOroDolar
 	 */
 	public Boolean updateRequestIdAnclaOroDolar(ObjectId id, Integer requestId) {
@@ -882,6 +948,78 @@ public class GestionEscenarioService {
 		}
 		
 		return null;
+	}
+	
+	/*
+	 * Actualiza Monedas
+	 */
+	
+	public Long updateMonedas (ListaMonedas peticion) {
+		
+		Long id = null;
+		MonedasEntity moneda = null;
+		
+		if(peticion!= null) {
+			moneda = new MonedasEntity();
+			for(ListaMonedasInner lmi:peticion) {
+				
+				moneda = mongoTemplate.findOne(Query.query(Criteria.where(ID).is(lmi.getId())), MonedasEntity.class);
+				
+				if(moneda!=null) {
+					
+					moneda.setPrecio(lmi.getPrecio());
+					moneda.setTipo(lmi.getTipo());
+					moneda.setOro(lmi.isOro());
+					LocalDate locateDate = LocalDate.now();
+					moneda.setFechaModificacion(locateDate);
+					moneda.setActualizadoPor(lmi.getActualizadoPor());
+					
+					
+				}
+			}
+			try {
+				mongoTemplate.save(moneda);
+				id = moneda.getId();
+			} catch(Exception e) {
+				log.error("Exception : {}", e);
+			}
+			
+				
+		}
+		
+		
+		return id;
+		
+	}
+	
+	
+	/*
+	 * Actualiza el request id en la collection de Monedas
+	 */
+	public Boolean updateRequestIdMonedas(Long id, Integer requestId) {
+		log.info("consultarRequestIdMonedas");
+		
+		MonedasEntity moneda = null;
+		Boolean procesado = false;
+		
+		try {
+			Query query = new Query();
+			query.addCriteria(Criteria.where(ID_MONEDA).in(id));
+			
+			moneda = mongoTemplate.findOne(query, MonedasEntity.class);
+			
+			if(moneda != null) {
+				moneda.setRequestId(requestId);
+				mongoTemplate.save(moneda);
+				
+				procesado = true;
+			}
+			
+		} catch (Exception e) {
+			log.info("Exception: {}", e);
+		}
+		
+		return procesado;
 	}
 	
 }

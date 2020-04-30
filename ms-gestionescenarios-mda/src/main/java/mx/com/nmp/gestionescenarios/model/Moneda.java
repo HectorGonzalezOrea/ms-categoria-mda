@@ -18,7 +18,7 @@ import javax.validation.constraints.*;
 
 public class Moneda   {
   @JsonProperty("id")
-  private Integer id = null;
+  private Long id = null;
 
   @JsonProperty("tipo")
   private Object tipo = null;
@@ -29,7 +29,7 @@ public class Moneda   {
   @JsonProperty("oro")
   private Boolean oro = null;
 
-  public Moneda id(Integer id) {
+  public Moneda id(Long id) {
     this.id = id;
     return this;
   }
@@ -41,11 +41,11 @@ public class Moneda   {
   @ApiModelProperty(example = "1", value = "Identificador de la moneda")
 
 
-  public Integer getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(Integer id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

@@ -34,6 +34,7 @@ public class BolsasService {
 	public static final String FACTOR = "factor";
 	public static final String ID = "_id";
 	private static final String BOLSA_SEQ_KEY = "bolsas_sequence";
+	private static final String ID_TIPO_BOLSA = "_id";
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -79,6 +80,49 @@ public class BolsasService {
 
 		return insertado;
 	}
+	
+	/*
+	 * Validacion de tipoBolsa
+	 */
+	
+	public Boolean consultaTipoBolsa(Integer idTipo) {
+		log.info("consultaTipoBolsa");
+		
+		Boolean encontrado = false;
+		if(idTipo!=null) {
+			log.info("Tipo a buscar es {}", idTipo);
+			Query query = new Query();
+			Criteria aux = Criteria.where(ID_TIPO_BOLSA).is(idTipo);
+			query.addCriteria(aux);
+			
+			encontrado = mongoTemplate.exists(query, TipoBolsaEntity.class);
+		}
+		log.info("Encontrado: {}", encontrado);
+		
+		return encontrado;
+	}
+	
+	/*
+	 * Validacion de Nombre
+	 */
+	
+	public Boolean consultaBolsa(String nombre) {
+		log.info("consultaBolsa");
+		
+		Boolean encontrado = false;
+		if(nombre != null) {
+			Query query = new Query();
+			Criteria aux = Criteria.where(NOMBRE).is(nombre);
+			query.addCriteria(aux);
+			
+			encontrado = mongoTemplate.exists(query, BolsasEntity.class);
+		}
+		
+		log.info("Encontrado: {}", encontrado);
+		
+		return encontrado;
+	}
+	
 
 	/*
 	 * Consulta de bolsas con filtros

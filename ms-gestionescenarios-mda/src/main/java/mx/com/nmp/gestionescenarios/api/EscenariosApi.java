@@ -100,7 +100,7 @@ public interface EscenariosApi {
     @RequestMapping(value = "/escenarios/monedas",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<ListaMonedas> escenariosMonedasGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@NotNull @ApiParam(value = "Flag para indicar si se consultan las monedas oro o sin oro", required = true) @Valid @RequestParam(value = "oro", required = true) Boolean oro);
+    ResponseEntity<?> escenariosMonedasGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@NotNull @ApiParam(value = "Flag para indicar si se consultan las monedas oro o sin oro", required = true) @Valid @RequestParam(value = "oro", required = true) Boolean oro);
 
 
     @ApiOperation(value = "Actualizar la configuración de Monedas", nickname = "escenariosMonedasPatch", notes = "Actualizar la configuración de las Monedas ### Seguridad Para poder realizar el consumo del recuros deberá de estar autorizado. Para esto tiene que enviar la llave en el encabezado HTTP: * 'X-API-KEY: eyJ4NXQjUzI1NiI6IkFTS1ESG42` ", response = GeneralResponse.class, authorizations = {
@@ -114,7 +114,7 @@ public interface EscenariosApi {
     @RequestMapping(value = "/escenarios/monedas",
         produces = { "application/json" }, 
         method = RequestMethod.PATCH)
-    ResponseEntity<GeneralResponse> escenariosMonedasPatch(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody ListaMonedas peticion);
+    ResponseEntity<?> escenariosMonedasPatch(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody ListaMonedas peticion);
 
 
     @ApiOperation(value = "Almacenar configuración de Monedas", nickname = "escenariosMonedasPost", notes = "Almacenar la configuración de las Monedas ### Seguridad Para poder realizar el consumo del recuros deberá de estar autorizado. Para esto tiene que enviar la llave en el encabezado HTTP: * 'X-API-KEY: eyJ4NXQjUzI1NiI6IkFTS1ESG42` ", response = GeneralResponse.class, authorizations = {
@@ -128,7 +128,7 @@ public interface EscenariosApi {
     @RequestMapping(value = "/escenarios/monedas",
         produces = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<GeneralResponse> escenariosMonedasPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody ListaMonedas peticion);
+    ResponseEntity<?> escenariosMonedasPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody ListaMonedas peticion);
 
 
     @ApiOperation(value = "Ejecutar un escenario", nickname = "escenariosPost", notes = "Ejecutar un escenario, los cuales pueden ser: * Dinámicos * Consolidados * Valor Ancla * Monedas con Oro * Monedas sin Oro ### Seguridad Para poder realizar el consumo del recuros deberá de estar autorizado. Para esto tiene que enviar la llave en el encabezado HTTP: * 'X-API-KEY: eyJ4NXQjUzI1NiI6IkFTS1ESG42` ", response = GeneralResponse.class, authorizations = {

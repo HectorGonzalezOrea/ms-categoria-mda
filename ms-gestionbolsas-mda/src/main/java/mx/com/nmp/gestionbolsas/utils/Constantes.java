@@ -1,4 +1,4 @@
-package mx.com.nmp.gestionescenarios.utils;
+package mx.com.nmp.gestionbolsas.utils;
 
 public final class Constantes {
 
@@ -15,6 +15,8 @@ public final class Constantes {
 	
 	public static final String ERROR_CODE_BAD_REQUEST = "NMP-MDA-400";
 	public static final String ERROR_MESSAGE_BAD_REQUEST = "El cuerpo de la petición no está bien formado, verifique su información";
+	public static final String ERROR_MESSAGE_NAME = "El nombre de la bolsa ya existe";
+	public static final String ERROR_MESSAGE_TIPO = "El tipo de la bolsa no existe";
 	
 	public static final String ERROR_CODE_INVALID_AUTHENTICATION = "NMP-MDA-401";
 	public static final String ERROR_MESSAGE_INVALID_AUTHENTICATION = "Se ha producido un error de autorización";
@@ -23,6 +25,10 @@ public final class Constantes {
 	public static final String ERROR_MESSAGE_INTERNAL_SERVER_ERROR = "Error interno del servidor. Falla de comunicación.";
 	public static final String ERROR_MESSAGE_INTERNAL_SERVER_ERROR_NO_GENERIC = "Error interno del servidor. No se proceso la petición correctamente.";
 	public static final String ERROR_MESSAGE_INTERNAL_SERVER_ERROR_ALMACENAR_O_PROCESAR = "Error interno del servidor. Ocurrio un error en el procesamiento.";
+	
+	public static final String MESSAGE_DELETE = "Bolsa eliminado exitosamente";
+	public static final String MESSAGE_NO_DELETE = "Bolsa no eleminada";
+	public static final String MESSAGE_OK_BOLSA = "Bolsa creada correctamente";
 	
 	public static final String METHOD_POST = "POST";
 	
