@@ -172,9 +172,13 @@ public class EscenariosApiController implements EscenariosApi {
         List<IndexGarantiaVO>lstIndexGarantia=null;
         RequestReglaEscenarioDinamicoDto requestReglaEscenarioDinamico=new RequestReglaEscenarioDinamicoDto();
         List<PartidaVO> lstPartidaVO=null;
+        List<IndexVentasVO> scrollElasticVentas=null;
         if (accept != null && accept.contains("application/json")) {
             try {
-            	lstIndexGarantia=elasticService.scrollElasticGarantias(elasticProperties.getIndexGarantia(),crearEscenariosRequest.getInfoRegla().getRamo(),crearEscenariosRequest.getInfoRegla().getSubramo().get(0));
+            	//primero obtenemos las ventas de los ultimos tres dias
+            	scrollElasticVentas=elasticService.scrollElasticVentas(elasticProperties.getIndexVenta());
+				//despues consultamos las partidas a partir de las ventas
+            	lstIndexGarantia=elasticService.scrollElasticGarantias(elasticProperties.getIndexGarantia(),crearEscenariosRequest.getInfoRegla().getRamo(),crearEscenariosRequest.getInfoRegla().getSubramo().get(0),scrollElasticVentas);
             	lstPartidaVO=castObjectGeneric.castPartidasToPartidaValorMonte(lstIndexGarantia, crearEscenariosRequest.getInfoRegla());
             	requestReglaEscenarioDinamico.setPartida(lstPartidaVO);
             	 String jsonMessage=new Gson().toJson(requestReglaEscenarioDinamico);
@@ -240,8 +244,11 @@ public class EscenariosApiController implements EscenariosApi {
         List<IndexGarantiaVO>lstIndexGarantia=null;
         RequestReglaEscenarioDinamicoDto wrapperReglaEscenarioDinamico=new RequestReglaEscenarioDinamicoDto();
         List<PartidaVO> castIndexToVO=null;
+        List<IndexVentasVO> scrollElasticVentas=null;
 			try {
-				lstIndexGarantia=elasticService.scrollElasticGarantias(elasticProperties.getIndexGarantia(),crearEscenariosReques.getInfoRegla().getRamo(),crearEscenariosReques.getInfoRegla().getSubramo().get(0));
+				scrollElasticVentas=elasticService.scrollElasticVentas(elasticProperties.getIndexVenta());//primero obtenemos las ventas de los ultimos tres dias
+				//despues consultamos las partidas a partir de las ventas
+				lstIndexGarantia=elasticService.scrollElasticGarantias(elasticProperties.getIndexGarantia(),crearEscenariosReques.getInfoRegla().getRamo(),crearEscenariosReques.getInfoRegla().getSubramo().get(0),scrollElasticVentas);
 				lstIndexGarantia.forEach(i->log.info(i.toString()));
 				lstPartidaPrecioValorMonte=(ArrayList<PartidaPrecioFinal>)clientesMicroservicios.calcularValorMonte(castObjectGeneric.castGarantiasToCalculoValor(lstIndexGarantia),usuario,origen,destino);
 				castIndexToVO=castObjectGeneric.castPartidasToPartidaValorMonte(lstIndexGarantia,crearEscenariosReques.getInfoRegla());

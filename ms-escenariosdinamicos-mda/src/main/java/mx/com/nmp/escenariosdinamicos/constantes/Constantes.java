@@ -49,6 +49,7 @@ public final class Constantes {
 		public static final int NUMERO_MAXIMO_SCROLL =2;
 		public static final int DIFERENCIA_DIAS =-3;
 		public static final String CAMPO_FECHA_INDEX="fecha";
+		public static final String CUO_PARTIDA="num_cuo";
 
 		public static final String TEMPLATE_NOTIFICACION_EMAIL_HEAD="<body>\r\n" + 
 				"	<table style=\"border-collapse: collapse;\">\r\n" + 
