@@ -20,8 +20,10 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -31,10 +33,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
-import mx.com.nmp.escenariosdinamicos.clienteservicios.service.ClientesMicroservicios;
+import mx.com.nmp.escenariosdinamicos.constantes.Constantes.Common;
 import mx.com.nmp.escenariosdinamicos.elastic.properties.ElasticProperties;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexVentasVO;
+import mx.com.nmp.escenariosdinamicos.utils.FechasComunes;
 @Service
 public class ElasticService {
 	
@@ -42,8 +45,12 @@ public class ElasticService {
 	private ElasticProperties connectionProperties;
 	@Autowired
 	private CastObjectGeneric castObject;
+	@Autowired
+	private FechasComunes formmatDate;
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ElasticService.class);
+	
+	private static Date fechaActual=new Date();
 	
 	 public synchronized RestHighLevelClient getConnectionElastic() {
 	        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
@@ -74,7 +81,7 @@ public class ElasticService {
 		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 		QueryBuilder query = QueryBuilders.queryStringQuery("ramo:'" + ramo + "' AND subramo:'" + subRamo + "'");
 		searchSourceBuilder.query(query);
-		searchSourceBuilder.size(2);//cuantos resultados se recuperan?
+		searchSourceBuilder.size(Common.NUMERO_MAXIMO_SCROLL);//cuantos resultados se recuperan?
 		searchRequest.source(searchSourceBuilder);
 		SearchResponse searchResponse = getConnectionElastic().search(searchRequest, RequestOptions.DEFAULT); //Inicialice el contexto de búsqueda enviando el SearchRequest inicial
 		String scrollId = searchResponse.getScrollId();//contexto de búsqueda que se mantiene vivo y que se necesitará en la siguiente
@@ -116,8 +123,12 @@ public class ElasticService {
 		searchRequest.scroll(scroll);
 		searchRequest.indices(index);
 		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-		//searchSourceBuilder.query(null); obtener ventas a partir de ramo subramo y de los ultimos 3 dias(fechaActual -3 Dias)
-		searchSourceBuilder.size(2);
+		
+		RangeQueryBuilder filter = QueryBuilders.rangeQuery(Common.CAMPO_FECHA_INDEX)
+				.gte(formmatDate.resetTimeToDown(fechaActual,Common.DIFERENCIA_DIAS)).lte(formmatDate.resetTimeToUp(fechaActual));
+		searchSourceBuilder.query(filter);
+		
+		searchSourceBuilder.size(Common.NUMERO_MAXIMO_SCROLL);
 		searchRequest.source(searchSourceBuilder);
 		SearchResponse searchResponse = getConnectionElastic().search(searchRequest, RequestOptions.DEFAULT); 
 		String scrollId = searchResponse.getScrollId();

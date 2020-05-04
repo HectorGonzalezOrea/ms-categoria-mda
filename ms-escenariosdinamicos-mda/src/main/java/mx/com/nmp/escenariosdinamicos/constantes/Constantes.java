@@ -45,6 +45,10 @@ public final class Constantes {
 		public static final int AVALUO_TECNICO=5;
 		public static final int AVALUO_COMERCIAL=6;
 		public static final int PRECIO_MERCADO=7;
+		
+		public static final int NUMERO_MAXIMO_SCROLL =2;
+		public static final int DIFERENCIA_DIAS =-3;
+		public static final String CAMPO_FECHA_INDEX="fecha";
 	}
 	
 

@@ -240,9 +240,7 @@ public class EscenariosApiController implements EscenariosApi {
         List<IndexGarantiaVO>lstIndexGarantia=null;
         RequestReglaEscenarioDinamicoDto wrapperReglaEscenarioDinamico=new RequestReglaEscenarioDinamicoDto();
         List<PartidaVO> castIndexToVO=null;
-        //ResponseOAGDto responseClientAplicaReglaEscenarioDinamico=null;
 			try {
-				//Date fechaActual=new Date();//ultimos tres dias
 				lstIndexGarantia=elasticService.scrollElasticGarantias(elasticProperties.getIndexGarantia(),crearEscenariosReques.getInfoRegla().getRamo(),crearEscenariosReques.getInfoRegla().getSubramo().get(0));
 				lstIndexGarantia.forEach(i->log.info(i.toString()));
 				lstPartidaPrecioValorMonte=(ArrayList<PartidaPrecioFinal>)clientesMicroservicios.calcularValorMonte(castObjectGeneric.castGarantiasToCalculoValor(lstIndexGarantia),usuario,origen,destino);
