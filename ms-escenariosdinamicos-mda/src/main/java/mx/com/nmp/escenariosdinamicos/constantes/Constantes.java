@@ -49,6 +49,25 @@ public final class Constantes {
 		public static final int NUMERO_MAXIMO_SCROLL =2;
 		public static final int DIFERENCIA_DIAS =-3;
 		public static final String CAMPO_FECHA_INDEX="fecha";
+
+		public static final String TEMPLATE_NOTIFICACION_EMAIL_HEAD="<body>\r\n" + 
+				"	<table style=\"border-collapse: collapse;\">\r\n" + 
+				"		<caption>Reporte de precios</caption>\r\n" + 
+				"		<thead>\r\n" + 
+				"		<tr>\r\n" + 
+				"			<th style=\"border: 1px solid black\">Partida</th>\r\n" + 
+				"			<th style=\"border: 1px solid black\">SKU</th>\r\n" + 
+				"			<th style=\"border: 1px solid black\">Prestamo</th>\r\n" + 
+				"			<th style=\"border: 1px solid black\">Precio</th>\r\n" + 
+				"			<th style=\"border: 1px solid black\">Precio etiqueta</th>\r\n" + 
+				"		</tr>\r\n" + 
+				"	</thead>\r\n" + 
+				"	<tbody>";
+		public static final String TEMPLATE_NOTIFICACION_EMAIL_FOOTER="	</tbody>\r\n" + 
+				"	</table>\r\n" + 
+				"</body>";
+		public static final String ASUNTO_AJUSTE_PRECIOS_FALSE = "Notificación de Partidas a las que no se pudo hacer el ajuste de precios.";
+		
 	}
 	
 

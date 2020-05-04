@@ -9,7 +9,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
+import com.google.gson.Gson;
 
 import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
 import mx.com.nmp.escenariosdinamicos.clienteoag.service.ClientOAGService;
@@ -45,7 +45,7 @@ public class ConsumerMessageComponent {
 	@RabbitListener(queues = "${rabbitmq.queue.cambioprecio}")
 	public void consumerCambioPrecio(String message) {
 		log.info("Recieved Message: " + message);
-		//clientOAG.reglaEscenarioDinamico(castObject.convertJsonToRequestEscenario(message));
+		clientOAG.reglaEscenarioDinamico(castObject.convertJsonToRequestEscenario(message));
 	}
 	
 	
@@ -65,12 +65,13 @@ public class ConsumerMessageComponent {
 		return reglasEscenario;
 	}
 	
-	/*public RequestReglaEscenarioDinamicoDto convertJsonRquestEscenario(String message) {
+	
+	public RequestReglaEscenarioDinamicoDto convertJsonRquestEscenario(String message) {
 		final Gson gson = new Gson();
 		RequestReglaEscenarioDinamicoDto request= new RequestReglaEscenarioDinamicoDto();
 		request=gson.fromJson(message, RequestReglaEscenarioDinamicoDto.class);
 		return request;
-	}*/
+	}
 	
 	
 }
