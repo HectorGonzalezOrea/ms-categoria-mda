@@ -2,7 +2,7 @@ package mx.com.nmp.escenariosdinamicos.constantes;
 
 public final class Constantes {
 	public class Common {
-		public static final String ERROR_GUARDAR = "NMP-MDA-400";
+		public static final String ERROR_CODE = "NMP-MDA-400";
 		public static final String ERROR_MENSAJE = "El cuerpo de la petición no está bien formado, verifique su información.";
 		
 		public static final String EXITO_GUARDAR = "Exitoso";

@@ -26,6 +26,7 @@ import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
 import mx.com.nmp.escenariosdinamicos.clienteoag.service.ClientOAGService;
 import mx.com.nmp.escenariosdinamicos.clienteservicios.service.ClientesMicroservicios;
 import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.CalculoValorVO;
+import mx.com.nmp.escenariosdinamicos.constantes.Constantes.Common;
 import mx.com.nmp.escenariosdinamicos.elastic.properties.ElasticProperties;
 import mx.com.nmp.escenariosdinamicos.elastic.service.ElasticService;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.AforoVO;
@@ -46,6 +47,7 @@ import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoRes;
 import mx.com.nmp.escenariosdinamicos.model.EliminarEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.InfoRegla;
 import mx.com.nmp.escenariosdinamicos.model.InformacionAjusteVO;
+import mx.com.nmp.escenariosdinamicos.model.InternalServerError;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosReq;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
@@ -230,7 +232,7 @@ public class EscenariosApiController implements EscenariosApi {
         return new ResponseEntity<EliminarEscenariosRes>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<SimularEscenarioDinamicoRes> simularEscenariosDinamicosPOST(
+    public ResponseEntity<?> simularEscenariosDinamicosPOST(
     		@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,
     		@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,
     		@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,
@@ -256,13 +258,18 @@ public class EscenariosApiController implements EscenariosApi {
 				clientOAGService.reglaEscenarioDinamico(wrapperReglaEscenarioDinamico);
 		} catch (Exception e) {
 				e.printStackTrace();
+				InternalServerError is = new InternalServerError();
+				is.setCodigo(Common.ERROR_SERVER);
+				is.setMensaje(Common.ERROR_SERVER_MSG);
+				return new ResponseEntity<InternalServerError>(is, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 			response.addAll(lstPartidaPrecioValorMonte);
 			return new ResponseEntity<SimularEscenarioDinamicoRes>(response, HttpStatus.OK);
     	}
-			
-
-        return new ResponseEntity<SimularEscenarioDinamicoRes>(HttpStatus.NOT_IMPLEMENTED);
+		BadRequest badRequest=new BadRequest();
+		badRequest.setCodigo(Common.ERROR_CODE);
+		badRequest.setMensaje(Common.ERROR_MENSAJE);
+        return new ResponseEntity<BadRequest>(badRequest,HttpStatus.BAD_REQUEST);
     }
 }
 
