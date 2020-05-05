@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.commons.codec.binary.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoRes;
 import mx.com.nmp.escenariosdinamicos.model.EliminarEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.InternalServerError;
+import mx.com.nmp.escenariosdinamicos.model.InvalidAuthentication;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosReq;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
@@ -158,13 +160,20 @@ public class EscenariosApiController implements EscenariosApi {
         return new ResponseEntity<ModEscenariosRes>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<EjecutarEscenarioDinamicoRes> ejecutarEscenariosDinamicosPOST(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  )  @Valid @RequestBody EjecutarEscenarioDinamicoReq crearEscenariosRequest) {
-        String accept = request.getHeader("Accept");
+    //    public ResponseEntity<EjecutarEscenarioDinamicoRes> ejecutarEscenariosDinamicosPOST(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  )  @Valid @RequestBody EjecutarEscenarioDinamicoReq crearEscenariosRequest) {
+    public ResponseEntity<?> ejecutarEscenariosDinamicosPOST(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  )  @Valid @RequestBody EjecutarEscenarioDinamicoReq crearEscenariosRequest) {
+    	String accept = request.getHeader("Accept");
         ArrayList<PartidaPrecioFinal> lstPartidaPrecioValorMonte=new ArrayList<PartidaPrecioFinal>();
         List<IndexGarantiaVO>lstIndexGarantia=null;
         RequestReglaEscenarioDinamicoDto requestReglaEscenarioDinamico=new RequestReglaEscenarioDinamicoDto();
         List<PartidaVO> lstPartidaVO=null;
         List<IndexVentasVO> scrollElasticVentas=null;
+        if(org.apache.commons.lang3.StringUtils.isBlank(usuario)) {
+        	InvalidAuthentication ia= new InvalidAuthentication();
+        	ia.setCode(Common.ERROR_CODE);
+        	ia.setMessage(Common.MESSAJE_ERROR_AUTORIZACION);
+        	 return new ResponseEntity<InvalidAuthentication>(ia,HttpStatus.UNAUTHORIZED);
+        }
         if (accept != null && accept.contains("application/json")) {
             try {
             	//primero obtenemos las ventas de los ultimos tres dias
@@ -175,15 +184,24 @@ public class EscenariosApiController implements EscenariosApi {
             	requestReglaEscenarioDinamico.setPartida(lstPartidaVO);
             	 String jsonMessage=new Gson().toJson(requestReglaEscenarioDinamico);
             	producerMessage.producerReglaEscenarioDinamico(jsonMessage);
-            	
-                return new ResponseEntity<EjecutarEscenarioDinamicoRes>(objectMapper.readValue("\"\"", EjecutarEscenarioDinamicoRes.class), HttpStatus.NOT_IMPLEMENTED);
             } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<EjecutarEscenarioDinamicoRes>(HttpStatus.INTERNAL_SERVER_ERROR);
+                log.error("Couldn't serialize response for content type application/json", e.getMessage());
+                InternalServerError is = new InternalServerError();
+                is.codigo(Common.ERROR_SERVER);
+                is.setMensaje(Common.ERROR_SERVER_MSG);
+                return new ResponseEntity<InternalServerError>(is,HttpStatus.INTERNAL_SERVER_ERROR);
             }
+        	EjecutarEscenarioDinamicoRes response= new EjecutarEscenarioDinamicoRes();
+        	response.setCode(Common.EXITO_EJECUTAR_ESCENARIODINAMICO);
+        	response.setMessage(Common.MENSAJE_OK);
+            return new ResponseEntity<EjecutarEscenarioDinamicoRes>(response, HttpStatus.OK);
         }
 
-        return new ResponseEntity<EjecutarEscenarioDinamicoRes>(HttpStatus.NOT_IMPLEMENTED);
+		BadRequest badRequest=new BadRequest();
+		badRequest.setCodigo(Common.ERROR_CODE);
+		badRequest.setMensaje(Common.ERROR_MENSAJE);
+        return new ResponseEntity<BadRequest>(badRequest,HttpStatus.BAD_REQUEST);
+
     }
 
     public ResponseEntity<?> eliminarEscenariosDELETE(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Identificador del escenario",required=true) @PathVariable("idEscenario") Integer idEscenario) {
