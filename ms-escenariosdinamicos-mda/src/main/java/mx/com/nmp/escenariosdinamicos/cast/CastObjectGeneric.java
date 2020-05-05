@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -15,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-
+import mx.com.nmp.escenariosdinamicos.clienteservicios.service.ClientesMicroservicios;
 import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.CalculoValorVO;
 import mx.com.nmp.escenariosdinamicos.constantes.Constantes.Common;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
@@ -32,6 +34,8 @@ import mx.com.nmp.escenariosdinamicos.oag.vo.PartidaVO;
 
 @Repository
 public class CastObjectGeneric {
+	private static final Logger LOG = LoggerFactory.getLogger(CastObjectGeneric.class);
+	
 	public IndexGarantiaVO JsonFieldToObject(String jsonField) {
 		ObjectMapper mapper = new ObjectMapper();
 		IndexGarantiaVO participantJsonList = null;
@@ -71,8 +75,8 @@ public class CastObjectGeneric {
 	//cast con lamda
 	public List<CalculoValorVO> castGarantiasToCalculoValor(List<IndexGarantiaVO> lstCalculoValor){
 		 List<CalculoValorVO> lstCalculoValors=lstCalculoValor.stream().map(calculoValor->{
-			 System.out.println("Cast con lamda----");
-			 System.out.println(calculoValor.toString());
+			 LOG.info("Cast con lamda----");
+			 LOG.info(calculoValor.toString());
 			 return new CalculoValorVO(
 					 calculoValor.getPartida()!=null?calculoValor.getPartida():0,
 					 calculoValor.getSku(),

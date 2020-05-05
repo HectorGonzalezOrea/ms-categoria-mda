@@ -9,25 +9,39 @@ import static mx.com.nmp.gestionescenarios.utils.Constantes.ID_ESCENARIO_CONSOLI
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ID_PETICION_ESCENARIO_CONSOLIDADO;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ID_ESCENARIO_ANCLA_ORO_DOLAR;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ID_PETICION_ESCENARIO_ANCLA_ORO_DOLAR;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ID_PETICION_ESCENARIO_MONEDA_ORO;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ID_ESCENARIO_MONEDA_ORO;
+
+
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.threeten.bp.LocalDate;
 
 import mx.com.nmp.gestionescenarios.model.InternalServerError;
+import mx.com.nmp.gestionescenarios.model.ListaMonedas;
+import mx.com.nmp.gestionescenarios.model.ListaMonedasInner;
 import mx.com.nmp.gestionescenarios.model.ModificarValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.model.ValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.mongodb.entity.AnclaOroDolarEntity;
+import mx.com.nmp.gestionescenarios.mongodb.entity.MonedasEntity;
 import mx.com.nmp.gestionescenarios.mongodb.repository.EscenariosRepository;
 import mx.com.nmp.gestionescenarios.mongodb.service.GestionEscenarioService;
+import mx.com.nmp.gestionescenarios.mongodb.service.SequenceGeneratorService;
 import mx.com.nmp.gestionescenarios.ms.ajustepreciosconsolidados.AjustePreciosConsolidadosController;
 import mx.com.nmp.gestionescenarios.oag.controller.OAGController;
 import mx.com.nmp.gestionescenarios.oag.vo.CalendarizarEscenarioRequestVO;
@@ -40,11 +54,21 @@ public class EscenariosService {
 
 	private static final Logger log = LoggerFactory.getLogger(EscenariosService.class);
 	
+	public static final String ORO = "oro";
+	public static final String ID = "_id";
+	
+	private static final String GESTIONESCENARIO_SEQ_KEY = "gestionEscenario_sequence";
+	private static final String MONEDAS_SEQ_KEY = "monedas_sequence";
+	
 	@Autowired
 	private AjustePreciosConsolidadosController ajustePreciosConsolidadosController;
 	
 	@Autowired
 	private OAGController oAGController;
+	@Autowired
+	private MongoTemplate mongoTemplate;
+	@Autowired
+	private SequenceGeneratorService sequenceGeneratorService;
 	
 	@Autowired
 	private GestionEscenarioService gestionEscenarioMongoService;
@@ -156,6 +180,77 @@ public class EscenariosService {
 		
 	}
 	
+	
+	/*
+	 *  Registrar valores de monedas
+	 */
+	
+	public Boolean registrarMonedas (ListaMonedas peticion) {
+		
+		Boolean insertado = null;
+		MonedasEntity moneda =null;		
+		
+		if (peticion!= null) {
+			moneda = new MonedasEntity ();
+			
+			for(ListaMonedasInner lmi:peticion) {
+			moneda.setTipo(lmi.getTipo());
+			moneda.setOro(lmi.isOro());
+			moneda.setPrecio(lmi.getPrecio());
+			LocalDate locateDate = LocalDate.now();
+			moneda.setFechaCreacion(locateDate);
+			moneda.setActualizadoPor(lmi.getActualizadoPor());
+			
+			Integer requestId = this.calendarizarEjecucion(ID_PETICION_ESCENARIO_MONEDA_ORO, ID_ESCENARIO_MONEDA_ORO);
+			moneda.setRequestId(requestId);
+			
+			Long id = sequenceGeneratorService.generateSequence(MONEDAS_SEQ_KEY);
+			moneda.setId(id);
+			}
+			
+			
+			mongoTemplate.insert(moneda);
+			insertado = true;
+
+		}
+		
+		
+		return insertado;
+	}
+	
+	/*
+	 * Consulta Monedas
+	 */
+	
+	public List<ListaMonedasInner> consultarMonedas (Boolean oro) {
+		
+		
+		List<MonedasEntity> busquedaList = this.buscarMonedas(oro);
+		List<ListaMonedasInner> monedas = null;
+		if(CollectionUtils.isNotEmpty(busquedaList)) {
+			log.info("buscarMonedas");
+			monedas= new ArrayList<>();
+			ListaMonedasInner lm = null;
+			for(MonedasEntity me:busquedaList) {
+				lm = new ListaMonedasInner();
+				lm.setId(me.getId());
+				lm.setTipo(me.getTipo());
+				lm.setPrecio(me.getPrecio());
+				lm.setOro(oro);
+				lm.setFechaCreacion(me.getFechaCreacion());
+				lm.setActualizadoPor(me.getActualizadoPor());
+				monedas.add(lm);
+			}
+			
+						
+			
+			
+		}
+		
+		return monedas;
+		
+	}
+		
 	/*
 	 * Consultar ancla oro dolar
 	 */
@@ -209,6 +304,41 @@ public class EscenariosService {
 	}
 	
 	/*
+	 * Solicitar el cambio de ancla oro dolar con los datos enviados
+	 */
+	public Boolean solictarCambioMoneda(ListaMonedas peticion) {
+		log.info("solictarCambioMoneda");
+		
+		Boolean procesado = false;
+		
+		if(peticion != null) {
+			Long id = gestionEscenarioMongoService.solictarCambioMoneda(peticion);
+			
+			if(id != null) {
+				MonedasEntity moneda = gestionEscenarioMongoService.consultarRequestIdMoneda(id);
+				if(moneda != null ) {
+					if(moneda.getRequestId() != null) {
+						procesado = this.existeRequestIdMonedas(moneda.getRequestId());
+						log.info("RequestId {}", procesado);
+						if(Boolean.TRUE.equals(procesado)) {
+							log.info("Se ha eliminado el requestId correctamente");
+						}else {
+							log.info("No se ha podido eliminar el requestId");
+						}
+						procesado = this.noExisteRequestIdMonedas(id);
+					
+					} else {
+						procesado = this.noExisteRequestIdMonedas(id);
+						log.info("RequestId {}", procesado);
+					}
+				}
+			}
+		}
+		
+		return procesado;
+	}
+	
+	/*
 	 * Existe el request id de ancla oro valor
 	 */
 	private Boolean existeRequestIdAnclaOroDolar(Integer requestId) {
@@ -219,8 +349,21 @@ public class EscenariosService {
 		return oAGController.eliminarCalendarizacionEscenario(requestId);
 	}
 	
+
+	
 	/*
-	 * No existe el request id de ancla oro valor
+	 * Existe el request id de Monedas
+	 */
+	private Boolean existeRequestIdMonedas(Integer requestId) {
+		log.info("existeRequestIdMoneda");
+		
+		log.info("requestId: {}", requestId);
+		
+		return oAGController.eliminarCalendarizacionEscenario(requestId);
+	}
+	
+	/*
+	 * No existe el request id de Monedas
 	 */
 	private Boolean noExisteRequestIdAnclaOroDolar(ObjectId id) {
 		log.info("noExisteRequestIdAnclaOroDolar");
@@ -236,4 +379,41 @@ public class EscenariosService {
 		return procesado;
 	}
 	
+	/*
+	 * No existe el request id de Monedas
+	 */
+	private Boolean noExisteRequestIdMonedas(Long id) {
+		log.info("noExisteRequestIdMoneda");
+		
+		Boolean procesado = false;
+		
+		// Se calendariza la ejecución de los escenarios de ancla oro dolar
+		Integer requestId = this.calendarizarEjecucion(ID_PETICION_ESCENARIO_MONEDA_ORO, ID_ESCENARIO_MONEDA_ORO);
+		if(requestId != null) {
+			procesado = gestionEscenarioMongoService.updateRequestIdMonedas(id, requestId);
+		}
+		
+		return procesado;
+	}
+	
+	/*
+	 * Buscar moneda
+	 */
+	
+	public List<MonedasEntity> buscarMonedas(Boolean oro) {
+		log.info("buscarMonedas");
+		
+		List<MonedasEntity> moneda = null;
+		
+		try {
+			Query query = new Query();
+			query.addCriteria(Criteria.where(ORO).in(oro));
+			
+			moneda = mongoTemplate.find(query, MonedasEntity.class);
+		} catch (Exception e) {
+			log.info("Exception: {}", e);
+		}
+		
+		return moneda;
+	}
 }

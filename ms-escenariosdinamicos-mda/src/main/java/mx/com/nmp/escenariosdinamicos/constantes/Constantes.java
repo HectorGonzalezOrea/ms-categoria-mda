@@ -2,7 +2,7 @@ package mx.com.nmp.escenariosdinamicos.constantes;
 
 public final class Constantes {
 	public class Common {
-		public static final String ERROR_GUARDAR = "NMP-MDA-400";
+		public static final String ERROR_CODE = "NMP-MDA-400";
 		public static final String ERROR_MENSAJE = "El cuerpo de la petición no está bien formado, verifique su información.";
 		
 		public static final String EXITO_GUARDAR = "Exitoso";
@@ -12,6 +12,12 @@ public final class Constantes {
 		
 		public static final String EXITO_ELIMINAR="NMP-MDA-200";
 		public static final String EXITO_ELIMINAR_MSG="Operación ejecutada satisfactoriamente.";
+		
+		public static final String EXITO_EJECUTAR_ESCENARIODINAMICO="NMP-MDA-200";
+		public static final String MENSAJE_OK="Operación ejecutada satisfactoriamente.";
+		
+		public static final String ERROR_CODE_AUTORIZACION="NMP-MDA-401";
+		public static final String MESSAJE_ERROR_AUTORIZACION="Se ha producido un error de autorización";
 		
 		//public static final String BLANK_SPACE="";
 		//public static final String WSDL_ARBITRADO="http://10.30.3.15:8011/NMP/OperacionPrendaria/MotorDescuentos/ArbitrajePreciosPartidas/v1?WSDL";
@@ -45,6 +51,30 @@ public final class Constantes {
 		public static final int AVALUO_TECNICO=5;
 		public static final int AVALUO_COMERCIAL=6;
 		public static final int PRECIO_MERCADO=7;
+		
+		public static final int NUMERO_MAXIMO_SCROLL =2;
+		public static final int DIFERENCIA_DIAS =-3;
+		public static final String CAMPO_FECHA_INDEX="fecha";
+		public static final String CUO_PARTIDA="num_cuo";
+
+		public static final String TEMPLATE_NOTIFICACION_EMAIL_HEAD="<body>\r\n" + 
+				"	<table style=\"border-collapse: collapse;\">\r\n" + 
+				"		<caption>Reporte de precios</caption>\r\n" + 
+				"		<thead>\r\n" + 
+				"		<tr>\r\n" + 
+				"			<th style=\"border: 1px solid black\">Partida</th>\r\n" + 
+				"			<th style=\"border: 1px solid black\">SKU</th>\r\n" + 
+				"			<th style=\"border: 1px solid black\">Prestamo</th>\r\n" + 
+				"			<th style=\"border: 1px solid black\">Precio</th>\r\n" + 
+				"			<th style=\"border: 1px solid black\">Precio etiqueta</th>\r\n" + 
+				"		</tr>\r\n" + 
+				"	</thead>\r\n" + 
+				"	<tbody>";
+		public static final String TEMPLATE_NOTIFICACION_EMAIL_FOOTER="	</tbody>\r\n" + 
+				"	</table>\r\n" + 
+				"</body>";
+		public static final String ASUNTO_AJUSTE_PRECIOS_FALSE = "Notificación de Partidas a las que no se pudo hacer el ajuste de precios.";
+		
 	}
 	
 

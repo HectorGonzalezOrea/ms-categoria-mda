@@ -1,5 +1,6 @@
 package mx.com.nmp.escenariosdinamicos.clienteoag.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -24,10 +25,12 @@ import com.google.gson.Gson;
 import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
 import mx.com.nmp.escenariosdinamicos.constantes.Constantes.Common;
 import mx.com.nmp.escenariosdinamicos.model.component.ProducerMessageComponent;
+import mx.com.nmp.escenariosdinamicos.oag.dto.RequestActualizarPrecioPartidaDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.RequestReglaEscenarioDinamicoDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseOAGDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseReglasArbitrajeOAGDto;
 import mx.com.nmp.escenariosdinamicos.oag.vo.PartidaVO;
+import mx.com.nmp.escenariosdinamicos.oag.vo.PreciosVO;
 
 
 
@@ -116,12 +119,32 @@ public class ClientOAGService {
 			  if(result.getBody() !=null) {
 				  response=  castObject.convertJsonToReglasArbitraje(result.getBody());
 				  pruducerMessage.producerCambioPrecio(result.getBody());
+				  
 			  }
 		  }
 		  
 		return response;
 	}
 	
+	public String  actualizarPrecioPartida(RequestActualizarPrecioPartidaDto request) {
+		 String token=clienteCorreo.getToken();
+		 Gson gson = new Gson();
+		 String jsonRequest=gson.toJson(request);
+		 RestTemplate restTemplate = new RestTemplate();
+		  HttpHeaders headers = new HttpHeaders();
+		  headers.setContentType(MediaType.APPLICATION_JSON);
+		  headers.add(Common.HEADER_USUARIO, headerUsuario);
+		  headers.add(Common.HEADER_ID_CONSUMIDOR, headerIdConsumidor);
+		  headers.add(Common.HEADER_ID_DESTINO, headerIdDestino);
+		  headers.add(Common.HEADER_OAUTH_BEARER,token);
+		  headers.setBasicAuth(usuario, password);
+		  HttpEntity<String> entity = new HttpEntity<>(jsonRequest,headers);
+			//String url="https://dev1775-ms-establecimientoprecios-mda.mybluemix.net/NMP/MotorDescuentosAPI/v1/precios";
+			 //ResponseEntity<String> response = restTemplate.postForEntity(url, entity,String.class);
+		  List<PreciosVO> lstPrecios= new ArrayList<PreciosVO>();
+		  clienteCorreo.sendEmailUser(lstPrecios);
+		  return null;
+	}
 	
 	
 	
@@ -129,27 +152,7 @@ public class ClientOAGService {
 	
 	 
 	  
-	  
-	  private String requestReglaArbitraje(PartidaVO vo ) {
-		  log.info("Generando request json reglas arbitraje");
-		  JsonNode rootNode=objectMapper.createObjectNode();
-		  JsonNode childNode = objectMapper.createObjectNode();
-		  String request=null;
-		 try {		  
-			  ((ObjectNode) childNode).put("idPartida", vo.getIdPartida());
-			  ((ObjectNode) childNode).put("sku", vo.getSku());
-			  ((ObjectNode) childNode).put("precioVenta", vo.getPrecioVenta());
-			  ((ObjectNode) childNode).put("montoPrestamo", vo.getMontoPrestamo());
-			  ((ObjectNode) rootNode).set("partida", childNode);
-			  request=objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
-		} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
-			log.info("Error al genrar el request de reglas arbitraje "+e.getMessage());
-		}
-		  return request;
-	  }
 
-	
 	
 
 }

@@ -4,6 +4,10 @@ import java.util.Objects;
 
 import org.springframework.validation.annotation.Validated;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * EjecutarEscenarioDinamicoRes
  */
@@ -12,6 +16,44 @@ import org.springframework.validation.annotation.Validated;
 
 public class EjecutarEscenarioDinamicoRes   {
 
+	 @JsonProperty("code")
+	  private String code = null;
+
+	 @JsonProperty("message")
+	 private String message = null;
+	 
+	  /**
+	   * Get code
+	   * @return code
+	  **/
+	  @ApiModelProperty(example = "200", value = "")
+
+
+	  public String getCode() {
+	    return code;
+	  }
+
+	  public void setCode(String code) {
+	    this.code = code;
+	  }
+
+	
+
+	  /**
+	   * Get message
+	   * @return message
+	  **/
+	  @ApiModelProperty(example = "Escenario eliminado exitosamente", value = "")
+
+
+	  public String getMessage() {
+	    return message;
+	  }
+
+	  public void setMessage(String message) {
+	    this.message = message;
+	  }
+	  
   @Override
   public boolean equals(java.lang.Object o) {
     if (this == o) {

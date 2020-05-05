@@ -29,6 +29,26 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
+
+import static mx.com.nmp.gestionbolsas.utils.Constantes.HEADER_APIKEY_KEY;
+import static mx.com.nmp.gestionbolsas.utils.Constantes.HEADER_ACCEPT_KEY;
+import static mx.com.nmp.gestionbolsas.utils.Constantes.HEADER_ACCEPT_VALUE;
+import static mx.com.nmp.gestionbolsas.utils.Constantes.CADENA_VACIA;
+								
+import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_CODE_INVALID_AUTHENTICATION;
+import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION;
+import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_CODE_INTERNAL_SERVER_ERROR;
+import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_MESSAGE_INTERNAL_SERVER_ERROR;
+import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_CODE_BAD_REQUEST;
+import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_MESSAGE_BAD_REQUEST;
+import static mx.com.nmp.gestionbolsas.utils.Constantes.SUCCESS_MESSAGE_OK;
+import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_MESSAGE_NAME;
+import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_MESSAGE_TIPO;
+import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_MESSAGE_INTERNAL_SERVER_ERROR_NO_GENERIC;
+import static mx.com.nmp.gestionbolsas.utils.Constantes.MESSAGE_DELETE;
+import static mx.com.nmp.gestionbolsas.utils.Constantes.MESSAGE_NO_DELETE;
+import static mx.com.nmp.gestionbolsas.utils.Constantes.MESSAGE_OK_BOLSA;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +81,22 @@ public class BolsasApiController implements BolsasApi {
 			@ApiParam(value = "Subramo configurado en la Bolsa") @Valid @RequestParam(value = "subramo", required = false) String subramo,
 			@ApiParam(value = "Factor configurado en la Bolsa") @Valid @RequestParam(value = "factor", required = false) String factor) {
 
-		String accept = request.getHeader("Accept");
+			String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+    	
+    		if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
+    		
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.error("{}" , ia);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+    	}
+		
+		String accept = request.getHeader(HEADER_ACCEPT_KEY);
+		
+		
 		if (accept != null && accept.contains("application/json")) {
 			try {
 				log.info("Consulta Bolsas");
@@ -90,25 +125,38 @@ public class BolsasApiController implements BolsasApi {
 	}
 
     public ResponseEntity<?> bolsasIdBolsaDelete(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Identificador de la Bolsa a eliminar",required=true) @PathVariable("idBolsa") Integer idBolsa) {
-        String accept = request.getHeader("Accept");
+    	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+    	
+		if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
+		
+		InvalidAuthentication ia = new InvalidAuthentication();
+		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+		
+		log.error("{}" , ia);
+		
+		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+	}
+	
+	String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains("application/json")) {
             try {
             	
             	if(idBolsa == null) {
             		log.error("Error en el mensaje de petición, verifique la información");
 					BadRequest br = new BadRequest();
-					br.setMessage("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCode("NMP-MDA-400");
+					br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+					br.setCode(ERROR_CODE_BAD_REQUEST);
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
             	}else {
             		Boolean eliminado = bolsaService.deleteBolsa(idBolsa);
             		GeneralResponse resp =  new GeneralResponse();
             		if(eliminado) {
-						resp.setMessage("Usuario eliminado exitosamente");
+						resp.setMessage(MESSAGE_DELETE);
 						return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
 					} else {
-						resp.setMessage("Usuario no eliminado");
+						resp.setMessage(MESSAGE_NO_DELETE);
 						return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
 					}
             		}
@@ -123,7 +171,20 @@ public class BolsasApiController implements BolsasApi {
     }
 
     public ResponseEntity<?> bolsasPatch(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody Bolsa peticion) {
-        String accept = request.getHeader("Accept");
+    	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+    	
+		if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
+		
+		InvalidAuthentication ia = new InvalidAuthentication();
+		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+		
+		log.error("{}" , ia);
+		
+		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+	}
+	
+	String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains("application/json")) {
             try {
             	if (peticion != null) {
@@ -138,15 +199,15 @@ public class BolsasApiController implements BolsasApi {
             			
             		}else {
             			InternalServerError ie = new InternalServerError();
-        				ie.setCode("NMP-MDA-500");
+        				ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
         				ie.setMessage("Error interno del servidor");
                         
                         return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
             		}
             	}else {
             		BadRequest br = new BadRequest();
-					br.setMessage("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCode("NMP-MDA-400");
+					br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+					br.setCode(ERROR_CODE_BAD_REQUEST);
 					
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
             	}
@@ -163,38 +224,72 @@ public class BolsasApiController implements BolsasApi {
 
     public ResponseEntity<?> bolsasPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody Bolsa peticion) {
     	log.info("Crear Bolsa");
-    	String accept = request.getHeader("Accept");
+    	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+    	
+		if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
+		
+		InvalidAuthentication ia = new InvalidAuthentication();
+		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+		
+		log.error("{}" , ia);
+		
+		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+	}
+	
+	String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains("application/json")) {
             try {
             	
             	if (peticion != null) {
+            		if(Boolean.TRUE.equals(bolsaService.consultaBolsa(peticion.getNombre()))) {
+            			BadRequest br = new BadRequest();
+                		br.setCode(ERROR_CODE_BAD_REQUEST);
+                		br.setMessage(ERROR_MESSAGE_NAME);
+                		
+                		log.error("{}" , br);
+    					
+    					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+            		
+            	}
+                	if(Boolean.FALSE.equals(bolsaService.consultaTipoBolsa(peticion.getTipo().getId()))) {
+                		BadRequest br = new BadRequest();
+                    	br.setCode(ERROR_CODE_BAD_REQUEST);
+                    	br.setMessage(ERROR_MESSAGE_TIPO);
+                    		
+                    	log.error("{}" , br);
+        					
+        				return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+                		
+                }else {
             		
             		log.info("peticion: " + peticion.toString());
             		
             		Boolean insertado = bolsaService.crearBolsa(peticion);
             		if(insertado) {
             			GeneralResponse resp =  new GeneralResponse();
-            			resp.setMessage("Bolsa creada correctamente.");
+            			resp.setMessage(MESSAGE_OK_BOLSA);
             			
             			return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
             		} else {
             			InternalServerError ie = new InternalServerError();
-        				ie.setCode("NMP-MDA-500");
+        				ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
         				ie.setMessage("Error interno del servidor");
                         
                         return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
             		}
+            	}
             	} else {
             		BadRequest br = new BadRequest();
-					br.setMessage("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCode("NMP-MDA-400");
+					br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+					br.setCode(ERROR_CODE_BAD_REQUEST);
 					
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
             	}
             } catch (Exception e) {
             	log.error("Couldn't serialize response for content type application/json", e);
                 InternalServerError ie = new InternalServerError();
-				ie.setCode("NMP-MDA-500");
+				ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
 				ie.setMessage("Error interno del servidor");
                 
                 return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -205,13 +300,26 @@ public class BolsasApiController implements BolsasApi {
     }
 
     public ResponseEntity<?> bolsasTiposGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario) {
-        String accept = request.getHeader("Accept");
+    	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+    	
+		if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
+		
+		InvalidAuthentication ia = new InvalidAuthentication();
+		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+		
+		log.error("{}" , ia);
+		
+		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+	}
+	
+	String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains("application/json")) {
         	BadRequest br = new BadRequest();
             try {
             	if(usuario == null) {
-            		br.setCode("NMP-MDA-400");
-            		br.setMessage("El cuerpo de la petición no está bien formado, verifique su información");
+            		br.setCode(ERROR_CODE_BAD_REQUEST);
+            		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
             		
             		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
             	}

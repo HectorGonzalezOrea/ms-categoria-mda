@@ -34,6 +34,7 @@ import mx.com.nmp.gestionescenarios.model.InfoRegla;
 import mx.com.nmp.gestionescenarios.model.ListaBolsas;
 import mx.com.nmp.gestionescenarios.model.ListaInfoGeneralRegla;
 import mx.com.nmp.gestionescenarios.model.ListaMonedas;
+import mx.com.nmp.gestionescenarios.model.ListaMonedasInner;
 import mx.com.nmp.gestionescenarios.model.ModificarValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.model.ValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.mongodb.service.GestionEscenarioService;
@@ -330,12 +331,32 @@ public class EscenariosApiController implements EscenariosApi {
 	/*
 	 * 
 	 */
-    public ResponseEntity<ListaMonedas> escenariosMonedasGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@NotNull @ApiParam(value = "Flag para indicar si se consultan las monedas oro o sin oro", required = true) @Valid @RequestParam(value = "oro", required = true) Boolean oro) {
+    public ResponseEntity<?> escenariosMonedasGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@NotNull @ApiParam(value = "Flag para indicar si se consultan las monedas oro o sin oro", required = true) @Valid @RequestParam(value = "oro", required = true) Boolean oro) {
         String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
-                return new ResponseEntity<ListaMonedas>(objectMapper.readValue("\"\"", ListaMonedas.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+            	
+            	List<ListaMonedasInner> consulta = escenariosService.consultarMonedas(oro);
+            	if(consulta!=null) {
+            		ListaMonedas moneda = new ListaMonedas();
+            		moneda.addAll(consulta);
+            		if(moneda!=null) {
+            			
+            			return new ResponseEntity<ListaMonedas>(moneda, HttpStatus.OK);
+            		}
+            	}else {
+            		BadRequest br = new BadRequest();
+            		
+            		br.setCode(ERROR_CODE_BAD_REQUEST);
+            		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+            		
+            		log.error("{}" , br);
+            		
+            		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+            	}
+      	
+        	
+            } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<ListaMonedas>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -347,12 +368,42 @@ public class EscenariosApiController implements EscenariosApi {
     /*
      * 
      */
-    public ResponseEntity<GeneralResponse> escenariosMonedasPatch(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody ListaMonedas peticion) {
+    public ResponseEntity<?> escenariosMonedasPatch(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody ListaMonedas peticion) {
         String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
-                return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+            	if(usuario == null || peticion == null) {
+					BadRequest br = new BadRequest();
+		    		
+		    		br.setCode(ERROR_CODE_BAD_REQUEST);
+		    		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+		    		
+		    		log.error("{}" , br);
+		    		
+		    		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+				}else {
+					log.info("usuario: {}", usuario);
+					log.info("peticion: {}", peticion);
+					
+					Boolean procesado = escenariosService.solictarCambioMoneda(peticion);
+					if(Boolean.TRUE.equals(procesado)) {
+						GeneralResponse gr = new GeneralResponse();
+						gr.setMessage(SUCCESS_MESSAGE_OK);
+						
+						log.info("{}" , gr);
+		                
+		                return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK);
+					} else {
+						InternalServerError ise = new InternalServerError();
+		                ise.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
+		                ise.setMessage(ERROR_MESSAGE_INTERNAL_SERVER_ERROR_NO_GENERIC);
+		                
+		                log.error("{}" , ise);
+		                
+		                return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
+					}
+				}
+            } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<GeneralResponse>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -364,12 +415,48 @@ public class EscenariosApiController implements EscenariosApi {
     /*
      * 
      */
-    public ResponseEntity<GeneralResponse> escenariosMonedasPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody ListaMonedas peticion) {
-        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+    public ResponseEntity<?> escenariosMonedasPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,
+    		@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody ListaMonedas peticion) {
+        log.info("*************************************************************");
+        log.info("escenariosMonedasPost");
+        log.info("*************************************************************");
+
+		String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+    	
+    	if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
+    		
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.error("{}" , ia);
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+    	}
+    	String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
-                return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+            	GeneralResponse gr = new GeneralResponse();
+            	if(peticion == null) {
+					BadRequest br = new BadRequest();
+		    		
+		    		br.setCode(ERROR_CODE_BAD_REQUEST);
+		    		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+		    		
+		    		log.error("{}" , br);
+		    		
+		    		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+				}else {
+					Boolean insertado = escenariosService.registrarMonedas(peticion);
+					if (insertado) {
+						gr.setMessage("Regla almacenada exitosamente");
+                		return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK);
+					}
+					
+				}
+            	
+                
+            } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<GeneralResponse>(HttpStatus.INTERNAL_SERVER_ERROR);
             }

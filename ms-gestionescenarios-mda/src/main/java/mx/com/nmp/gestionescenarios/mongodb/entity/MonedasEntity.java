@@ -22,6 +22,7 @@ public class MonedasEntity {
 	private LocalDate fechaCreacion;
 	private LocalDate fechaModificacion;
 	private String actualizadoPor;
+	private Integer requestId;
 	
 	
 	public Long getId() {
@@ -65,6 +66,12 @@ public class MonedasEntity {
 	}
 	public void setActualizadoPor(String actualizadoPor) {
 		this.actualizadoPor = actualizadoPor;
+	}
+	public Integer getRequestId() {
+		return requestId;
+	}
+	public void setRequestId(Integer requestId) {
+		this.requestId = requestId;
 	}
 	
 	
