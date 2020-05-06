@@ -50,8 +50,10 @@ public class ValorMonteService {
 
 							cvmRespInner.setIdPartida(Integer.valueOf(producto.getPartida()));
 							cvmRespInner.setSku(producto.getSku());
-							cvmRespInner.setValorMonteActualizado(Float.valueOf(producto.getValorMonteAct()));
-
+							
+							if(producto.getValorMonteAct() != null) {
+								cvmRespInner.setValorMonteActualizado(Float.valueOf(producto.getValorMonteAct()));
+							}
 							cvmResp.add(cvmRespInner);
 						}
 					}
