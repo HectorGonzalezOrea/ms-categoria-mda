@@ -32,7 +32,7 @@ public class HistoricoPrecios   {
   private Float precioModificado = null;
 
   @JsonProperty("fecha")
-  private String fecha = null;
+  private OffsetDateTime fecha = null;
 
   public HistoricoPrecios sku(String sku) {
     this.sku = sku;
@@ -114,7 +114,7 @@ public class HistoricoPrecios   {
     this.precioModificado = precioModificado;
   }
 
-  public HistoricoPrecios fecha(String fecha) {
+  public HistoricoPrecios fecha(OffsetDateTime fecha) {
     this.fecha = fecha;
     return this;
   }
@@ -127,11 +127,11 @@ public class HistoricoPrecios   {
 
   @Valid
 
-  public String getFecha() {
+  public OffsetDateTime getFecha() {
     return fecha;
   }
 
-  public void setFecha(String fecha) {
+  public void setFecha(OffsetDateTime fecha) {
     this.fecha = fecha;
   }
 

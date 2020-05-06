@@ -30,29 +30,30 @@ public class ValorMonteService {
 		if (vm != null) {
 			cvmResp = new CalculoValorMonteRes();
 			for (CalculoValorMonteReqInner vmri : vm) {
-				if (vmri.getValorAncla() != null && vmri.getDesplazamiento() != null && vmri.getGramaje() != null
-						&& vmri.getIncremento() != null && vmri.getKilataje() != null
-						&& vmri.getAvaluoComplementario() != null) {
-					
-					vma = this.valorMonteActualizado(vmri);
-					cvmRespInner = new CalculoValorMonteResInner();
-
-					cvmRespInner.setIdPartida(vmri.getIdPartida());
-					cvmRespInner.setSku(vmri.getSKU());
-					cvmRespInner.setValorMonteActualizado(vma);
-
-					cvmResp.add(cvmRespInner);
-				} else {
-					Source producto = elasticController.consultaElastic(vmri.getSKU());
-
-					if(producto != null) {
+				Source producto = elasticController.consultaElastic(vmri.getSKU(), vmri.getIdPartida());
+				if(producto != null) {
+					if (vmri.getValorAncla() != null && vmri.getDesplazamiento() != null && vmri.getGramaje() != null
+							&& vmri.getIncremento() != null && vmri.getKilataje() != null
+							&& vmri.getAvaluoComplementario() != null) {
+						
+						vma = this.valorMonteActualizado(vmri);
 						cvmRespInner = new CalculoValorMonteResInner();
 
-						cvmRespInner.setIdPartida(Integer.valueOf(producto.getPartida()));
-						cvmRespInner.setSku(producto.getSku());
-						cvmRespInner.setValorMonteActualizado(Float.valueOf(producto.getValorMonteAct()));
+						cvmRespInner.setIdPartida(vmri.getIdPartida());
+						cvmRespInner.setSku(vmri.getSKU());
+						cvmRespInner.setValorMonteActualizado(vma);
 
 						cvmResp.add(cvmRespInner);
+					} else {
+						if(producto != null) {
+							cvmRespInner = new CalculoValorMonteResInner();
+
+							cvmRespInner.setIdPartida(Integer.valueOf(producto.getPartida()));
+							cvmRespInner.setSku(producto.getSku());
+							cvmRespInner.setValorMonteActualizado(Float.valueOf(producto.getValorMonteAct()));
+
+							cvmResp.add(cvmRespInner);
+						}
 					}
 				}
 			}

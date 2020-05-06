@@ -56,14 +56,8 @@ public class HistoricoPreciosService {
 			hpvo.setPrecio_modificado(hp.getPrecioModificado().toString());
 			hpvo.setUsuario(usuario);
 			
-			String[] fechaAcotada = hp.getFecha().split(" ");
-			
-			if(fechaAcotada.length != 0) {
-				hpvo.setFecha(fechaAcotada[0]);
-			} else {
-				hpvo.setFecha(hp.getFecha());
-			}
-			
+			hpvo.setFecha(hp.getFecha().toString());
+
 			try {
 			
 				insertado = elasticService.insertHistoricoPreciosVO(hpvo, index, restHighLevelClient);
