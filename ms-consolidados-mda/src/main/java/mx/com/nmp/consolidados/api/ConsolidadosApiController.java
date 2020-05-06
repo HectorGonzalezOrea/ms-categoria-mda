@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.ApiParam;
@@ -63,6 +64,7 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 
     @org.springframework.beans.factory.annotation.Autowired
     public ConsolidadosApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+    	objectMapper.configure(MapperFeature.ALLOW_COERCION_OF_SCALARS, false);
         this.objectMapper = objectMapper;
         this.request = request;
     }
@@ -70,80 +72,92 @@ public class ConsolidadosApiController implements ConsolidadosApi {
     /*
      * Actualizar prioridad de ejecución del archivo
      */
-    public ResponseEntity<?> actualizarPosicionArchivoPUT(
-    		@ApiParam(value = "Usuario en el sistema origen que lanza la petici\u00F3n" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,
-    		@ApiParam(value = "Sistema que origina la petici\u00F3n" ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,
-    		@ApiParam(value = "Destino final de la informaci\u00F3n" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,
-    		@ApiParam(value = "Identificador del archivo",required=true) @PathVariable("idArchivo") String idArchivo,
-    		@ApiParam(value = "peticion para modificar la posicion de un archivo"  )  @Valid @RequestBody ModificarPrioridadArchivoConsolidadoReq modificarPosicionReq) {
-    	
-    	log.info("Actualizar la posición de los archivos consolidados.");
-    	
-    	String apiKeyBluemix = request.getHeader(HEADER_APIKEY_KEY);
-    	
-    	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
-    		InvalidAuthentication ia = new InvalidAuthentication();
-    		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
-    		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
-    		
-    		log.info("{}" , ia);
-    		
-    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
-    	}
-    	
-        String accept = request.getHeader(HEADER_ACCEPT);
-        if (accept != null && accept.contains(HEADER_APP_JSON)) {
-            try {
-            	
-            	log.info("usuario : {}" , usuario);
-            	log.info("origen : {}" , origen);
-            	log.info("destino : {}" , destino);
-            	log.info("idArchivo : {}" , idArchivo);
-            	log.info("request : {}" , modificarPosicionReq);
-            	
-            	if(modificarPosicionReq == null || idArchivo == null || idArchivo.equals(Common.BLANK_SPACE) || usuario == null || usuario.equals(Common.BLANK_SPACE) || origen == null || origen.equals(Common.BLANK_SPACE)  || destino == null || destino.equals(Common.BLANK_SPACE) ) {
-            		BadRequest br =  new BadRequest();
-            		br.setCodigo(Common.ERROR_GUARDAR);
-            		br.setMensaje(Common.ERROR_MENSAJE);
-            		
-            		log.info("{}" , br);
-            		
-            		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
-            	}
-            	
-            	InlineResponse200 resp = consolidadoService.actualizarPrioridadArchivo(modificarPosicionReq);
-            	if(resp != null) {
-            		return new ResponseEntity<InlineResponse200>(resp, HttpStatus.OK);
-            	} else {
-            		InternalServerError isr = new InternalServerError();
-             		isr.setCodigo(Common.ERROR_SERVER);
-             		isr.setMensaje(Common.ERROR_SERVER_MSG);
-             		
-             		log.info("{}" ,isr);
-             		
-            		return new ResponseEntity<InternalServerError>(isr, HttpStatus.INTERNAL_SERVER_ERROR);
-            	}
-                //return new ResponseEntity<InlineResponse200>(objectMapper.readValue("{  \"nombreArchivo\" : \"nombreArchivo\",  \"idPosicion\" : 0}", InlineResponse200.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (Exception e) {
-            	log.error("Couldn't serialize response for content type application/json", e);
-            	InternalServerError isr = new InternalServerError();
-         		isr.setCodigo(Common.ERROR_SERVER);
-         		isr.setMensaje(Common.ERROR_SERVER_MSG);
-         		
-         		log.info("{}" ,isr);
-         		
-         		return new ResponseEntity<InternalServerError>(isr, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-		
-        BadRequest br = new BadRequest();
+	public ResponseEntity<?> actualizarPosicionArchivoPUT(
+			@ApiParam(value = "Usuario en el sistema origen que lanza la petici\u00F3n", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Sistema que origina la petici\u00F3n", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
+			@ApiParam(value = "Destino final de la informaci\u00F3n", required = true, allowableValues = "bluemix, mockserver") @RequestHeader(value = "destino", required = true) String destino,
+			@ApiParam(value = "Identificador del archivo", required = true) @PathVariable("idArchivo") String idArchivo,
+			@ApiParam(value = "peticion para modificar la posicion de un archivo") @Valid @RequestBody ModificarPrioridadArchivoConsolidadoReq modificarPosicionReq) {
+
+		log.info("Actualizar la posición de los archivos consolidados.");
+
+		String apiKeyBluemix = request.getHeader(HEADER_APIKEY_KEY);
+
+		if (apiKeyBluemix == null || apiKeyBluemix.equals("")) {
+			InvalidAuthentication ia = new InvalidAuthentication();
+			ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+			ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+
+			log.info("{}", ia);
+
+			return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+		}
+
+		String accept = request.getHeader(HEADER_ACCEPT);
+		if (accept != null && accept.contains(HEADER_APP_JSON)) {
+			try {
+
+				log.info("usuario : {}", usuario);
+				log.info("origen : {}", origen);
+				log.info("destino : {}", destino);
+				log.info("idArchivo : {}", idArchivo);
+				log.info("request : {}", modificarPosicionReq);
+
+				if (modificarPosicionReq == null || idArchivo == null || idArchivo.equals(Common.BLANK_SPACE)
+						|| usuario == null || usuario.equals(Common.BLANK_SPACE) || origen == null
+						|| origen.equals(Common.BLANK_SPACE) || destino == null || destino.equals(Common.BLANK_SPACE)) {
+					
+					BadRequest br = new BadRequest();
+					br.setCodigo(Common.ERROR_GUARDAR);
+					br.setMensaje(Common.ERROR_MENSAJE);
+
+					log.info("{}", br);
+
+					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+				}
+				
+				if(new Integer(idArchivo) == modificarPosicionReq.getIdArchivo()) {
+					InlineResponse200 resp = consolidadoService.actualizarPrioridadArchivo(modificarPosicionReq);
+					if (resp != null) {
+						return new ResponseEntity<InlineResponse200>(resp, HttpStatus.OK);
+					} else {
+						InternalServerError isr = new InternalServerError();
+						isr.setCodigo(Common.ERROR_SERVER);
+						isr.setMensaje(Common.ERROR_SERVER_MSG);
+
+						log.info("{}", isr);
+
+						return new ResponseEntity<InternalServerError>(isr, HttpStatus.INTERNAL_SERVER_ERROR);
+					}
+				} else {
+					BadRequest br = new BadRequest();
+					br.setCodigo(Common.ERROR_GUARDAR);
+					br.setMensaje(Common.ERROR_MENSAJE);
+
+					log.info("{}", br);
+
+					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+				}
+			} catch (Exception e) {
+				log.error("Couldn't serialize response for content type application/json", e);
+				InternalServerError isr = new InternalServerError();
+				isr.setCodigo(Common.ERROR_SERVER);
+				isr.setMensaje(Common.ERROR_SERVER_MSG);
+
+				log.info("{}", isr);
+
+				return new ResponseEntity<InternalServerError>(isr, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+
+		BadRequest br = new BadRequest();
 		br.setCodigo(Common.ERROR_GUARDAR);
 		br.setMensaje(Common.ERROR_MENSAJE);
 
-		log.info("{}" ,br);
-		
+		log.info("{}", br);
+
 		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
-    }
+	}
 
     /*
      * Consulta los archivos por la fecha en la que estan programados
@@ -265,7 +279,7 @@ public class ConsolidadosApiController implements ConsolidadosApi {
              		return new ResponseEntity<SuccessfulResponse>(sr, HttpStatus.OK);
              	} else {
              		
-             		sr.setCodigo(Common.EXITO_ELIMINAR);
+             		sr.setCodigo(Common.ERROR_SERVER);
              		sr.setMensaje(Common.NO_EXITO_ELIMINAR_MSG);    		
              		
              		log.info("{}" , sr);

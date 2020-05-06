@@ -18,7 +18,7 @@ public class Constantes {
 		
 		public static final String EXITO_ELIMINAR="NMP-MDA-200";
 		public static final String EXITO_ELIMINAR_MSG="Operación ejecutada satisfactoriamente.";
-		public static final String NO_EXITO_ELIMINAR_MSG="Operación ejecutada no satisfactoriamente.";
+		public static final String NO_EXITO_ELIMINAR_MSG="No se pudo eliminar el consolidado.";
 		
 		public static final String BLANK_SPACE="";
 		public static final String WSDL_ARBITRADO="http://10.30.3.15:8011/NMP/OperacionPrendaria/MotorDescuentos/ArbitrajePreciosPartidas/v1?WSDL";

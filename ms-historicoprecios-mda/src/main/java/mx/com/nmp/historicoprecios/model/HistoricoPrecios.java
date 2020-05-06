@@ -3,10 +3,12 @@ package mx.com.nmp.historicoprecios.model;
 import java.util.Date;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.threeten.bp.OffsetDateTime;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -17,7 +19,6 @@ import javax.validation.constraints.*;
 @ApiModel(description = "Información de histórico de precios")
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2019-12-19T17:57:16.669Z")
-
 public class HistoricoPrecios   {
   @JsonProperty("sku")
   private String sku = null;
@@ -125,8 +126,7 @@ public class HistoricoPrecios   {
   **/
   @ApiModelProperty(example = "2020-01-09 13:32:56.776", value = "Fecha de registro")
 
-  @Valid
-
+  
   public OffsetDateTime getFecha() {
     return fecha;
   }

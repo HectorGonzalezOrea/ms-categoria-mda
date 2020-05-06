@@ -1,5 +1,6 @@
 package mx.com.nmp.historicoprecios.api;
 
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
 import mx.com.nmp.historicoprecios.elastic.service.HistoricoPreciosService;
@@ -45,6 +46,7 @@ public class HistoricoApiController implements HistoricoApi {
 
 	@org.springframework.beans.factory.annotation.Autowired
 	public HistoricoApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+		objectMapper.configure(MapperFeature.ALLOW_COERCION_OF_SCALARS, false);
 		this.objectMapper = objectMapper;
 		this.request = request;
 	}
@@ -52,7 +54,7 @@ public class HistoricoApiController implements HistoricoApi {
 	public ResponseEntity<?> historicoPreciosPost(
 			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = "Cuerpo de la petición", required = true) @Valid @RequestBody HistoricoPrecios peticion) {
-		
+
 		log.info("*********************************************************");
 		log.info("Historico de precios.");
 		log.info("*********************************************************");
@@ -95,8 +97,10 @@ public class HistoricoApiController implements HistoricoApi {
 
 					if (peticion.getFecha() == null || peticion.getFolioPartida() == null
 							|| peticion.getPrecioActual() == null || peticion.getPrecioModificado() == null
-							|| peticion.getSku() == null || peticion.getFolioPartida().equals("") || peticion.getSku().equals("")) {
-						
+							|| peticion.getSku() == null || peticion.getFolioPartida().equals("")
+							|| peticion.getSku().equals("") || !(peticion.getPrecioActual() instanceof Float)
+							|| !(peticion.getPrecioModificado() instanceof Float)) {
+
 						br = new BadRequest();
 						br.setCode(Constantes.ERROR_CODE_BAD_REQUEST);
 						br.setMessage(Constantes.ERROR_MESSAGE_BAD_REQUEST);
@@ -110,9 +114,9 @@ public class HistoricoApiController implements HistoricoApi {
 						if (insertado) {
 							gr = new GeneralResponse();
 							gr.setMessage(Constantes.ERROR_MESSAGE_SUCCESS);
-							
+
 							log.info("{}", gr);
-							
+
 							return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK);
 						} else {
 							ise = new InternalServerError();
@@ -120,7 +124,7 @@ public class HistoricoApiController implements HistoricoApi {
 							ise.setMessage(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 
 							log.info("{}", ise);
-							
+
 							return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
 						}
 					}
@@ -139,13 +143,13 @@ public class HistoricoApiController implements HistoricoApi {
 				ise.setMessage(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 
 				log.info("{}", ise);
-				
+
 				return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
-		
+
 		BadRequest br = null;
-		
+
 		br = new BadRequest();
 		br.setCode(Constantes.ERROR_CODE_BAD_REQUEST);
 		br.setMessage(Constantes.ERROR_MESSAGE_BAD_REQUEST);

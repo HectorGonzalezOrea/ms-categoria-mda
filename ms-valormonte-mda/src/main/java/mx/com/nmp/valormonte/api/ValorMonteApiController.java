@@ -1,5 +1,6 @@
 package mx.com.nmp.valormonte.api;
 
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
 import mx.com.nmp.valormonte.utils.Constantes;
@@ -51,6 +52,7 @@ public class ValorMonteApiController implements ValorMonteApi {
 
 	@org.springframework.beans.factory.annotation.Autowired
 	public ValorMonteApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+		objectMapper.configure(MapperFeature.ALLOW_COERCION_OF_SCALARS, false);
 		this.objectMapper = objectMapper;
 		this.request = request;
 	}

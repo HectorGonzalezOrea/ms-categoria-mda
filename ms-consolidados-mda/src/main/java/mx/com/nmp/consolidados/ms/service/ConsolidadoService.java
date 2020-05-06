@@ -165,6 +165,11 @@ public class ConsolidadoService {
 						eliminado = true;
 					}
 				}
+			} else {
+				Boolean eliminadoMongo = this.eliminarConsolidado(consolidado);
+				if (Boolean.TRUE.equals(eliminadoMongo)) {
+					eliminado = true;
+				}
 			}
 		}
 		return eliminado;
