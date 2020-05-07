@@ -98,8 +98,6 @@ public class ConsolidadoService {
 			FileReader targetReader = null;
 
 			try {
-				log.info("guardando.......");
-				consolidado.setNombreCliente(request.getUsuario());
 				consolidado.setVigencia(request.getVigencia());
 				consolidado.setNombreAjuste(request.getNombreAjuste());
 				consolidado.setEmergente(request.getEmergente());
@@ -112,7 +110,6 @@ public class ConsolidadoService {
 				consolidado.setAdjunto(castConsolidados.lstToJson(lst));
 				consolidado.setNombreArchivo(archivo.getName());
 				consolidado.setPrioridad(consultaArhivoConsolidadoByDate(request.getFechaAplicacion()).size() + 1);
-				log.info("Fin set datos.......");
 				log.info(castConsolidados.lstToJson(lst));
 			} catch (FileNotFoundException e) {
 				log.info("FileNotFoundException : {} ", e);
