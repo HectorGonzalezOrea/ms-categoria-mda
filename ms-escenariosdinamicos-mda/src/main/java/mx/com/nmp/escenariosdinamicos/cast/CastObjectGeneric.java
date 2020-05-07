@@ -122,12 +122,9 @@ public class CastObjectGeneric {
 	}
 	
 	public List<PartidaVO> castPartidasToPartidaValorMonte(List<IndexGarantiaVO> lstResultServiceValorMonte,InfoRegla infoRegla){
-		List<PartidaVO> lstPartidas=null;
+		List<PartidaVO> lstPartidas=new ArrayList<>();
 		if (lstResultServiceValorMonte != null && !lstResultServiceValorMonte.isEmpty()) {
-			lstPartidas = new ArrayList<>();
-			for (IndexGarantiaVO entity : lstResultServiceValorMonte) {
-				lstPartidas.add(fillValues(entity,infoRegla));
-			}
+			lstResultServiceValorMonte.stream().forEach(entity->lstPartidas.add(fillValues(entity,infoRegla)));
 		}
 		return lstPartidas;
 	}
