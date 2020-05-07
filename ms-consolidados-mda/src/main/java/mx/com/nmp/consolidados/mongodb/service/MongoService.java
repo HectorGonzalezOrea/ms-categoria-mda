@@ -62,8 +62,7 @@ public class MongoService {
 		log.info("fecha fin dia: {}", fechaAplicacionFinDia);
 		Query q = new Query();
 		q.addCriteria(Criteria.where(FECHA).gte(fechaAplicacionInicioDia).lt(fechaAplicacionFinDia));
-		
-		//q.with(new Sort(new Order(Direction.ASC, PRIORIDAD)));
+		q.with(new Sort(new Order(Direction.ASC, PRIORIDAD)));
 
 		log.info("q: {}", q);
 		
