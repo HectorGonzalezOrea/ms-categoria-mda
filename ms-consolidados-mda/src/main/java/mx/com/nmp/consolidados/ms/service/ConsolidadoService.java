@@ -22,6 +22,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import mx.com.nmp.consolidados.model.Consolidados;
@@ -31,6 +32,7 @@ import mx.com.nmp.consolidados.model.InlineResponse200;
 import mx.com.nmp.consolidados.model.ModificarPrioridadArchivoConsolidadoReq;
 import mx.com.nmp.consolidados.mongodb.entity.ArchivoEntity;
 import mx.com.nmp.consolidados.mongodb.entity.caster.CastConsolidados;
+import mx.com.nmp.consolidados.mongodb.service.MongoService;
 import mx.com.nmp.consolidados.mongodb.service.SequenceGeneratorService;
 import mx.com.nmp.consolidados.msestablecimientoprecios.controller.EstablecimientoPreciosController;
 import mx.com.nmp.consolidados.msestablecimientoprecios.vo.AjustePrecio;
@@ -88,8 +90,12 @@ public class ConsolidadoService {
 	@Autowired
 	private EstablecimientoPreciosController establecimientoPreciosController;
 
+	@Autowired
+	private MongoService mongoService;
+	
 	public Boolean crearConsolidado(Consolidados request) {
 		log.info("ConsolidadoService.crearConsolidado");
+		long inicio = System.currentTimeMillis();
 		Boolean insertado = false;
 		if (request != null) {
 			CastConsolidados castConsolidados = new CastConsolidados();
@@ -104,19 +110,30 @@ public class ConsolidadoService {
 				consolidado.setFechaAplicacion(request.getFechaAplicacion());
 				consolidado.setIdArchivo(sequenceGeneratorService.generateSequence(SEQUENCE));
 				archivo = request.getAdjunto();
+
 				targetReader = new FileReader(archivo);
+
 				BufferedReader b = new BufferedReader(targetReader);
 				List<InfoProducto> lst = castConsolidados.cvsLectura(b);
 				consolidado.setAdjunto(castConsolidados.lstToJson(lst));
 				consolidado.setNombreArchivo(archivo.getName());
-				consolidado.setPrioridad(consultaArhivoConsolidadoByDate(request.getFechaAplicacion()).size() + 1);
-				log.info(castConsolidados.lstToJson(lst));
+				consolidado.setPrioridad(mongoService.countConsultaArhivoConsolidadoByDate(request.getFechaAplicacion()) + 1);
+
+				// log.debug("{}" , castConsolidados.lstToJson(lst));
+
+				mongoService.insertarConsolidado(consolidado);
+				insertado = true;
 			} catch (FileNotFoundException e) {
 				log.info("FileNotFoundException : {} ", e);
 			}
-			mongoTemplate.insert(consolidado);
-			insertado = true;
 		}
+		
+		long fin = System.currentTimeMillis();
+
+		double tiempo = (double) ((fin - inicio) / 1000);
+
+		log.info("crearConsolidado: {} segundos", tiempo);
+
 		return insertado;
 	}
 
@@ -131,7 +148,7 @@ public class ConsolidadoService {
 			log.info("ParseException : {}", e);
 		}
 
-		List<ArchivoEntity> busquedaList = this.consultaArhivoConsolidadoByDate(fechaAplicaciondate);
+		List<ArchivoEntity> busquedaList = mongoService.consultaArhivoConsolidadoByDate(fechaAplicaciondate);
 
 		if (!busquedaList.isEmpty()) {
 			CastConsolidados castConsolidados = new CastConsolidados();
@@ -528,24 +545,6 @@ public class ConsolidadoService {
 			});
 		}
 	}
-	
-	/*
-	 * Consulta consolidados por fecha
-	 */
-	@SuppressWarnings("deprecation")
-	private List<ArchivoEntity> consultaArhivoConsolidadoByDate(Date vigencia) {
-		Date fechaAplicacionInicioDia = CastConsolidados.resetTimeToDown(vigencia);
-		log.info("fecha inicio dia: {}", fechaAplicacionInicioDia);
-		Date fechaAplicacionFinDia = CastConsolidados.resetTimeToUp(vigencia);
-		log.info("fecha fin dia: {}", fechaAplicacionFinDia);
-		Query q = new Query();
-		q.addCriteria(Criteria.where(FECHA).gte(fechaAplicacionInicioDia).lt(fechaAplicacionFinDia));
-		q.with(new Sort(new Order(Direction.ASC, PRIORIDAD)));
-		
-		List<ArchivoEntity> busquedaList = mongoTemplate.find(q, ArchivoEntity.class);
-		log.info("query size(): {}", busquedaList.size());
-		return busquedaList;
-	}
 
 	private List<ArchivoEntity> getConsolidados(Integer idArchivo) {
 		log.info("getConsolidadosPorIdArchivo");
@@ -572,4 +571,5 @@ public class ConsolidadoService {
 
 		return eliminado;
 	}
+	
 }
