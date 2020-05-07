@@ -225,6 +225,7 @@ public class EscenariosApiController implements EscenariosApi {
 						resp.setMessage("Escenario eliminado exitosamente");
 						return new ResponseEntity<EliminarEscenariosRes>(resp, HttpStatus.OK);
 					} else {
+						resp.setCode("NMP-MDA-200");
 						resp.setMessage("Escenario no eliminado");
 						return new ResponseEntity<EliminarEscenariosRes>(resp, HttpStatus.OK);
 					}
