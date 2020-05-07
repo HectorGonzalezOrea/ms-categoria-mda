@@ -20,6 +20,8 @@ public class Consolidados {
 	private Boolean emergente;
 	@JsonProperty("fechaAplicacion")
 	private Date fechaAplicacion;
+	@JsonProperty("usuario")
+	private String usuario;
 	
 	public Long getIdArchivo() {
 		return idArchivo;
@@ -56,5 +58,11 @@ public class Consolidados {
 	}
 	public void setFechaAplicacion(Date fechaAplicacion) {
 		this.fechaAplicacion = fechaAplicacion;
+	}
+	public String getUsuario() {
+		return usuario;
+	}
+	public void setUsuario(String usuario) {
+		this.usuario = usuario;
 	}
 }

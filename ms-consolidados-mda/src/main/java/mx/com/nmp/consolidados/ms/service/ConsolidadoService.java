@@ -98,6 +98,7 @@ public class ConsolidadoService {
 			FileReader targetReader = null;
 
 			try {
+				consolidado.setNombreCliente(request.getUsuario());
 				consolidado.setVigencia(request.getVigencia());
 				consolidado.setNombreAjuste(request.getNombreAjuste());
 				consolidado.setEmergente(request.getEmergente());
@@ -540,7 +541,7 @@ public class ConsolidadoService {
 		log.info("fecha fin dia: {}", fechaAplicacionFinDia);
 		Query q = new Query();
 		q.addCriteria(Criteria.where(FECHA).gte(fechaAplicacionInicioDia).lt(fechaAplicacionFinDia));
-		q.with(new Sort(new Order(Direction.ASC, PRIORIDAD)));
+		//q.with(new Sort(new Order(Direction.ASC, PRIORIDAD)));
 		
 		List<ArchivoEntity> busquedaList = mongoTemplate.find(q, ArchivoEntity.class);
 		log.info("query size(): {}", busquedaList.size());
