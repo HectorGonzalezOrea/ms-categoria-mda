@@ -47,6 +47,8 @@ import static mx.com.nmp.consolidados.utils.Constantes.HEADER_APP_JSON;
 import static mx.com.nmp.consolidados.utils.Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION;
 import static mx.com.nmp.consolidados.utils.Constantes.ERROR_CODE_INVALID_AUTHENTICATION;
 import static mx.com.nmp.consolidados.utils.Constantes.HEADER_APIKEY_KEY;
+import static mx.com.nmp.consolidados.utils.Constantes.CSV_MIN;
+import static mx.com.nmp.consolidados.utils.Constantes.CSV_MAY;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-01-22T02:47:50.165Z")
 
@@ -319,7 +321,6 @@ public class ConsolidadosApiController implements ConsolidadosApi {
         
         log.info("procesarConsolidadoPOST");
         
-        
         String apiKeyBluemix = request.getHeader(HEADER_APIKEY_KEY);
     	
     	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
@@ -408,9 +409,10 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 		log.info("origen " + origen);
 		log.info("destino " + destino);
 		log.info("adjunto " + adjunto.getOriginalFilename());
+		log.info("adjunto " + adjunto.getOriginalFilename().toLowerCase().endsWith(CSV_MIN));
 		log.info("vigencia " + vigencia);
 		log.info("emergente " + emergente);
-
+		
 		String accept = request.getHeader(HEADER_ACCEPT);
 		if (accept != null && accept.contains(HEADER_APP_JSON)) {
 
@@ -421,6 +423,16 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 				bad = new BadRequest();
 				bad.setCodigo(Common.ERROR_GUARDAR);
 				bad.setMensaje(Common.ERROR_MENSAJE);
+
+				log.info("{}", bad);
+
+				return new ResponseEntity<BadRequest>(bad, HttpStatus.BAD_REQUEST);
+			}
+			
+			if(Boolean.FALSE.equals(adjunto.getOriginalFilename().toLowerCase().endsWith(CSV_MIN))) {
+				bad = new BadRequest();
+				bad.setCodigo(Common.ERROR_GUARDAR);
+				bad.setMensaje(Common.ERROR_BAD_REQUEST_EXT);
 
 				log.info("{}", bad);
 

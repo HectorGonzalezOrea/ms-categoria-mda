@@ -6,6 +6,9 @@ public final class Constantes {
 		throw new UnsupportedOperationException();
 	}
 	
+	public static final String CSV_MIN = "csv";
+	public static final String CSV_MAY = "CSV";
+	
 	public static final String HEADER_ACCEPT = "Accept";
 	public static final String HEADER_APP_JSON = "application/json";
 	public static final String ERROR_CODE_INVALID_AUTHENTICATION = "NMP-MDA-401";

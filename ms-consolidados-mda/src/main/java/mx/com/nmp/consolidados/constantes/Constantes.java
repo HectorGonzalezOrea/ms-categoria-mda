@@ -5,6 +5,8 @@ public class Constantes {
 		public static final String ERROR_GUARDAR = "NMP-MDA-400";
 		public static final String ERROR_MENSAJE = "El cuerpo de la petición no está bien formado, verifique su información.";
 		
+		public static final String ERROR_BAD_REQUEST_EXT = "Formato de archivo no es válido.";
+		
 		public static final String CODE_NOT_FOUND = "NMP-MDA-404";
 		public static final String MESSAGE_NOT_FOUND = "No existe el recurso con la información proporcionada. Verificar y volver a enviar la petición.";
 		
