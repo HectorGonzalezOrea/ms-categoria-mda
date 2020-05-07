@@ -71,7 +71,7 @@ public class ClienteCorreoService {
 	@Value("${oag.resource.oauth.sendmail.to}")
 	protected String para;
 	
-	@Value("${oag.resource.oauth.sendmail.from }")
+	@Value("${oag.resource.oauth.sendmail.from}")
 	protected String de;
 	
 	public RespuestaVO sendEmailUser(List<PreciosVO>lstPrecios) {
