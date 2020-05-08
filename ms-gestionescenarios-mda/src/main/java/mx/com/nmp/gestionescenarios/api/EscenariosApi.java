@@ -142,7 +142,7 @@ public interface EscenariosApi {
     @RequestMapping(value = "/escenarios",
         produces = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<GeneralResponse> escenariosPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody Escenarios peticion);
+    ResponseEntity<?> escenariosPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody Escenarios peticion);
 
 
     @ApiOperation(value = "Actualizar el estatus de una regla", nickname = "escenariosReglasEstatusPut", notes = "Actualiza el estatus de una regla. ### Seguridad Para poder realizar el consumo del recuros deberá de estar autorizado. Para esto tiene que enviar la llave en el encabezado HTTP: * 'X-API-KEY: eyJ4NXQjUzI1NiI6IkFTS1ESG42` ", response = GeneralResponse.class, authorizations = {

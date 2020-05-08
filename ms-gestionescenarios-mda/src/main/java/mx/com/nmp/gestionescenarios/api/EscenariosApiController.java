@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.ApiParam;
+import mx.com.nmp.gestionescenarios.clientservice.ClientService;
 import mx.com.nmp.gestionescenarios.model.BadRequest;
 import mx.com.nmp.gestionescenarios.model.Bolsa;
 import mx.com.nmp.gestionescenarios.model.Escenarios;
@@ -40,6 +41,8 @@ import mx.com.nmp.gestionescenarios.model.ModificarValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.model.ValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.mongodb.service.GestionEscenarioService;
 import mx.com.nmp.gestionescenarios.service.EscenariosService;
+import mx.com.nmp.gestionescenarios.utils.Constantes;
+import mx.com.nmp.gestionescenarios.vo.ResponseClientVO;
 import mx.com.nmp.gestionescenarios.model.InternalServerError;
 import mx.com.nmp.gestionescenarios.model.InvalidAuthentication;
 
@@ -76,6 +79,8 @@ public class EscenariosApiController implements EscenariosApi {
     
     @Autowired
     private EscenariosService escenariosService;
+    @Autowired
+    private ClientService clientService;
 
     @org.springframework.beans.factory.annotation.Autowired
     public EscenariosApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -473,15 +478,43 @@ public class EscenariosApiController implements EscenariosApi {
     /*
      * 
      */
-    public ResponseEntity<GeneralResponse> escenariosPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody Escenarios peticion) {
-        String accept = request.getHeader(HEADER_ACCEPT_KEY);
+    public ResponseEntity<?> escenariosPost(
+    		@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true)
+    		@RequestHeader(value="usuario", required=true) String usuario,
+    		@ApiParam(value = "Cuerpo de la petición" ,required=true ) 
+    		@Valid @RequestBody Escenarios peticion) {
+    	
+    	log.info("*************************************************************");
+		log.info("escenariosPost");
+		log.info("*************************************************************");
+		
+    	//GeneralResponse
+		String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+    	if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
+    		
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		log.error("{}" , ia);
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+    	}
+    	
+    	String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
-            try {
-                return new ResponseEntity<GeneralResponse>(objectMapper.readValue("{  \"message\" : \"Exitoso\"}", GeneralResponse.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<GeneralResponse>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+        	ResponseClientVO  clientVO= new ResponseClientVO();
+        	GeneralResponse response=new GeneralResponse();
+        	switch (peticion.getId()) {
+        	
+			case Constantes.ESCENARIO_CONSOLIDADOS:
+				log.info("Entrando al case "+ Constantes.ESCENARIO_CONSOLIDADOS);
+				clientVO=clientService.enviarConsolidados(peticion.getFecha());
+				response.setMessage(Constantes.SUCCESS_MESSAGE_OK);
+				break;
+			case Constantes.ESCENARIO_DINAMICOS:
+				break;
+			}
+        	
+        	return new ResponseEntity<GeneralResponse>(response,HttpStatus.OK);
         }
 
         return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);

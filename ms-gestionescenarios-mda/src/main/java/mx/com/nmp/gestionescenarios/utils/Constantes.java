@@ -61,7 +61,8 @@ public final class Constantes {
 	
 	public static final Integer ID_PETICION_ESCENARIO_MONEDA_ORO = 4;
 	public static final Integer ID_ESCENARIO_MONEDA_ORO = 4;
-	
+	public static final String ESCENARIO_CONSOLIDADOS="Consolidados";
+	public static final String ESCENARIO_DINAMICOS="Dinamicos";
 	
 }
 

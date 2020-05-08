@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import mx.com.nmp.gestionescenarios.model.InfoGeneralReglaCanalComercializacion;
+import mx.com.nmp.gestionescenarios.vo.CommonVO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +63,8 @@ public class InfoGeneralRegla   {
 
   @JsonProperty("estatus")
   private Object estatus = null;
+  
+  private Object tipoMonedas;
 
   public InfoGeneralRegla id(Integer id) {
     this.id = id;
@@ -412,5 +415,13 @@ public class InfoGeneralRegla   {
     }
     return o.toString().replace("\n", "\n    ");
   }
+
+public Object getTipoMonedas() {
+	return tipoMonedas;
+}
+
+public void setTipoMonedas(Object tipoMonedas) {
+	this.tipoMonedas = tipoMonedas;
+}
 }
 
