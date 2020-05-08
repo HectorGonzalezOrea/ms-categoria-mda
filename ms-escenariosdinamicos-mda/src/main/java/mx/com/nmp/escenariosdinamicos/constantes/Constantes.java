@@ -16,16 +16,19 @@ public final class Constantes {
 		public static final String ERROR_SERVER_MSG="Error interno del servidor. Falla de comunicación.";
 		
 		public static final String EXITO_ELIMINAR="NMP-MDA-200";
-		public static final String EXITO_ELIMINAR_MSG="Operación ejecutada satisfactoriamente.";
+		public static final String EXITO_ELIMINAR_MSG="Escenario eliminado exitosamente";
 		
 		public static final String EXITO_EJECUTAR_ESCENARIODINAMICO="NMP-MDA-200";
 		public static final String MENSAJE_OK="Operación ejecutada satisfactoriamente.";
 		
 		public static final String ERROR_CODE_AUTORIZACION="NMP-MDA-401";
-		public static final String MESSAJE_ERROR_AUTORIZACION="Se ha producido un error de autorización";
+		public static final String MESSAGE_ERROR_AUTORIZACION="Se ha producido un error de autorización";
 		
 		public static final String ERROR_CODE_BAD_REQUEST = "NMP-MDA-400";
-		public static final String MESSAJE_ERROR_BAD_REQUEST ="El cuerpo de la petición no está bien formado, verifique su información";
+		public static final String MESSAGE_ERROR_BAD_REQUEST ="El cuerpo de la petición no está bien formado, verifique su información";
+		
+		public static final String ERROR_CODE_NOT_FOUND = "NMP-MDA-404";
+		public static final String MESSAGE_ERROR_CODE_NOT_FOUND ="Escenario no encontrado";
 		
 		//public static final String BLANK_SPACE="";
 		//public static final String WSDL_ARBITRADO="http://10.30.3.15:8011/NMP/OperacionPrendaria/MotorDescuentos/ArbitrajePreciosPartidas/v1?WSDL";

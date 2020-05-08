@@ -42,6 +42,7 @@ import mx.com.nmp.escenariosdinamicos.model.InternalServerError;
 import mx.com.nmp.escenariosdinamicos.model.InvalidAuthentication;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosReq;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosRes;
+import mx.com.nmp.escenariosdinamicos.model.NotFound;
 import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
 import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoRes;
@@ -101,7 +102,7 @@ public class EscenariosApiController implements EscenariosApi {
 		if (apiKeyBluemix == null || apiKeyBluemix.equals("")) {
 			InvalidAuthentication ia = new InvalidAuthentication();
 			ia.setCode(Common.ERROR_CODE_AUTORIZACION);
-			ia.setMessage(Common.MESSAJE_ERROR_AUTORIZACION);
+			ia.setMessage(Common.MESSAGE_ERROR_AUTORIZACION);
 
 			log.info("{}", ia);
 
@@ -133,7 +134,7 @@ public class EscenariosApiController implements EscenariosApi {
 
 		BadRequest br = new BadRequest();
 		br.setCodigo(Common.ERROR_CODE_BAD_REQUEST);
-		br.setMensaje(Common.MESSAJE_ERROR_BAD_REQUEST);
+		br.setMensaje(Common.MESSAGE_ERROR_BAD_REQUEST);
 		
 		log.info("{}" , br);
 		
@@ -158,7 +159,7 @@ public class EscenariosApiController implements EscenariosApi {
 		if (apiKeyBluemix == null || apiKeyBluemix.equals("")) {
 			InvalidAuthentication ia = new InvalidAuthentication();
 			ia.setCode(Common.ERROR_CODE_AUTORIZACION);
-			ia.setMessage(Common.MESSAJE_ERROR_AUTORIZACION);
+			ia.setMessage(Common.MESSAGE_ERROR_AUTORIZACION);
 
 			log.info("{}", ia);
 
@@ -177,7 +178,7 @@ public class EscenariosApiController implements EscenariosApi {
 				} else {
 					BadRequest br = new BadRequest();
 					br.setCodigo(Common.ERROR_CODE_BAD_REQUEST);
-					br.setMensaje(Common.MESSAJE_ERROR_BAD_REQUEST);
+					br.setMensaje(Common.MESSAGE_ERROR_BAD_REQUEST);
 					
 					log.info("{}" , br);
 					
@@ -196,7 +197,7 @@ public class EscenariosApiController implements EscenariosApi {
 
 		BadRequest br = new BadRequest();
 		br.setCodigo(Common.ERROR_CODE_BAD_REQUEST);
-		br.setMensaje(Common.MESSAJE_ERROR_BAD_REQUEST);
+		br.setMensaje(Common.MESSAGE_ERROR_BAD_REQUEST);
 		
 		log.info("{}" , br);
 		
@@ -222,7 +223,7 @@ public class EscenariosApiController implements EscenariosApi {
 		if (apiKeyBluemix == null || apiKeyBluemix.equals("")) {
 			InvalidAuthentication ia = new InvalidAuthentication();
 			ia.setCode(Common.ERROR_CODE_AUTORIZACION);
-			ia.setMessage(Common.MESSAJE_ERROR_AUTORIZACION);
+			ia.setMessage(Common.MESSAGE_ERROR_AUTORIZACION);
 
 			log.info("{}", ia);
 
@@ -240,9 +241,11 @@ public class EscenariosApiController implements EscenariosApi {
 
 				} else {
 					BadRequest br = new BadRequest();
-					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-					br.setCodigo("NMP-MDA-400");
-
+					br.setCodigo(Common.ERROR_CODE_BAD_REQUEST);
+					br.setMensaje(Common.MESSAGE_ERROR_BAD_REQUEST);
+					
+					log.info("{}" , br);
+					
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 				}
 			} catch (Exception e) {
@@ -276,7 +279,7 @@ public class EscenariosApiController implements EscenariosApi {
 		if (apiKeyBluemix == null || apiKeyBluemix.equals("")) {
 			InvalidAuthentication ia = new InvalidAuthentication();
 			ia.setCode(Common.ERROR_CODE_AUTORIZACION);
-			ia.setMessage(Common.MESSAJE_ERROR_AUTORIZACION);
+			ia.setMessage(Common.MESSAGE_ERROR_AUTORIZACION);
 
 			log.info("{}", ia);
 
@@ -352,7 +355,7 @@ public class EscenariosApiController implements EscenariosApi {
 		if (apiKeyBluemix == null || apiKeyBluemix.equals("")) {
 			InvalidAuthentication ia = new InvalidAuthentication();
 			ia.setCode(Common.ERROR_CODE_AUTORIZACION);
-			ia.setMessage(Common.MESSAJE_ERROR_AUTORIZACION);
+			ia.setMessage(Common.MESSAGE_ERROR_AUTORIZACION);
 
 			log.info("{}", ia);
 
@@ -367,23 +370,21 @@ public class EscenariosApiController implements EscenariosApi {
 					log.error("Error en el mensaje de petición, verifique la información");
 					BadRequest br = new BadRequest();
 					br.setCodigo(Common.ERROR_CODE_BAD_REQUEST);
-					br.setMensaje(Common.MESSAJE_ERROR_BAD_REQUEST);
+					br.setMensaje(Common.MESSAGE_ERROR_BAD_REQUEST);
 					
 					log.info("{}" , br);
 					
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 				} else {
-					Boolean eliminado = escenarioService.eliminaEscenario(idEscenario);
-					EliminarEscenariosRes resp = new EliminarEscenariosRes();
-					if (eliminado) {
-						resp.setCode("NMP-MDA-200");
-						resp.setMessage("Escenario eliminado exitosamente");
-						return new ResponseEntity<EliminarEscenariosRes>(resp, HttpStatus.OK);
-					} else {
-						resp.setMessage("Escenario no eliminado");
-						return new ResponseEntity<EliminarEscenariosRes>(resp, HttpStatus.OK);
+					Object resp = escenarioService.eliminaEscenario(idEscenario);
+					
+					if(resp instanceof EliminarEscenariosRes) {
+						return new ResponseEntity<EliminarEscenariosRes>((EliminarEscenariosRes)resp, HttpStatus.OK);
+					} else if(resp instanceof InternalServerError) {
+						return new ResponseEntity<InternalServerError>((InternalServerError)resp, HttpStatus.INTERNAL_SERVER_ERROR);
+					} else if(resp instanceof NotFound) {
+						return new ResponseEntity<NotFound>((NotFound)resp, HttpStatus.NOT_FOUND);
 					}
-
 				}
 			} catch (Exception e) {
 				log.error("Exception: {}", e);
@@ -395,7 +396,13 @@ public class EscenariosApiController implements EscenariosApi {
 			}
 		}
 
-		return new ResponseEntity<EliminarEscenariosRes>(HttpStatus.NOT_IMPLEMENTED);
+		BadRequest badRequest = new BadRequest();
+		badRequest.setCodigo(Common.ERROR_CODE);
+		badRequest.setMensaje(Common.ERROR_MENSAJE);
+		
+		log.info("{}", badRequest);
+		
+		return new ResponseEntity<BadRequest>(badRequest, HttpStatus.BAD_REQUEST);
 	}
 
 	/*
@@ -416,7 +423,7 @@ public class EscenariosApiController implements EscenariosApi {
 		if (apiKeyBluemix == null || apiKeyBluemix.equals("")) {
 			InvalidAuthentication ia = new InvalidAuthentication();
 			ia.setCode(Common.ERROR_CODE_AUTORIZACION);
-			ia.setMessage(Common.MESSAJE_ERROR_AUTORIZACION);
+			ia.setMessage(Common.MESSAGE_ERROR_AUTORIZACION);
 
 			log.info("{}", ia);
 
