@@ -305,9 +305,11 @@ public class EscenariosApiController implements EscenariosApi {
 				
 				lstPartidaVO = castObjectGeneric.castPartidasToPartidaValorMonte(lstIndexGarantia,
 						crearEscenariosRequest.getInfoRegla());
-				requestReglaEscenarioDinamico.setPartida(lstPartidaVO);
-				String jsonMessage = new Gson().toJson(requestReglaEscenarioDinamico);
-				producerMessage.producerReglaEscenarioDinamico(jsonMessage);
+				if(!lstPartidaVO.isEmpty()) {
+            		requestReglaEscenarioDinamico.setPartida(lstPartidaVO);
+            	 	String jsonMessage=new Gson().toJson(requestReglaEscenarioDinamico);
+            	 	producerMessage.producerReglaEscenarioDinamico(jsonMessage);
+            	}
 				
 			} catch (IOException e) {
 				log.error("Exception: {}", e);
