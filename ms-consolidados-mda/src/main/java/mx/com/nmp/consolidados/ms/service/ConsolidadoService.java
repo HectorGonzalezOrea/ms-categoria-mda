@@ -540,7 +540,7 @@ public class ConsolidadoService {
 		log.info("fecha fin dia: {}", fechaAplicacionFinDia);
 		Query q = new Query();
 		q.addCriteria(Criteria.where(FECHA).gte(fechaAplicacionInicioDia).lt(fechaAplicacionFinDia));
-		//q.with(new Sort(new Order(Direction.ASC, PRIORIDAD)));
+		q.with(new Sort(new Order(Direction.ASC, PRIORIDAD)));
 		
 		List<ArchivoEntity> busquedaList = mongoTemplate.find(q, ArchivoEntity.class);
 		log.info("query size(): {}", busquedaList.size());
