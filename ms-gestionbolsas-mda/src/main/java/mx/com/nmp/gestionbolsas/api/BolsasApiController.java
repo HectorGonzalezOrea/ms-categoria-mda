@@ -48,6 +48,9 @@ import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_MESSAGE_INTERNAL_S
 import static mx.com.nmp.gestionbolsas.utils.Constantes.MESSAGE_DELETE;
 import static mx.com.nmp.gestionbolsas.utils.Constantes.MESSAGE_NO_DELETE;
 import static mx.com.nmp.gestionbolsas.utils.Constantes.MESSAGE_OK_BOLSA;
+import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_CODE_NOT_FOUND;
+import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_MESSAGE_NOT_FOUND;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -150,6 +153,8 @@ public class BolsasApiController implements BolsasApi {
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
             	}else {
+            		
+            		if(Boolean.TRUE.equals(bolsaService.validarIdBolsa(idBolsa))) {
             		Boolean eliminado = bolsaService.deleteBolsa(idBolsa);
             		GeneralResponse resp =  new GeneralResponse();
             		if(eliminado) {
@@ -159,7 +164,14 @@ public class BolsasApiController implements BolsasApi {
 						resp.setMessage(MESSAGE_NO_DELETE);
 						return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
 					}
+            		}else {
+            			log.error("Error en el Id, verifique la información");
+    					BadRequest br = new BadRequest();
+    					br.setMessage(ERROR_MESSAGE_NOT_FOUND);
+    					br.setCode(ERROR_CODE_NOT_FOUND);
+    					return new ResponseEntity<BadRequest>(br, HttpStatus.NOT_FOUND);
             		}
+            	}
                                	
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
@@ -240,7 +252,6 @@ public class BolsasApiController implements BolsasApi {
 	String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains("application/json")) {
             try {
-            	
             	if (peticion != null) {
             		if(Boolean.TRUE.equals(bolsaService.consultaBolsa(peticion.getNombre()))) {
             			BadRequest br = new BadRequest();
@@ -252,6 +263,8 @@ public class BolsasApiController implements BolsasApi {
     					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
             		
             	}
+            		
+            		
                 	if(Boolean.FALSE.equals(bolsaService.consultaTipoBolsa(peticion.getTipo().getId()))) {
                 		BadRequest br = new BadRequest();
                     	br.setCode(ERROR_CODE_BAD_REQUEST);
@@ -264,20 +277,48 @@ public class BolsasApiController implements BolsasApi {
                 }else {
             		
             		log.info("peticion: " + peticion.toString());
+            		if(Boolean.TRUE.equals(bolsaService.consultaTipoBolsaRegla(peticion.getTipo().getId()))) {
+            			if(peticion.getFactor()== null || peticion.getFactor()=="" && peticion.getRamo()==null || peticion.getRamo()=="" && peticion.getSubramo()==null || peticion.getSubramo()== "" ) {
+            				BadRequest br = new BadRequest();
+        					br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+        					br.setCode(ERROR_CODE_BAD_REQUEST);
+        					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+            			}else {
+            				log.info(peticion.getFactor());
+            				log.info(peticion.getRamo());
+            				log.info(peticion.getSubramo());
+            				Boolean insertado = bolsaService.crearBolsa(peticion);
+                    		if(insertado) {
+                    			GeneralResponse resp =  new GeneralResponse();
+                    			resp.setMessage(MESSAGE_OK_BOLSA);
+                    			
+                    			return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
+                    		} else {
+                    			InternalServerError ie = new InternalServerError();
+                				ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
+                				ie.setMessage("Error interno del servidor");
+                                
+                                return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+                    		}
+            			}
+            		}else {
+        				
+        				Boolean insertado = bolsaService.crearBolsa(peticion);
+                		if(insertado) {
+                			GeneralResponse resp =  new GeneralResponse();
+                			resp.setMessage(MESSAGE_OK_BOLSA);
+                			
+                			return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
+                		} else {
+                			InternalServerError ie = new InternalServerError();
+            				ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
+            				ie.setMessage("Error interno del servidor");
+                            
+                            return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+                		}
+        			}
             		
-            		Boolean insertado = bolsaService.crearBolsa(peticion);
-            		if(insertado) {
-            			GeneralResponse resp =  new GeneralResponse();
-            			resp.setMessage(MESSAGE_OK_BOLSA);
-            			
-            			return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
-            		} else {
-            			InternalServerError ie = new InternalServerError();
-        				ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
-        				ie.setMessage("Error interno del servidor");
-                        
-                        return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
-            		}
+            		
             	}
             	} else {
             		BadRequest br = new BadRequest();

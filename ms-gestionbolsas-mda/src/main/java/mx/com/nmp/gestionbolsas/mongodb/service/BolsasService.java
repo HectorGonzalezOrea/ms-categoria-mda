@@ -347,7 +347,32 @@ public class BolsasService {
 		return lista;
 
 	}
+	
+	/*
+	 *  Validar idBolsa 
+	 */
+	
+	public Boolean validarIdBolsa (Integer idBolsa) {
+		
+		Boolean encontrado = false;
+		if(idBolsa!=null) {
+			log.info("IdBolsa a buscar es {}", idBolsa);
+			Query query = new Query();
+			Criteria aux = Criteria.where(ID).is(idBolsa);
+			query.addCriteria(aux);
+			
+			encontrado = mongoTemplate.exists(query, BolsasEntity.class);
+		}
+		
+		log.info("Encontrado: {}", encontrado);
+		
+		
+		return encontrado;
+		
+	}
 
+	
+	
 	/*
 	 *  Armado de Busqueda de Bolsas
 	 */
@@ -463,6 +488,31 @@ public class BolsasService {
 
 		log.info("Query: {}", query);
 		return query;
+	}
+	
+	/*
+	 * TipoBolsa sea Regla
+	 */
+	
+	public Boolean consultaTipoBolsaRegla(Integer idTipo) {
+		log.info("consultaTipoBolsa");
+		
+		TipoBolsaEntity bolsaEntity = new TipoBolsaEntity();
+		Boolean encontrado = false;
+		if(idTipo!=null) {
+			log.info("Tipo a buscar es {}", idTipo);
+			Query query = new Query();
+			Criteria aux = Criteria.where(ID_TIPO_BOLSA).is(idTipo);
+			query.addCriteria(aux);
+			
+			bolsaEntity = mongoTemplate.findById(idTipo, TipoBolsaEntity.class);
+			if(bolsaEntity.getDescripcion().equals("Reglas")) {
+				encontrado =true;
+			}
+		}
+		log.info("Encontrado: {}", encontrado);
+		
+		return encontrado;
 	}
 
 

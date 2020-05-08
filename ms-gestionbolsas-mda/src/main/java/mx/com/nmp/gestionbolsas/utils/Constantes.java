@@ -18,6 +18,9 @@ public final class Constantes {
 	public static final String ERROR_MESSAGE_NAME = "El nombre de la bolsa ya existe";
 	public static final String ERROR_MESSAGE_TIPO = "El tipo de la bolsa no existe";
 	
+	public static final String ERROR_CODE_NOT_FOUND = "NMP-MDA-404";
+	public static final String ERROR_MESSAGE_NOT_FOUND = "El id de la bolsa a eliminar no existe";
+	
 	public static final String ERROR_CODE_INVALID_AUTHENTICATION = "NMP-MDA-401";
 	public static final String ERROR_MESSAGE_INVALID_AUTHENTICATION = "Se ha producido un error de autorización";
 	
