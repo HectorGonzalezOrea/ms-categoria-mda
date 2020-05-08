@@ -110,7 +110,7 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 						|| origen.equals(Common.BLANK_SPACE) || destino == null || destino.equals(Common.BLANK_SPACE)) {
 					
 					BadRequest br = new BadRequest();
-					br.setCodigo(Common.ERROR_GUARDAR);
+					br.setCodigo(Common.ERROR_CODE);
 					br.setMensaje(Common.ERROR_MENSAJE);
 
 					log.info("{}", br);
@@ -133,7 +133,7 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 					}
 				} else {
 					BadRequest br = new BadRequest();
-					br.setCodigo(Common.ERROR_GUARDAR);
+					br.setCodigo(Common.ERROR_CODE);
 					br.setMensaje(Common.ERROR_MENSAJE);
 
 					log.info("{}", br);
@@ -153,7 +153,7 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 		}
 
 		BadRequest br = new BadRequest();
-		br.setCodigo(Common.ERROR_GUARDAR);
+		br.setCodigo(Common.ERROR_CODE);
 		br.setMensaje(Common.ERROR_MENSAJE);
 
 		log.info("{}", br);
@@ -170,60 +170,53 @@ public class ConsolidadosApiController implements ConsolidadosApi {
     		@ApiParam(value = "Destino final de la informaci\u00F3n" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,
     		@NotNull @ApiParam(value = "Fecha de ejecuci\u00F3n del proceso de consolidados", required = true) @Valid @RequestParam(value = "vigencia", required = true) String vigencia,
     		@NotNull @ApiParam(value = "Prioridad en la ejecuci\u00F3n del archivo", required = false) @Valid @RequestParam(value = "idPrioridad", required = false) String idPrioridad) {
-    		
 		log.info("ConsolidadosApiController.consultaConsolidadosArchivosGET");
-
 		String apiKeyBluemix = request.getHeader(HEADER_APIKEY_KEY);
-    	
     	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
     		InvalidAuthentication ia = new InvalidAuthentication();
     		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
     		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
-    		
     		log.info("{}" , ia);
-    		
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
-		
 		String accept = request.getHeader(HEADER_ACCEPT);
 		if (accept != null && accept.contains(HEADER_APP_JSON)) {
-
 			BadRequest badReq = null;
 			if (usuario == null || origen == null || destino == null || vigencia == null) {
 				badReq = new BadRequest();
-				badReq.setCodigo(Common.ERROR_GUARDAR);
+				badReq.setCodigo(Common.ERROR_CODE);
 				badReq.setMensaje(Common.ERROR_MENSAJE);
 				log.info("{}", badReq);
 				return new ResponseEntity<BadRequest>(badReq, HttpStatus.BAD_REQUEST);
 			}
-
+			if(!consolidadoService.validaFormatoFecha(vigencia)){
+				log.info("validando.......");
+				System.out.println(consolidadoService.validaFormatoFecha(vigencia));
+				badReq = new BadRequest();
+				badReq.setCodigo(Common.ERROR_CODE);
+				badReq.setMensaje(Common.ERROR_MENSAJE_DATE);
+				return new ResponseEntity<BadRequest>(badReq, HttpStatus.BAD_REQUEST);
+			}
 			log.info(usuario);
 			log.info(origen);
 			log.info(vigencia);
 			log.info(idPrioridad);
-
 			ArrayList<ConsultarArchivoConsolidadoResInner> result = consolidadoService.getConsolidados(vigencia);
 			ConsultarArchivoConsolidadoRes response = new ConsultarArchivoConsolidadoRes();
 			if (!result.isEmpty()) {
 				response.addAll(result);
 				return new ResponseEntity<ConsultarArchivoConsolidadoRes>(response, HttpStatus.OK);
 			} else {
-				
 				NotFound nf = new NotFound();
 				nf.setCodigo(Common.CODE_NOT_FOUND);
 				nf.setMensaje(Common.MESSAGE_NOT_FOUND);
-				
 				return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
 			}
-			
 		}
-
 		BadRequest br = new BadRequest();
-		br.setCodigo(Common.ERROR_GUARDAR);
+		br.setCodigo(Common.ERROR_CODE);
 		br.setMensaje(Common.ERROR_MENSAJE);
-
 		log.info("{}" , br);
-		
 		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 	}
 
@@ -261,7 +254,7 @@ public class ConsolidadosApiController implements ConsolidadosApi {
             	
             	if(idArchivo == null || idArchivo.equals("") || usuario == null || usuario.equals("") || origen == null || origen.equals("")  || destino == null || destino.equals("") ) {
             		BadRequest br =  new BadRequest();
-            		br.setCodigo(Common.ERROR_GUARDAR);
+            		br.setCodigo(Common.ERROR_CODE);
             		br.setMensaje(Common.ERROR_MENSAJE);
             		
             		log.info("{}" , br);
@@ -302,7 +295,7 @@ public class ConsolidadosApiController implements ConsolidadosApi {
         }
 
         BadRequest br = new BadRequest();
-		br.setCodigo(Common.ERROR_GUARDAR);
+		br.setCodigo(Common.ERROR_CODE);
 		br.setMensaje(Common.ERROR_MENSAJE);
 
 		log.info("{}" , br);
@@ -351,7 +344,7 @@ public class ConsolidadosApiController implements ConsolidadosApi {
             		return new ResponseEntity<SuccessfulResponse>(sr, HttpStatus.OK);
             	} else {
             		badReq=new BadRequest();
-        			badReq.setCodigo(Common.ERROR_GUARDAR);
+        			badReq.setCodigo(Common.ERROR_CODE);
         			badReq.setMensaje(Common.ERROR_MENSAJE);
         			return new ResponseEntity<BadRequest>(badReq, HttpStatus.BAD_REQUEST);
             	}
@@ -371,7 +364,7 @@ public class ConsolidadosApiController implements ConsolidadosApi {
         }
 
         BadRequest br = new BadRequest();
-		br.setCodigo(Common.ERROR_GUARDAR);
+		br.setCodigo(Common.ERROR_CODE);
 		br.setMensaje(Common.ERROR_MENSAJE);
 
 		log.info("{}" , br);
@@ -390,21 +383,15 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 			@ApiParam(value = "Fecha de vigencia para el ajuste", required = true) @RequestHeader(value = "vigencia", required = true) String vigencia,
 			@ApiParam(value = "Nombre del ajuste", required = true) @RequestHeader(value = "nombreAjuste", required = true) String nombreAjuste,
 			@ApiParam(value = "Flag para indicar si el ajuste es emergente", required = true) @RequestHeader(value = "emergente", required = true) Boolean emergente) {
-
 		log.info("ConsolidadosApiController.registrarConsolidadoPOST");
-
 		String apiKeyBluemix = request.getHeader(HEADER_APIKEY_KEY);
-    	
     	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
     		InvalidAuthentication ia = new InvalidAuthentication();
     		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
     		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
-    		
     		log.info("{}" , ia);
-    		
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
     	}
-		
 		log.info("usuario " + usuario);
 		log.info("origen " + origen);
 		log.info("destino " + destino);
@@ -412,40 +399,31 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 		log.info("adjunto " + adjunto.getOriginalFilename().toLowerCase().endsWith(CSV_MIN));
 		log.info("vigencia " + vigencia);
 		log.info("emergente " + emergente);
-		
 		String accept = request.getHeader(HEADER_ACCEPT);
 		if (accept != null && accept.contains(HEADER_APP_JSON)) {
-
 			GeneralResponse res = null;
 			BadRequest bad = null;
 			if (usuario == null || origen == null || destino == null || adjunto == null || vigencia == null
 					|| emergente == null) {
 				bad = new BadRequest();
-				bad.setCodigo(Common.ERROR_GUARDAR);
+				bad.setCodigo(Common.ERROR_CODE);
 				bad.setMensaje(Common.ERROR_MENSAJE);
-
 				log.info("{}", bad);
-
 				return new ResponseEntity<BadRequest>(bad, HttpStatus.BAD_REQUEST);
 			}
-			
 			if(Boolean.FALSE.equals(adjunto.getOriginalFilename().toLowerCase().endsWith(CSV_MIN))) {
 				bad = new BadRequest();
-				bad.setCodigo(Common.ERROR_GUARDAR);
+				bad.setCodigo(Common.ERROR_CODE);
 				bad.setMensaje(Common.ERROR_BAD_REQUEST_EXT);
-
 				log.info("{}", bad);
-
 				return new ResponseEntity<BadRequest>(bad, HttpStatus.BAD_REQUEST);
 			}
-			
 			try {
 				CastConsolidados util = new CastConsolidados();
 				Consolidados consolidado = new Consolidados();
+				consolidado.setUsuario(origen);
 				consolidado.setEmergente(emergente);
 				consolidado.setFechaAplicacion(new Date());
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
-				LocalDate localDate = LocalDate.parse(vigencia, formatter);
 				consolidado.setVigencia(new Date());
 				consolidado.setNombreAjuste(nombreAjuste);
 				consolidado.setAdjunto(util.convert(adjunto));
@@ -453,31 +431,22 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 				if (service) {
 					res = new GeneralResponse();
 					res.setMessage(Common.EXITO_GUARDAR);
-
 					log.info("{}", res);
-
 					return new ResponseEntity<GeneralResponse>(res, HttpStatus.OK);
 				}
 			} catch (IOException e) {
 				log.error("Couldn't serialize response for content type application/json", e);
-
 				InternalServerError is = new InternalServerError();
 				is.setCodigo(Common.ERROR_SERVER);
 				is.setMensaje(Common.ERROR_SERVER_MSG);
-
 				log.info("{}", is);
-
 				return new ResponseEntity<InternalServerError>(is, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-
 		}
-
 		BadRequest br = new BadRequest();
-		br.setCodigo(Common.ERROR_GUARDAR);
+		br.setCodigo(Common.ERROR_CODE);
 		br.setMensaje(Common.ERROR_MENSAJE);
-
 		log.info("{}" , br);
-		
 		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 	}
 

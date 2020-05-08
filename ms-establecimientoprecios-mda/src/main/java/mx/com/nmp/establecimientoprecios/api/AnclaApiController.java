@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.ApiParam;
@@ -42,6 +43,7 @@ public class AnclaApiController implements AnclaApi {
 
     @org.springframework.beans.factory.annotation.Autowired
     public AnclaApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+    	objectMapper.configure(MapperFeature.ALLOW_COERCION_OF_SCALARS, false);
         this.objectMapper = objectMapper;
         this.request = request;
     }

@@ -1,5 +1,6 @@
 package mx.com.nmp.establecimientoprecios.api;
 
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
 import mx.com.nmp.establecimientoprecios.model.BadRequest;
@@ -48,6 +49,7 @@ public class PreciosApiController implements PreciosApi {
     
     @org.springframework.beans.factory.annotation.Autowired
     public PreciosApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+    	objectMapper.configure(MapperFeature.ALLOW_COERCION_OF_SCALARS, false);
         this.objectMapper = objectMapper;
         this.request = request;
     }

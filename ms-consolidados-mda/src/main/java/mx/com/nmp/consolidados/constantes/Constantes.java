@@ -2,8 +2,9 @@ package mx.com.nmp.consolidados.constantes;
 
 public class Constantes {
 	public class Common {
-		public static final String ERROR_GUARDAR = "NMP-MDA-400";
+		public static final String ERROR_CODE = "NMP-MDA-400";
 		public static final String ERROR_MENSAJE = "El cuerpo de la petición no está bien formado, verifique su información.";
+		public static final String ERROR_MENSAJE_DATE = "La fecha debe ser enviada con el formato dd/mm/yyyy";
 		
 		public static final String ERROR_BAD_REQUEST_EXT = "Formato de archivo no es válido.";
 		

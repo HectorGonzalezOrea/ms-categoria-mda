@@ -11,12 +11,16 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDate;
 
+import mx.com.nmp.escenariosdinamicos.constantes.Constantes.Common;
 import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosResInner;
 import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosReq;
 import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosRes;
+import mx.com.nmp.escenariosdinamicos.model.EliminarEscenariosRes;
+import mx.com.nmp.escenariosdinamicos.model.InternalServerError;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosReq;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosRes;
+import mx.com.nmp.escenariosdinamicos.model.NotFound;
 import mx.com.nmp.escenariosdinamicos.mongodb.entity.EscenarioEntity;
 import mx.com.nmp.escenariosdinamicos.mongodb.repository.EscenarioRepository;
 import mx.com.nmp.escenariosdinamicos.oag.controller.OAGController;
@@ -202,36 +206,57 @@ public class EscenariosService {
 	/*
 	 * Eliminar escenario dinamico
 	 */
-	
-	public Boolean eliminaEscenario (Integer idEscenario) {
+	public Object eliminaEscenario(Integer idEscenario) {
 		log.info("BolsasService.elimina");
-		Boolean eliminado = false;
-		
-		if(idEscenario != null) {
+
+		if (idEscenario != null) {
 			EscenarioEntity escenario = (EscenarioEntity) escenarioRepository.findByIdEscenario(idEscenario);
-			if(escenario != null) {
+
+			log.info("{}", escenario);
+
+			if (escenario != null) {
 				try {
 					escenarioRepository.delete(escenario);
-					eliminado = true;
-				}catch(Exception e) {
+				} catch (Exception e) {
 					log.error("Exception : {}", e);
+
+					InternalServerError is = new InternalServerError();
+					is.setCodigo(Common.ERROR_SERVER);
+					is.setMensaje(Common.ERROR_SERVER_MSG);
+
+					log.info("{}", is);
+
+					return is;
 				}
-				if (eliminado) {
-					
-					EnviarNotificacionRequestVO r = new EnviarNotificacionRequestVO();
-					
-					r.setDe(De);
-					r.setPara(Para);
-					r.setAsunto(ASUNTO_MESSAGE);
-					r.setContenidoHTML(CONTENIDO);
-					log.info("Asunto: {}", r.getAsunto());
-					
-					oAGController.enviarNotificacion(r);
-					
-				}
+
+				EnviarNotificacionRequestVO r = new EnviarNotificacionRequestVO();
+
+				r.setDe(De);
+				r.setPara(Para);
+				r.setAsunto(ASUNTO_MESSAGE);
+				r.setContenidoHTML(CONTENIDO);
+				log.info("Asunto: {}", r.getAsunto());
+
+				oAGController.enviarNotificacion(r);
+			} else {
+				log.info("Escenario no encontrado.");
+				NotFound nf = new NotFound();
+				nf.setCodigo(Common.ERROR_CODE_NOT_FOUND);
+				nf.setMensaje(Common.MESSAGE_ERROR_CODE_NOT_FOUND);
+
+				log.info("{}", nf);
+
+				return nf;
 			}
 		}
-		return eliminado;
-		
+
+		EliminarEscenariosRes resp = new EliminarEscenariosRes();
+
+		resp.setCode(Common.EXITO_ELIMINAR);
+		resp.setMessage(Common.EXITO_ELIMINAR_MSG);
+
+		log.info("{}", resp);
+
+		return resp;
 	}
 }

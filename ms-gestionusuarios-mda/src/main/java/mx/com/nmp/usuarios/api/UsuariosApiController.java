@@ -1,5 +1,6 @@
 package mx.com.nmp.usuarios.api;
 
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.ApiParam;
@@ -61,6 +62,7 @@ public class UsuariosApiController implements UsuariosApi {
 
 	@org.springframework.beans.factory.annotation.Autowired
 	public UsuariosApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+		objectMapper.configure(MapperFeature.ALLOW_COERCION_OF_SCALARS, false);
 		this.objectMapper = objectMapper;
 		this.request = request;
 	}

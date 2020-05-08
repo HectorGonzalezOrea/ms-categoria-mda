@@ -1,5 +1,6 @@
 package mx.com.nmp.gestionbolsas.api;
 
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
 import mx.com.nmp.gestionbolsas.model.BadRequest;
@@ -11,7 +12,6 @@ import mx.com.nmp.gestionbolsas.model.ListaBolsas;
 import mx.com.nmp.gestionbolsas.model.ListaTipoBolsas;
 import mx.com.nmp.gestionbolsas.model.ListaTipoBolsasInner;
 import mx.com.nmp.gestionbolsas.mongodb.service.BolsasService;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ import static mx.com.nmp.gestionbolsas.utils.Constantes.HEADER_APIKEY_KEY;
 import static mx.com.nmp.gestionbolsas.utils.Constantes.HEADER_ACCEPT_KEY;
 import static mx.com.nmp.gestionbolsas.utils.Constantes.HEADER_ACCEPT_VALUE;
 import static mx.com.nmp.gestionbolsas.utils.Constantes.CADENA_VACIA;
-								
+
 import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_CODE_INVALID_AUTHENTICATION;
 import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION;
 import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_CODE_INTERNAL_SERVER_ERROR;
@@ -55,27 +55,31 @@ import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_MESSAGE_NOT_FOUND;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-02-21T17:43:22.226Z")
 
 @Controller
 public class BolsasApiController implements BolsasApi {
 
-    private static final Logger log = LoggerFactory.getLogger(BolsasApiController.class);
-    
+	private static final Logger log = LoggerFactory.getLogger(BolsasApiController.class);
 
-    private final ObjectMapper objectMapper;
+	private final ObjectMapper objectMapper;
 
-    private final HttpServletRequest request;
-    
-    @Autowired
-    private BolsasService bolsaService;
+	private final HttpServletRequest request;
 
-    @org.springframework.beans.factory.annotation.Autowired
-    public BolsasApiController(ObjectMapper objectMapper, HttpServletRequest request) {
-        this.objectMapper = objectMapper;
-        this.request = request;
-    }
+	@Autowired
+	private BolsasService bolsaService;
 
+	@org.springframework.beans.factory.annotation.Autowired
+	public BolsasApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+		objectMapper.configure(MapperFeature.ALLOW_COERCION_OF_SCALARS, false);
+		this.objectMapper = objectMapper;
+		this.request = request;
+	}
+
+	/*
+	 * Get Bolsa
+	 */
 	public ResponseEntity<?> bolsasGet(
 			@ApiParam(value = "Usuario de sistema que lanza la petición", required = false) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = " Identificador del tipo de bolsa a buscar") @Valid @RequestParam(value = "idTipo", required = false) String idTipo,
@@ -84,27 +88,33 @@ public class BolsasApiController implements BolsasApi {
 			@ApiParam(value = "Subramo configurado en la Bolsa") @Valid @RequestParam(value = "subramo", required = false) String subramo,
 			@ApiParam(value = "Factor configurado en la Bolsa") @Valid @RequestParam(value = "factor", required = false) String factor) {
 
-			String apiKey = request.getHeader(HEADER_APIKEY_KEY);
-    	
-    		if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
-    		
-    		InvalidAuthentication ia = new InvalidAuthentication();
-    		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
-    		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
-    		
-    		log.error("{}" , ia);
-    		
-    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
-    	}
-		
+		log.info("*********************************************************");
+		log.info("Consultar Bolsas.");
+		log.info("*********************************************************");
+
+		String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+
+		if (apiKey == null || apiKey.equals(CADENA_VACIA)) {
+
+			InvalidAuthentication ia = new InvalidAuthentication();
+			ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+			ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+
+			log.error("{}", ia);
+
+			return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+		}
+
 		String accept = request.getHeader(HEADER_ACCEPT_KEY);
-		
-		
-		if (accept != null && accept.contains("application/json")) {
+
+		if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
 			try {
 				log.info("Consulta Bolsas");
 				if (idTipo == null && nombre == null && ramo == null && subramo == null && factor == null) {
 					ListaBolsas list = bolsaService.getBolsasSinFiltro();
+					
+					log.info("{}", list);
+					
 					return new ResponseEntity<ListaBolsas>(list, HttpStatus.OK);
 				} else {
 					ListaBolsas listaBolsa = bolsaService.getBolsas(idTipo, nombre, ramo, subramo, factor);
@@ -113,43 +123,71 @@ public class BolsasApiController implements BolsasApi {
 					if (!listaBolsa.isEmpty()) {
 						log.info("Resultado: {}", listaBolsa);
 						listBol.addAll(listaBolsa);
+						
+						log.info("{}", listBol);
+						
 						return new ResponseEntity<ListaBolsas>(listBol, HttpStatus.OK);
 					} else {
+						
+						log.info("{}", listBol);
 						return new ResponseEntity<ListaBolsas>(listBol, HttpStatus.OK);
 					}
 				}
 			} catch (Exception e) {
 				log.error("Couldn't serialize response for content type application/json", e);
-				return new ResponseEntity<ListaBolsas>(HttpStatus.INTERNAL_SERVER_ERROR);
+				InternalServerError ie = new InternalServerError();
+				ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
+				ie.setMessage(ERROR_MESSAGE_INTERNAL_SERVER_ERROR);
+
+				log.error("{}", ie);
+				
+				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 
-		return new ResponseEntity<ListaBolsas>(HttpStatus.NOT_IMPLEMENTED);
+		BadRequest br = new BadRequest();
+		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+		br.setCode(ERROR_CODE_BAD_REQUEST);
+
+		log.error("{}" , br);
+		
+		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 	}
 
-    public ResponseEntity<?> bolsasIdBolsaDelete(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Identificador de la Bolsa a eliminar",required=true) @PathVariable("idBolsa") Integer idBolsa) {
-    	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
-    	
-		if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
+	/*
+	 * Eliminar Bolsa por Id
+	 */
+	public ResponseEntity<?> bolsasIdBolsaDelete(
+			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Identificador de la Bolsa a eliminar", required = true) @PathVariable("idBolsa") Integer idBolsa) {
 		
-		InvalidAuthentication ia = new InvalidAuthentication();
-		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
-		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+		log.info("*********************************************************");
+		log.info("Eliminar Bolsa.");
+		log.info("*********************************************************");
 		
-		log.error("{}" , ia);
-		
-		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
-	}
-	
-	String accept = request.getHeader(HEADER_ACCEPT_KEY);
-        if (accept != null && accept.contains("application/json")) {
-            try {
-            	
-            	if(idBolsa == null) {
-            		log.error("Error en el mensaje de petición, verifique la información");
+		String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+
+		if (apiKey == null || apiKey.equals(CADENA_VACIA)) {
+
+			InvalidAuthentication ia = new InvalidAuthentication();
+			ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+			ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+
+			log.error("{}", ia);
+
+			return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+		}
+
+		String accept = request.getHeader(HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
+			try {
+
+				if (idBolsa == null) {
+					log.error("Error en el mensaje de petición, verifique la información");
 					BadRequest br = new BadRequest();
 					br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
 					br.setCode(ERROR_CODE_BAD_REQUEST);
+
 					
 					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
             	}else {
@@ -158,12 +196,21 @@ public class BolsasApiController implements BolsasApi {
             		Boolean eliminado = bolsaService.deleteBolsa(idBolsa);
             		GeneralResponse resp =  new GeneralResponse();
             		if(eliminado) {
+
+
+					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+				} else {
+					Boolean eliminado = bolsaService.deleteBolsa(idBolsa);
+					GeneralResponse resp = new GeneralResponse();
+					if (eliminado) {
+
 						resp.setMessage(MESSAGE_DELETE);
 						return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
 					} else {
 						resp.setMessage(MESSAGE_NO_DELETE);
 						return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
 					}
+
             		}else {
             			log.error("Error en el Id, verifique la información");
     					BadRequest br = new BadRequest();
@@ -186,66 +233,116 @@ public class BolsasApiController implements BolsasApi {
     	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
     	
 		if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
+
+				}
+
+			} catch (Exception e) {
+				log.error("Couldn't serialize response for content type application/json", e);
+				InternalServerError ie = new InternalServerError();
+				ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
+				ie.setMessage(ERROR_MESSAGE_INTERNAL_SERVER_ERROR);
+
+				log.error("{}", ie);
+				
+				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+
+		BadRequest br = new BadRequest();
+		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+		br.setCode(ERROR_CODE_BAD_REQUEST);
+
+		log.error("{}" , br);
+
 		
-		InvalidAuthentication ia = new InvalidAuthentication();
-		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
-		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
-		
-		log.error("{}" , ia);
-		
-		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 	}
-	
-	String accept = request.getHeader(HEADER_ACCEPT_KEY);
-        if (accept != null && accept.contains("application/json")) {
-            try {
-            	if (peticion != null) {
-            		log.info("peticion: " + peticion.toString());
-            		Boolean actualizado = bolsaService.updateBolsa(peticion);
-            		
-            		if(actualizado) {
-            			GeneralResponse resp =  new GeneralResponse();
-            			resp.setMessage("Bolsa actualizada correctamente.");
-            			
-            			return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
-            			
-            		}else {
-            			InternalServerError ie = new InternalServerError();
-        				ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
-        				ie.setMessage("Error interno del servidor");
-                        
-                        return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
-            		}
-            	}else {
-            		BadRequest br = new BadRequest();
+
+	/*
+	 * Actualizar Bolsas
+	 */
+	public ResponseEntity<?> bolsasPatch(
+			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Cuerpo de la petición", required = true) @Valid @RequestBody Bolsa peticion) {
+		
+		log.info("*********************************************************");
+		log.info("Actualizar Bolsas.");
+		log.info("*********************************************************");
+		
+		String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+
+		if (apiKey == null || apiKey.equals(CADENA_VACIA)) {
+
+			InvalidAuthentication ia = new InvalidAuthentication();
+			ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+			ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+
+			log.error("{}", ia);
+
+			return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+		}
+
+		String accept = request.getHeader(HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
+			try {
+				if (peticion != null) {
+					log.info("peticion: " + peticion.toString());
+					Boolean actualizado = bolsaService.updateBolsa(peticion);
+
+					if (actualizado) {
+						GeneralResponse resp = new GeneralResponse();
+						resp.setMessage("Bolsa actualizada correctamente.");
+
+						return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
+
+					} else {
+						InternalServerError ie = new InternalServerError();
+						ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
+						ie.setMessage(ERROR_MESSAGE_INTERNAL_SERVER_ERROR);
+
+						return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+					}
+				} else {
+					BadRequest br = new BadRequest();
 					br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
 					br.setCode(ERROR_CODE_BAD_REQUEST);
-					
+
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
-            	}
-            		
-                
-            } catch (Exception e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<GeneralResponse>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+				}
 
-        return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
-    }
+			} catch (Exception e) {
+				log.error("Couldn't serialize response for content type application/json", e);
+				InternalServerError ie = new InternalServerError();
+				ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
+				ie.setMessage(ERROR_MESSAGE_INTERNAL_SERVER_ERROR);
 
-    public ResponseEntity<?> bolsasPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody Bolsa peticion) {
-    	log.info("Crear Bolsa");
-    	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
-    	
-		if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
+				log.error("{}", ie);
+				
+				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+
+		BadRequest br = new BadRequest();
+		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+		br.setCode(ERROR_CODE_BAD_REQUEST);
+
+		log.error("{}" , br);
 		
-		InvalidAuthentication ia = new InvalidAuthentication();
-		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
-		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+	}
+
+	/*
+	 * Crear Bolsas
+	 */
+	public ResponseEntity<?> bolsasPost(
+			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Cuerpo de la petición", required = true) @Valid @RequestBody Bolsa peticion) {
 		
-		log.error("{}" , ia);
+		log.info("*********************************************************");
+		log.info("Crear Bolsa");
+		log.info("*********************************************************");
 		
+
 		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
 	}
 	
@@ -322,66 +419,153 @@ public class BolsasApiController implements BolsasApi {
             	}
             	} else {
             		BadRequest br = new BadRequest();
+
+		String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+
+		if (apiKey == null || apiKey.equals(CADENA_VACIA)) {
+
+			InvalidAuthentication ia = new InvalidAuthentication();
+			ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+			ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+
+			log.error("{}", ia);
+
+			return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+		}
+
+		String accept = request.getHeader(HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
+			try {
+
+				if (peticion != null) {
+					if (Boolean.TRUE.equals(bolsaService.consultaBolsa(peticion.getNombre()))) {
+						BadRequest br = new BadRequest();
+						br.setCode(ERROR_CODE_BAD_REQUEST);
+						br.setMessage(ERROR_MESSAGE_NAME);
+
+						log.error("{}", br);
+
+						return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+
+					}
+					if (Boolean.FALSE.equals(bolsaService.consultaTipoBolsa(peticion.getTipo().getId()))) {
+						BadRequest br = new BadRequest();
+						br.setCode(ERROR_CODE_BAD_REQUEST);
+						br.setMessage(ERROR_MESSAGE_TIPO);
+
+						log.error("{}", br);
+
+						return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+
+					} else {
+
+						log.info("peticion: " + peticion.toString());
+
+						Boolean insertado = bolsaService.crearBolsa(peticion);
+						if (insertado) {
+							GeneralResponse resp = new GeneralResponse();
+							resp.setMessage(MESSAGE_OK_BOLSA);
+
+							return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
+						} else {
+							InternalServerError ie = new InternalServerError();
+							ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
+							ie.setMessage(ERROR_MESSAGE_INTERNAL_SERVER_ERROR);
+
+							return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+						}
+					}
+				} else {
+					BadRequest br = new BadRequest();
+
 					br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
 					br.setCode(ERROR_CODE_BAD_REQUEST);
-					
+
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
-            	}
-            } catch (Exception e) {
-            	log.error("Couldn't serialize response for content type application/json", e);
-                InternalServerError ie = new InternalServerError();
+				}
+			} catch (Exception e) {
+				log.error("Couldn't serialize response for content type application/json", e);
+				InternalServerError ie = new InternalServerError();
 				ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
-				ie.setMessage("Error interno del servidor");
-                
-                return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+				ie.setMessage(ERROR_MESSAGE_INTERNAL_SERVER_ERROR);
 
-        return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
-    }
+				log.error("{}", ie);
+				
+				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
 
-    public ResponseEntity<?> bolsasTiposGet(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario) {
-    	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
-    	
-		if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
+		BadRequest br = new BadRequest();
+		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+		br.setCode(ERROR_CODE_BAD_REQUEST);
+
+		log.error("{}" , br);
 		
-		InvalidAuthentication ia = new InvalidAuthentication();
-		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
-		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
-		
-		log.error("{}" , ia);
-		
-		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 	}
-	
-	String accept = request.getHeader(HEADER_ACCEPT_KEY);
-        if (accept != null && accept.contains("application/json")) {
-        	BadRequest br = new BadRequest();
-            try {
-            	if(usuario == null) {
-            		br.setCode(ERROR_CODE_BAD_REQUEST);
-            		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
-            		
-            		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
-            	}
-            	ListaTipoBolsas response = bolsaService.consultaTipoBolsa();		
-            	
-    			if(!response.isEmpty()) {
-    				log.info("Result: {}" , response);
-    				return new ResponseEntity<ListaTipoBolsas>(response, HttpStatus.OK);
-    			}else {
-    				log.info("No se encontro nada");
-    				return new ResponseEntity<ListaTipoBolsas>(response, HttpStatus.BAD_REQUEST);
-    			}
-    			
-        
-            } catch (Exception e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<ListaTipoBolsas>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
 
-        return new ResponseEntity<ListaTipoBolsas>(HttpStatus.NOT_IMPLEMENTED);
-    }
+	/*
+	 * Consultar bolsa por su tipo
+	 */
+	public ResponseEntity<?> bolsasTiposGet(
+			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario) {
+		
+		log.info("*********************************************************");
+		log.info("Consultar Bolsa por su tipo");
+		log.info("*********************************************************");
+		
+		String apiKey = request.getHeader(HEADER_APIKEY_KEY);
+
+		if (apiKey == null || apiKey.equals(CADENA_VACIA)) {
+
+			InvalidAuthentication ia = new InvalidAuthentication();
+			ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+			ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
+
+			log.error("{}", ia);
+
+			return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+		}
+
+		String accept = request.getHeader(HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
+			BadRequest br = new BadRequest();
+			try {
+				if (usuario == null) {
+					br.setCode(ERROR_CODE_BAD_REQUEST);
+					br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+
+					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+				}
+				ListaTipoBolsas response = bolsaService.consultaTipoBolsa();
+
+				if (!response.isEmpty()) {
+					log.info("Result: {}", response);
+					return new ResponseEntity<ListaTipoBolsas>(response, HttpStatus.OK);
+				} else {
+					log.info("No se encontro nada");
+					return new ResponseEntity<ListaTipoBolsas>(response, HttpStatus.BAD_REQUEST);
+				}
+
+			} catch (Exception e) {
+				log.error("Couldn't serialize response for content type application/json", e);
+				InternalServerError ie = new InternalServerError();
+				ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
+				ie.setMessage(ERROR_MESSAGE_INTERNAL_SERVER_ERROR);
+
+				log.error("{}", ie);
+				
+				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+
+		BadRequest br = new BadRequest();
+		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+		br.setCode(ERROR_CODE_BAD_REQUEST);
+
+		log.error("{}" , br);
+		
+		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+	}
 
 }

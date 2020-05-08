@@ -9,9 +9,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -34,9 +31,6 @@ import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
 //@Repository
 public class CastConsolidados {
-	
-	private static final Logger log = LoggerFactory.getLogger(CastConsolidados.class);
-	
 	public ConsultarArchivoConsolidadoResInner fillVoValues(ArchivoEntity entity) {
 		ConsultarArchivoConsolidadoResInner consolidado = null;
 		if (entity != null) {
@@ -76,9 +70,6 @@ public class CastConsolidados {
 	}
 
 	public List<InfoProducto> cvsLectura(BufferedReader b) {
-		log.info("cvsLectura");
-		long inicio = System.currentTimeMillis();
-
 		String line = "";
 		String cvsSplitBy = ",";
 		List<InfoProducto> lst = new ArrayList<>();
@@ -98,28 +89,14 @@ public class CastConsolidados {
 				}
 			}
 		} catch (IOException e) {
-			log.error("IOException: {}", e);
+			e.printStackTrace();
 		}
-
-		long fin = System.currentTimeMillis();
-		double tiempo = (double) ((fin - inicio) / 1000);
-		log.info("cvsLectura: {} segundos" , tiempo);
-		
 		return lst;
 	}
 
 	public String lstToJson(List<InfoProducto> lst) {
-		log.info("lstToJson");
-		
-		long inicio = System.currentTimeMillis();
-		
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String json = gson.toJson(lst);
-		
-		long fin = System.currentTimeMillis();
-		double tiempo = (double) ((fin - inicio) / 1000);
-		log.info("lstToJson: {} segundos" , tiempo);
-		
 		return json;
 	}
 
@@ -130,11 +107,11 @@ public class CastConsolidados {
 			participantJsonList = mapper.readValue(jsonString, new TypeReference<List<InfoProducto>>() {
 			});
 		} catch (JsonParseException e) {
-			log.error("JsonParseException: {}" , e);
+			e.printStackTrace();
 		} catch (JsonMappingException e) {
-			log.error("JsonMappingException: {}" , e);
+			e.printStackTrace();
 		} catch (IOException e) {
-			log.error("IOException: {}" , e);
+			e.printStackTrace();
 		}
 		return participantJsonList;
 	}
@@ -171,7 +148,8 @@ public class CastConsolidados {
             jaxbMarshaller.marshal(obj, sw);
             xmlContent = sw.toString();
         } catch (JAXBException e) {
-        	log.error("JAXBException: {}" , e);
+        	System.out.println("Error en jaxbObjectToXML: " + e.getMessage());
+        	e.getStackTrace();
         }
         return Common.OPEN_PAYLOAD+xmlContent+Common.CLOSE_PAYLOAD;
     }
