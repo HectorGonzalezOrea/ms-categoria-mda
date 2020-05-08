@@ -96,7 +96,6 @@ public class ConsolidadoService {
 			ArchivoEntity consolidado = new ArchivoEntity();
 			File archivo = null;
 			FileReader targetReader = null;
-
 			try {
 				consolidado.setNombreCliente(request.getUsuario());
 				consolidado.setVigencia(request.getVigencia());
@@ -572,5 +571,17 @@ public class ConsolidadoService {
 		}
 
 		return eliminado;
+	}
+	
+	public Boolean validaFormatoFecha(String StringDate){
+		log.info("validando Fecha");
+		Boolean flag = false;
+		try {
+		 new SimpleDateFormat("dd/MM/yyyy").parse(StringDate);
+		 return flag=true;
+		} catch (ParseException e) {
+			log.info("El formato de la fecha no es el esperado");
+			return flag=false;
+		}
 	}
 }
