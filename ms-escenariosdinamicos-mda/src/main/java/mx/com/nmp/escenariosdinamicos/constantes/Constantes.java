@@ -2,6 +2,11 @@ package mx.com.nmp.escenariosdinamicos.constantes;
 
 public final class Constantes {
 	public class Common {
+		
+		public static final String HEADER_APIKEY_KEY = "X-IBM-Client-Id";
+		public static final String HEADER_ACCEPT_KEY = "Accept";
+		public static final String HEADER_ACCEPT_VALUE = "application/json";
+		
 		public static final String ERROR_CODE = "NMP-MDA-400";
 		public static final String ERROR_MENSAJE = "El cuerpo de la petición no está bien formado, verifique su información.";
 		
@@ -18,6 +23,9 @@ public final class Constantes {
 		
 		public static final String ERROR_CODE_AUTORIZACION="NMP-MDA-401";
 		public static final String MESSAJE_ERROR_AUTORIZACION="Se ha producido un error de autorización";
+		
+		public static final String ERROR_CODE_BAD_REQUEST = "NMP-MDA-400";
+		public static final String MESSAJE_ERROR_BAD_REQUEST ="El cuerpo de la petición no está bien formado, verifique su información";
 		
 		//public static final String BLANK_SPACE="";
 		//public static final String WSDL_ARBITRADO="http://10.30.3.15:8011/NMP/OperacionPrendaria/MotorDescuentos/ArbitrajePreciosPartidas/v1?WSDL";

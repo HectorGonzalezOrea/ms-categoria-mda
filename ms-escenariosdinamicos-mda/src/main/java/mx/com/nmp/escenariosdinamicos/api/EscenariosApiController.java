@@ -7,7 +7,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.apache.commons.codec.binary.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
@@ -49,235 +49,418 @@ import mx.com.nmp.escenariosdinamicos.model.component.ProducerMessageComponent;
 import mx.com.nmp.escenariosdinamicos.mongodb.service.EscenariosService;
 import mx.com.nmp.escenariosdinamicos.oag.dto.RequestReglaEscenarioDinamicoDto;
 import mx.com.nmp.escenariosdinamicos.oag.vo.PartidaVO;
+
+
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-04T01:28:01.968Z")
 
 @Controller
 public class EscenariosApiController implements EscenariosApi {
 
-    private static final Logger log = LoggerFactory.getLogger(EscenariosApiController.class);
+	private static final Logger log = LoggerFactory.getLogger(EscenariosApiController.class);
 
-    private final ObjectMapper objectMapper;
+	private final ObjectMapper objectMapper;
 
-    private final HttpServletRequest request;
-    
-    @Autowired
-    private EscenariosService escenarioService;
-    @Autowired
-    private ElasticService elasticService;
-    @Autowired
-    private ElasticProperties elasticProperties;
-    @Autowired 
-    private ClientesMicroservicios clientesMicroservicios;
-    @Autowired
-    private CastObjectGeneric castObjectGeneric;
-    @Autowired
-    private ClientOAGService clientOAGService;
-    @Autowired
-    private ProducerMessageComponent  producerMessage;
+	private final HttpServletRequest request;
 
-    @org.springframework.beans.factory.annotation.Autowired
-    public EscenariosApiController(ObjectMapper objectMapper, HttpServletRequest request) {
-        this.objectMapper = objectMapper;
-        this.request = request;
-    }
+	@Autowired
+	private EscenariosService escenarioService;
+	@Autowired
+	private ElasticService elasticService;
+	@Autowired
+	private ElasticProperties elasticProperties;
+	@Autowired
+	private ClientesMicroservicios clientesMicroservicios;
+	@Autowired
+	private CastObjectGeneric castObjectGeneric;
+	@Autowired
+	private ClientOAGService clientOAGService;
+	@Autowired
+	private ProducerMessageComponent producerMessage;
 
-	public ResponseEntity<?> consultarEscenariosGET(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="MongoDB, mockserver") @RequestHeader(value="destino", required=true) String destino) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-            	List<ConsultarEscenariosResInner> escenario = escenarioService.consultaEscenario();
-            	ConsultarEscenariosRes escenariosRes = new ConsultarEscenariosRes();
-            	if(escenario!=null) {
-            		log.info("Si hubo considencias.");
-            		escenariosRes.addAll(escenario);
-            		return new ResponseEntity<ConsultarEscenariosRes>(escenariosRes, HttpStatus.OK);
-            	}else {
-            		log.info("No concidencias.");
-            		return new ResponseEntity<ConsultarEscenariosRes>(escenariosRes, HttpStatus.OK);
-            	}
-            } catch (Exception e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<ConsultarEscenariosRes>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+	@org.springframework.beans.factory.annotation.Autowired
+	public EscenariosApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+		objectMapper.configure(MapperFeature.ALLOW_COERCION_OF_SCALARS, false);
+		this.objectMapper = objectMapper;
+		this.request = request;
+	}
 
-        return new ResponseEntity<ConsultarEscenariosRes>(HttpStatus.NOT_IMPLEMENTED);
-    }
-	
-    public ResponseEntity<?> crearEscenariosPOST(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  )  @Valid @RequestBody CrearEscenariosReq crearEscenariosRequest) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-            	if(crearEscenariosRequest !=null) {
-            		log.info("peticion: {}", crearEscenariosRequest.toString());
-            		CrearEscenariosRes esce = escenarioService.crearEscenario(crearEscenariosRequest);
-      
-            			
-            			return new ResponseEntity<CrearEscenariosRes>(esce, HttpStatus.OK);
-            			
-            		}else {
-                		BadRequest br = new BadRequest();
-    					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-    					br.setCodigo("NMP-MDA-400");
-    					
-    					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
-                	}
-            	
-            	
-            } catch (Exception e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<CrearEscenariosRes>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+	/*
+	 * Consultar escenario
+	 */
+	public ResponseEntity<?> consultarEscenariosGET(
+			@ApiParam(value = "Usuario en el sistema origen que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Sistema que origina la petición", required = true, allowableValues = "portalInteligenciaComercial") @RequestHeader(value = "origen", required = true) String origen,
+			@ApiParam(value = "Destino final de la información", required = true, allowableValues = "MongoDB, mockserver") @RequestHeader(value = "destino", required = true) String destino) {
+		
+		log.info("*********************************************************");
+		log.info("Consultar escenario.");
+		log.info("*********************************************************");
 
-        return new ResponseEntity<CrearEscenariosRes>(HttpStatus.NOT_IMPLEMENTED);
-    }
+		String apiKeyBluemix = request.getHeader(Common.HEADER_APIKEY_KEY);
 
-    public ResponseEntity<?> editaEscenariosPUT(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Identificador del escenario",required=true) @PathVariable("idEscenario") Integer idEscenario,@ApiParam(value = "peticion para modificar las reglas de precios en los escenarios dinámicos."  )  @Valid @RequestBody ModEscenariosReq modEscenariosRequest) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-            	if(modEscenariosRequest !=null) {
-            		log.info("peticion: {}", modEscenariosRequest.toString());
-            		ModEscenariosRes esce = escenarioService.editaEscenario(modEscenariosRequest);
-      
-            			
-            			return new ResponseEntity<ModEscenariosRes>(esce, HttpStatus.OK);
-            			
-            		}else {
-                		BadRequest br = new BadRequest();
-    					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
-    					br.setCodigo("NMP-MDA-400");
-    					
-    					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
-                	}
-            } catch (Exception e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<ModEscenariosRes>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+		if (apiKeyBluemix == null || apiKeyBluemix.equals("")) {
+			InvalidAuthentication ia = new InvalidAuthentication();
+			ia.setCode(Common.ERROR_CODE_AUTORIZACION);
+			ia.setMessage(Common.MESSAJE_ERROR_AUTORIZACION);
 
-        return new ResponseEntity<ModEscenariosRes>(HttpStatus.NOT_IMPLEMENTED);
-    }
+			log.info("{}", ia);
 
-    //    public ResponseEntity<EjecutarEscenarioDinamicoRes> ejecutarEscenariosDinamicosPOST(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  )  @Valid @RequestBody EjecutarEscenarioDinamicoReq crearEscenariosRequest) {
-    public ResponseEntity<?> ejecutarEscenariosDinamicosPOST(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  )  @Valid @RequestBody EjecutarEscenarioDinamicoReq crearEscenariosRequest) {
-    	String accept = request.getHeader("Accept");
-        ArrayList<PartidaPrecioFinal> lstPartidaPrecioValorMonte=new ArrayList<PartidaPrecioFinal>();
-        List<IndexGarantiaVO>lstIndexGarantia=null;
-        RequestReglaEscenarioDinamicoDto requestReglaEscenarioDinamico=new RequestReglaEscenarioDinamicoDto();
-        List<PartidaVO> lstPartidaVO=null;
-        List<IndexVentasVO> scrollElasticVentas=null;
-        if(org.apache.commons.lang3.StringUtils.isBlank(usuario)) {
-        	InvalidAuthentication ia= new InvalidAuthentication();
-        	ia.setCode(Common.ERROR_CODE);
-        	ia.setMessage(Common.MESSAJE_ERROR_AUTORIZACION);
-        	 return new ResponseEntity<InvalidAuthentication>(ia,HttpStatus.UNAUTHORIZED);
-        }
-        if (accept != null && accept.contains("application/json")) {
-            try {
-            	//primero obtenemos las ventas de los ultimos tres dias
-            	scrollElasticVentas=elasticService.scrollElasticVentas(elasticProperties.getIndexVenta());
-				//despues consultamos las partidas a partir de las ventas
-            	lstIndexGarantia=elasticService.scrollElasticGarantias(elasticProperties.getIndexGarantia(),crearEscenariosRequest.getInfoRegla().getRamo(),crearEscenariosRequest.getInfoRegla().getSubramo().get(0),scrollElasticVentas);
-            	lstPartidaVO=castObjectGeneric.castPartidasToPartidaValorMonte(lstIndexGarantia, crearEscenariosRequest.getInfoRegla());
-            	requestReglaEscenarioDinamico.setPartida(lstPartidaVO);
-            	 String jsonMessage=new Gson().toJson(requestReglaEscenarioDinamico);
-            	producerMessage.producerReglaEscenarioDinamico(jsonMessage);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e.getMessage());
-                InternalServerError is = new InternalServerError();
-                is.codigo(Common.ERROR_SERVER);
-                is.setMensaje(Common.ERROR_SERVER_MSG);
-                return new ResponseEntity<InternalServerError>(is,HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        	EjecutarEscenarioDinamicoRes response= new EjecutarEscenarioDinamicoRes();
-        	response.setCode(Common.EXITO_EJECUTAR_ESCENARIODINAMICO);
-        	response.setMessage(Common.MENSAJE_OK);
-            return new ResponseEntity<EjecutarEscenarioDinamicoRes>(response, HttpStatus.OK);
-        }
+			return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+		}
 
-		BadRequest badRequest=new BadRequest();
-		badRequest.setCodigo(Common.ERROR_CODE);
-		badRequest.setMensaje(Common.ERROR_MENSAJE);
-        return new ResponseEntity<BadRequest>(badRequest,HttpStatus.BAD_REQUEST);
+		String accept = request.getHeader(Common.HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(Common.HEADER_ACCEPT_VALUE)) {
+			try {
+				List<ConsultarEscenariosResInner> escenario = escenarioService.consultaEscenario();
+				ConsultarEscenariosRes escenariosRes = new ConsultarEscenariosRes();
+				if (escenario != null) {
+					log.info("Si hubo considencias.");
+					escenariosRes.addAll(escenario);
+					return new ResponseEntity<ConsultarEscenariosRes>(escenariosRes, HttpStatus.OK);
+				} else {
+					log.info("No concidencias.");
+					return new ResponseEntity<ConsultarEscenariosRes>(escenariosRes, HttpStatus.OK);
+				}
+			} catch (Exception e) {
+				log.error("Exception: {}", e);
+				
+				InternalServerError is = new InternalServerError();
+				is.setCodigo(Common.ERROR_SERVER);
+				is.setMensaje(Common.ERROR_SERVER_MSG);
+				return new ResponseEntity<InternalServerError>(is, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
 
-    }
+		BadRequest br = new BadRequest();
+		br.setCodigo(Common.ERROR_CODE_BAD_REQUEST);
+		br.setMensaje(Common.MESSAJE_ERROR_BAD_REQUEST);
+		
+		log.info("{}" , br);
+		
+		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+	}
 
-    public ResponseEntity<?> eliminarEscenariosDELETE(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Identificador del escenario",required=true) @PathVariable("idEscenario") Integer idEscenario) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-            	
-            	if(idEscenario == null) {
-            		
-            		log.error("Error en el mensaje de petición, verifique la información");
+	/*
+	 * Crear Escenarios
+	 */
+	public ResponseEntity<?> crearEscenariosPOST(
+			@ApiParam(value = "Usuario en el sistema origen que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Sistema que origina la petición", required = true, allowableValues = "portalInteligenciaComercial") @RequestHeader(value = "origen", required = true) String origen,
+			@ApiParam(value = "Destino final de la información", required = true, allowableValues = "bluemix, mockserver") @RequestHeader(value = "destino", required = true) String destino,
+			@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos") @Valid @RequestBody CrearEscenariosReq crearEscenariosRequest) {
+		
+		log.info("*********************************************************");
+		log.info("Crear escenario.");
+		log.info("*********************************************************");
+
+		String apiKeyBluemix = request.getHeader(Common.HEADER_APIKEY_KEY);
+
+		if (apiKeyBluemix == null || apiKeyBluemix.equals("")) {
+			InvalidAuthentication ia = new InvalidAuthentication();
+			ia.setCode(Common.ERROR_CODE_AUTORIZACION);
+			ia.setMessage(Common.MESSAJE_ERROR_AUTORIZACION);
+
+			log.info("{}", ia);
+
+			return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+		}
+
+		String accept = request.getHeader(Common.HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(Common.HEADER_ACCEPT_VALUE)) {
+			try {
+				if (crearEscenariosRequest != null) {
+					log.info("peticion: {}", crearEscenariosRequest.toString());
+					CrearEscenariosRes esce = escenarioService.crearEscenario(crearEscenariosRequest);
+
+					return new ResponseEntity<CrearEscenariosRes>(esce, HttpStatus.OK);
+
+				} else {
+					BadRequest br = new BadRequest();
+					br.setCodigo(Common.ERROR_CODE_BAD_REQUEST);
+					br.setMensaje(Common.MESSAJE_ERROR_BAD_REQUEST);
+					
+					log.info("{}" , br);
+					
+					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+				}
+
+			} catch (Exception e) {
+				log.error("Exception: {}", e);
+				
+				InternalServerError is = new InternalServerError();
+				is.setCodigo(Common.ERROR_SERVER);
+				is.setMensaje(Common.ERROR_SERVER_MSG);
+				return new ResponseEntity<InternalServerError>(is, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+
+		BadRequest br = new BadRequest();
+		br.setCodigo(Common.ERROR_CODE_BAD_REQUEST);
+		br.setMensaje(Common.MESSAJE_ERROR_BAD_REQUEST);
+		
+		log.info("{}" , br);
+		
+		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+	}
+
+	/*
+	 * Editar Escenarios
+	 */
+	public ResponseEntity<?> editaEscenariosPUT(
+			@ApiParam(value = "Usuario en el sistema origen que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Sistema que origina la petición", required = true, allowableValues = "portalInteligenciaComercial") @RequestHeader(value = "origen", required = true) String origen,
+			@ApiParam(value = "Destino final de la información", required = true, allowableValues = "bluemix, mockserver") @RequestHeader(value = "destino", required = true) String destino,
+			@ApiParam(value = "Identificador del escenario", required = true) @PathVariable("idEscenario") Integer idEscenario,
+			@ApiParam(value = "peticion para modificar las reglas de precios en los escenarios dinámicos.") @Valid @RequestBody ModEscenariosReq modEscenariosRequest) {
+		
+		log.info("*********************************************************");
+		log.info("Editar escenario.");
+		log.info("*********************************************************");
+
+		String apiKeyBluemix = request.getHeader(Common.HEADER_APIKEY_KEY);
+
+		if (apiKeyBluemix == null || apiKeyBluemix.equals("")) {
+			InvalidAuthentication ia = new InvalidAuthentication();
+			ia.setCode(Common.ERROR_CODE_AUTORIZACION);
+			ia.setMessage(Common.MESSAJE_ERROR_AUTORIZACION);
+
+			log.info("{}", ia);
+
+			return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+		}
+
+		String accept = request.getHeader(Common.HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(Common.HEADER_ACCEPT_VALUE)) {
+			try {
+				if (modEscenariosRequest != null) {
+					log.info("peticion: {}", modEscenariosRequest.toString());
+					ModEscenariosRes esce = escenarioService.editaEscenario(modEscenariosRequest);
+
+					return new ResponseEntity<ModEscenariosRes>(esce, HttpStatus.OK);
+
+				} else {
 					BadRequest br = new BadRequest();
 					br.setMensaje("El cuerpo de la petición no está bien formado, verifique su información");
 					br.setCodigo("NMP-MDA-400");
+
+					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+				}
+			} catch (Exception e) {
+				log.error("Exception: {}", e);
+				
+				InternalServerError is = new InternalServerError();
+				is.setCodigo(Common.ERROR_SERVER);
+				is.setMensaje(Common.ERROR_SERVER_MSG);
+				return new ResponseEntity<InternalServerError>(is, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+
+		return new ResponseEntity<ModEscenariosRes>(HttpStatus.NOT_IMPLEMENTED);
+	}
+
+	/*
+	 * Ejecutar Escenarios
+	 */
+	public ResponseEntity<?> ejecutarEscenariosDinamicosPOST(
+			@ApiParam(value = "Usuario en el sistema origen que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Sistema que origina la petición", required = true, allowableValues = "portalInteligenciaComercial") @RequestHeader(value = "origen", required = true) String origen,
+			@ApiParam(value = "Destino final de la información", required = true, allowableValues = "bluemix, mockserver") @RequestHeader(value = "destino", required = true) String destino,
+			@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos") @Valid @RequestBody EjecutarEscenarioDinamicoReq crearEscenariosRequest) {
+
+		log.info("*********************************************************");
+		log.info("Ejecutar escenario dinamicos.");
+		log.info("*********************************************************");
+
+		String apiKeyBluemix = request.getHeader(Common.HEADER_APIKEY_KEY);
+
+		if (apiKeyBluemix == null || apiKeyBluemix.equals("")) {
+			InvalidAuthentication ia = new InvalidAuthentication();
+			ia.setCode(Common.ERROR_CODE_AUTORIZACION);
+			ia.setMessage(Common.MESSAJE_ERROR_AUTORIZACION);
+
+			log.info("{}", ia);
+
+			return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+		}
+
+		String accept = request.getHeader(Common.HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(Common.HEADER_ACCEPT_VALUE)) {
+
+			try {
+				ArrayList<PartidaPrecioFinal> lstPartidaPrecioValorMonte = new ArrayList<PartidaPrecioFinal>();
+				List<IndexGarantiaVO> lstIndexGarantia = null;
+				RequestReglaEscenarioDinamicoDto requestReglaEscenarioDinamico = new RequestReglaEscenarioDinamicoDto();
+				List<PartidaVO> lstPartidaVO = null;
+				List<IndexVentasVO> scrollElasticVentas = null;
+
+				// primero obtenemos las ventas de los ultimos tres dias
+				scrollElasticVentas = elasticService.scrollElasticVentas(elasticProperties.getIndexVenta());
+				// despues consultamos las partidas a partir de las ventas
+				lstIndexGarantia = elasticService.scrollElasticGarantias(elasticProperties.getIndexGarantia(),
+						crearEscenariosRequest.getInfoRegla().getRamo(),
+						crearEscenariosRequest.getInfoRegla().getSubramo().get(0), scrollElasticVentas);
+				
+				lstPartidaVO = castObjectGeneric.castPartidasToPartidaValorMonte(lstIndexGarantia,
+						crearEscenariosRequest.getInfoRegla());
+				requestReglaEscenarioDinamico.setPartida(lstPartidaVO);
+				String jsonMessage = new Gson().toJson(requestReglaEscenarioDinamico);
+				producerMessage.producerReglaEscenarioDinamico(jsonMessage);
+				
+			} catch (IOException e) {
+				log.error("Exception: {}", e);
+
+				InternalServerError is = new InternalServerError();
+				is.setCodigo(Common.ERROR_SERVER);
+				is.setMensaje(Common.ERROR_SERVER_MSG);
+				return new ResponseEntity<InternalServerError>(is, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+			
+			EjecutarEscenarioDinamicoRes response = new EjecutarEscenarioDinamicoRes();
+			response.setCode(Common.EXITO_EJECUTAR_ESCENARIODINAMICO);
+			response.setMessage(Common.MENSAJE_OK);
+			
+			log.info("{}", response);
+			
+			return new ResponseEntity<EjecutarEscenarioDinamicoRes>(response, HttpStatus.OK);
+		}
+
+		BadRequest badRequest = new BadRequest();
+		badRequest.setCodigo(Common.ERROR_CODE);
+		badRequest.setMensaje(Common.ERROR_MENSAJE);
+		
+		log.info("{}", badRequest);
+		
+		return new ResponseEntity<BadRequest>(badRequest, HttpStatus.BAD_REQUEST);
+
+	}
+
+	/*
+	 * Eliminar Escenarios
+	 */
+	public ResponseEntity<?> eliminarEscenariosDELETE(
+			@ApiParam(value = "Usuario en el sistema origen que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Sistema que origina la petición", required = true, allowableValues = "portalInteligenciaComercial") @RequestHeader(value = "origen", required = true) String origen,
+			@ApiParam(value = "Destino final de la información", required = true, allowableValues = "bluemix, mockserver") @RequestHeader(value = "destino", required = true) String destino,
+			@ApiParam(value = "Identificador del escenario", required = true) @PathVariable("idEscenario") Integer idEscenario) {
+		
+		log.info("*********************************************************");
+		log.info("Eliminar escenario.");
+		log.info("*********************************************************");
+
+		String apiKeyBluemix = request.getHeader(Common.HEADER_APIKEY_KEY);
+
+		if (apiKeyBluemix == null || apiKeyBluemix.equals("")) {
+			InvalidAuthentication ia = new InvalidAuthentication();
+			ia.setCode(Common.ERROR_CODE_AUTORIZACION);
+			ia.setMessage(Common.MESSAJE_ERROR_AUTORIZACION);
+
+			log.info("{}", ia);
+
+			return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+		}
+
+		String accept = request.getHeader(Common.HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(Common.HEADER_ACCEPT_VALUE)) {
+			try {
+				if (idEscenario == null) {
+
+					log.error("Error en el mensaje de petición, verifique la información");
+					BadRequest br = new BadRequest();
+					br.setCodigo(Common.ERROR_CODE_BAD_REQUEST);
+					br.setMensaje(Common.MESSAJE_ERROR_BAD_REQUEST);
 					
-					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
-            	}else {
-            		Boolean eliminado = escenarioService.eliminaEscenario(idEscenario);
-            		EliminarEscenariosRes resp =  new EliminarEscenariosRes();
-            		if(eliminado) {
-            			resp.setCode("NMP-MDA-200");
+					log.info("{}" , br);
+					
+					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+				} else {
+					Boolean eliminado = escenarioService.eliminaEscenario(idEscenario);
+					EliminarEscenariosRes resp = new EliminarEscenariosRes();
+					if (eliminado) {
+						resp.setCode("NMP-MDA-200");
 						resp.setMessage("Escenario eliminado exitosamente");
 						return new ResponseEntity<EliminarEscenariosRes>(resp, HttpStatus.OK);
 					} else {
 						resp.setMessage("Escenario no eliminado");
 						return new ResponseEntity<EliminarEscenariosRes>(resp, HttpStatus.OK);
 					}
-            		
-            	}
 
-            } catch (Exception e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<EliminarEscenariosRes>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<EliminarEscenariosRes>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    public ResponseEntity<?> simularEscenariosDinamicosPOST(
-    		@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,
-    		@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,
-    		@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,
-    		@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  ) @Valid @RequestBody SimularEscenarioDinamicoReq crearEscenariosReques
-    		) {
-    	String accept = request.getHeader("Accept");
-    	SimularEscenarioDinamicoRes response=new SimularEscenarioDinamicoRes();
-    	if (accept != null && accept.contains("application/json")) {
-    	ArrayList<PartidaPrecioFinal> lstPartidaPrecioValorMonte=new ArrayList<PartidaPrecioFinal>();
-        log.info("obtencion de indices");
-        List<IndexGarantiaVO>lstIndexGarantia=null;
-        RequestReglaEscenarioDinamicoDto wrapperReglaEscenarioDinamico=new RequestReglaEscenarioDinamicoDto();
-        List<PartidaVO> castIndexToVO=null;
-        List<IndexVentasVO> scrollElasticVentas=null;
-			try {
-				scrollElasticVentas=elasticService.scrollElasticVentas(elasticProperties.getIndexVenta());//primero obtenemos las ventas de los ultimos tres dias
-				//despues consultamos las partidas a partir de las ventas
-				lstIndexGarantia=elasticService.scrollElasticGarantias(elasticProperties.getIndexGarantia(),crearEscenariosReques.getInfoRegla().getRamo(),crearEscenariosReques.getInfoRegla().getSubramo().get(0),scrollElasticVentas);
-				lstIndexGarantia.forEach(i->log.info(i.toString()));
-				lstPartidaPrecioValorMonte=(ArrayList<PartidaPrecioFinal>)clientesMicroservicios.calcularValorMonte(castObjectGeneric.castGarantiasToCalculoValor(lstIndexGarantia),usuario,origen,destino);
-				castIndexToVO=castObjectGeneric.castPartidasToPartidaValorMonte(lstIndexGarantia,crearEscenariosReques.getInfoRegla());
-				wrapperReglaEscenarioDinamico.setPartida(castIndexToVO);
-				clientOAGService.reglaEscenarioDinamico(wrapperReglaEscenarioDinamico);
-		} catch (Exception e) {
-				e.printStackTrace();
+				}
+			} catch (Exception e) {
+				log.error("Exception: {}", e);
+				
 				InternalServerError is = new InternalServerError();
 				is.setCodigo(Common.ERROR_SERVER);
 				is.setMensaje(Common.ERROR_SERVER_MSG);
 				return new ResponseEntity<InternalServerError>(is, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
 		}
+
+		return new ResponseEntity<EliminarEscenariosRes>(HttpStatus.NOT_IMPLEMENTED);
+	}
+
+	/*
+	 * Simular Escenarios
+	 */
+	public ResponseEntity<?> simularEscenariosDinamicosPOST(
+			@ApiParam(value = "Usuario en el sistema origen que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Sistema que origina la petición", required = true, allowableValues = "portalInteligenciaComercial") @RequestHeader(value = "origen", required = true) String origen,
+			@ApiParam(value = "Destino final de la información", required = true, allowableValues = "bluemix, mockserver") @RequestHeader(value = "destino", required = true) String destino,
+			@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos") @Valid @RequestBody SimularEscenarioDinamicoReq crearEscenariosReques) {
+		
+		log.info("*********************************************************");
+		log.info("Simular escenarios dinamicos");
+		log.info("*********************************************************");
+
+		String apiKeyBluemix = request.getHeader(Common.HEADER_APIKEY_KEY);
+
+		if (apiKeyBluemix == null || apiKeyBluemix.equals("")) {
+			InvalidAuthentication ia = new InvalidAuthentication();
+			ia.setCode(Common.ERROR_CODE_AUTORIZACION);
+			ia.setMessage(Common.MESSAJE_ERROR_AUTORIZACION);
+
+			log.info("{}", ia);
+
+			return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
+		}
+
+		String accept = request.getHeader(Common.HEADER_ACCEPT_KEY);
+		if (accept != null && accept.contains(Common.HEADER_ACCEPT_VALUE)) {
+			SimularEscenarioDinamicoRes response = new SimularEscenarioDinamicoRes();
+			ArrayList<PartidaPrecioFinal> lstPartidaPrecioValorMonte = new ArrayList<PartidaPrecioFinal>();
+			log.info("obtencion de indices");
+			List<IndexGarantiaVO> lstIndexGarantia = null;
+			RequestReglaEscenarioDinamicoDto wrapperReglaEscenarioDinamico = new RequestReglaEscenarioDinamicoDto();
+			List<PartidaVO> castIndexToVO = null;
+			List<IndexVentasVO> scrollElasticVentas = null;
+			try {
+				// primero obtenemos las ventas de los ultimos tres dias
+				scrollElasticVentas = elasticService.scrollElasticVentas(elasticProperties.getIndexVenta());
+				// despues consultamos las partidas a partir de las ventas
+				lstIndexGarantia = elasticService.scrollElasticGarantias(elasticProperties.getIndexGarantia(),
+						crearEscenariosReques.getInfoRegla().getRamo(),
+						crearEscenariosReques.getInfoRegla().getSubramo().get(0), scrollElasticVentas);
+				lstIndexGarantia.forEach(i -> log.info(i.toString()));
+				lstPartidaPrecioValorMonte = (ArrayList<PartidaPrecioFinal>) clientesMicroservicios.calcularValorMonte(
+						castObjectGeneric.castGarantiasToCalculoValor(lstIndexGarantia), usuario, origen, destino);
+				castIndexToVO = castObjectGeneric.castPartidasToPartidaValorMonte(lstIndexGarantia,
+						crearEscenariosReques.getInfoRegla());
+				wrapperReglaEscenarioDinamico.setPartida(castIndexToVO);
+				clientOAGService.reglaEscenarioDinamico(wrapperReglaEscenarioDinamico);
+			} catch (Exception e) {
+				log.error("Exception: {}", e);
+
+				InternalServerError is = new InternalServerError();
+				is.setCodigo(Common.ERROR_SERVER);
+				is.setMensaje(Common.ERROR_SERVER_MSG);
+				return new ResponseEntity<InternalServerError>(is, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
 			response.addAll(lstPartidaPrecioValorMonte);
 			return new ResponseEntity<SimularEscenarioDinamicoRes>(response, HttpStatus.OK);
-    	}
-		BadRequest badRequest=new BadRequest();
+		}
+		
+		BadRequest badRequest = new BadRequest();
 		badRequest.setCodigo(Common.ERROR_CODE);
 		badRequest.setMensaje(Common.ERROR_MENSAJE);
-        return new ResponseEntity<BadRequest>(badRequest,HttpStatus.BAD_REQUEST);
-    }
+		return new ResponseEntity<BadRequest>(badRequest, HttpStatus.BAD_REQUEST);
+	}
 }
-
