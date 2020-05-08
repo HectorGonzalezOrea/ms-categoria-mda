@@ -54,6 +54,9 @@ import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INTERN
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_CODE_BAD_REQUEST;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_BAD_REQUEST;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.SUCCESS_MESSAGE_OK;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.STATUS_MESSAGE_MONEDA;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.STATUS_MESSAGE_REGLA;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.CODE_MESSAGE_NOT_FOUND_REGLA;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INTERNAL_SERVER_ERROR_NO_GENERIC;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-20T16:07:47.599Z")
@@ -449,7 +452,7 @@ public class EscenariosApiController implements EscenariosApi {
 				}else {
 					Boolean insertado = escenariosService.registrarMonedas(peticion);
 					if (insertado) {
-						gr.setMessage("Regla almacenada exitosamente");
+						gr.setMessage(STATUS_MESSAGE_MONEDA);
                 		return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK);
 					}
 					
@@ -511,7 +514,7 @@ public class EscenariosApiController implements EscenariosApi {
             		log.info("Peticion : {}", peticion.toString());
             		Boolean actualizado = gestionEscenarioService.actualizaEstatus(peticion);
             		GeneralResponse gr = new GeneralResponse ();
-            		gr.setMessage("Regla actualizada exitosamente");
+            		gr.setMessage(STATUS_MESSAGE_REGLA);
             		return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK);
             	}else {
             		BadRequest br = new BadRequest();
@@ -598,8 +601,8 @@ public class EscenariosApiController implements EscenariosApi {
             } catch (Exception e) {
             	log.error("Couldn't serialize response for content type application/json", e);
 				InternalServerError ie = new InternalServerError();
-				ie.setCode("NMP-MDA-500");
-				ie.setMessage("Error interno del servidor");
+				ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
+				ie.setMessage(ERROR_MESSAGE_INTERNAL_SERVER_ERROR_NO_GENERIC);
 				
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -647,7 +650,7 @@ public class EscenariosApiController implements EscenariosApi {
             			log.info("No hubo coincidencias");
             			BadRequest bd=new BadRequest();
             			bd.setCode("NMP-MDA-404");
-            			bd.setMessage("No se encontro el idRegla");
+            			bd.setMessage(CODE_MESSAGE_NOT_FOUND_REGLA);
             			return new ResponseEntity<BadRequest>(bd,HttpStatus.NOT_FOUND);
             		}
             	}
