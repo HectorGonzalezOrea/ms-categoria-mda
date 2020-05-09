@@ -15,6 +15,7 @@ import static mx.com.nmp.gestionescenarios.utils.Constantes.ID_ESCENARIO_MONEDA_
 
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,7 +31,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.threeten.bp.LocalDate;
+
 
 import mx.com.nmp.gestionescenarios.model.InternalServerError;
 import mx.com.nmp.gestionescenarios.model.ListaMonedas;

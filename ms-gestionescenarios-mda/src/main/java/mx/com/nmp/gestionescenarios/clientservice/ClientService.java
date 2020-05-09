@@ -30,6 +30,7 @@ import mx.com.nmp.gestionescenarios.model.client.dto.RequestInformacionEscenario
 import mx.com.nmp.gestionescenarios.utils.Constantes;
 import mx.com.nmp.gestionescenarios.utils.PropertiesVaribles;
 import mx.com.nmp.gestionescenarios.vo.AnclaOroDolarVO;
+import mx.com.nmp.gestionescenarios.vo.GestionMonedasVO;
 import mx.com.nmp.gestionescenarios.vo.ResponseClientVO;
 import mx.com.nmp.gestionescenarios.vo.ResponseEscenarioVO;
 
@@ -129,6 +130,31 @@ public class ClientService {
 			}
 		}
 		return respuesta;
+	}
+	
+	public void enviarValoresMonedas(List<GestionMonedasVO> request) {
+		log.info("::: Entrando al método enviarValoresMonedas :::");
+		String jsonRequest=new Gson().toJson(request);
+		log.info("Request ::: "+jsonRequest);
+		RestTemplate restTemplate = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add(Constantes.HEADER_ORIGEN, properties.getOrigen());
+		headers.add(Constantes.HEADER_DESTINO, properties.getDestino());
+		headers.add(Constantes.HEADER_APIKEY_KEY, properties.getClientIdMonedas());
+		List<MediaType> acceptableMediaTypes= new ArrayList<MediaType>();
+		acceptableMediaTypes.add(MediaType.APPLICATION_JSON);
+		headers.setAccept(acceptableMediaTypes);
+		headers.add(Constantes.HEADER_USUARIO, properties.getUsuario());
+		HttpEntity<String> entity = new HttpEntity<>(jsonRequest,headers);
+		ResponseEntity<String> response = restTemplate.postForEntity(properties.getUrlMonedas()+properties.getEndPointMonedas(),entity,String.class);
+		if(response.getStatusCode()==HttpStatus.OK) {
+			if(response.getBody() !=null) {
+				log.info("La respuesta "+response.getBody());
+			}
+		}
+		
+		
 	}
 
 

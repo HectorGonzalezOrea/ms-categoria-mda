@@ -32,6 +32,13 @@ public class PropertiesVaribles {
 	@Value("${ancla.dolar.resource.header.clientId}")
 	private String clientIdAnclaDolar;
 	
+	@Value("${monedas.resource.base_url}")
+	private String urlMonedas;
+	@Value("${monedas.resource.ednpointmonedas}")
+	private String endPointMonedas;
+	@Value("${monedas.resource.header_clientId}")
+	private String clientIdMonedas;
+	
 	
 	public String getOrigen() {
 		return origen;
@@ -74,5 +81,14 @@ public class PropertiesVaribles {
 	}
 	public String getClientIdAnclaDolar() {
 		return clientIdAnclaDolar;
+	}
+	public String getUrlMonedas() {
+		return urlMonedas;
+	}
+	public String getEndPointMonedas() {
+		return endPointMonedas;
+	}
+	public String getClientIdMonedas() {
+		return clientIdMonedas;
 	}
 }

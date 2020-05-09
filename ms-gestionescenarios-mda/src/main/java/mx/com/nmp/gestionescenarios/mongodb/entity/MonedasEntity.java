@@ -2,10 +2,12 @@ package mx.com.nmp.gestionescenarios.mongodb.entity;
 
 
 
+import java.time.LocalDate;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.threeten.bp.LocalDate;
+
 
 
 @Document(collection = "gestion-monedas")

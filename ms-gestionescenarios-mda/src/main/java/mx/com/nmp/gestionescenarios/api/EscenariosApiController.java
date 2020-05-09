@@ -44,8 +44,10 @@ import mx.com.nmp.gestionescenarios.model.client.dto.RequestInformacionEscenario
 import mx.com.nmp.gestionescenarios.mongodb.service.GestionEscenarioService;
 import mx.com.nmp.gestionescenarios.service.AnclOroDolarService;
 import mx.com.nmp.gestionescenarios.service.EscenariosService;
+import mx.com.nmp.gestionescenarios.service.GestionMonedasService;
 import mx.com.nmp.gestionescenarios.utils.Constantes;
 import mx.com.nmp.gestionescenarios.vo.AnclaOroDolarVO;
+import mx.com.nmp.gestionescenarios.vo.GestionMonedasVO;
 import mx.com.nmp.gestionescenarios.vo.GestionReglasVO;
 import mx.com.nmp.gestionescenarios.vo.ResponseClientVO;
 import mx.com.nmp.gestionescenarios.model.InternalServerError;
@@ -88,6 +90,8 @@ public class EscenariosApiController implements EscenariosApi {
     private ClientService clientService;
     @Autowired
     private AnclOroDolarService  anclaOroDolarService;
+    @Autowired
+    private GestionMonedasService gestionService;
 
     @org.springframework.beans.factory.annotation.Autowired
     public EscenariosApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -510,8 +514,8 @@ public class EscenariosApiController implements EscenariosApi {
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
         	ResponseClientVO  clientVO= new ResponseClientVO();
         	GeneralResponse response=new GeneralResponse();
+        	try {
         	switch (peticion.getId()) {
-        	
 			case Constantes.ESCENARIO_CONSOLIDADOS:
 				log.info("Entrando al case "+ Constantes.ESCENARIO_CONSOLIDADOS);
 				clientVO=clientService.enviarConsolidados(peticion.getFecha());
@@ -546,17 +550,34 @@ public class EscenariosApiController implements EscenariosApi {
 				}
 				response.setMessage(Constantes.SUCCESS_MESSAGE_OK);
 				break;
+			case Constantes.ESCENARIO_MONEDAS_CON_ORO:
+				Boolean oro=true;
+				List<GestionMonedasVO> lstMonedasConOro=gestionService.obtenerValoresMonedas(oro);
+				clientService.enviarValoresMonedas(lstMonedasConOro);
+				response.setMessage(Constantes.SUCCESS_MESSAGE_OK);
+				break;
+			case Constantes.ESCENARIO_MONEDAS_SIN_ORO:
+				oro=false;
+				List<GestionMonedasVO> lstMonedasSinOro=gestionService.obtenerValoresMonedas(oro);
+				clientService.enviarValoresMonedas(lstMonedasSinOro);
+				response.setMessage(Constantes.SUCCESS_MESSAGE_OK);
+				break;
 			}
         	
+        	}catch (Exception e) {
+        		InternalServerError is = new InternalServerError();
+        		is.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
+        		is.message(ERROR_MESSAGE_INTERNAL_SERVER_ERROR);
+				return new ResponseEntity<InternalServerError>(is, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
         	return new ResponseEntity<GeneralResponse>(response,HttpStatus.OK);
         }
-
-        return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
+        BadRequest badRequest= new BadRequest();
+        badRequest.setCode(ERROR_CODE_BAD_REQUEST);
+        badRequest.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+        return new ResponseEntity<BadRequest>(badRequest,HttpStatus.BAD_REQUEST);
     }
-
-    /*
-     * 
-     */
+    
     public ResponseEntity<?> escenariosReglasEstatusPut(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody EstatusRegla peticion) {
         
     	log.info("*************************************************************");

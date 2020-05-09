@@ -2,6 +2,7 @@ package mx.com.nmp.gestionescenarios.mongodb.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
-import org.threeten.bp.LocalDate;
+
 
 import mx.com.nmp.gestionescenarios.mongodb.service.SequenceGeneratorService;
 import mx.com.nmp.gestionescenarios.vo.GestionReglasVO;

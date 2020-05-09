@@ -147,7 +147,12 @@ public class CastObjectGeneric {
 
 	public  String convertLocalDateToString(LocalDate fecha) {
 		String string = fecha.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-		System.out.println("El formato de fecha es "+string);
+		return string;
+	}
+	
+	
+	public  String formatLocalDate(LocalDate fecha) {
+		String string = fecha.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 		return string;
 	}
 	
