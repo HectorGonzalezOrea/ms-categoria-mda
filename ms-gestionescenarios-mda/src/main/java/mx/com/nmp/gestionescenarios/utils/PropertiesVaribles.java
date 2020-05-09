@@ -25,6 +25,14 @@ public class PropertiesVaribles {
 	@Value("${escenario.dinamico.resource.header.clientId}")
 	private String clientIdEscenarioDinamico;
 	
+	@Value("${ancla.dolar.resource.base_url}")
+	private String urlAnclaOro;
+	@Value("${ancla.dolar.resource.endPointancladolar}")
+	private String endPointAnclaDolar;
+	@Value("${ancla.dolar.resource.header.clientId}")
+	private String clientIdAnclaDolar;
+	
+	
 	public String getOrigen() {
 		return origen;
 	}
@@ -57,5 +65,14 @@ public class PropertiesVaribles {
 	}
 	public void setUrlService(String urlService) {
 		this.urlService = urlService;
+	}
+	public String getUrlAnclaOro() {
+		return urlAnclaOro;
+	}
+	public String getEndPointAnclaDolar() {
+		return endPointAnclaDolar;
+	}
+	public String getClientIdAnclaDolar() {
+		return clientIdAnclaDolar;
 	}
 }

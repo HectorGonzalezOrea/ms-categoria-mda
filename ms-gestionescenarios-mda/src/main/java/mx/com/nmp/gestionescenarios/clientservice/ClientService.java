@@ -29,6 +29,7 @@ import mx.com.nmp.gestionescenarios.cast.CastObjectGeneric;
 import mx.com.nmp.gestionescenarios.model.client.dto.RequestInformacionEscenarioDto;
 import mx.com.nmp.gestionescenarios.utils.Constantes;
 import mx.com.nmp.gestionescenarios.utils.PropertiesVaribles;
+import mx.com.nmp.gestionescenarios.vo.AnclaOroDolarVO;
 import mx.com.nmp.gestionescenarios.vo.ResponseClientVO;
 import mx.com.nmp.gestionescenarios.vo.ResponseEscenarioVO;
 
@@ -105,7 +106,30 @@ public class ClientService {
 		return vo;
 	}
 	
-	
+	public String  enviarValoresAncla(AnclaOroDolarVO request) {
+		log.info("::: Entrado al método enviarValoresAncla :::");
+		String respuesta=null;
+		String jsonRequest=new Gson().toJson(request);
+		RestTemplate restTemplate = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add(Constantes.HEADER_ORIGEN, properties.getOrigen());
+		headers.add(Constantes.HEADER_DESTINO, properties.getDestino());
+		headers.add(Constantes.HEADER_APIKEY_KEY, properties.getClientIdAnclaDolar());
+		List<MediaType> acceptableMediaTypes= new ArrayList<MediaType>();
+		acceptableMediaTypes.add(MediaType.APPLICATION_JSON);
+		headers.setAccept(acceptableMediaTypes);
+		headers.add(Constantes.HEADER_USUARIO, properties.getUsuario());
+		HttpEntity<String> entity = new HttpEntity<>(jsonRequest,headers);
+		ResponseEntity<String> response = restTemplate.postForEntity(properties.getUrlAnclaOro()+properties.getEndPointAnclaDolar(),entity,String.class);
+		if(response.getStatusCode()==HttpStatus.OK) {
+			if(response.getBody() !=null) {
+				respuesta=response.getBody();
+				log.info("response "+response.getBody());
+			}
+		}
+		return respuesta;
+	}
 
 
 }

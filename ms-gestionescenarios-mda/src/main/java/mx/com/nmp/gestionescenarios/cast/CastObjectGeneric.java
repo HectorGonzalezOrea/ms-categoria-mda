@@ -2,9 +2,11 @@ package mx.com.nmp.gestionescenarios.cast;
 
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,6 +18,7 @@ import com.google.gson.GsonBuilder;
 
 import mx.com.nmp.gestionescenarios.model.InfoGeneralReglaCanalComercializacion;
 import mx.com.nmp.gestionescenarios.model.InfoRegla;
+import mx.com.nmp.gestionescenarios.vo.AnclaOroDolarVO;
 import mx.com.nmp.gestionescenarios.vo.CommonVO;
 import mx.com.nmp.gestionescenarios.vo.GestionReglasVO;
 
@@ -139,10 +142,18 @@ public class CastObjectGeneric {
 		}
 		return vo;
 	}
+	
+
 
 	public  String convertLocalDateToString(LocalDate fecha) {
 		String string = fecha.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 		System.out.println("El formato de fecha es "+string);
 		return string;
+	}
+	
+	public String covertDateToEstring (Date fecha) {
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		String fechaStr=format.format(fecha);
+		return fechaStr;
 	}
 }
