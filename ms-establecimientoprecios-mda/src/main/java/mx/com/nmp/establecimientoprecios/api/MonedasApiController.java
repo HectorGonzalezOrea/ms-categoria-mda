@@ -55,9 +55,13 @@ public class MonedasApiController implements MonedasApi {
 		this.request = request;
 	}
 
+	/*
+	 * Actualizar la configuración de Monedas
+	 */
 	public ResponseEntity<?> monedasPatch(
 			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = "Cuerpo de la petición", required = true) @Valid @RequestBody ListaMonedas peticion) {
+		
 		log.info("Actualizar la configuración de Monedas");
 
 		String accept = request.getHeader(HEADER_ACCEPT_KEY);
@@ -120,6 +124,9 @@ public class MonedasApiController implements MonedasApi {
 		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 	}
 
+	/*
+	 * Almacenar configuración de Monedas
+	 */
 	public ResponseEntity<?> monedasPost(
 			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = "Cuerpo de la petición", required = true) @Valid @RequestBody ListaMonedas peticion) {

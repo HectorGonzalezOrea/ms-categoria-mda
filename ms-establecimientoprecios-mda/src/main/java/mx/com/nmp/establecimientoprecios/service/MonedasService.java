@@ -40,7 +40,7 @@ private static final Logger log = LoggerFactory.getLogger(MonedasService.class);
 			
 			if(Boolean.TRUE.equals(insertado)) {
 				gr = new GeneralResponse();
-				gr.setMessage("Alta exitosa.");
+				gr.setMessage("Ajuste exitosa.");
 			}
 		}
 		

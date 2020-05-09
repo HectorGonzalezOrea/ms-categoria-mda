@@ -127,7 +127,7 @@ public class OAGController extends OAGBaseController {
 	
 	@PostMapping(path = "/actualizarMonedas")
 	public Boolean actualizarMonedas() {
-		log.info("valorAncla");
+		log.info("actualizarMonedas");
 		
 		Boolean insertado = true;
 		
@@ -136,7 +136,7 @@ public class OAGController extends OAGBaseController {
 	
 	@PostMapping(path = "/almacenarMonedas")
 	public Boolean almacenarMonedas() {
-		log.info("valorAncla");
+		log.info("almacenarMonedas");
 		
 		Boolean insertado = true;
 		
