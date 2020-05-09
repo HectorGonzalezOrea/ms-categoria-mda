@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.ApiParam;
+import mx.com.nmp.gestionescenarios.cast.CastObjectGeneric;
 import mx.com.nmp.gestionescenarios.clientservice.ClientService;
 import mx.com.nmp.gestionescenarios.model.BadRequest;
 import mx.com.nmp.gestionescenarios.model.Bolsa;
@@ -39,9 +40,11 @@ import mx.com.nmp.gestionescenarios.model.ListaMonedas;
 import mx.com.nmp.gestionescenarios.model.ListaMonedasInner;
 import mx.com.nmp.gestionescenarios.model.ModificarValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.model.ValorAnclaOroDolar;
+import mx.com.nmp.gestionescenarios.model.client.dto.RequestInformacionEscenarioDto;
 import mx.com.nmp.gestionescenarios.mongodb.service.GestionEscenarioService;
 import mx.com.nmp.gestionescenarios.service.EscenariosService;
 import mx.com.nmp.gestionescenarios.utils.Constantes;
+import mx.com.nmp.gestionescenarios.vo.GestionReglasVO;
 import mx.com.nmp.gestionescenarios.vo.ResponseClientVO;
 import mx.com.nmp.gestionescenarios.model.InternalServerError;
 import mx.com.nmp.gestionescenarios.model.InvalidAuthentication;
@@ -487,7 +490,7 @@ public class EscenariosApiController implements EscenariosApi {
     	log.info("*************************************************************");
 		log.info("escenariosPost");
 		log.info("*************************************************************");
-		
+		CastObjectGeneric cast= new CastObjectGeneric();
     	//GeneralResponse
 		String apiKey = request.getHeader(HEADER_APIKEY_KEY);
     	if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
@@ -511,6 +514,18 @@ public class EscenariosApiController implements EscenariosApi {
 				response.setMessage(Constantes.SUCCESS_MESSAGE_OK);
 				break;
 			case Constantes.ESCENARIO_DINAMICOS:
+				//
+				log.info("Entrando al case "+ Constantes.ESCENARIO_DINAMICOS);
+				List<GestionReglasVO>lstInfoReglas =gestionEscenarioService.obtenerReglasByFechas(peticion.getFecha());
+				if(!lstInfoReglas.isEmpty()) {
+					lstInfoReglas.stream().forEach(vo->{
+						RequestInformacionEscenarioDto requestInformacion= new RequestInformacionEscenarioDto();
+						requestInformacion.setInfoRegla(cast.formatInformacionEscenario(vo));
+						clientService.enviarInformacionReglaEscenario(requestInformacion);
+
+					});
+					response.setMessage(Constantes.SUCCESS_MESSAGE_OK);
+				}
 				break;
 			}
         	

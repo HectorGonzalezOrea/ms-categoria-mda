@@ -2,6 +2,8 @@ package mx.com.nmp.gestionescenarios.cast;
 
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +16,6 @@ import com.google.gson.GsonBuilder;
 
 import mx.com.nmp.gestionescenarios.model.InfoGeneralReglaCanalComercializacion;
 import mx.com.nmp.gestionescenarios.model.InfoRegla;
-import mx.com.nmp.gestionescenarios.vo.CanalComercializacionVO;
 import mx.com.nmp.gestionescenarios.vo.CommonVO;
 import mx.com.nmp.gestionescenarios.vo.GestionReglasVO;
 
@@ -66,7 +67,6 @@ public class CastObjectGeneric {
 	private String objectToJson(Object obj) {
 		Gson gson = new Gson();
 		String json=gson.toJson(obj);
-		System.out.println("El json es "+json);
 		return json;
 	}
 	
@@ -99,9 +99,9 @@ public class CastObjectGeneric {
 		return lstObject;
 	}
 	
-	public List<CanalComercializacionVO> entityListToListCanalPojo(List<InfoGeneralReglaCanalComercializacion> lstCanalComercializacion){
-		CanalComercializacionVO vo = new CanalComercializacionVO();
-		List<CanalComercializacionVO> lstVO= new ArrayList<CanalComercializacionVO>();
+	public List<InfoGeneralReglaCanalComercializacion> entityListToListCanalPojo(List<InfoGeneralReglaCanalComercializacion> lstCanalComercializacion){
+		InfoGeneralReglaCanalComercializacion vo = new InfoGeneralReglaCanalComercializacion();
+		List<InfoGeneralReglaCanalComercializacion> lstVO= new ArrayList<InfoGeneralReglaCanalComercializacion>();
 		lstCanalComercializacion.stream().forEach(entity->{
 			vo.setIdCanal(entity.getIdCanal());
 			vo.setCanal(entity.getCanal());
@@ -140,4 +140,9 @@ public class CastObjectGeneric {
 		return vo;
 	}
 
+	public  String convertLocalDateToString(LocalDate fecha) {
+		String string = fecha.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+		System.out.println("El formato de fecha es "+string);
+		return string;
+	}
 }

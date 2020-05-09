@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDate;
 
 import mx.com.nmp.gestionescenarios.mongodb.service.SequenceGeneratorService;
+import mx.com.nmp.gestionescenarios.vo.GestionReglasVO;
+import mx.com.nmp.gestionescenarios.cast.CastObjectGeneric;
 import mx.com.nmp.gestionescenarios.model.EstatusRegla;
 import mx.com.nmp.gestionescenarios.model.InfoGeneralRegla;
 import mx.com.nmp.gestionescenarios.model.InfoRegla;
@@ -1020,6 +1022,44 @@ public class GestionEscenarioService {
 		}
 		
 		return procesado;
+	}
+	
+	public List<GestionReglasVO> obtenerReglasByFechas(java.time.LocalDate fecha){
+		log.info("Consultando las reglas por fecha");
+		CastObjectGeneric cast= new CastObjectGeneric();
+		List<GestionEscenarioEntity>lstEscenarioEntity=escenariosRepository.lstEscenarios(cast.convertLocalDateToString(fecha));
+		List<GestionReglasVO> gestionLst= new ArrayList<GestionReglasVO>();
+		if(!lstEscenarioEntity.isEmpty()) {
+			lstEscenarioEntity.stream().forEach(entity->{
+				GestionReglasVO vo= new GestionReglasVO();
+				 vo.setId(entity.getIdRegla());
+				 vo.setNombre(entity.getNombre());
+				 vo.setOrigen(entity.getOrigen());
+				 vo.setRamo(cast.objectToPojoVO(entity.getRamo()));
+				 vo.setSubramo(cast.convertObjectToPojo(entity.getSubramo()));
+				 vo.setFactor(cast.convertObjectToPojo(entity.getFactor()));
+				 vo.setClasificacionClientes(cast.convertObjectToPojo(entity.getClasificacionClientes()));
+				 vo.setBolsas(entity.getBolsas());
+				 vo.setSucursales(cast.convertObjectToPojo(entity.getSucursales()));
+				 vo.setCanalComercializacion(cast.entityListToListCanalPojo(entity.getCanalComercializacion()));
+				 vo.setFechaAplicacion(entity.getFechaAplicacion());
+				 vo.setFechas(entity.getFechas());
+				 vo.setEstatus(entity.getEstatus());
+				 vo.setCompraCumplido(entity.getCompraCumplido());
+				 vo.setAforo(entity.getAforo());
+				 vo.setEstatusPartida(entity.getEstatusPartida());
+				 vo.setMonedas(cast.convertObjectToPojo(entity.getMonedas()));
+				 vo.setCanalIngresoActual(entity.getCanalIngresoActual());
+				 vo.setDiasAlmoneda(entity.getDiasAlmoneda());
+				 vo.setNivelAgrupacion(entity.getNivelAgrupacion());
+				 vo.setReglasDescuento(entity.getReglasDescuento());
+				 vo.setCandadoInferior(entity.getCandadoInferior());
+				 gestionLst.add(vo);
+				
+			});
+		}
+		log.info("El tamaño de la lista es "+gestionLst.size());
+		return gestionLst;
 	}
 	
 }
