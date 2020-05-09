@@ -23,7 +23,7 @@ private static final Logger log = LoggerFactory.getLogger(MonedasService.class);
 		
 		Boolean insertado = oagController.almacenarMonedas();
 		
-		if(insertado) {
+		if(Boolean.TRUE.equals(insertado)) {
 			gr = new GeneralResponse();
 			gr.setMessage("Alta exitosa.");
 		}
@@ -38,7 +38,7 @@ private static final Logger log = LoggerFactory.getLogger(MonedasService.class);
 		if(monedas != null) {
 			Boolean insertado = oagController.actualizarMonedas();
 			
-			if(insertado) {
+			if(Boolean.TRUE.equals(insertado)) {
 				gr = new GeneralResponse();
 				gr.setMessage("Alta exitosa.");
 			}
