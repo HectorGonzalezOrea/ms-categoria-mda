@@ -42,8 +42,10 @@ import mx.com.nmp.gestionescenarios.model.ModificarValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.model.ValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.model.client.dto.RequestInformacionEscenarioDto;
 import mx.com.nmp.gestionescenarios.mongodb.service.GestionEscenarioService;
+import mx.com.nmp.gestionescenarios.service.AnclOroDolarService;
 import mx.com.nmp.gestionescenarios.service.EscenariosService;
 import mx.com.nmp.gestionescenarios.utils.Constantes;
+import mx.com.nmp.gestionescenarios.vo.AnclaOroDolarVO;
 import mx.com.nmp.gestionescenarios.vo.GestionReglasVO;
 import mx.com.nmp.gestionescenarios.vo.ResponseClientVO;
 import mx.com.nmp.gestionescenarios.model.InternalServerError;
@@ -84,6 +86,8 @@ public class EscenariosApiController implements EscenariosApi {
     private EscenariosService escenariosService;
     @Autowired
     private ClientService clientService;
+    @Autowired
+    private AnclOroDolarService  anclaOroDolarService;
 
     @org.springframework.beans.factory.annotation.Autowired
     public EscenariosApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -514,7 +518,6 @@ public class EscenariosApiController implements EscenariosApi {
 				response.setMessage(Constantes.SUCCESS_MESSAGE_OK);
 				break;
 			case Constantes.ESCENARIO_DINAMICOS:
-				//
 				log.info("Entrando al case "+ Constantes.ESCENARIO_DINAMICOS);
 				List<GestionReglasVO>lstInfoReglas =gestionEscenarioService.obtenerReglasByFechas(peticion.getFecha());
 				if(!lstInfoReglas.isEmpty()) {
@@ -526,6 +529,22 @@ public class EscenariosApiController implements EscenariosApi {
 					});
 					response.setMessage(Constantes.SUCCESS_MESSAGE_OK);
 				}
+				break;
+			case Constantes.ESCENARIO_VALOR_ANCLA:
+				log.info("Entrando al case "+ Constantes.ESCENARIO_VALOR_ANCLA);
+				List<AnclaOroDolarVO> lstVO=anclaOroDolarService.obtenerValoresAncla(peticion.getFecha());
+				if(!lstVO.isEmpty()) {
+					lstVO.stream().forEach(vo->{
+						AnclaOroDolarVO anclaVo= new AnclaOroDolarVO();
+						anclaVo.setValorAnclaOro(vo.getValorAnclaOro());
+						anclaVo.setValorAnclaDolar(vo.getValorAnclaDolar());
+						anclaVo.setFechaAplicacion(vo.getFechaAplicacion());
+						anclaVo.setIdBolsa(vo.getIdBolsa());
+						anclaVo.setSucursales(vo.getSucursales());
+						clientService.enviarValoresAncla(vo);
+					});
+				}
+				response.setMessage(Constantes.SUCCESS_MESSAGE_OK);
 				break;
 			}
         	
