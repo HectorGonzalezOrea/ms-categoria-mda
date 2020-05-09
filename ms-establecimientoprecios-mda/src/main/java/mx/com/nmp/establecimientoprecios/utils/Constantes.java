@@ -15,5 +15,18 @@ public final class Constantes {
 	public static final String GRANT_TYPE = "grant_type";
 	public static final String SCOPE = "scope";
 	
+	public static final String ERROR_CODE_BAD_REQUEST = "NMP-MDA-400";
+	public static final String ERROR_MESSAGE_BAD_REQUEST_0 = "El cuerpo de la petición no está bien formado, verifique su información.";
+	public static final String ERROR_MESSAGE_BAD_REQUEST_1 = "El cuerpo de la petición no está bien formado, verifique su información: ";
+	public static final String ERROR_MESSAGE_BAD_REQUEST_2 = "El cuerpo de la petición no está bien formado, verifique sus parametros: ";
+
+	public static final String ERROR_CODE_INVALID_AUTHENTICATION = "NMP-MDA-401";
+	public static final String ERROR_MESSAGE_INVALID_AUTHENTICATION = "Se ha producido un error de autorización. No se recibio un APIKEY valido.";
+	
+	public static final String ERROR_CODE_INTERNAL_SERVER = "NMP-MDA-500";
+	public static final String ERROR_MESSAGE_INTERNAL_SERVER = "NMP-MDA-500";
+	
+	public static final String MESSAGE_SUCCESS = "Alta exitosa.";
+	
 	public static final int STATUS_CODE_OK = 200;
 }

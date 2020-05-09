@@ -3,6 +3,14 @@ package mx.com.nmp.establecimientoprecios.api;
 import static mx.com.nmp.establecimientoprecios.utils.Constantes.HEADER_ACCEPT_KEY;
 import static mx.com.nmp.establecimientoprecios.utils.Constantes.HEADER_ACCEPT_VALUE;
 import static mx.com.nmp.establecimientoprecios.utils.Constantes.HEADER_APIKEY_KEY;
+import static mx.com.nmp.establecimientoprecios.utils.Constantes.ERROR_CODE_BAD_REQUEST;
+import static mx.com.nmp.establecimientoprecios.utils.Constantes.ERROR_MESSAGE_BAD_REQUEST_0;
+import static mx.com.nmp.establecimientoprecios.utils.Constantes.ERROR_MESSAGE_BAD_REQUEST_1;
+import static mx.com.nmp.establecimientoprecios.utils.Constantes.ERROR_MESSAGE_BAD_REQUEST_2;
+import static mx.com.nmp.establecimientoprecios.utils.Constantes.ERROR_CODE_INTERNAL_SERVER;
+import static mx.com.nmp.establecimientoprecios.utils.Constantes.ERROR_MESSAGE_INTERNAL_SERVER;
+import static mx.com.nmp.establecimientoprecios.utils.Constantes.ERROR_CODE_INVALID_AUTHENTICATION;
+import static mx.com.nmp.establecimientoprecios.utils.Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -50,8 +58,9 @@ public class AnclaApiController implements AnclaApi {
 
     public ResponseEntity<?> anclaOroDolarPost(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,
     											@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody ModificarValorAnclaOroDolar peticion) {
-    	log.info("Solicitar cambio de valores ancla para Oro y Dolar");
     	
+    	log.info("Solicitar cambio de valores ancla para Oro y Dolar");
+
     	String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
@@ -63,8 +72,8 @@ public class AnclaApiController implements AnclaApi {
             	if(apikey == null || apikey.trim().length()==0 ) {
             		
             		InvalidAuthentication ia = new InvalidAuthentication();
-            		ia.setCode("NMP-MDA-401");
-            		ia.setMessage("Se ha producido un error de autorización. No se recibio un APIKEY valido.");
+            		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
+            		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
             		log.error("Se ha producido un error de autorización. No se recibio un APIKEY valido. Valor recibido: {}", apikey);
             		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.FORBIDDEN);
             	}
@@ -72,8 +81,10 @@ public class AnclaApiController implements AnclaApi {
             	if(usuario == null || usuario.trim().length()==0) {
             		BadRequest bd = new BadRequest();
             		
-            		bd.setCode("NMP-MDA-400");
-            		bd.setMessage("El cuerpo de la petición no está bien formado, verifique su información: "+usuario);
+            		bd.setCode(ERROR_CODE_BAD_REQUEST);
+            		bd.setMessage(ERROR_MESSAGE_BAD_REQUEST_1 + usuario);
+            		
+            		log.error("{}", bd);
             		
             		return new ResponseEntity<BadRequest>(bd, HttpStatus.BAD_REQUEST);
             	}
@@ -81,32 +92,48 @@ public class AnclaApiController implements AnclaApi {
             	if(peticion == null || peticion.getFechaAplicacion() == null || peticion.getIdBolsa() == null || peticion.getValorAnclaDolar() == null || peticion.getValorAnclaOro() == null || peticion.getSucursales() == null) {
             		BadRequest bd = new BadRequest();
             		
-            		bd.setCode("NMP-MDA-400");
-            		bd.setMessage("El cuerpo de la petición no está bien formado, verifique sus parametros: "+peticion);
+            		bd.setCode(ERROR_CODE_BAD_REQUEST);
+            		bd.setMessage(ERROR_MESSAGE_BAD_REQUEST_2 + peticion);
+            		
+            		log.error("{}", bd);
             		
             		return new ResponseEntity<BadRequest>(bd, HttpStatus.BAD_REQUEST);
             	} else {
             		GeneralResponse resp = anclaService.ajusteValorAncla(peticion);
+            		
+            		log.info("{}", resp);
+            		
             		return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
             	}
             } catch (TablasReferenciaException e) {
             	log.error("Error al invocar los servicios de tablas de referencia", e);
             	BadRequest badRequest = new BadRequest();
-            	badRequest.setCode("NMP-MDA-400");
+            	badRequest.setCode(ERROR_CODE_BAD_REQUEST);
             	badRequest.setMessage(e.getMessage());
+            	
+            	log.error("{}", badRequest);
+            	
             	return new ResponseEntity<BadRequest>(badRequest, HttpStatus.BAD_REQUEST);
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 
                 InternalServerError ise = new InternalServerError();
-                ise.setCode("NMP-MDA-500");
-                ise.setMessage("Error interno del servidor. Falla de comunicación.");
+                ise.setCode(ERROR_CODE_INTERNAL_SERVER);
+                ise.setMessage(ERROR_MESSAGE_INTERNAL_SERVER);
+                
+                log.error("{}", ise);
                 
                 return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
-        return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
+        BadRequest badRequest = new BadRequest();
+    	badRequest.setCode(ERROR_CODE_BAD_REQUEST);
+    	badRequest.setMessage(ERROR_MESSAGE_BAD_REQUEST_0);
+    	
+    	log.error("{}", badRequest);
+    	
+    	return new ResponseEntity<BadRequest>(badRequest, HttpStatus.BAD_REQUEST);
     }
 
 }

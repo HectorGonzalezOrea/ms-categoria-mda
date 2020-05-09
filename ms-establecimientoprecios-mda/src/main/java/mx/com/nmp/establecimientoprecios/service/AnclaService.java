@@ -32,6 +32,8 @@ import mx.com.nmp.ms.sivad.referencia.adminapi.ws.ReferenciaValorAnclaOroService
 import mx.com.nmp.ms.sivad.referencia.ws.oro.datatypes.ValorAnclaOroSucursal;
 import mx.com.nmp.ms.sivad.referencia.ws.oro.datatypes.ValorAnclaOroSucursalRequest;
 
+import static mx.com.nmp.establecimientoprecios.utils.Constantes.MESSAGE_SUCCESS;
+
 @Service
 public class AnclaService {
 
@@ -70,7 +72,7 @@ public class AnclaService {
 		GeneralResponse gr = new GeneralResponse();
 		
 		if(valorAncla != null && ajusteValorAnclaOro(valorAncla) && ajusteValorAnclaDolar(valorAncla)) {
-			gr.setMessage("Alta exitosa. ajusteValorAncla oro y dolar ");
+			gr.setMessage(MESSAGE_SUCCESS);
 		} else {
 			throw new TablasReferenciaException("Parametros nulos o invalidos al envocar el ajuste de valor ancla. Parametros: " + valorAncla);
 		}
@@ -115,7 +117,6 @@ public class AnclaService {
 				
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			log.error("error al ajustar el valor ancla oro ",e);
 			throw new TablasReferenciaException("error al ajustar el valor ancla oro ",e);
 		}
@@ -181,7 +182,6 @@ public class AnclaService {
 			}
 		
 		} catch (Exception e) {
-			e.printStackTrace();
 			log.error("error al ajustar el valor ancla dolar ",e);
 			throw new TablasReferenciaException("error al ajustar el valor ancla dolar ",e);
 		}
