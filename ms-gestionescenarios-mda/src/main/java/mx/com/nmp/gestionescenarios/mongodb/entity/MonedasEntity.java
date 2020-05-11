@@ -25,6 +25,7 @@ public class MonedasEntity {
 	private LocalDate fechaModificacion;
 	private String actualizadoPor;
 	private Integer requestId;
+	private LocalDate fechaAplicacion;
 	
 	
 	public Long getId() {
@@ -74,6 +75,12 @@ public class MonedasEntity {
 	}
 	public void setRequestId(Integer requestId) {
 		this.requestId = requestId;
+	}
+	public LocalDate getFechaAplicacion() {
+		return fechaAplicacion;
+	}
+	public void setFechaAplicacion(LocalDate fechaAplicacion) {
+		this.fechaAplicacion = fechaAplicacion;
 	}
 	
 	

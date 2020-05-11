@@ -1,6 +1,7 @@
 package mx.com.nmp.gestionescenarios.api;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -552,13 +553,13 @@ public class EscenariosApiController implements EscenariosApi {
 				break;
 			case Constantes.ESCENARIO_MONEDAS_CON_ORO:
 				Boolean oro=true;
-				List<GestionMonedasVO> lstMonedasConOro=gestionService.obtenerValoresMonedas(oro);
+				List<GestionMonedasVO> lstMonedasConOro=gestionService.obtenerValoresMonedas(oro,peticion.getFecha());
 				clientService.enviarValoresMonedas(lstMonedasConOro);
 				response.setMessage(Constantes.SUCCESS_MESSAGE_OK);
 				break;
 			case Constantes.ESCENARIO_MONEDAS_SIN_ORO:
 				oro=false;
-				List<GestionMonedasVO> lstMonedasSinOro=gestionService.obtenerValoresMonedas(oro);
+				List<GestionMonedasVO> lstMonedasSinOro=gestionService.obtenerValoresMonedas(oro,peticion.getFecha());
 				clientService.enviarValoresMonedas(lstMonedasSinOro);
 				response.setMessage(Constantes.SUCCESS_MESSAGE_OK);
 				break;

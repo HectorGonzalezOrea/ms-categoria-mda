@@ -1,13 +1,18 @@
 package mx.com.nmp.gestionescenarios.service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+
 
 import mx.com.nmp.gestionescenarios.cast.CastObjectGeneric;
 import mx.com.nmp.gestionescenarios.mongodb.entity.MonedasEntity;
@@ -24,10 +29,15 @@ public class GestionMonedasService {
 	CastObjectGeneric cast= new CastObjectGeneric();
 	
 	//LocalDate fecha
-	public List<GestionMonedasVO> obtenerValoresMonedas(Boolean oro){
+	public List<GestionMonedasVO> obtenerValoresMonedas(Boolean oro,LocalDate fechaAplicacion){
 		log.info("::: Entrando al métod obtenerValoresMonedas :::");
-		List<MonedasEntity>lstMonedasEntity=gestionRepository.obtenerMonedas(oro);
 		List<GestionMonedasVO>lstMonedas= new ArrayList<GestionMonedasVO>();
+
+	    try {
+			Date fechaInicial=cast.resetTimeToDown(new SimpleDateFormat("yyyy-MM-dd").parse(fechaAplicacion.toString()));
+			Date fechaFin=cast.resetTimeToUp(new SimpleDateFormat("yyyy-MM-dd").parse(fechaAplicacion.toString()));
+		
+		List<MonedasEntity>lstMonedasEntity=gestionRepository.obtenerMonedas(oro,fechaInicial,fechaFin);
 		if(!lstMonedasEntity.isEmpty()) {
 			lstMonedasEntity.stream().forEach(entity->{
 				GestionMonedasVO vo= new GestionMonedasVO();
@@ -41,6 +51,9 @@ public class GestionMonedasService {
 				lstMonedas.add(vo);
 				}
 			});
+		}
+	    } catch (ParseException e) {
+			log.error("Error al parsear las fecjas {}" +e.getMessage());
 		}
 		log.info("Tamaño de la lista moneda ::: "+lstMonedas.size());
 		return lstMonedas;
