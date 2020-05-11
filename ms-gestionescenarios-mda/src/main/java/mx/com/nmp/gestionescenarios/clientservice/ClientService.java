@@ -132,8 +132,9 @@ public class ClientService {
 		return respuesta;
 	}
 	
-	public void enviarValoresMonedas(List<GestionMonedasVO> request) {
+	public String enviarValoresMonedas(List<GestionMonedasVO> request) {
 		log.info("::: Entrando al método enviarValoresMonedas :::");
+		String respuest=null;
 		String jsonRequest=new Gson().toJson(request);
 		log.info("Request ::: "+jsonRequest);
 		RestTemplate restTemplate = new RestTemplate();
@@ -150,10 +151,11 @@ public class ClientService {
 		ResponseEntity<String> response = restTemplate.postForEntity(properties.getUrlMonedas()+properties.getEndPointMonedas(),entity,String.class);
 		if(response.getStatusCode()==HttpStatus.OK) {
 			if(response.getBody() !=null) {
+				respuest=response.getBody();
 				log.info("La respuesta "+response.getBody());
 			}
 		}
-		
+		return respuest;
 		
 	}
 

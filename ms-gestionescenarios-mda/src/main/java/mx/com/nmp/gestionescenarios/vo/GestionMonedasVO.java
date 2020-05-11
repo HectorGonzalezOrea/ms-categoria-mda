@@ -11,6 +11,7 @@ public class GestionMonedasVO {
 	private String fechaCreacion;
 	private LocalDate fechaModificacion;
 	private String actualizadoPor;
+	private String fechaAplicacion;
 	
 	
 	public Long getId() {
@@ -55,6 +56,12 @@ public class GestionMonedasVO {
 	}
 	public void setActualizadoPor(String actualizadoPor) {
 		this.actualizadoPor = actualizadoPor;
+	}
+	public String getFechaAplicacion() {
+		return fechaAplicacion;
+	}
+	public void setFechaAplicacion(String fechaAplicacion) {
+		this.fechaAplicacion = fechaAplicacion;
 	}
 
 }

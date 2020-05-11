@@ -48,6 +48,7 @@ public class GestionMonedasService {
 				vo.setOro(entity.getOro());
 				vo.setFechaCreacion(cast.formatLocalDate(entity.getFechaCreacion()));
 				vo.setActualizadoPor(entity.getActualizadoPor());
+				vo.setFechaAplicacion(cast.formatLocalDate(entity.getFechaAplicacion()));
 				lstMonedas.add(vo);
 				}
 			});
