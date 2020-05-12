@@ -127,8 +127,6 @@ public class ConsolidadoService {
 			} catch (FileNotFoundException e) {
 				log.info("FileNotFoundException : {} ", e);
 			}
-			mongoTemplate.insert(consolidado);
-			insertado = true;
 		}
 
 		long fin = System.currentTimeMillis();
