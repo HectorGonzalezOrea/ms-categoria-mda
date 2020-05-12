@@ -50,7 +50,7 @@ public final class Constantes {
 	
 	public static final String FECHA_APLICACION = "fechaAplicacion";
 	
-	public static final String TMP = "tmp/";
+	public static final String TMP = "temp/docs";
 	public static final String SLASH = "/";
 	public static final String FORMATO_FECHA = "dd/MM/yyyy";
 	public static final String FORMATO_FECHA_HORA = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
