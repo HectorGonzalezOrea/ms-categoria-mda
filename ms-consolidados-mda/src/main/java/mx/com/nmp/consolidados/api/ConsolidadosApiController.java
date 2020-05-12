@@ -118,9 +118,12 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 				}
 				
-				if(new Integer(idArchivo) == modificarPosicionReq.getIdArchivo()) {
+				if(idArchivo.equals(modificarPosicionReq.getIdArchivo().toString())) {
 					InlineResponse200 resp = consolidadoService.actualizarPrioridadArchivo(modificarPosicionReq);
 					if (resp != null) {
+						
+						log.info("{}", resp);
+						
 						return new ResponseEntity<InlineResponse200>(resp, HttpStatus.OK);
 					} else {
 						InternalServerError isr = new InternalServerError();
@@ -134,7 +137,7 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 				} else {
 					BadRequest br = new BadRequest();
 					br.setCodigo(Common.ERROR_CODE);
-					br.setMensaje(Common.ERROR_MENSAJE);
+					br.setMensaje(Common.ERROR_MENSAJE_IDS);
 
 					log.info("{}", br);
 
