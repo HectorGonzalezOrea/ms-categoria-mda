@@ -49,6 +49,7 @@ public final class Constantes {
 	public static final String CODE_MESSAGE_NOT_FOUND_REGLA = "No se encontro el idRegla";
 	
 	public static final String FECHA_APLICACION = "fechaAplicacion";
+	public static final String VIGENCIA = "vigencia";
 	
 	public static final String TEMP = ".";
 	public static final String SLASH = "/";

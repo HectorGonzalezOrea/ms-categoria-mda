@@ -43,6 +43,7 @@ import static mx.com.nmp.gestionescenarios.utils.Constantes.HEADER_NOMBRE_AJUSTE
 import static mx.com.nmp.gestionescenarios.utils.Constantes.HEADER_EMERGENTE;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.BODY_ADJUNTO;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.FECHA_APLICACION;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.VIGENCIA;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.HEADER_APIKEY_KEY;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.METHOD_POST;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.TEMP;
@@ -96,12 +97,12 @@ public class AjustePreciosConsolidadosController extends AjustePreciosConsolidad
 			
 			if(response.code() == 200) {
 				
-				Date fecha = new Date();
-				String fechaAplicacion = new SimpleDateFormat(FORMATO_FECHA).format(fecha);
+				Date fecha = new Date(vigencia);
+				String vigencia2 = new SimpleDateFormat(FORMATO_FECHA).format(fecha);
 				
-				log.info("Date: {}" , fechaAplicacion);
+				log.info("Date: {}" , vigencia2);
 				
-				ConsultarConsolidadoResponseVO consolidadoList = this.consultarConsolidado(usuario, origen, destino, fechaAplicacion);
+				ConsultarConsolidadoResponseVO consolidadoList = this.consultarConsolidado(usuario, origen, destino, vigencia2);
 				listIdConsolidado = new ArrayList<>();
 				
 				for(ConsolidadoVO c : consolidadoList) {
@@ -120,7 +121,7 @@ public class AjustePreciosConsolidadosController extends AjustePreciosConsolidad
 	/*
 	 * Consultar Consolidado
 	 */
-	private ConsultarConsolidadoResponseVO consultarConsolidado(String usuario, String origen, String destino, String fechaAplicacion) {
+	private ConsultarConsolidadoResponseVO consultarConsolidado(String usuario, String origen, String destino, String vigencia) {
 		log.info("consultarConsolidado");
 		
 		Unirest.setTimeouts(0, 0);
@@ -130,7 +131,7 @@ public class AjustePreciosConsolidadosController extends AjustePreciosConsolidad
 		try {
 			
 			Map<String, Object> parameters = new HashMap<>();
-			parameters.put(FECHA_APLICACION, fechaAplicacion);
+			parameters.put(VIGENCIA, vigencia);
 			
 			HttpResponse<String> response = Unirest.get(urlBase + servicioConsultaronsolidados)
 			  .header(HEADER_USUARIO, usuario)

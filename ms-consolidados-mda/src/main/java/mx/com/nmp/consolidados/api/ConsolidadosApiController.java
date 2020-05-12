@@ -192,6 +192,11 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 				log.info("{}", badReq);
 				return new ResponseEntity<BadRequest>(badReq, HttpStatus.BAD_REQUEST);
 			}
+			log.info(usuario);
+			log.info(origen);
+			log.info(vigencia);
+			log.info(idPrioridad);
+			
 			if(!consolidadoService.validaFormatoFecha(vigencia)){
 				log.info("validando.......");
 				System.out.println(consolidadoService.validaFormatoFecha(vigencia));
@@ -200,10 +205,6 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 				badReq.setMensaje(Common.ERROR_MENSAJE_DATE);
 				return new ResponseEntity<BadRequest>(badReq, HttpStatus.BAD_REQUEST);
 			}
-			log.info(usuario);
-			log.info(origen);
-			log.info(vigencia);
-			log.info(idPrioridad);
 			ArrayList<ConsultarArchivoConsolidadoResInner> result = consolidadoService.getConsolidados(vigencia);
 			ConsultarArchivoConsolidadoRes response = new ConsultarArchivoConsolidadoRes();
 			if (!result.isEmpty()) {
@@ -426,8 +427,8 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 				Consolidados consolidado = new Consolidados();
 				consolidado.setUsuario(origen);
 				consolidado.setEmergente(emergente);
-				consolidado.setFechaAplicacion(new Date());
-				consolidado.setVigencia(new Date());
+				consolidado.setFechaAplicacion(new Date(vigencia));
+				consolidado.setVigencia(new Date(vigencia));
 				consolidado.setNombreAjuste(nombreAjuste);
 				consolidado.setAdjunto(util.convert(adjunto));
 				Boolean service = consolidadoService.crearConsolidado(consolidado);
