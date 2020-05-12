@@ -681,6 +681,7 @@ public class EscenariosApiController implements EscenariosApi {
             			return new ResponseEntity<ListaInfoGeneralRegla>(resp, HttpStatus.OK);
             		}
             	}
+            	if(fechaAplicacion!=null)
             	if(!gestionEscenarioService.validaFormatoFecha(fechaAplicacion)){
     				BadRequest badReq = new BadRequest();
     				badReq.setCode(ERROR_CODE_BAD_REQUEST);
