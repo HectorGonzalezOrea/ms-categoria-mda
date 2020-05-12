@@ -405,276 +405,273 @@ public class GestionEscenarioService {
 		log.info("GestionEscenarioService.busquedaReglaNull");
 
 		Query query = new Query();
-
-		if (nombre != null) {
-			Criteria aux = Criteria.where(NOMBRE).is(nombre);
-
-			if (ramo != null) {
-				aux.and(RAMO).is(ramo);
-			}
-			if (subramo != null) {
-				aux.and(SUBRAMO).is(subramo);
-			}
-			if (factor != null) {
-				aux.and(FACTOR).is(factor);
-			}
-			if (origen != null) {
-				aux.and(ORIGEN).is(origen);
-			}
-			if (clasificacionClientes != null) {
-				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
-			}
-			if (estatusPartida != null) {
-				aux.and(ESTATUS).is(estatusPartida);
-			}
-			if (canalComercializacion != null) {
-				aux.and(CANAL).is(canalComercializacion);
-			}
-			if (fechaAplicacion != null) {
-				aux.and(FECHA_APLICACION).is(fechaAplicacion);
-			}
-			query.addCriteria(aux);
-		}
-
-		if (ramo != null) {
-			Criteria aux = Criteria.where(RAMO).is(ramo);
-
+			//Criteria aux = Criteria.where(NOMBRE).is(nombre);
 			if (nombre != null) {
-				aux.and(NOMBRE).is(nombre);
-			}
-			if (subramo != null) {
-				aux.and(SUBRAMO).is(subramo);
-			}
-			if (factor != null) {
-				aux.and(FACTOR).is(factor);
-			}
-			if (origen != null) {
-				aux.and(ORIGEN).is(origen);
-			}
-			if (clasificacionClientes != null) {
-				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
-			}
-			if (estatusPartida != null) {
-				aux.and(ESTATUS).is(estatusPartida);
-			}
-			if (canalComercializacion != null) {
-				aux.and(CANAL).is(canalComercializacion);
-			}
-			if (fechaAplicacion != null) {
-				aux.and(FECHA_APLICACION).is(fechaAplicacion);
-			}
-			query.addCriteria(aux);
-		}
-
-		if (subramo != null) {
-			Criteria aux = Criteria.where(SUBRAMO).is(subramo);
-
-			if (nombre != null) {
-				aux.and(NOMBRE).is(nombre);
+				query.addCriteria(Criteria.where(NOMBRE).is(nombre));
 			}
 			if (ramo != null) {
-				aux.and(RAMO).is(ramo);
-			}
-			if (factor != null) {
-				aux.and(FACTOR).is(factor);
-			}
-			if (origen != null) {
-				aux.and(ORIGEN).is(origen);
-			}
-			if (clasificacionClientes != null) {
-				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
-			}
-			if (estatusPartida != null) {
-				aux.and(ESTATUS).is(estatusPartida);
-			}
-			if (canalComercializacion != null) {
-				aux.and(CANAL).is(canalComercializacion);
-			}
-			if (fechaAplicacion != null) {
-				aux.and(FECHA_APLICACION).is(fechaAplicacion);
-			}
-			query.addCriteria(aux);
-		}
-
-		if (factor != null) {
-			Criteria aux = Criteria.where(FACTOR).is(factor);
-
-			if (nombre != null) {
-				aux.and(NOMBRE).is(nombre);
-			}
-			if (ramo != null) {
-				aux.and(RAMO).is(ramo);
+				query.addCriteria(Criteria.where(RAMO).is(ramo));
 			}
 			if (subramo != null) {
-				aux.and(SUBRAMO).is(subramo);
-			}
-			if (origen != null) {
-				aux.and(ORIGEN).is(origen);
-			}
-			if (clasificacionClientes != null) {
-				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
-			}
-			if (estatusPartida != null) {
-				aux.and(ESTATUS).is(estatusPartida);
-			}
-			if (canalComercializacion != null) {
-				aux.and(CANAL).is(canalComercializacion);
-			}
-			if (fechaAplicacion != null) {
-				aux.and(FECHA_APLICACION).is(fechaAplicacion);
-			}
-			query.addCriteria(aux);
-		}
-
-		if (origen != null) {
-			Criteria aux = Criteria.where(ORIGEN).is(origen);
-
-			if (nombre != null) {
-				aux.and(NOMBRE).is(nombre);
-			}
-			if (ramo != null) {
-				aux.and(RAMO).is(ramo);
-			}
-			if (subramo != null) {
-				aux.and(SUBRAMO).is(subramo);
+				query.addCriteria(Criteria.where(SUBRAMO).is(subramo));
 			}
 			if (factor != null) {
-				aux.and(FACTOR).is(factor);
-			}
-			if (clasificacionClientes != null) {
-				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
-			}
-			if (estatusPartida != null) {
-				aux.and(ESTATUS).is(estatusPartida);
-			}
-			if (canalComercializacion != null) {
-				aux.and(CANAL).is(canalComercializacion);
-			}
-			if (fechaAplicacion != null) {
-				aux.and(FECHA_APLICACION).is(fechaAplicacion);
-			}
-			query.addCriteria(aux);
-		}
-
-		if (estatusPartida != null) {
-			Criteria aux = Criteria.where(ESTATUS).is(estatusPartida);
-
-			if (nombre != null) {
-				aux.and(NOMBRE).is(nombre);
-			}
-			if (ramo != null) {
-				aux.and(RAMO).is(ramo);
-			}
-			if (subramo != null) {
-				aux.and(SUBRAMO).is(subramo);
-			}
-			if (factor != null) {
-				aux.and(FACTOR).is(factor);
+				query.addCriteria(Criteria.where(FACTOR).is(factor));
 			}
 			if (origen != null) {
-				aux.and(ORIGEN).is(origen);
+				query.addCriteria(Criteria.where(ORIGEN).is(origen));
 			}
 			if (clasificacionClientes != null) {
-				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
-			}
-			if (canalComercializacion != null) {
-				aux.and(CANAL).is(canalComercializacion);
-			}
-			if (fechaAplicacion != null) {
-				aux.and(FECHA_APLICACION).is(fechaAplicacion);
-			}
-			query.addCriteria(aux);
-		}
-
-		if (clasificacionClientes != null) {
-			Criteria aux = Criteria.where(CLASIF_CLIENTES).is(clasificacionClientes);
-
-			if (nombre != null) {
-				aux.and(NOMBRE).is(nombre);
-			}
-			if (ramo != null) {
-				aux.and(RAMO).is(ramo);
-			}
-			if (subramo != null) {
-				aux.and(SUBRAMO).is(subramo);
-			}
-			if (factor != null) {
-				aux.and(FACTOR).is(factor);
-			}
-			if (origen != null) {
-				aux.and(ORIGEN).is(origen);
+				query.addCriteria(Criteria.where(CLASIF_CLIENTES).is(clasificacionClientes));
 			}
 			if (estatusPartida != null) {
-				aux.and(ESTATUS).is(estatusPartida);
+				query.addCriteria(Criteria.where(ESTATUS).is(estatusPartida));
 			}
 			if (canalComercializacion != null) {
-				aux.and(CANAL).is(canalComercializacion);
+				query.addCriteria(Criteria.where(CANAL).is(canalComercializacion));
 			}
 			if (fechaAplicacion != null) {
-				aux.and(FECHA_APLICACION).is(fechaAplicacion);
+				query.addCriteria(Criteria.where(FECHA_APLICACION).is(fechaAplicacion));
 			}
-			query.addCriteria(aux);
-		}
-
-		if (canalComercializacion != null) {
-			Criteria aux = Criteria.where(CANAL).is(canalComercializacion);
-
-			if (nombre != null) {
-				aux.and(NOMBRE).is(nombre);
-			}
-			if (ramo != null) {
-				aux.and(RAMO).is(ramo);
-			}
-			if (subramo != null) {
-				aux.and(SUBRAMO).is(subramo);
-			}
-			if (factor != null) {
-				aux.and(FACTOR).is(factor);
-			}
-			if (origen != null) {
-				aux.and(ORIGEN).is(origen);
-			}
-			if (estatusPartida != null) {
-				aux.and(ESTATUS).is(estatusPartida);
-			}
-			if (clasificacionClientes != null) {
-				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
-			}
-			if (fechaAplicacion != null) {
-				aux.and(FECHA_APLICACION).is(fechaAplicacion);
-			}
-			query.addCriteria(aux);
-		}
-
-		if (fechaAplicacion != null) {
-			Criteria aux = Criteria.where(FECHA_APLICACION).is(fechaAplicacion);
-
-			if (nombre != null) {
-				aux.and(NOMBRE).is(nombre);
-			}
-			if (ramo != null) {
-				aux.and(RAMO).is(ramo);
-			}
-			if (subramo != null) {
-				aux.and(SUBRAMO).is(subramo);
-			}
-			if (factor != null) {
-				aux.and(FACTOR).is(factor);
-			}
-			if (origen != null) {
-				aux.and(ORIGEN).is(origen);
-			}
-			if (estatusPartida != null) {
-				aux.and(ESTATUS).is(estatusPartida);
-			}
-			if (clasificacionClientes != null) {
-				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
-			}
-			if (canalComercializacion != null) {
-				aux.and(CANAL).is(canalComercializacion);
-			}
-			query.addCriteria(aux);
-		}
+//		if (ramo != null) {
+//			Criteria aux = Criteria.where(RAMO).is(ramo);
+//
+//			if (nombre != null) {
+//				aux.and(NOMBRE).is(nombre);
+//			}
+//			if (subramo != null) {
+//				aux.and(SUBRAMO).is(subramo);
+//			}
+//			if (factor != null) {
+//				aux.and(FACTOR).is(factor);
+//			}
+//			if (origen != null) {
+//				aux.and(ORIGEN).is(origen);
+//			}
+//			if (clasificacionClientes != null) {
+//				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
+//			}
+//			if (estatusPartida != null) {
+//				aux.and(ESTATUS).is(estatusPartida);
+//			}
+//			if (canalComercializacion != null) {
+//				aux.and(CANAL).is(canalComercializacion);
+//			}
+//			if (fechaAplicacion != null) {
+//				aux.and(FECHA_APLICACION).is(fechaAplicacion);
+//			}
+//			query.addCriteria(aux);
+//		}
+//
+//		if (subramo != null) {
+//			Criteria aux = Criteria.where(SUBRAMO).is(subramo);
+//
+//			if (nombre != null) {
+//				aux.and(NOMBRE).is(nombre);
+//			}
+//			if (ramo != null) {
+//				aux.and(RAMO).is(ramo);
+//			}
+//			if (factor != null) {
+//				aux.and(FACTOR).is(factor);
+//			}
+//			if (origen != null) {
+//				aux.and(ORIGEN).is(origen);
+//			}
+//			if (clasificacionClientes != null) {
+//				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
+//			}
+//			if (estatusPartida != null) {
+//				aux.and(ESTATUS).is(estatusPartida);
+//			}
+//			if (canalComercializacion != null) {
+//				aux.and(CANAL).is(canalComercializacion);
+//			}
+//			if (fechaAplicacion != null) {
+//				aux.and(FECHA_APLICACION).is(fechaAplicacion);
+//			}
+//			query.addCriteria(aux);
+//		}
+//
+//		if (factor != null) {
+//			Criteria aux = Criteria.where(FACTOR).is(factor);
+//
+//			if (nombre != null) {
+//				aux.and(NOMBRE).is(nombre);
+//			}
+//			if (ramo != null) {
+//				aux.and(RAMO).is(ramo);
+//			}
+//			if (subramo != null) {
+//				aux.and(SUBRAMO).is(subramo);
+//			}
+//			if (origen != null) {
+//				aux.and(ORIGEN).is(origen);
+//			}
+//			if (clasificacionClientes != null) {
+//				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
+//			}
+//			if (estatusPartida != null) {
+//				aux.and(ESTATUS).is(estatusPartida);
+//			}
+//			if (canalComercializacion != null) {
+//				aux.and(CANAL).is(canalComercializacion);
+//			}
+//			if (fechaAplicacion != null) {
+//				aux.and(FECHA_APLICACION).is(fechaAplicacion);
+//			}
+//			query.addCriteria(aux);
+//		}
+//
+//		if (origen != null) {
+//			Criteria aux = Criteria.where(ORIGEN).is(origen);
+//
+//			if (nombre != null) {
+//				aux.and(NOMBRE).is(nombre);
+//			}
+//			if (ramo != null) {
+//				aux.and(RAMO).is(ramo);
+//			}
+//			if (subramo != null) {
+//				aux.and(SUBRAMO).is(subramo);
+//			}
+//			if (factor != null) {
+//				aux.and(FACTOR).is(factor);
+//			}
+//			if (clasificacionClientes != null) {
+//				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
+//			}
+//			if (estatusPartida != null) {
+//				aux.and(ESTATUS).is(estatusPartida);
+//			}
+//			if (canalComercializacion != null) {
+//				aux.and(CANAL).is(canalComercializacion);
+//			}
+//			if (fechaAplicacion != null) {
+//				aux.and(FECHA_APLICACION).is(fechaAplicacion);
+//			}
+//			query.addCriteria(aux);
+//		}
+//
+//		if (estatusPartida != null) {
+//			Criteria aux = Criteria.where(ESTATUS).is(estatusPartida);
+//
+//			if (nombre != null) {
+//				aux.and(NOMBRE).is(nombre);
+//			}
+//			if (ramo != null) {
+//				aux.and(RAMO).is(ramo);
+//			}
+//			if (subramo != null) {
+//				aux.and(SUBRAMO).is(subramo);
+//			}
+//			if (factor != null) {
+//				aux.and(FACTOR).is(factor);
+//			}
+//			if (origen != null) {
+//				aux.and(ORIGEN).is(origen);
+//			}
+//			if (clasificacionClientes != null) {
+//				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
+//			}
+//			if (canalComercializacion != null) {
+//				aux.and(CANAL).is(canalComercializacion);
+//			}
+//			if (fechaAplicacion != null) {
+//				aux.and(FECHA_APLICACION).is(fechaAplicacion);
+//			}
+//			query.addCriteria(aux);
+//		}
+//
+//		if (clasificacionClientes != null) {
+//			Criteria aux = Criteria.where(CLASIF_CLIENTES).is(clasificacionClientes);
+//
+//			if (nombre != null) {
+//				aux.and(NOMBRE).is(nombre);
+//			}
+//			if (ramo != null) {
+//				aux.and(RAMO).is(ramo);
+//			}
+//			if (subramo != null) {
+//				aux.and(SUBRAMO).is(subramo);
+//			}
+//			if (factor != null) {
+//				aux.and(FACTOR).is(factor);
+//			}
+//			if (origen != null) {
+//				aux.and(ORIGEN).is(origen);
+//			}
+//			if (estatusPartida != null) {
+//				aux.and(ESTATUS).is(estatusPartida);
+//			}
+//			if (canalComercializacion != null) {
+//				aux.and(CANAL).is(canalComercializacion);
+//			}
+//			if (fechaAplicacion != null) {
+//				aux.and(FECHA_APLICACION).is(fechaAplicacion);
+//			}
+//			query.addCriteria(aux);
+//		}
+//
+//		if (canalComercializacion != null) {
+//			Criteria aux = Criteria.where(CANAL).is(canalComercializacion);
+//
+//			if (nombre != null) {
+//				aux.and(NOMBRE).is(nombre);
+//			}
+//			if (ramo != null) {
+//				aux.and(RAMO).is(ramo);
+//			}
+//			if (subramo != null) {
+//				aux.and(SUBRAMO).is(subramo);
+//			}
+//			if (factor != null) {
+//				aux.and(FACTOR).is(factor);
+//			}
+//			if (origen != null) {
+//				aux.and(ORIGEN).is(origen);
+//			}
+//			if (estatusPartida != null) {
+//				aux.and(ESTATUS).is(estatusPartida);
+//			}
+//			if (clasificacionClientes != null) {
+//				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
+//			}
+//			if (fechaAplicacion != null) {
+//				aux.and(FECHA_APLICACION).is(fechaAplicacion);
+//			}
+//			query.addCriteria(aux);
+//		}
+//
+//		if (fechaAplicacion != null) {
+//			Criteria aux = Criteria.where(FECHA_APLICACION).is(fechaAplicacion);
+//
+//			if (nombre != null) {
+//				aux.and(NOMBRE).is(nombre);
+//			}
+//			if (ramo != null) {
+//				aux.and(RAMO).is(ramo);
+//			}
+//			if (subramo != null) {
+//				aux.and(SUBRAMO).is(subramo);
+//			}
+//			if (factor != null) {
+//				aux.and(FACTOR).is(factor);
+//			}
+//			if (origen != null) {
+//				aux.and(ORIGEN).is(origen);
+//			}
+//			if (estatusPartida != null) {
+//				aux.and(ESTATUS).is(estatusPartida);
+//			}
+//			if (clasificacionClientes != null) {
+//				aux.and(CLASIF_CLIENTES).is(clasificacionClientes);
+//			}
+//			if (canalComercializacion != null) {
+//				aux.and(CANAL).is(canalComercializacion);
+//			}
+//			query.addCriteria(aux);
+//		}
 
 		log.info("Query: {}" , query.toString());
 		return query;
