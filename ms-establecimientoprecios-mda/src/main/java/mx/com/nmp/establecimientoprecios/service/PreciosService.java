@@ -144,7 +144,7 @@ public class PreciosService {
 				hpRequest.setFolioPartida(partida.getFolioPartida());
 				
 				Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-				hpRequest.setFecha(timestamp.toString());
+				hpRequest.setFecha(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(timestamp));
 				
 				Boolean insertadoHistoricoPrecios = historicoPreciosController.insertaHistoricoPrecios(usuario, hpRequest);
 				
