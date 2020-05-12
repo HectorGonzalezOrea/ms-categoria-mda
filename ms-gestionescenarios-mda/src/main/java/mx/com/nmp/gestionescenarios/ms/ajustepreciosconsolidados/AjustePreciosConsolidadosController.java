@@ -45,7 +45,7 @@ import static mx.com.nmp.gestionescenarios.utils.Constantes.BODY_ADJUNTO;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.FECHA_APLICACION;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.HEADER_APIKEY_KEY;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.METHOD_POST;
-import static mx.com.nmp.gestionescenarios.utils.Constantes.TMP;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.TEMP;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.FORMATO_FECHA;
 
 @RestController
@@ -71,7 +71,7 @@ public class AjustePreciosConsolidadosController extends AjustePreciosConsolidad
 		RequestBody requestBody = new MultipartBody.Builder()
 				.setType(MultipartBody.FORM)
 				.addFormDataPart(BODY_ADJUNTO, adjunto.getOriginalFilename(), RequestBody
-						.create(okhttp3.MediaType.parse(MediaType.APPLICATION_OCTET_STREAM), new File(TMP + adjunto.getOriginalFilename())))
+						.create(okhttp3.MediaType.parse(MediaType.APPLICATION_OCTET_STREAM), new File(adjunto.getOriginalFilename())))
 				.build();
 
 		Request request = new Request.Builder()
