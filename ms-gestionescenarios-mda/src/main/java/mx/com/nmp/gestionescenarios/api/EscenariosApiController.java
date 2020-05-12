@@ -669,14 +669,6 @@ public class EscenariosApiController implements EscenariosApi {
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
             	if(nombre == null && ramo == null && subramo == null && factor == null && origen == null && clasificacionClientes == null && estatusPartida == null && canalComercializacion== null && fechaAplicacion == null) {
-            		if(!gestionEscenarioService.validaFormatoFecha(fechaAplicacion)){
-        				log.info("validando.......");
-        				BadRequest badReq = new BadRequest();
-        				badReq.setCode(ERROR_CODE_BAD_REQUEST);
-        				badReq.setMessage(ERROR_MENSAJE_DATE);
-        				return new ResponseEntity<BadRequest>(badReq, HttpStatus.BAD_REQUEST);
-        			}
-            		
             		List<InfoGeneralRegla> reglas = gestionEscenarioService.consultaReglaSinFiltro();
             		ListaInfoGeneralRegla resp = new ListaInfoGeneralRegla ();
             		log.info("Reglas: {}", reglas);
@@ -689,7 +681,12 @@ public class EscenariosApiController implements EscenariosApi {
             			return new ResponseEntity<ListaInfoGeneralRegla>(resp, HttpStatus.OK);
             		}
             	}
-            	
+            	if(!gestionEscenarioService.validaFormatoFecha(fechaAplicacion)){
+    				BadRequest badReq = new BadRequest();
+    				badReq.setCode(ERROR_CODE_BAD_REQUEST);
+    				badReq.setMessage(ERROR_MENSAJE_DATE);
+    				return new ResponseEntity<BadRequest>(badReq, HttpStatus.BAD_REQUEST);
+    			}
             	List<InfoGeneralRegla> reglas = gestionEscenarioService.consultaRegla(nombre, ramo, subramo, factor, origen, clasificacionClientes, estatusPartida, canalComercializacion, fechaAplicacion);
         		ListaInfoGeneralRegla resp = new ListaInfoGeneralRegla ();
         		
