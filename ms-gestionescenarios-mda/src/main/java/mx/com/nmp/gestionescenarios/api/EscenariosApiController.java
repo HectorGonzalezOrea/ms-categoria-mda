@@ -601,11 +601,16 @@ public class EscenariosApiController implements EscenariosApi {
     	String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
-            	if(peticion != null) {
+            	if(peticion != null &&  peticion.getId() !=null) {
             		log.info("Peticion : {}", peticion.toString());
+            		 
             		Boolean actualizado = gestionEscenarioService.actualizaEstatus(peticion);
             		GeneralResponse gr = new GeneralResponse ();
             		gr.setMessage(STATUS_MESSAGE_REGLA);
+            		if(actualizado ==false) {
+            			gr.setMessage(CODE_MESSAGE_NOT_FOUND_REGLA);
+            			return new ResponseEntity<GeneralResponse>(gr, HttpStatus.CREATED);
+            		}
             		return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK);
             	}else {
             		BadRequest br = new BadRequest();
