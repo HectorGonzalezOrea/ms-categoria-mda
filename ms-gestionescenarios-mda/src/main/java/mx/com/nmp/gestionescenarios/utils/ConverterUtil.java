@@ -15,6 +15,7 @@ import mx.com.nmp.gestionescenarios.oag.vo.GetTokenResponseVO;
 import mx.com.nmp.gestionescenarios.oag.vo.CalendarizarEscenarioResponseVO;
 import mx.com.nmp.gestionescenarios.oag.vo.ConsultarConsolidadoResponseVO;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.TMP;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.SLASH;
 
 public class ConverterUtil {
 
@@ -64,7 +65,7 @@ public class ConverterUtil {
 	public static void convertMultipartFileToFile(MultipartFile file) {
 		log.info("convertMultipartFileToFile");
 		
-		File convFile = new File(TMP + file.getOriginalFilename());
+		File convFile = new File(TMP + SLASH + file.getOriginalFilename());
 		try {
 			convFile.createNewFile();
 			FileOutputStream fos = new FileOutputStream(convFile);
