@@ -24,6 +24,8 @@ public final class Constantes {
 	public static final String ERROR_MESSAGE_INTERNAL_SERVER_ERROR_NO_GENERIC = "Error interno del servidor. No se proceso la petición correctamente.";
 	public static final String ERROR_MESSAGE_INTERNAL_SERVER_ERROR_ALMACENAR_O_PROCESAR = "Error interno del servidor. Ocurrio un error en el procesamiento.";
 	
+	public static final String ERROR_MENSAJE_DATE = "La fecha debe ser enviada con el formato dd/mm/yyyy";
+	
 	public static final String METHOD_POST = "POST";
 	
 	public static final String HEADER_USUARIO = "usuario";

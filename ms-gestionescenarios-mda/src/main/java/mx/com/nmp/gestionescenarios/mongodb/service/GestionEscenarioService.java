@@ -1063,4 +1063,15 @@ public class GestionEscenarioService {
 		return gestionLst;
 	}
 	
+	public Boolean validaFormatoFecha(String StringDate){
+		log.info("validando Fecha");
+		Boolean flag = false;
+		try {
+		 new SimpleDateFormat("dd/MM/yyyy").parse(StringDate);
+		 return flag=true;
+		} catch (ParseException e) {
+			log.info("El formato de la fecha no es el esperado");
+			return flag=false;
+		}
+	}
 }

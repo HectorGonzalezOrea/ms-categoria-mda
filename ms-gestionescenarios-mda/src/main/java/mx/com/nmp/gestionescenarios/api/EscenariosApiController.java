@@ -70,6 +70,7 @@ import static mx.com.nmp.gestionescenarios.utils.Constantes.STATUS_MESSAGE_MONED
 import static mx.com.nmp.gestionescenarios.utils.Constantes.STATUS_MESSAGE_REGLA;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.CODE_MESSAGE_NOT_FOUND_REGLA;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INTERNAL_SERVER_ERROR_NO_GENERIC;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MENSAJE_DATE;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-20T16:07:47.599Z")
 
@@ -663,6 +664,13 @@ public class EscenariosApiController implements EscenariosApi {
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
             	if(nombre == null && ramo == null && subramo == null && factor == null && origen == null && clasificacionClientes == null && estatusPartida == null && canalComercializacion== null && fechaAplicacion == null) {
+            		if(!gestionEscenarioService.validaFormatoFecha(fechaAplicacion)){
+        				log.info("validando.......");
+        				BadRequest badReq = new BadRequest();
+        				badReq.setCode(ERROR_CODE_BAD_REQUEST);
+        				badReq.setMessage(ERROR_MENSAJE_DATE);
+        				return new ResponseEntity<BadRequest>(badReq, HttpStatus.BAD_REQUEST);
+        			}
             		
             		List<InfoGeneralRegla> reglas = gestionEscenarioService.consultaReglaSinFiltro();
             		ListaInfoGeneralRegla resp = new ListaInfoGeneralRegla ();
