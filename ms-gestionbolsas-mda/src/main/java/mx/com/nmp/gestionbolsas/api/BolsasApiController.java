@@ -61,21 +61,22 @@ import java.util.List;
 @Controller
 public class BolsasApiController implements BolsasApi {
 
-	private static final Logger log = LoggerFactory.getLogger(BolsasApiController.class);
+  private static final Logger log = LoggerFactory.getLogger(BolsasApiController.class);
+    
 
-	private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
-	private final HttpServletRequest request;
+    private final HttpServletRequest request;
+    
+    @Autowired
+    private BolsasService bolsaService;
 
-	@Autowired
-	private BolsasService bolsaService;
-
-	@org.springframework.beans.factory.annotation.Autowired
-	public BolsasApiController(ObjectMapper objectMapper, HttpServletRequest request) {
-		objectMapper.configure(MapperFeature.ALLOW_COERCION_OF_SCALARS, false);
-		this.objectMapper = objectMapper;
-		this.request = request;
-	}
+    @org.springframework.beans.factory.annotation.Autowired
+    public BolsasApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+    	objectMapper.configure(MapperFeature.ALLOW_COERCION_OF_SCALARS, false);
+        this.objectMapper = objectMapper;
+        this.request = request;
+    }
 
 	/*
 	 * Get Bolsa
@@ -154,13 +155,14 @@ public class BolsasApiController implements BolsasApi {
 		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 	}
 
-	/*
-	 * Eliminar Bolsa por Id
-	 */
+
+	@Override
 	public ResponseEntity<?> bolsasIdBolsaDelete(
-			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
-			@ApiParam(value = "Identificador de la Bolsa a eliminar", required = true) @PathVariable("idBolsa") Integer idBolsa) {
-		
+			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) 
+			@RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Identificador de la Bolsa a eliminar", required = true)
+			@PathVariable("idBolsa") Integer idBolsa
+			) {
 		log.info("*********************************************************");
 		log.info("Eliminar Bolsa.");
 		log.info("*********************************************************");
@@ -188,52 +190,17 @@ public class BolsasApiController implements BolsasApi {
 					br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
 					br.setCode(ERROR_CODE_BAD_REQUEST);
 
-					
-					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
-            	}else {
-            		
-            		if(Boolean.TRUE.equals(bolsaService.validarIdBolsa(idBolsa))) {
-            		Boolean eliminado = bolsaService.deleteBolsa(idBolsa);
-            		GeneralResponse resp =  new GeneralResponse();
-            		if(eliminado) {
-
-
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 				} else {
 					Boolean eliminado = bolsaService.deleteBolsa(idBolsa);
 					GeneralResponse resp = new GeneralResponse();
 					if (eliminado) {
-
 						resp.setMessage(MESSAGE_DELETE);
 						return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
 					} else {
 						resp.setMessage(MESSAGE_NO_DELETE);
 						return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
 					}
-
-            		}else {
-            			log.error("Error en el Id, verifique la información");
-    					BadRequest br = new BadRequest();
-    					br.setMessage(ERROR_MESSAGE_NOT_FOUND);
-    					br.setCode(ERROR_CODE_NOT_FOUND);
-    					return new ResponseEntity<BadRequest>(br, HttpStatus.NOT_FOUND);
-            		}
-            	}
-                               	
-            } catch (Exception e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<InternalServerError>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    public ResponseEntity<?> bolsasPatch(@ApiParam(value = "Usuario de sistema que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Cuerpo de la petición" ,required=true )  @Valid @RequestBody Bolsa peticion) {
-    	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
-    	
-		if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
-
 				}
 
 			} catch (Exception e) {
@@ -253,18 +220,17 @@ public class BolsasApiController implements BolsasApi {
 		br.setCode(ERROR_CODE_BAD_REQUEST);
 
 		log.error("{}" , br);
-
 		
 		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 	}
 
-	/*
-	 * Actualizar Bolsas
-	 */
+	@Override
 	public ResponseEntity<?> bolsasPatch(
-			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
-			@ApiParam(value = "Cuerpo de la petición", required = true) @Valid @RequestBody Bolsa peticion) {
-		
+			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true)
+			@RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Cuerpo de la petición", required = true) 
+			@Valid @RequestBody Bolsa peticion
+			) {
 		log.info("*********************************************************");
 		log.info("Actualizar Bolsas.");
 		log.info("*********************************************************");
@@ -331,95 +297,16 @@ public class BolsasApiController implements BolsasApi {
 		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 	}
 
-	/*
-	 * Crear Bolsas
-	 */
+	@Override
 	public ResponseEntity<?> bolsasPost(
-			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
-			@ApiParam(value = "Cuerpo de la petición", required = true) @Valid @RequestBody Bolsa peticion) {
-		
+			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) 
+			@RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Cuerpo de la petición", required = true)
+			@Valid @RequestBody Bolsa peticion) {
 		log.info("*********************************************************");
 		log.info("Crear Bolsa");
 		log.info("*********************************************************");
 		
-
-		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
-	}
-	
-	String accept = request.getHeader(HEADER_ACCEPT_KEY);
-        if (accept != null && accept.contains("application/json")) {
-            try {
-            	if (peticion != null) {
-            		if(Boolean.TRUE.equals(bolsaService.consultaBolsa(peticion.getNombre()))) {
-            			BadRequest br = new BadRequest();
-                		br.setCode(ERROR_CODE_BAD_REQUEST);
-                		br.setMessage(ERROR_MESSAGE_NAME);
-                		
-                		log.error("{}" , br);
-    					
-    					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
-            		
-            	}
-            		
-            		
-                	if(Boolean.FALSE.equals(bolsaService.consultaTipoBolsa(peticion.getTipo().getId()))) {
-                		BadRequest br = new BadRequest();
-                    	br.setCode(ERROR_CODE_BAD_REQUEST);
-                    	br.setMessage(ERROR_MESSAGE_TIPO);
-                    		
-                    	log.error("{}" , br);
-        					
-        				return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
-                		
-                }else {
-            		
-            		log.info("peticion: " + peticion.toString());
-            		if(Boolean.TRUE.equals(bolsaService.consultaTipoBolsaRegla(peticion.getTipo().getId()))) {
-            			if(peticion.getFactor()== null || peticion.getFactor()=="" && peticion.getRamo()==null || peticion.getRamo()=="" && peticion.getSubramo()==null || peticion.getSubramo()== "" ) {
-            				BadRequest br = new BadRequest();
-        					br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
-        					br.setCode(ERROR_CODE_BAD_REQUEST);
-        					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
-            			}else {
-            				log.info(peticion.getFactor());
-            				log.info(peticion.getRamo());
-            				log.info(peticion.getSubramo());
-            				Boolean insertado = bolsaService.crearBolsa(peticion);
-                    		if(insertado) {
-                    			GeneralResponse resp =  new GeneralResponse();
-                    			resp.setMessage(MESSAGE_OK_BOLSA);
-                    			
-                    			return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
-                    		} else {
-                    			InternalServerError ie = new InternalServerError();
-                				ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
-                				ie.setMessage("Error interno del servidor");
-                                
-                                return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
-                    		}
-            			}
-            		}else {
-        				
-        				Boolean insertado = bolsaService.crearBolsa(peticion);
-                		if(insertado) {
-                			GeneralResponse resp =  new GeneralResponse();
-                			resp.setMessage(MESSAGE_OK_BOLSA);
-                			
-                			return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
-                		} else {
-                			InternalServerError ie = new InternalServerError();
-            				ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
-            				ie.setMessage("Error interno del servidor");
-                            
-                            return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
-                		}
-        			}
-            		
-            		
-            	}
-            	} else {
-            		BadRequest br = new BadRequest();
-
 		String apiKey = request.getHeader(HEADER_APIKEY_KEY);
 
 		if (apiKey == null || apiKey.equals(CADENA_VACIA)) {
@@ -477,7 +364,6 @@ public class BolsasApiController implements BolsasApi {
 					}
 				} else {
 					BadRequest br = new BadRequest();
-
 					br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
 					br.setCode(ERROR_CODE_BAD_REQUEST);
 
@@ -504,11 +390,10 @@ public class BolsasApiController implements BolsasApi {
 		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 	}
 
-	/*
-	 * Consultar bolsa por su tipo
-	 */
+	@Override
 	public ResponseEntity<?> bolsasTiposGet(
-			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario) {
+			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true)
+	       @RequestHeader(value = "usuario", required = true) String usuario) {
 		
 		log.info("*********************************************************");
 		log.info("Consultar Bolsa por su tipo");
