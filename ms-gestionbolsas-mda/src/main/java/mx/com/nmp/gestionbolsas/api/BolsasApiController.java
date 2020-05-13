@@ -12,6 +12,7 @@ import mx.com.nmp.gestionbolsas.model.ListaBolsas;
 import mx.com.nmp.gestionbolsas.model.ListaTipoBolsas;
 import mx.com.nmp.gestionbolsas.model.ListaTipoBolsasInner;
 import mx.com.nmp.gestionbolsas.mongodb.service.BolsasService;
+import mx.com.nmp.gestionbolsas.utils.BolaUtils;
 import mx.com.nmp.gestionbolsas.utils.Constantes;
 
 import org.slf4j.Logger;
@@ -235,7 +236,7 @@ public class BolsasApiController implements BolsasApi {
 		log.info("*********************************************************");
 		log.info("Actualizar Bolsas.");
 		log.info("*********************************************************");
-		
+		BolaUtils bolsaUtils= new BolaUtils();
 		String apiKey = request.getHeader(HEADER_APIKEY_KEY);
 
 		if (apiKey == null || apiKey.equals(CADENA_VACIA)) {
@@ -254,6 +255,16 @@ public class BolsasApiController implements BolsasApi {
 			try {
 				if (peticion != null) {
 					log.info("peticion: " + peticion.toString());
+					Boolean bandera=bolsaService.validarActualizarBolsas(peticion.getRamo(), peticion.getSubramo(), peticion.getFactor(),bolsaUtils.paseraLista(peticion.getSucursales()),peticion.getId());
+					if(bandera==true){
+						BadRequest br = new BadRequest();
+						br.setCode(ERROR_CODE_BAD_REQUEST);
+						br.setMessage(Constantes.ERROR_MESSGE_BOLSA);
+
+						log.error("{}", br);
+
+						return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+					}
 					Boolean actualizado = bolsaService.updateBolsa(peticion);
 
 					if (actualizado) {
@@ -307,7 +318,7 @@ public class BolsasApiController implements BolsasApi {
 		log.info("*********************************************************");
 		log.info("Crear Bolsa");
 		log.info("*********************************************************");
-		
+		BolaUtils bolsaUtils= new BolaUtils();
 		String apiKey = request.getHeader(HEADER_APIKEY_KEY);
 
 		if (apiKey == null || apiKey.equals(CADENA_VACIA)) {
@@ -325,7 +336,7 @@ public class BolsasApiController implements BolsasApi {
 		if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
 			try {
 				
-				Boolean validacion=bolsaService.validarBolsas(peticion.getRamo(), peticion.getSubramo(), peticion.getFactor(), peticion.getSucursales());
+				Boolean validacion=bolsaService.validarBolsas(peticion.getRamo(), peticion.getSubramo(), peticion.getFactor(), bolsaUtils.paseraLista(peticion.getSucursales()));
 				if(validacion==true) {
 					BadRequest br = new BadRequest();
 					br.setCode(ERROR_CODE_BAD_REQUEST);

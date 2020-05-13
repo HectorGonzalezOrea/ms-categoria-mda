@@ -22,6 +22,7 @@ import mx.com.nmp.gestionbolsas.model.TipoBolsa;
 import mx.com.nmp.gestionbolsas.mongodb.entity.BolsasEntity;
 import mx.com.nmp.gestionbolsas.mongodb.entity.TipoBolsaEntity;
 import mx.com.nmp.gestionbolsas.mongodb.repository.BolsaRepository;
+import mx.com.nmp.gestionbolsas.utils.BolaUtils;
 
 @Service
 public class BolsasService {
@@ -51,7 +52,7 @@ public class BolsasService {
 	 */
 	public Boolean crearBolsa(Bolsa peticion) {
 		log.info("BolsasService.crearBolsa");
-		
+		BolaUtils bolsaUtils= new BolaUtils();
 		Boolean insertado = false;
 		
 		if (peticion != null) {
@@ -62,7 +63,7 @@ public class BolsasService {
 			bolsa.setSubramo(peticion.getSubramo());
 			bolsa.setFactor(peticion.getFactor());
 			//bolsa.setSucursales(peticion.getSucursales());
-			bolsa.setSucursales(paseraLista(peticion.getSucursales()));
+			bolsa.setSucursales(bolsaUtils.paseraLista(peticion.getSucursales()));
 			bolsa.setAutor(peticion.getAutor());
 
 			LocalDate locateDate = LocalDate.now();
@@ -84,33 +85,7 @@ public class BolsasService {
 		return insertado;
 	}
 	
-	private List<String>paseraLista(List<String> sucursalesLst){
-		String cadena=null;
-		List<String> lstSucursales= new ArrayList<String>();
-		for (String text : sucursalesLst) {
-			cadena=text;
-		}
-		Boolean delimitador=cadena.contains("-");
-		if(delimitador ==true){
-            String[] texto = cadena.split("-");
-            Integer  inicio = Integer.parseInt(texto[0]);
-            Integer  fin= Integer.parseInt(texto[1]);
-            lstSucursales= obtenervalores(inicio,fin);
-        }else{
-        	String[] textoComas = cadena.split(",");
-            lstSucursales=Arrays.asList(textoComas);
-        }
-		return lstSucursales;
-	}
-	
-	 public  List<String> obtenervalores(Integer inicio, Integer fin ){
-		 List<String> sucursales= new ArrayList<String>();
-	        for(Integer i=inicio; i<=fin;i++){
-	            sucursales.add(String.valueOf(i));
-	            
-	        }
-	        return sucursales;
-	 } 
+
 	
 	/*
 	 * Validacion de tipoBolsa
@@ -154,11 +129,31 @@ public class BolsasService {
 		return encontrado;
 	}
 	
+	/*
+	 * Valida si la sucursal ya esta asignado a una bolsa.
+	 * */
 	public Boolean validarBolsas(String ramo, String subramo, String factor, List<String> sucursales) {
 		Boolean existe = false;
 		Query query = new Query();
 		Criteria aux = Criteria.where(RAMO).is(ramo).and(SUBRAMO).is(subramo).and(FACTOR).is(factor).and(SUCURSALES).in(sucursales);
 		query.addCriteria(aux);
+		log.info("El query es "+query.toString());
+		existe=mongoTemplate.exists(query, BolsasEntity.class);
+		log.info("El valor es "+existe);
+		return existe;
+	}
+	
+	/**
+	 * Valida al actualizar la bolsa con la 
+	 * sucursal
+	 * */
+	public Boolean validarActualizarBolsas(String ramo, String subramo, String factor, List<String> sucursales,Integer id) {
+		Boolean existe = false;
+		Query query = new Query();
+		Criteria aux = Criteria.where(RAMO).is(ramo).and(SUBRAMO).is(subramo).and(FACTOR).is(factor).and(SUCURSALES).in(sucursales)
+				.and(ID).nin(id);
+		query.addCriteria(aux);
+		log.info("El query es "+query.toString());
 		existe=mongoTemplate.exists(query, BolsasEntity.class);
 		log.info("El valor es "+existe);
 		return existe;
@@ -317,7 +312,7 @@ public class BolsasService {
 	 */
 	public Boolean updateBolsa(Bolsa peticion) {
 		log.info("BolsasService.updateBolsa");
-		
+		BolaUtils bolsaUtils= new BolaUtils();
 		Boolean actualizado = false;
 		BolsasEntity bolsa = null;
 		
@@ -334,7 +329,8 @@ public class BolsasService {
 				bolsa.setSubramo(peticion.getSubramo());
 				bolsa.setFactor(peticion.getFactor());
 				bolsa.setTipo(peticion.getTipo().getId());
-				bolsa.setSucursales(peticion.getSucursales());
+				//bolsa.setSucursales(peticion.getSucursales()); 898
+				bolsa.setSucursales(bolsaUtils.paseraLista(peticion.getSucursales()));
 				bolsa.setAutor(peticion.getAutor());
 				
 				LocalDate locateDate = LocalDate.now();
