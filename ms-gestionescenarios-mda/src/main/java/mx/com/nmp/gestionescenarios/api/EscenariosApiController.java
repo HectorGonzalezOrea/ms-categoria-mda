@@ -71,6 +71,8 @@ import static mx.com.nmp.gestionescenarios.utils.Constantes.STATUS_MESSAGE_REGLA
 import static mx.com.nmp.gestionescenarios.utils.Constantes.CODE_MESSAGE_NOT_FOUND_REGLA;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INTERNAL_SERVER_ERROR_NO_GENERIC;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MENSAJE_DATE;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_DUPLICADO;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.SUCCESS_MSG_REGLA;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-20T16:07:47.599Z")
 
@@ -912,26 +914,20 @@ public class EscenariosApiController implements EscenariosApi {
             		if(Boolean.TRUE.equals(gestionEscenarioService.consultaRegla(peticion.getNombre())) ) {
             			BadRequest br = new BadRequest();
                 		br.setCode(ERROR_CODE_BAD_REQUEST);
-                		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
-                		
+                		br.setMessage(ERROR_MESSAGE_DUPLICADO);
                 		log.error("{}" , br);
-    					
     					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
-            		
             	}
             		else {
-                		Boolean insert = gestionEscenarioService.almacenarRegla(peticion);
-                		gr.setMessage("Regla almacenada exitosamente");
-                		return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK);
-                		
+                		gestionEscenarioService.almacenarRegla(peticion);
+                		gr.setMessage(SUCCESS_MSG_REGLA);
+                		return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK);	
                 	}
             	}else {
             		BadRequest br = new BadRequest();
             		br.setCode(ERROR_CODE_BAD_REQUEST);
             		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
-            		
             		log.error("{}" , br);
-					
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
             		
             	}

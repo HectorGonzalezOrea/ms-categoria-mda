@@ -17,26 +17,21 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
-
-import mx.com.nmp.gestionescenarios.mongodb.service.SequenceGeneratorService;
-import mx.com.nmp.gestionescenarios.vo.GestionReglasVO;
 import mx.com.nmp.gestionescenarios.cast.CastObjectGeneric;
 import mx.com.nmp.gestionescenarios.model.EstatusRegla;
 import mx.com.nmp.gestionescenarios.model.InfoGeneralRegla;
 import mx.com.nmp.gestionescenarios.model.InfoRegla;
-import mx.com.nmp.gestionescenarios.model.ListaInfoGeneralRegla;
 import mx.com.nmp.gestionescenarios.model.ListaMonedas;
 import mx.com.nmp.gestionescenarios.model.ListaMonedasInner;
-import mx.com.nmp.gestionescenarios.model.Moneda;
 import mx.com.nmp.gestionescenarios.model.ModificarValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.mongodb.entity.AnclaOroDolarEntity;
 import mx.com.nmp.gestionescenarios.mongodb.entity.BolsasEntity;
-
 import mx.com.nmp.gestionescenarios.mongodb.entity.GestionEscenarioEntity;
 import mx.com.nmp.gestionescenarios.mongodb.entity.MonedasEntity;
 import mx.com.nmp.gestionescenarios.mongodb.repository.ConsolidadoEntity;
 import mx.com.nmp.gestionescenarios.mongodb.repository.EscenariosRepository;
 import mx.com.nmp.gestionescenarios.mongodb.repository.OrigenRepository;
+import mx.com.nmp.gestionescenarios.vo.GestionReglasVO;
 
 @Service
 public class GestionEscenarioService {
