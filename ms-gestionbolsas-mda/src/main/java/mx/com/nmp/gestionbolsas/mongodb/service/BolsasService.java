@@ -137,9 +137,9 @@ public class BolsasService {
 		Query query = new Query();
 		Criteria aux = Criteria.where(RAMO).is(ramo).and(SUBRAMO).is(subramo).and(FACTOR).is(factor).and(SUCURSALES).in(sucursales);
 		query.addCriteria(aux);
-		log.info("El query es "+query.toString());
+	
 		existe=mongoTemplate.exists(query, BolsasEntity.class);
-		log.info("El valor es "+existe);
+		
 		return existe;
 	}
 	
@@ -153,9 +153,7 @@ public class BolsasService {
 		Criteria aux = Criteria.where(RAMO).is(ramo).and(SUBRAMO).is(subramo).and(FACTOR).is(factor).and(SUCURSALES).in(sucursales)
 				.and(ID).nin(id);
 		query.addCriteria(aux);
-		log.info("El query es "+query.toString());
 		existe=mongoTemplate.exists(query, BolsasEntity.class);
-		log.info("El valor es "+existe);
 		return existe;
 	}
 	
