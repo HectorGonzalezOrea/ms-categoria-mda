@@ -1,6 +1,7 @@
 package mx.com.nmp.gestionbolsas.mongodb.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bson.codecs.jsr310.LocalDateCodec;
@@ -60,7 +61,8 @@ public class BolsasService {
 			bolsa.setRamo(peticion.getRamo());
 			bolsa.setSubramo(peticion.getSubramo());
 			bolsa.setFactor(peticion.getFactor());
-			bolsa.setSucursales(peticion.getSucursales());
+			//bolsa.setSucursales(peticion.getSucursales());
+			bolsa.setSucursales(paseraLista(peticion.getSucursales()));
 			bolsa.setAutor(peticion.getAutor());
 
 			LocalDate locateDate = LocalDate.now();
@@ -81,6 +83,34 @@ public class BolsasService {
 
 		return insertado;
 	}
+	
+	private List<String>paseraLista(List<String> sucursalesLst){
+		String cadena=null;
+		List<String> lstSucursales= new ArrayList<String>();
+		for (String text : sucursalesLst) {
+			cadena=text;
+		}
+		Boolean delimitador=cadena.contains("-");
+		if(delimitador ==true){
+            String[] texto = cadena.split("-");
+            Integer  inicio = Integer.parseInt(texto[0]);
+            Integer  fin= Integer.parseInt(texto[1]);
+            lstSucursales= obtenervalores(inicio,fin);
+        }else{
+        	String[] textoComas = cadena.split(",");
+            lstSucursales=Arrays.asList(textoComas);
+        }
+		return lstSucursales;
+	}
+	
+	 public  List<String> obtenervalores(Integer inicio, Integer fin ){
+		 List<String> sucursales= new ArrayList<String>();
+	        for(Integer i=inicio; i<=fin;i++){
+	            sucursales.add(String.valueOf(i));
+	            
+	        }
+	        return sucursales;
+	 } 
 	
 	/*
 	 * Validacion de tipoBolsa
