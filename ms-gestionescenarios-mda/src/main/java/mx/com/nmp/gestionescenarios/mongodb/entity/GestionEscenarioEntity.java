@@ -171,17 +171,4 @@ public class GestionEscenarioEntity {
 	public void setCandadoInferior(Object candadoInferior) {
 		this.candadoInferior = candadoInferior;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
 }
