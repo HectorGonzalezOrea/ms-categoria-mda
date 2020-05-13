@@ -265,6 +265,18 @@ public class BolsasApiController implements BolsasApi {
 
 						return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 					}
+					
+					if (Boolean.TRUE.equals(bolsaService.validarNombreActualizarBolsa(peticion.getId(), peticion.getNombre()))) {
+						BadRequest br = new BadRequest();
+						br.setCode(ERROR_CODE_BAD_REQUEST);
+						br.setMessage(ERROR_MESSAGE_NAME);
+
+						log.error("{}", br);
+
+						return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+
+					}
+					
 					Boolean actualizado = bolsaService.updateBolsa(peticion);
 
 					if (actualizado) {

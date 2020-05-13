@@ -159,6 +159,15 @@ public class BolsasService {
 		return existe;
 	}
 	
+	public Boolean validarNombreActualizarBolsa(Integer id, String nombre ) {
+		Boolean existe = false;
+		Query query = new Query();
+		Criteria aux = Criteria.where(NOMBRE).is(nombre).and(ID).nin(id); 
+		query.addCriteria(aux);
+		existe=mongoTemplate.exists(query, BolsasEntity.class);
+		return existe;
+	}
+	
 
 	/*
 	 * Consulta de bolsas con filtros
