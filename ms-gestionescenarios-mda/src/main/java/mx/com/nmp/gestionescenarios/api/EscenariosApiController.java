@@ -73,6 +73,7 @@ import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INTERN
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MENSAJE_DATE;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_DUPLICADO;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.SUCCESS_MSG_REGLA;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.MSG_ELEMENTO_INEXISTENTE;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-20T16:07:47.599Z")
 
@@ -860,16 +861,20 @@ public class EscenariosApiController implements EscenariosApi {
             	if(peticion != null) {
             		log.info("Peticion : {}", peticion.toString());
             		Boolean actualizado = gestionEscenarioService.actualizaRegla(peticion);
-            		GeneralResponse gr = new GeneralResponse ();
-            		gr.setMessage("Regla actualizada exitosamente");
-            		return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK);
+            		if(actualizado){
+            			GeneralResponse gr = new GeneralResponse ();
+                		gr.setMessage(STATUS_MESSAGE_REGLA);
+                		return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK);
+            		}else{
+            			GeneralResponse br = new GeneralResponse();
+                		br.setMessage(MSG_ELEMENTO_INEXISTENTE);
+                		return new ResponseEntity<GeneralResponse>(br, HttpStatus.OK);
+            		}
             	}else {
             		BadRequest br = new BadRequest();
             		br.setCode(ERROR_CODE_BAD_REQUEST);
             		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
-            		
             		log.error("{}" , br);
-					
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
             	}
             		

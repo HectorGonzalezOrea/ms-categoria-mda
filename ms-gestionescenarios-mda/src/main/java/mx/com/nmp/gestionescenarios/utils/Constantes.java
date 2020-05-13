@@ -13,6 +13,7 @@ public final class Constantes {
 	
 	public static final String SUCCESS_MESSAGE_OK = "Exitoso";
 	public static final String SUCCESS_MSG_REGLA="Regla almacenada exitosamente";
+	public static final String MSG_ELEMENTO_INEXISTENTE="El elemento que desea actualizar no existe";
 	
 	public static final String ERROR_CODE_BAD_REQUEST = "NMP-MDA-400";
 	public static final String ERROR_MESSAGE_BAD_REQUEST = "El cuerpo de la petición no está bien formado, verifique su información";
