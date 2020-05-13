@@ -12,6 +12,7 @@ import mx.com.nmp.gestionbolsas.model.ListaBolsas;
 import mx.com.nmp.gestionbolsas.model.ListaTipoBolsas;
 import mx.com.nmp.gestionbolsas.model.ListaTipoBolsasInner;
 import mx.com.nmp.gestionbolsas.mongodb.service.BolsasService;
+import mx.com.nmp.gestionbolsas.utils.Constantes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -323,7 +324,18 @@ public class BolsasApiController implements BolsasApi {
 		String accept = request.getHeader(HEADER_ACCEPT_KEY);
 		if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
 			try {
+				
+				Boolean validacion=bolsaService.validarBolsas(peticion.getRamo(), peticion.getSubramo(), peticion.getFactor(), peticion.getSucursales());
+				if(validacion==true) {
+					BadRequest br = new BadRequest();
+					br.setCode(ERROR_CODE_BAD_REQUEST);
+					br.setMessage(Constantes.ERROR_MESSGE_BOLSA);
 
+					log.error("{}", br);
+
+					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+					
+				}
 				if (peticion != null) {
 					if (Boolean.TRUE.equals(bolsaService.consultaBolsa(peticion.getNombre()))) {
 						BadRequest br = new BadRequest();

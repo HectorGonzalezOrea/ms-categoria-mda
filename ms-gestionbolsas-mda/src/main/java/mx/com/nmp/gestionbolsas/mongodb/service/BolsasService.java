@@ -35,6 +35,7 @@ public class BolsasService {
 	public static final String ID = "_id";
 	private static final String BOLSA_SEQ_KEY = "bolsas_sequence";
 	private static final String ID_TIPO_BOLSA = "_id";
+	private static final String SUCURSALES="sucursales";
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -121,6 +122,16 @@ public class BolsasService {
 		log.info("Encontrado: {}", encontrado);
 		
 		return encontrado;
+	}
+	
+	public Boolean validarBolsas(String ramo, String subramo, String factor, List<String> sucursales) {
+		Boolean existe = false;
+		Query query = new Query();
+		Criteria aux = Criteria.where(RAMO).is(ramo).and(SUBRAMO).is(subramo).and(FACTOR).is(factor).and(SUCURSALES).in(sucursales);
+		query.addCriteria(aux);
+		existe=mongoTemplate.exists(query, BolsasEntity.class);
+		log.info("El valor es "+existe);
+		return existe;
 	}
 	
 
