@@ -44,6 +44,7 @@ public final class Constantes {
 	public static final String GRANT_TYPE = "grant_type";
 	public static final String SCOPE = "scope";
 	public static final int STATUS_CODE_OK = 200;
+	public static final String MESSAGE_SUCCESS_OK = "Escenario ejecutado correctamente";
 	public static final String STATUS_MESSAGE_MONEDA = "Moneda almacenada exitosamente";
 	public static final String STATUS_MESSAGE_REGLA = "Regla actualizada exitosamente";
 	public static final String CODE_MESSAGE_NOT_FOUND_REGLA = "No se encontro el idRegla";

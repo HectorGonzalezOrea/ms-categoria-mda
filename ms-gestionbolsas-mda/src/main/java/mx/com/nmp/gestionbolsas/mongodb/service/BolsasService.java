@@ -123,7 +123,9 @@ public class BolsasService {
 		
 		return encontrado;
 	}
-	
+	/*
+	 * Validar Bolsas
+	 */
 	public Boolean validarBolsas(String ramo, String subramo, String factor, List<String> sucursales) {
 		Boolean existe = false;
 		Query query = new Query();

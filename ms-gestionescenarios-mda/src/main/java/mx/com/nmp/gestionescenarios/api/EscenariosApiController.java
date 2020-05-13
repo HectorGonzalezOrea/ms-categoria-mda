@@ -71,6 +71,7 @@ import static mx.com.nmp.gestionescenarios.utils.Constantes.STATUS_MESSAGE_REGLA
 import static mx.com.nmp.gestionescenarios.utils.Constantes.CODE_MESSAGE_NOT_FOUND_REGLA;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INTERNAL_SERVER_ERROR_NO_GENERIC;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MENSAJE_DATE;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.MESSAGE_SUCCESS_OK;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-20T16:07:47.599Z")
 
@@ -533,7 +534,8 @@ public class EscenariosApiController implements EscenariosApi {
 						clientService.enviarInformacionReglaEscenario(requestInformacion);
 
 					});
-					response.setMessage(Constantes.SUCCESS_MESSAGE_OK);
+					
+					response.setMessage(Constantes.MESSAGE_SUCCESS_OK);
 				}
 				break;
 			case Constantes.ESCENARIO_VALOR_ANCLA:
