@@ -34,6 +34,8 @@ public final class Constantes {
 	public static final String MESSAGE_NO_DELETE = "Bolsa no eleminada";
 	public static final String MESSAGE_OK_BOLSA = "Bolsa creada correctamente";
 	
+	public static final String ANCLA = "Ancla";
+	
 	public static final String METHOD_POST = "POST";
 	
 	public static final String HEADER_USUARIO = "usuario";

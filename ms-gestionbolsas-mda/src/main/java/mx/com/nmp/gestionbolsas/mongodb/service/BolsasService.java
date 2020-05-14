@@ -126,13 +126,17 @@ public class BolsasService {
 	/*
 	 * Validar Bolsas
 	 */
-	public Boolean validarBolsas(String ramo, String subramo, String factor, List<String> sucursales) {
+	//public Boolean validarBolsas(String ramo, String subramo, String factor, List<String> sucursales) {
+	public Boolean validarExistenciaBolsas(List<String> sucursales) {
 		Boolean existe = false;
 		Query query = new Query();
-		Criteria aux = Criteria.where(RAMO).is(ramo).and(SUBRAMO).is(subramo).and(FACTOR).is(factor).and(SUCURSALES).in(sucursales);
+		// Criteria aux = Criteria.where(RAMO).is(ramo).and(SUBRAMO).is(subramo).and(FACTOR).is(factor).and(SUCURSALES).in(sucursales);
+		Criteria aux = Criteria.where(SUCURSALES).in(sucursales);
 		query.addCriteria(aux);
-		existe=mongoTemplate.exists(query, BolsasEntity.class);
-		log.info("El valor es "+existe);
+
+		log.info("query {}", query);
+		existe = mongoTemplate.exists(query, BolsasEntity.class);
+		log.info("El valor es {}", existe);
 		return existe;
 	}
 	

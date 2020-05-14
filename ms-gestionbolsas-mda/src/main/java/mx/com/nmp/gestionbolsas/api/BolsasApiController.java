@@ -10,7 +10,6 @@ import mx.com.nmp.gestionbolsas.model.InternalServerError;
 import mx.com.nmp.gestionbolsas.model.InvalidAuthentication;
 import mx.com.nmp.gestionbolsas.model.ListaBolsas;
 import mx.com.nmp.gestionbolsas.model.ListaTipoBolsas;
-import mx.com.nmp.gestionbolsas.model.ListaTipoBolsasInner;
 import mx.com.nmp.gestionbolsas.mongodb.service.BolsasService;
 import mx.com.nmp.gestionbolsas.utils.Constantes;
 
@@ -24,10 +23,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 
@@ -42,20 +37,12 @@ import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_CODE_INTERNAL_SERV
 import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_MESSAGE_INTERNAL_SERVER_ERROR;
 import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_CODE_BAD_REQUEST;
 import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_MESSAGE_BAD_REQUEST;
-import static mx.com.nmp.gestionbolsas.utils.Constantes.SUCCESS_MESSAGE_OK;
 import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_MESSAGE_NAME;
 import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_MESSAGE_TIPO;
-import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_MESSAGE_INTERNAL_SERVER_ERROR_NO_GENERIC;
 import static mx.com.nmp.gestionbolsas.utils.Constantes.MESSAGE_DELETE;
 import static mx.com.nmp.gestionbolsas.utils.Constantes.MESSAGE_NO_DELETE;
 import static mx.com.nmp.gestionbolsas.utils.Constantes.MESSAGE_OK_BOLSA;
-import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_CODE_NOT_FOUND;
-import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_MESSAGE_NOT_FOUND;
-
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import static mx.com.nmp.gestionbolsas.utils.Constantes.ANCLA;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-02-21T17:43:22.226Z")
 
@@ -156,7 +143,9 @@ public class BolsasApiController implements BolsasApi {
 		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 	}
 
-
+	/*
+	 * Eliminar bolsa por id
+	 */
 	@Override
 	public ResponseEntity<?> bolsasIdBolsaDelete(
 			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) 
@@ -225,6 +214,9 @@ public class BolsasApiController implements BolsasApi {
 		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 	}
 
+	/*
+	 * Actualizar Bolsas
+	 */
 	@Override
 	public ResponseEntity<?> bolsasPatch(
 			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true)
@@ -298,16 +290,17 @@ public class BolsasApiController implements BolsasApi {
 		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 	}
 
+	/*
+	 * Crear bolsa
+	 */
 	@Override
 	public ResponseEntity<?> bolsasPost(
-			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) 
-			@RequestHeader(value = "usuario", required = true) String usuario,
-			@ApiParam(value = "Cuerpo de la petición", required = true)
-			@Valid @RequestBody Bolsa peticion) {
+			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Cuerpo de la petición", required = true) @Valid @RequestBody Bolsa peticion) {
 		log.info("*********************************************************");
 		log.info("Crear Bolsa");
 		log.info("*********************************************************");
-		
+
 		String apiKey = request.getHeader(HEADER_APIKEY_KEY);
 
 		if (apiKey == null || apiKey.equals(CADENA_VACIA)) {
@@ -324,61 +317,122 @@ public class BolsasApiController implements BolsasApi {
 		String accept = request.getHeader(HEADER_ACCEPT_KEY);
 		if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
 			try {
-				
-				Boolean validacion=bolsaService.validarBolsas(peticion.getRamo(), peticion.getSubramo(), peticion.getFactor(), peticion.getSucursales());
-				if(validacion==true) {
-					BadRequest br = new BadRequest();
-					br.setCode(ERROR_CODE_BAD_REQUEST);
-					br.setMessage(Constantes.ERROR_MESSGE_BOLSA);
-
-					log.error("{}", br);
-
-					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+				if(peticion != null) {
+					log.info("peticion: {}" , peticion);
 					
-				}
-				if (peticion != null) {
-					if (Boolean.TRUE.equals(bolsaService.consultaBolsa(peticion.getNombre()))) {
-						BadRequest br = new BadRequest();
-						br.setCode(ERROR_CODE_BAD_REQUEST);
-						br.setMessage(ERROR_MESSAGE_NAME);
+					//Boolean validacion = bolsaService.validarBolsas(peticion.getRamo(), peticion.getSubramo(), peticion.getFactor(), peticion.getSucursales());
+					if(!peticion.getSucursales().isEmpty()) {
+						Boolean validacion = bolsaService.validarExistenciaBolsas(peticion.getSucursales());
+						if (Boolean.TRUE.equals(validacion)) {
+							BadRequest br = new BadRequest();
+							br.setCode(ERROR_CODE_BAD_REQUEST);
+							br.setMessage(Constantes.ERROR_MESSGE_BOLSA);
 
-						log.error("{}", br);
+							log.error("{}", br);
 
-						return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
-
-					}
-					if (Boolean.FALSE.equals(bolsaService.consultaTipoBolsa(peticion.getTipo().getId()))) {
-						BadRequest br = new BadRequest();
-						br.setCode(ERROR_CODE_BAD_REQUEST);
-						br.setMessage(ERROR_MESSAGE_TIPO);
-
-						log.error("{}", br);
-
-						return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
-
-					} else {
-
-						log.info("peticion: " + peticion.toString());
-
-						Boolean insertado = bolsaService.crearBolsa(peticion);
-						if (insertado) {
-							GeneralResponse resp = new GeneralResponse();
-							resp.setMessage(MESSAGE_OK_BOLSA);
-
-							return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
+							return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 						} else {
-							InternalServerError ie = new InternalServerError();
-							ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
-							ie.setMessage(ERROR_MESSAGE_INTERNAL_SERVER_ERROR);
+							if (Boolean.TRUE.equals(bolsaService.consultaBolsa(peticion.getNombre()))) {
+								BadRequest br = new BadRequest();
+								br.setCode(ERROR_CODE_BAD_REQUEST);
+								br.setMessage(ERROR_MESSAGE_NAME);
 
-							return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+								log.error("{}", br);
+
+								return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+							}
+							if(peticion.getTipo() == null || peticion.getTipo().equals(CADENA_VACIA)) {
+								BadRequest br = new BadRequest();
+								br.setCode(ERROR_CODE_BAD_REQUEST);
+								br.setMessage(ERROR_MESSAGE_TIPO);
+
+								log.error("{}", br);
+
+								return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+							} else {
+								if (Boolean.FALSE.equals(bolsaService.consultaTipoBolsa(peticion.getTipo().getId()))) {
+									BadRequest br = new BadRequest();
+									br.setCode(ERROR_CODE_BAD_REQUEST);
+									br.setMessage(ERROR_MESSAGE_TIPO);
+
+									log.error("{}", br);
+
+									return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+
+								} else {
+									Boolean tipoBolsa = bolsaService.consultaTipoBolsaRegla(peticion.getTipo().getId());
+									log.info("Tipo Bolsa", tipoBolsa);
+									if (Boolean.TRUE.equals(tipoBolsa)) {
+										if ((peticion.getFactor() == null || peticion.getFactor().equals(CADENA_VACIA))
+												|| (peticion.getRamo() == null || peticion.getRamo().equals(CADENA_VACIA))
+												|| (peticion.getSubramo() == null || peticion.getSubramo().equals(CADENA_VACIA))) {
+											
+											BadRequest br = new BadRequest();
+											br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+											br.setCode(ERROR_CODE_BAD_REQUEST);
+											
+											log.error("{}", br);
+											
+											return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+										} else {
+											Boolean insertado = bolsaService.crearBolsa(peticion);
+											if (Boolean.TRUE.equals(insertado)) {
+												GeneralResponse resp = new GeneralResponse();
+												resp.setMessage(MESSAGE_OK_BOLSA);
+
+												log.info("{}", resp);
+												
+												return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
+											} else {
+												InternalServerError ie = new InternalServerError();
+												ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
+												ie.setMessage("Error interno del servidor");
+
+												log.error("{}", ie);
+												
+												return new ResponseEntity<InternalServerError>(ie,
+														HttpStatus.INTERNAL_SERVER_ERROR);
+											}
+										}
+									} else {
+										if(peticion.getTipo().equals(ANCLA)) {
+											Boolean insertado = bolsaService.crearBolsa(peticion);
+											if (insertado) {
+												GeneralResponse resp = new GeneralResponse();
+												resp.setMessage(MESSAGE_OK_BOLSA);
+
+												return new ResponseEntity<GeneralResponse>(resp, HttpStatus.OK);
+											} else {
+												InternalServerError ie = new InternalServerError();
+												ie.setCode(ERROR_CODE_INTERNAL_SERVER_ERROR);
+												ie.setMessage("Error interno del servidor");
+
+												log.error("{}", ie);
+												
+												return new ResponseEntity<InternalServerError>(ie,
+														HttpStatus.INTERNAL_SERVER_ERROR);
+											}
+										}
+									}
+								}
+							}
 						}
+					} else {
+						BadRequest br = new BadRequest();
+						br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+						br.setCode(ERROR_CODE_BAD_REQUEST);
+						
+						log.error("{}", br);
+						
+						return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 					}
 				} else {
 					BadRequest br = new BadRequest();
 					br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
 					br.setCode(ERROR_CODE_BAD_REQUEST);
-
+					
+					log.error("{}", br);
+					
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 				}
 			} catch (Exception e) {
@@ -388,20 +442,23 @@ public class BolsasApiController implements BolsasApi {
 				ie.setMessage(ERROR_MESSAGE_INTERNAL_SERVER_ERROR);
 
 				log.error("{}", ie);
-				
+
 				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
-
+		
 		BadRequest br = new BadRequest();
 		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
 		br.setCode(ERROR_CODE_BAD_REQUEST);
 
-		log.error("{}" , br);
-		
-		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
-	}
+		log.error("{}", br);
 
+		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+	}			
+					
+	/*
+	 * Consultar tipo de bolsa
+	 */
 	@Override
 	public ResponseEntity<?> bolsasTiposGet(
 			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true)
