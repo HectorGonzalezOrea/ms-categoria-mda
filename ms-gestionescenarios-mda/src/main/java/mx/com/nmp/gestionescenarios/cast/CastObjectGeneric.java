@@ -10,6 +10,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.stereotype.Repository;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -22,7 +24,7 @@ import mx.com.nmp.gestionescenarios.model.InfoRegla;
 import mx.com.nmp.gestionescenarios.vo.AnclaOroDolarVO;
 import mx.com.nmp.gestionescenarios.vo.CommonVO;
 import mx.com.nmp.gestionescenarios.vo.GestionReglasVO;
-
+@Repository
 public class CastObjectGeneric {
 	
 	public List<CommonVO> convertObjectToPojo(Object obj) {
