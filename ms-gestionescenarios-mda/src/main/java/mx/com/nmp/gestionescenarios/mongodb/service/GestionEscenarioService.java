@@ -17,26 +17,22 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
-
-import mx.com.nmp.gestionescenarios.mongodb.service.SequenceGeneratorService;
-import mx.com.nmp.gestionescenarios.vo.GestionReglasVO;
 import mx.com.nmp.gestionescenarios.cast.CastObjectGeneric;
 import mx.com.nmp.gestionescenarios.model.EstatusRegla;
 import mx.com.nmp.gestionescenarios.model.InfoGeneralRegla;
 import mx.com.nmp.gestionescenarios.model.InfoRegla;
-import mx.com.nmp.gestionescenarios.model.ListaInfoGeneralRegla;
 import mx.com.nmp.gestionescenarios.model.ListaMonedas;
 import mx.com.nmp.gestionescenarios.model.ListaMonedasInner;
-import mx.com.nmp.gestionescenarios.model.Moneda;
 import mx.com.nmp.gestionescenarios.model.ModificarValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.mongodb.entity.AnclaOroDolarEntity;
 import mx.com.nmp.gestionescenarios.mongodb.entity.BolsasEntity;
-
 import mx.com.nmp.gestionescenarios.mongodb.entity.GestionEscenarioEntity;
 import mx.com.nmp.gestionescenarios.mongodb.entity.MonedasEntity;
 import mx.com.nmp.gestionescenarios.mongodb.repository.ConsolidadoEntity;
 import mx.com.nmp.gestionescenarios.mongodb.repository.EscenariosRepository;
 import mx.com.nmp.gestionescenarios.mongodb.repository.OrigenRepository;
+import mx.com.nmp.gestionescenarios.vo.CommonVO;
+import mx.com.nmp.gestionescenarios.vo.GestionReglasVO;
 
 @Service
 public class GestionEscenarioService {
@@ -68,9 +64,9 @@ public class GestionEscenarioService {
 	@Autowired
 	private SequenceGeneratorService sequenceGeneratorService;
 	@Autowired
-	private OrigenRepository origenRepository;
-	@Autowired
 	private EscenariosRepository escenariosRepository;
+	@Autowired
+	private CastObjectGeneric castObjectGeneric;
 
 	/*
 	 * Almacenar Regla POST /escenarios/reglas
@@ -1073,4 +1069,44 @@ public class GestionEscenarioService {
 			return flag=false;
 		}
 	}
+	
+	public Boolean estaVacio(InfoRegla regla){
+    	Boolean flag=false;
+    	if(regla.getId()==null)flag=true;
+    	if(regla.getOrigen()==null)flag=true;
+    	if(regla.getBolsas()==null)flag=true;
+    	if(regla.getEstatus()==null)flag=true;
+    	if(regla.getEstatusPartida()==null)flag=true;
+    	if(regla.getCanalIngresoActual()==null)flag=true;
+    	if(regla.getNivelAgrupacion()==null)flag=true;
+    	if(regla.getNombre()==null)flag=true;
+    	if(regla.getRamo()==null)flag=true;
+    	if(regla.getSucursales()==null)flag=true;
+    	if(regla.getCanalComercializacion()==null)flag=true;
+    	if(regla.getFechaAplicacion()==null)flag=true;
+    	if(regla.isCompraCumplido()==null)flag=true;
+    	if(regla.getAforo()==null)flag=true;
+    	if(regla.getDiasAlmoneda()==null)flag=true;
+    	if(regla.getReglasDescuento()==null)flag=true;
+    	if(regla.getCandadoInferior()==null)flag=true;
+    	if(regla.getSubramo()!=null){
+    		List<CommonVO> lst =castObjectGeneric.convertObjectToPojo(regla.getSubramo());
+    		for (CommonVO commonVO : lst) {
+    			if(commonVO.getDescripcion()==null||commonVO.getId()==null)flag=true;
+			}
+    	}
+    	if(regla.getFactor()!=null){
+    		List<CommonVO> factor=(List<CommonVO>) castObjectGeneric.convertObjectToPojo(regla.getFactor());
+    		for (CommonVO fac : factor) {
+    			if(fac.getDescripcion()==null||fac.getId()==null)flag=true;
+			}
+    	}
+    	if(regla.getClasificacionClientes()!=null){
+    		List<CommonVO> cl=(List<CommonVO>) castObjectGeneric.convertObjectToPojo(regla.getClasificacionClientes());
+    		for (CommonVO cliente : cl) {
+    			if(cliente.getDescripcion()==null||cliente.getId()==null)flag=true;
+			}
+    	}
+    	return flag;
+    }
 }

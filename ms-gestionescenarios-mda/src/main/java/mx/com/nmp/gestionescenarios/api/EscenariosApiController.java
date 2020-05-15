@@ -1,7 +1,24 @@
 package mx.com.nmp.gestionescenarios.api;
 
-import java.io.IOException;
-import java.util.Date;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.CADENA_VACIA;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.CODE_MESSAGE_NOT_FOUND_REGLA;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_CODE_BAD_REQUEST;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_CODE_INTERNAL_SERVER_ERROR;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_CODE_INVALID_AUTHENTICATION;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MENSAJE_DATE;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_BAD_REQUEST;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INTERNAL_SERVER_ERROR;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INTERNAL_SERVER_ERROR_NO_GENERIC;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.FECHA_NOT_FOUND;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.HEADER_ACCEPT_KEY;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.HEADER_ACCEPT_VALUE;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.HEADER_APIKEY_KEY;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.MSG_ELEMENTO_INEXISTENTE;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.STATUS_MESSAGE_MONEDA;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.STATUS_MESSAGE_REGLA;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.SUCCESS_MESSAGE_OK;
+
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +37,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
-import org.threeten.bp.LocalDate;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,13 +45,13 @@ import io.swagger.annotations.ApiParam;
 import mx.com.nmp.gestionescenarios.cast.CastObjectGeneric;
 import mx.com.nmp.gestionescenarios.clientservice.ClientService;
 import mx.com.nmp.gestionescenarios.model.BadRequest;
-import mx.com.nmp.gestionescenarios.model.Bolsa;
 import mx.com.nmp.gestionescenarios.model.Escenarios;
 import mx.com.nmp.gestionescenarios.model.EstatusRegla;
 import mx.com.nmp.gestionescenarios.model.GeneralResponse;
 import mx.com.nmp.gestionescenarios.model.InfoGeneralRegla;
 import mx.com.nmp.gestionescenarios.model.InfoRegla;
-import mx.com.nmp.gestionescenarios.model.ListaBolsas;
+import mx.com.nmp.gestionescenarios.model.InternalServerError;
+import mx.com.nmp.gestionescenarios.model.InvalidAuthentication;
 import mx.com.nmp.gestionescenarios.model.ListaInfoGeneralRegla;
 import mx.com.nmp.gestionescenarios.model.ListaMonedas;
 import mx.com.nmp.gestionescenarios.model.ListaMonedasInner;
@@ -51,28 +67,6 @@ import mx.com.nmp.gestionescenarios.vo.AnclaOroDolarVO;
 import mx.com.nmp.gestionescenarios.vo.GestionMonedasVO;
 import mx.com.nmp.gestionescenarios.vo.GestionReglasVO;
 import mx.com.nmp.gestionescenarios.vo.ResponseClientVO;
-import mx.com.nmp.gestionescenarios.model.InternalServerError;
-import mx.com.nmp.gestionescenarios.model.InvalidAuthentication;
-
-import static mx.com.nmp.gestionescenarios.utils.Constantes.HEADER_APIKEY_KEY;
-import static mx.com.nmp.gestionescenarios.utils.Constantes.HEADER_ACCEPT_KEY;
-import static mx.com.nmp.gestionescenarios.utils.Constantes.HEADER_ACCEPT_VALUE;
-import static mx.com.nmp.gestionescenarios.utils.Constantes.CADENA_VACIA;
-
-import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_CODE_INVALID_AUTHENTICATION;
-import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION;
-import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_CODE_INTERNAL_SERVER_ERROR;
-import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INTERNAL_SERVER_ERROR;
-import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_CODE_BAD_REQUEST;
-import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_BAD_REQUEST;
-import static mx.com.nmp.gestionescenarios.utils.Constantes.SUCCESS_MESSAGE_OK;
-import static mx.com.nmp.gestionescenarios.utils.Constantes.STATUS_MESSAGE_MONEDA;
-import static mx.com.nmp.gestionescenarios.utils.Constantes.STATUS_MESSAGE_REGLA;
-import static mx.com.nmp.gestionescenarios.utils.Constantes.CODE_MESSAGE_NOT_FOUND_REGLA;
-import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INTERNAL_SERVER_ERROR_NO_GENERIC;
-import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MENSAJE_DATE;
-import static mx.com.nmp.gestionescenarios.utils.Constantes.FECHA_NOT_FOUND;
-import static mx.com.nmp.gestionescenarios.utils.Constantes.MSG_ELEMENTO_INEXISTENTE;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-20T16:07:47.599Z")
 
@@ -838,11 +832,9 @@ public class EscenariosApiController implements EscenariosApi {
 	public ResponseEntity<?> escenariosReglasPatch(
 			@ApiParam(value = "Usuario de sistema que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = "Cuerpo de la petición", required = true) @Valid @RequestBody InfoRegla peticion) {
-		
 		log.info("*************************************************************");
 		log.info("escenariosReglasPatch");
 		log.info("*************************************************************");
-		
     	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
     	if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
     		InvalidAuthentication ia = new InvalidAuthentication();
@@ -856,6 +848,14 @@ public class EscenariosApiController implements EscenariosApi {
             try {   	
             	if(peticion != null) {
             		log.info("Peticion : {}", peticion.toString());
+            		if(gestionEscenarioService.estaVacio(peticion)){
+            			BadRequest br = new BadRequest();
+                		br.setCode(ERROR_CODE_BAD_REQUEST);
+                		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
+                		log.error("{}" , br);
+                		log.error("Faltan elementos en el objeto infoRegla");
+    					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+            		}
             		Boolean actualizado = gestionEscenarioService.actualizaRegla(peticion);
             		if(actualizado){
             		GeneralResponse gr = new GeneralResponse ();
