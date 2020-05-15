@@ -25,6 +25,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import mx.com.nmp.consolidados.constantes.Constantes.Common;
 import mx.com.nmp.consolidados.model.Consolidados;
 import mx.com.nmp.consolidados.model.ConsultarArchivoConsolidadoResInner;
 import mx.com.nmp.consolidados.model.InfoProducto;
@@ -46,6 +47,7 @@ import mx.com.nmp.consolidados.oag.vo.EnviarNotificacionRequestVO;
 import mx.com.nmp.consolidados.oag.vo.PartidaResponseVO;
 import mx.com.nmp.consolidados.oag.vo.PartidaVO;
 import mx.com.nmp.consolidados.utils.ConvertStringToBase64;
+import mx.com.nmp.consolidados.utils.ConverterUtil;
 import mx.com.nmp.consolidados.utils.ExcelUtils;
 import mx.com.nmp.consolidados.utils.HtmlUtil;
 
@@ -192,28 +194,53 @@ public class ConsolidadoService {
 		}
 		return eliminado;
 	}
+	
 
 	/*
 	 * Actualiza la prioridad del archivo consolidados
 	 */
 	public InlineResponse200 actualizarPrioridadArchivo(ModificarPrioridadArchivoConsolidadoReq request) {
 		log.info("Actualizar Prioridad Archivo Consolidado");
-
+		CastConsolidados cast= new CastConsolidados();
 		InlineResponse200 resp = null;
-
-		Query query = new Query();
-		query.addCriteria(Criteria.where(ID_ARCHIVO).is(request.getIdArchivo()));
+		Query query1 = new Query();
+		query1.addCriteria(Criteria.where(ID_ARCHIVO).is(request.getIdArchivo()));
 		Update update = new Update();
 		update.set(PRIORIDAD, request.getIdPrioridad());
-
-		ArchivoEntity consolidado = mongoTemplate.findAndModify(query, update, ArchivoEntity.class);
-
-		if (consolidado != null) {
-			resp = new InlineResponse200();
-
-			resp.setIdPosicion(consolidado.getPrioridad());
-			resp.setNombreArchivo(consolidado.getNombreAjuste());
+		ArchivoEntity consolidado = mongoTemplate.findAndModify(query1, update, ArchivoEntity.class);
+			
+		Query queryCons = new Query();
+		queryCons.addCriteria(Criteria.where(ID_ARCHIVO).is(request.getIdArchivo()));
+		//ArchivoEntity consolidado =  mongoTemplate.find(queryCons, ArchivoEntity.class).get(0);
+		Date fechaInicio=cast.resetTimeToDown(consolidado.getVigencia());
+		Date fechaFin=cast.resetTimeToUp(consolidado.getVigencia());
+		Query query= new Query();
+		query.addCriteria(Criteria.where(FECHA).gte(fechaInicio).lt(fechaFin).and(ID_ARCHIVO).nin(consolidado.getIdArchivo()));
+		query.with(new Sort(new Order(Direction.ASC,PRIORIDAD)));
+		List<ArchivoEntity> lstEntity=mongoTemplate.find(query, ArchivoEntity.class);
+		Integer prioridad=0;
+		if(request.getIdPrioridad() ==1) {
+			prioridad=1;
 		}
+		
+		if(!lstEntity.isEmpty() && request.getIdPrioridad() <=lstEntity.size()) {
+	
+		for (ArchivoEntity entity : lstEntity) {
+			if(entity.getIdArchivo() !=Long.valueOf(request.getIdArchivo())) {
+				prioridad ++;
+				entity.setPrioridad(prioridad);
+				
+			}
+			
+			mongoTemplate.save(entity);
+		}
+		}else {
+			log.info("Ocurrio un error el id prioridad esta fuera del rango.");
+		}
+		resp = new InlineResponse200();
+
+		resp.setIdPosicion(consolidado.getPrioridad());
+		resp.setNombreArchivo(consolidado.getNombreAjuste());
 
 		return resp;
 	}

@@ -6,8 +6,10 @@ public class Constantes {
 		public static final String ERROR_MENSAJE = "El cuerpo de la petición no está bien formado, verifique su información.";
 		public static final String ERROR_MENSAJE_IDS = "El cuerpo de la petición no está bien formado, los id's del archivo deben de iguales.";
 		public static final String ERROR_MENSAJE_DATE = "La fecha debe ser enviada con el formato dd/mm/yyyy";
-		
+		public static final String ERROR_CONSOLIDACION="El id de la prioridad no es válido.";
 		public static final String ERROR_BAD_REQUEST_EXT = "Formato de archivo no es válido.";
+		
+		
 		
 		public static final String CODE_NOT_FOUND = "NMP-MDA-404";
 		public static final String MESSAGE_NOT_FOUND = "No existe el recurso con la información proporcionada. Verificar y volver a enviar la petición.";

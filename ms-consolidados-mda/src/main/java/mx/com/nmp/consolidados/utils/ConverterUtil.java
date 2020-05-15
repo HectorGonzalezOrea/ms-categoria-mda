@@ -1,6 +1,8 @@
 package mx.com.nmp.consolidados.utils;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,5 +71,4 @@ public class ConverterUtil {
 		}
 		return obj;
 	}
-	
 }

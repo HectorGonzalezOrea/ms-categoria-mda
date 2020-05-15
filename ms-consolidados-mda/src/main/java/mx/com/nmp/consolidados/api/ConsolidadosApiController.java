@@ -117,7 +117,12 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 				}
-				
+				if(modificarPosicionReq.getIdPrioridad() <1 ) {
+					BadRequest br = new BadRequest();
+					br.setCodigo(Common.ERROR_CODE);
+					br.setMensaje(Common.ERROR_CONSOLIDACION);
+					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+				}
 				if(idArchivo.equals(modificarPosicionReq.getIdArchivo().toString())) {
 					InlineResponse200 resp = consolidadoService.actualizarPrioridadArchivo(modificarPosicionReq);
 					if (resp != null) {
