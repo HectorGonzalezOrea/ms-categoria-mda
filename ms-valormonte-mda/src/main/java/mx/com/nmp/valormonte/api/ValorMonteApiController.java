@@ -13,6 +13,7 @@ import mx.com.nmp.valormonte.model.CalculoValorMonteRes;
 import mx.com.nmp.valormonte.model.CalculoValorMonteResInner;
 import mx.com.nmp.valormonte.model.InternalServerError;
 import mx.com.nmp.valormonte.model.InvalidAuthentication;
+import mx.com.nmp.valormonte.model.NotFound;
 import mx.com.nmp.valormonte.service.ValorMonteService;
 
 import org.slf4j.Logger;
@@ -82,7 +83,8 @@ public class ValorMonteApiController implements ValorMonteApi {
     	String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
 			try {
-				CalculoValorMonteRes resp;
+				//CalculoValorMonteRes resp;
+				Object resp;
 
 				if (valorMonteReq.isEmpty()) {
 					log.info("Request Invalido");
@@ -99,20 +101,21 @@ public class ValorMonteApiController implements ValorMonteApi {
 					
 					if(Boolean.TRUE.equals(this.validarCalculoValorMonteReq(valorMonteReq))) {
 						resp = valorMonteService.calcularValorMonte(valorMonteReq);
-						if (resp != null) {
-							log.info("{}", resp);
-
-							return new ResponseEntity<CalculoValorMonteRes>(resp, HttpStatus.OK);
+						
+						log.info("{}", resp);
+						
+						if(resp instanceof CalculoValorMonteRes) {
+							return new ResponseEntity<CalculoValorMonteRes>((CalculoValorMonteRes)resp, HttpStatus.OK);
+						} else if(resp instanceof NotFound) {
+							return new ResponseEntity<NotFound>((NotFound)resp, HttpStatus.NOT_FOUND);
 						} else {
-							log.error("No se pudo hacer el calculo");
 							InternalServerError ise = new InternalServerError();
+
 							ise.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
 							ise.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
 							
-							log.info("{}" , ConverterUtil.messageToJson(ise));
-							
+							log.info("{}" , ise);
 							return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
-					
 						}
 					} else {
 						log.info("Request Invalido");
@@ -130,20 +133,21 @@ public class ValorMonteApiController implements ValorMonteApi {
 				InternalServerError ise = new InternalServerError();
 
 				ise.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
-				ise.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
+				//ise.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
+				ise.setMensaje(e.getMessage());
 				
 				log.info("{}" , ise);
 				return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-		} else {
+		}
+		
 			BadRequest br = new BadRequest();
-
+	
 			br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 			br.mensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
-			
+				
 			log.info("{}" , br);
 			return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
-		}
 	}
 
 	private Boolean validarCalculoValorMonteReq(CalculoValorMonteReq req) {

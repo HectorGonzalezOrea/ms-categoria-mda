@@ -1,16 +1,22 @@
 package mx.com.nmp.valormonte.service;
 
+import java.awt.List;
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import mx.com.nmp.valormonte.api.NotFoundException;
 import mx.com.nmp.valormonte.elastic.controller.ElasticController;
 import mx.com.nmp.valormonte.elastic.vo.Source;
 import mx.com.nmp.valormonte.model.CalculoValorMonteReq;
 import mx.com.nmp.valormonte.model.CalculoValorMonteReqInner;
 import mx.com.nmp.valormonte.model.CalculoValorMonteRes;
 import mx.com.nmp.valormonte.model.CalculoValorMonteResInner;
+import mx.com.nmp.valormonte.model.NotFound;
+import mx.com.nmp.valormonte.utils.Constantes;
 
 @Service
 public class ValorMonteService {
@@ -20,49 +26,71 @@ public class ValorMonteService {
 
 	private static final Logger log = LoggerFactory.getLogger(ValorMonteService.class);
 
-	public CalculoValorMonteRes calcularValorMonte(CalculoValorMonteReq vm) {
+	public Object calcularValorMonte(CalculoValorMonteReq vm) throws NotFoundException {
 		log.info("ValorMonteService.CalcularValorMonte");
 
 		Float vma = null;
 		CalculoValorMonteRes cvmResp = null;
 		CalculoValorMonteResInner cvmRespInner = null;
 
-		if (vm != null) {
-			cvmResp = new CalculoValorMonteRes();
-			for (CalculoValorMonteReqInner vmri : vm) {
-				Source producto = elasticController.consultaElastic(vmri.getSKU(), vmri.getIdPartida());
-				if(producto != null) {
-					if (vmri.getValorAncla() != null && vmri.getDesplazamiento() != null && vmri.getGramaje() != null
-							&& vmri.getIncremento() != null && vmri.getKilataje() != null
-							&& vmri.getAvaluoComplementario() != null) {
-						
-						vma = this.valorMonteActualizado(vmri);
-						cvmRespInner = new CalculoValorMonteResInner();
+		ArrayList<String> noEncontrados = new ArrayList<>();
 
-						cvmRespInner.setIdPartida(vmri.getIdPartida());
-						cvmRespInner.setSku(vmri.getSKU());
-						cvmRespInner.setValorMonteActualizado(vma);
+		try {
+			if (vm != null) {
+				cvmResp = new CalculoValorMonteRes();
+				for (CalculoValorMonteReqInner vmri : vm) {
+					Source producto = elasticController.consultaElastic(vmri.getSKU(), vmri.getIdPartida());
+					if (producto != null) {
+						if (vmri.getValorAncla() != null && vmri.getDesplazamiento() != null
+								&& vmri.getGramaje() != null && vmri.getIncremento() != null
+								&& vmri.getKilataje() != null && vmri.getAvaluoComplementario() != null) {
 
-						cvmResp.add(cvmRespInner);
-					} else {
-						if(producto != null) {
+							vma = this.valorMonteActualizado(vmri);
 							cvmRespInner = new CalculoValorMonteResInner();
 
-							cvmRespInner.setIdPartida(Integer.valueOf(producto.getPartida()));
-							cvmRespInner.setSku(producto.getSku());
-							
-							if(producto.getValorMonteAct() != null) {
-								cvmRespInner.setValorMonteActualizado(Float.valueOf(producto.getValorMonteAct()));
-							}
+							cvmRespInner.setIdPartida(vmri.getIdPartida());
+							cvmRespInner.setSku(vmri.getSKU());
+							cvmRespInner.setValorMonteActualizado(vma);
+
 							cvmResp.add(cvmRespInner);
+						} else {
+							if (producto != null) {
+								cvmRespInner = new CalculoValorMonteResInner();
+
+								cvmRespInner.setIdPartida(Integer.valueOf(producto.getPartida()));
+								cvmRespInner.setSku(producto.getSku());
+
+								if (producto.getValorMonteAct() != null) {
+									cvmRespInner.setValorMonteActualizado(Float.valueOf(producto.getValorMonteAct()));
+								}
+								cvmResp.add(cvmRespInner);
+							}
 						}
+					} else {
+						noEncontrados.add(vmri.getSKU());
 					}
 				}
+
+				if (!cvmResp.isEmpty()) {
+					return cvmResp;
+				}
+
+				if (!noEncontrados.isEmpty() && cvmResp.isEmpty()) {
+					NotFound nf = new NotFound();
+
+					nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND_ERROR);
+					nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND_ERROR + noEncontrados.toString());
+
+					return nf;
+				}
 			}
+		} catch (Exception e) {
+			log.error("Excepcion: {}" , e);
+			
+			throw new NotFoundException(500, e.getMessage());
 		}
 
 		return cvmResp;
-
 	}
 
 	private Float valorMonteActualizado(CalculoValorMonteReqInner producto) {

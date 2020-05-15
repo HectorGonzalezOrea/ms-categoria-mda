@@ -75,7 +75,7 @@ public class AnclaApiController implements AnclaApi {
             		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
             		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
             		log.error("Se ha producido un error de autorización. No se recibio un APIKEY valido. Valor recibido: {}", apikey);
-            		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.FORBIDDEN);
+            		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
             	}
             	
             	if(usuario == null || usuario.trim().length()==0) {

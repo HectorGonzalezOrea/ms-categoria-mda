@@ -23,6 +23,9 @@ public final class Constantes {
 	public static final String ERROR_CODE_BAD_REQUEST = "NMP-MDA-400";
 	public static final String ERROR_MESSAGE_BAD_REQUEST = "El cuerpo de la petición no está bien formado, verifique su información";
 	
+	public static final String ERROR_CODE_NOT_FOUND_ERROR = "NMP-MDA-404";
+	public static final String ERROR_MESSAGE_NOT_FOUND_ERROR = "Producto(s) no encontrado(s): ";
+	
 	public static final String ERROR_CODE_INTERNAL_ERROR = "NMP-MDA-500";
 	public static final String ERROR_MESSAGE_INTERNAL_ERROR = "Error interno del servidor";
 }
