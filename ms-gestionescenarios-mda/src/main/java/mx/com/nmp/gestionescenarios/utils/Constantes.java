@@ -48,6 +48,7 @@ public final class Constantes {
 	public static final String STATUS_MESSAGE_MONEDA = "Moneda almacenada exitosamente";
 	public static final String STATUS_MESSAGE_REGLA = "Regla actualizada exitosamente";
 	public static final String CODE_MESSAGE_NOT_FOUND_REGLA = "No se encontro el idRegla";
+	public static final String FECHA_NOT_FOUND = "La fecha no fue encontrada";
 	
 	public static final String FECHA_APLICACION = "fechaAplicacion";
 	public static final String VIGENCIA = "vigencia";

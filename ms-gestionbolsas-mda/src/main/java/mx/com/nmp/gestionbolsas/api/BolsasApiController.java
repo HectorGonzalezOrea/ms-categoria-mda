@@ -395,7 +395,7 @@ public class BolsasApiController implements BolsasApi {
 											}
 										}
 									} else {
-										if(peticion.getTipo().equals(ANCLA)) {
+										
 											Boolean insertado = bolsaService.crearBolsa(peticion);
 											if (insertado) {
 												GeneralResponse resp = new GeneralResponse();
@@ -412,7 +412,7 @@ public class BolsasApiController implements BolsasApi {
 												return new ResponseEntity<InternalServerError>(ie,
 														HttpStatus.INTERNAL_SERVER_ERROR);
 											}
-										}
+										
 									}
 								}
 							}

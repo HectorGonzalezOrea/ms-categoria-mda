@@ -71,7 +71,7 @@ import static mx.com.nmp.gestionescenarios.utils.Constantes.STATUS_MESSAGE_REGLA
 import static mx.com.nmp.gestionescenarios.utils.Constantes.CODE_MESSAGE_NOT_FOUND_REGLA;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INTERNAL_SERVER_ERROR_NO_GENERIC;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MENSAJE_DATE;
-import static mx.com.nmp.gestionescenarios.utils.Constantes.MESSAGE_SUCCESS_OK;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.FECHA_NOT_FOUND;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-20T16:07:47.599Z")
 
@@ -528,7 +528,7 @@ public class EscenariosApiController implements EscenariosApi {
 				log.info("Entrando al case "+ Constantes.ESCENARIO_DINAMICOS);
 				List<GestionReglasVO>lstInfoReglas =gestionEscenarioService.obtenerReglasByFechas(peticion.getFecha());
 				if(!lstInfoReglas.isEmpty()) {
-					lstInfoReglas.stream().forEach(vo->{
+					lstInfoReglas.stream().forEach(vo->{	
 						RequestInformacionEscenarioDto requestInformacion= new RequestInformacionEscenarioDto();
 						requestInformacion.setInfoRegla(cast.formatInformacionEscenario(vo));
 						clientService.enviarInformacionReglaEscenario(requestInformacion);
@@ -536,6 +536,8 @@ public class EscenariosApiController implements EscenariosApi {
 					});
 					
 					response.setMessage(Constantes.MESSAGE_SUCCESS_OK);
+				}else {
+					response.setMessage(FECHA_NOT_FOUND);
 				}
 				break;
 			case Constantes.ESCENARIO_VALOR_ANCLA:
