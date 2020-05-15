@@ -72,6 +72,7 @@ import static mx.com.nmp.gestionescenarios.utils.Constantes.CODE_MESSAGE_NOT_FOU
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MESSAGE_INTERNAL_SERVER_ERROR_NO_GENERIC;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ERROR_MENSAJE_DATE;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.FECHA_NOT_FOUND;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.MSG_ELEMENTO_INEXISTENTE;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-20T16:07:47.599Z")
 
@@ -843,39 +844,35 @@ public class EscenariosApiController implements EscenariosApi {
 		log.info("*************************************************************");
 		
     	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
-    	
     	if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
-    		
     		InvalidAuthentication ia = new InvalidAuthentication();
     		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
     		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
-    		
     		log.error("{}" , ia);
-    		
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
     	}
-		
         String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
-            try {
-            	
+            try {   	
             	if(peticion != null) {
             		log.info("Peticion : {}", peticion.toString());
             		Boolean actualizado = gestionEscenarioService.actualizaRegla(peticion);
+            		if(actualizado){
             		GeneralResponse gr = new GeneralResponse ();
-            		gr.setMessage("Regla actualizada exitosamente");
+            		gr.setMessage(STATUS_MESSAGE_REGLA);
             		return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK);
+            		}else{
+            			GeneralResponse br = new GeneralResponse();
+                		br.setMessage(MSG_ELEMENTO_INEXISTENTE);
+                		return new ResponseEntity<GeneralResponse>(br, HttpStatus.OK);
+            		}
             	}else {
             		BadRequest br = new BadRequest();
             		br.setCode(ERROR_CODE_BAD_REQUEST);
             		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
-            		
-            		log.error("{}" , br);
-					
+            		log.error("{}" , br);	
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
             	}
-            		
-               
             } catch (Exception e) {
             	log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<GeneralResponse>(HttpStatus.INTERNAL_SERVER_ERROR);

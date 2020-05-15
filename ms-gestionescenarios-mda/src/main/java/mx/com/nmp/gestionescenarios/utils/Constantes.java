@@ -15,6 +15,7 @@ public final class Constantes {
 	
 	public static final String ERROR_CODE_BAD_REQUEST = "NMP-MDA-400";
 	public static final String ERROR_MESSAGE_BAD_REQUEST = "El cuerpo de la petición no está bien formado, verifique su información";
+	public static final String MSG_ELEMENTO_INEXISTENTE="El elemento que desea actualizar no existe";
 	
 	public static final String ERROR_CODE_INVALID_AUTHENTICATION = "NMP-MDA-401";
 	public static final String ERROR_MESSAGE_INVALID_AUTHENTICATION = "Se ha producido un error de autorización";
