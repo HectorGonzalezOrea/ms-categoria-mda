@@ -21,6 +21,7 @@ import mx.com.nmp.gestionbolsas.model.TipoBolsa;
 import mx.com.nmp.gestionbolsas.mongodb.entity.BolsasEntity;
 import mx.com.nmp.gestionbolsas.mongodb.entity.TipoBolsaEntity;
 import mx.com.nmp.gestionbolsas.mongodb.repository.BolsaRepository;
+import mx.com.nmp.gestionbolsas.utils.BolsaUtils;
 
 @Service
 public class BolsasService {
@@ -50,7 +51,7 @@ public class BolsasService {
 	 */
 	public Boolean crearBolsa(Bolsa peticion) {
 		log.info("BolsasService.crearBolsa");
-		
+		BolsaUtils utils=new BolsaUtils();
 		Boolean insertado = false;
 		
 		if (peticion != null) {
@@ -60,7 +61,7 @@ public class BolsasService {
 			bolsa.setRamo(peticion.getRamo());
 			bolsa.setSubramo(peticion.getSubramo());
 			bolsa.setFactor(peticion.getFactor());
-			bolsa.setSucursales(peticion.getSucursales());
+			bolsa.setSucursales(utils.paseraLista(peticion.getSucursales()));
 			bolsa.setAutor(peticion.getAutor());
 
 			LocalDate locateDate = LocalDate.now();
@@ -139,6 +140,33 @@ public class BolsasService {
 		log.info("El valor es {}", existe);
 		return existe;
 	}
+	
+	
+
+	/**
+	 * Valida al actualizar la bolsa con la 
+	 * sucursal
+	 * */
+	public Boolean validarActualizarBolsas(String ramo, String subramo, String factor, List<String> sucursales,Integer id) {
+		Boolean existe = false;
+		Query query = new Query();
+		Criteria aux = Criteria.where(RAMO).is(ramo).and(SUBRAMO).is(subramo).and(FACTOR).is(factor).and(SUCURSALES).in(sucursales)
+				.and(ID).nin(id);
+		query.addCriteria(aux);
+		existe=mongoTemplate.exists(query, BolsasEntity.class);
+		return existe;
+	}
+	
+	public Boolean validarNombreActualizarBolsa(Integer id, String nombre ) {
+		Boolean existe = false;
+		Query query = new Query();
+		Criteria aux = Criteria.where(NOMBRE).is(nombre).and(ID).nin(id); 
+		query.addCriteria(aux);
+		existe=mongoTemplate.exists(query, BolsasEntity.class);
+		return existe;
+	}
+	
+	
 	
 
 	/*
@@ -296,6 +324,7 @@ public class BolsasService {
 		
 		Boolean actualizado = false;
 		BolsasEntity bolsa = null;
+		BolsaUtils utils= new BolsaUtils();
 		
 		if(peticion != null) {
 			try {
@@ -310,7 +339,7 @@ public class BolsasService {
 				bolsa.setSubramo(peticion.getSubramo());
 				bolsa.setFactor(peticion.getFactor());
 				bolsa.setTipo(peticion.getTipo().getId());
-				bolsa.setSucursales(peticion.getSucursales());
+				bolsa.setSucursales(utils.paseraLista(peticion.getSucursales()));
 				bolsa.setAutor(peticion.getAutor());
 				
 				LocalDate locateDate = LocalDate.now();

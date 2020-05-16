@@ -11,6 +11,7 @@ import mx.com.nmp.gestionbolsas.model.InvalidAuthentication;
 import mx.com.nmp.gestionbolsas.model.ListaBolsas;
 import mx.com.nmp.gestionbolsas.model.ListaTipoBolsas;
 import mx.com.nmp.gestionbolsas.mongodb.service.BolsasService;
+import mx.com.nmp.gestionbolsas.utils.BolsaUtils;
 import mx.com.nmp.gestionbolsas.utils.Constantes;
 
 import org.slf4j.Logger;
@@ -227,6 +228,7 @@ public class BolsasApiController implements BolsasApi {
 		log.info("*********************************************************");
 		log.info("Actualizar Bolsas.");
 		log.info("*********************************************************");
+		BolsaUtils utils= new BolsaUtils();
 		
 		String apiKey = request.getHeader(HEADER_APIKEY_KEY);
 
@@ -246,6 +248,28 @@ public class BolsasApiController implements BolsasApi {
 			try {
 				if (peticion != null) {
 					log.info("peticion: " + peticion.toString());
+					
+					Boolean bandera=bolsaService.validarActualizarBolsas(peticion.getRamo(), peticion.getSubramo(), peticion.getFactor(),utils.paseraLista(peticion.getSucursales()),peticion.getId());
+					if(bandera==true){
+						BadRequest br = new BadRequest();
+						br.setCode(ERROR_CODE_BAD_REQUEST);
+						br.setMessage(Constantes.ERROR_MESSGE_BOLSA);
+
+						log.error("{}", br);
+
+						return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+					}
+					
+					if (Boolean.TRUE.equals(bolsaService.validarNombreActualizarBolsa(peticion.getId(), peticion.getNombre()))) {
+						BadRequest br = new BadRequest();
+						br.setCode(ERROR_CODE_BAD_REQUEST);
+						br.setMessage(ERROR_MESSAGE_NAME);
+
+						log.error("{}", br);
+
+						return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+
+					}
 					Boolean actualizado = bolsaService.updateBolsa(peticion);
 
 					if (actualizado) {
