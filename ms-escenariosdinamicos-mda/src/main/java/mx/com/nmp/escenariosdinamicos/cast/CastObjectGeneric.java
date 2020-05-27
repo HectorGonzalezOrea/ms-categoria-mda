@@ -27,6 +27,7 @@ import mx.com.nmp.escenariosdinamicos.model.CommonBaseAjuste;
 import mx.com.nmp.escenariosdinamicos.model.InfoRegla;
 import mx.com.nmp.escenariosdinamicos.model.InformacionAjusteVO;
 import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
+import mx.com.nmp.escenariosdinamicos.oag.dto.RequestActualizarPrecioPartidaDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.RequestReglaEscenarioDinamicoDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseOAGDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseReglasArbitrajeOAGDto;
@@ -240,6 +241,20 @@ public class CastObjectGeneric {
 		RequestReglaEscenarioDinamicoDto request= new RequestReglaEscenarioDinamicoDto();
 		try {
 			request=mapper.readValue(jsonString, RequestReglaEscenarioDinamicoDto.class);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return request;
+	}
+	
+	public RequestActualizarPrecioPartidaDto convertJsonToRequestActualizarPrecioPartida(String jsonString) {
+		ObjectMapper mapper = new ObjectMapper();
+		RequestActualizarPrecioPartidaDto request= new RequestActualizarPrecioPartidaDto();
+		try {
+			request=mapper.readValue(jsonString, RequestActualizarPrecioPartidaDto.class);
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -45,9 +45,9 @@ public class ConsumerMessageComponent {
 	@RabbitListener(queues = "${rabbitmq.queue.cambioprecio}")
 	public void consumerCambioPrecio(String message) {
 		log.info("Recieved Message: " + message);
-		clientOAG.reglaEscenarioDinamico(castObject.convertJsonToRequestEscenario(message));
+		//clientOAG.reglaEscenarioDinamico(castObject.convertJsonToRequestEscenario(message));
+		clientOAG.actualizarPrecioPartida(castObject.convertJsonToRequestActualizarPrecioPartida(message));
 	}
-	
 	
 	private RequestReglaEscenarioDinamicoDto  convertObjectToJson(ResponseOAGDto messageVO) {
 		PartidaVO partidaVO = new PartidaVO();

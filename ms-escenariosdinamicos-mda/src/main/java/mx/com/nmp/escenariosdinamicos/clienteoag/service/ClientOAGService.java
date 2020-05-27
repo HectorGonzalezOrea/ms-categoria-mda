@@ -75,84 +75,95 @@ public class ClientOAGService {
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	
 	public ResponseOAGDto reglaEscenarioDinamico(RequestReglaEscenarioDinamicoDto requestDto) {
-        log.info(":: Entrado al metodo  actualizarPrecioPartida ::");
-        String request =  new Gson().toJson(requestDto);
-		  String token=clienteCorreo.getToken();
-		  RestTemplate restTemplate = new RestTemplate();
-		  HttpHeaders headers = new HttpHeaders();
-		  headers.setContentType(MediaType.APPLICATION_JSON);
-		  headers.add(Common.HEADER_USUARIO, headerUsuario);
-		  headers.add(Common.HEADER_ID_CONSUMIDOR, headerIdConsumidor);
-		  headers.add(Common.HEADER_ID_DESTINO, headerIdDestino);
-		  headers.add(Common.HEADER_OAUTH_BEARER,token);
-		  headers.setBasicAuth(usuario, password);	
-		  HttpEntity<String> entity = new HttpEntity<>(request,headers);
-		  ResponseEntity<String> result = restTemplate.postForEntity(urlBase+endPointAjustePrecioPartidas, entity,String.class);
-		  
-		  ResponseOAGDto response= new ResponseOAGDto();
-		  if(result.getStatusCode() == HttpStatus.OK) {
-			  if(result.getBody() !=null) {
-				  response= castObject.convertJsonToReponseOAGDto(result.getBody());
-				  pruducerMessage.producerReglaArbitraje(result.getBody());
-			  }
-		  }
-		 
-		  return response;
-	}
-	
-	public  ResponseReglasArbitrajeOAGDto aplicarReglaArbitraje(RequestReglaEscenarioDinamicoDto requestEscenario ) {
-		  log.info(":: Entrado al metodo aplicarReglaArbitraje  ::");
-		  String request= new Gson().toJson(requestEscenario);
-		  String token=clienteCorreo.getToken();
-		  RestTemplate restTemplate = new RestTemplate();
-		  HttpHeaders headers = new HttpHeaders();
-		  headers.setContentType(MediaType.APPLICATION_JSON);
-		  headers.add(Common.HEADER_USUARIO, headerUsuario);
-		  headers.add(Common.HEADER_ID_CONSUMIDOR, headerIdConsumidor);
-		  headers.add(Common.HEADER_ID_DESTINO, headerIdDestino);
-		  headers.add(Common.HEADER_OAUTH_BEARER,token);
-		  headers.setBasicAuth(usuario, password);	
-		  HttpEntity<String> entity = new HttpEntity<>(request,headers);
-		  ResponseEntity<String> result = restTemplate.postForEntity(urlBase+endPointReglasArbitraje, entity,String.class);
-		  ResponseReglasArbitrajeOAGDto response = new ResponseReglasArbitrajeOAGDto();
-		  if(result.getStatusCode() == HttpStatus.OK) {
-			  if(result.getBody() !=null) {
-				  response=  castObject.convertJsonToReglasArbitraje(result.getBody());
-				  pruducerMessage.producerCambioPrecio(result.getBody());
-				  
-			  }
-		  }
-		  
+		log.info(":: Entrado al metodo  actualizarPrecioPartida ::");
+		String request = new Gson().toJson(requestDto);
+
+		log.info("Request: {}" , request);
+		
+		ResponseOAGDto response = new ResponseOAGDto();
+		
+		if(request != null && !request.equals("")) {
+			String token = clienteCorreo.getToken();
+			RestTemplate restTemplate = new RestTemplate();
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			headers.add(Common.HEADER_USUARIO, headerUsuario);
+			headers.add(Common.HEADER_ID_CONSUMIDOR, headerIdConsumidor);
+			headers.add(Common.HEADER_ID_DESTINO, headerIdDestino);
+			headers.add(Common.HEADER_OAUTH_BEARER, token);
+			headers.setBasicAuth(usuario, password);
+			HttpEntity<String> entity = new HttpEntity<>(request, headers);
+			ResponseEntity<String> result = restTemplate.postForEntity(urlBase + endPointAjustePrecioPartidas, entity,
+					String.class);
+
+			if (result.getStatusCode() == HttpStatus.OK) {
+				if (result.getBody() != null) {
+					response = castObject.convertJsonToReponseOAGDto(result.getBody());
+					pruducerMessage.producerReglaArbitraje(result.getBody());
+				}
+			}
+		}
+		
 		return response;
 	}
 	
-	public String  actualizarPrecioPartida(RequestActualizarPrecioPartidaDto request) {
-		 String token=clienteCorreo.getToken();
-		 Gson gson = new Gson();
-		 String jsonRequest=gson.toJson(request);
-		 RestTemplate restTemplate = new RestTemplate();
-		  HttpHeaders headers = new HttpHeaders();
-		  headers.setContentType(MediaType.APPLICATION_JSON);
-		  headers.add(Common.HEADER_USUARIO, headerUsuario);
-		  headers.add(Common.HEADER_ID_CONSUMIDOR, headerIdConsumidor);
-		  headers.add(Common.HEADER_ID_DESTINO, headerIdDestino);
-		  headers.add(Common.HEADER_OAUTH_BEARER,token);
-		  headers.setBasicAuth(usuario, password);
-		  HttpEntity<String> entity = new HttpEntity<>(jsonRequest,headers);
-			//String url="https://dev1775-ms-establecimientoprecios-mda.mybluemix.net/NMP/MotorDescuentosAPI/v1/precios";
-			 //ResponseEntity<String> response = restTemplate.postForEntity(url, entity,String.class);
-		  List<PreciosVO> lstPrecios= new ArrayList<PreciosVO>();
-		  clienteCorreo.sendEmailUser(lstPrecios);
-		  return null;
+	public ResponseReglasArbitrajeOAGDto aplicarReglaArbitraje(RequestReglaEscenarioDinamicoDto requestEscenario ) {
+		  log.info(":: Entrado al metodo aplicarReglaArbitraje  ::");
+		  String request= new Gson().toJson(requestEscenario);
+		  ResponseReglasArbitrajeOAGDto response = new ResponseReglasArbitrajeOAGDto();
+		  
+		  log.info("Request: {}" , request);
+		  
+		  if(request != null && !request.equals("")) {
+			  String token=clienteCorreo.getToken();
+			  RestTemplate restTemplate = new RestTemplate();
+			  HttpHeaders headers = new HttpHeaders();
+			  headers.setContentType(MediaType.APPLICATION_JSON);
+			  headers.add(Common.HEADER_USUARIO, headerUsuario);
+			  headers.add(Common.HEADER_ID_CONSUMIDOR, headerIdConsumidor);
+			  headers.add(Common.HEADER_ID_DESTINO, headerIdDestino);
+			  headers.add(Common.HEADER_OAUTH_BEARER,token);
+			  headers.setBasicAuth(usuario, password);	
+			  HttpEntity<String> entity = new HttpEntity<>(request,headers);
+			  ResponseEntity<String> result = restTemplate.postForEntity(urlBase+endPointReglasArbitraje, entity,String.class);
+			  
+			  if(result.getStatusCode() == HttpStatus.OK) {
+				  if(result.getBody() !=null) {
+					  response=  castObject.convertJsonToReglasArbitraje(result.getBody());
+					  pruducerMessage.producerCambioPrecio(result.getBody());
+				  }
+			  }
+		  }
+
+		return response;
 	}
 	
-	
-	
-	
-	
-	 
-	  
+	public String actualizarPrecioPartida(RequestActualizarPrecioPartidaDto request) {
+		String token = clienteCorreo.getToken();
+		Gson gson = new Gson();
+		String jsonRequest = gson.toJson(request);
 
-	
+		log.info("Request: {}", request);
+
+		if (jsonRequest != null && !jsonRequest.equals("")) {
+
+			RestTemplate restTemplate = new RestTemplate();
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			headers.add(Common.HEADER_USUARIO, headerUsuario);
+			headers.add(Common.HEADER_ID_CONSUMIDOR, headerIdConsumidor);
+			headers.add(Common.HEADER_ID_DESTINO, headerIdDestino);
+			headers.add(Common.HEADER_OAUTH_BEARER, token);
+			headers.setBasicAuth(usuario, password);
+			HttpEntity<String> entity = new HttpEntity<>(jsonRequest, headers);
+			// String
+			// url="https://dev1775-ms-establecimientoprecios-mda.mybluemix.net/NMP/MotorDescuentosAPI/v1/precios";
+			// ResponseEntity<String> response = restTemplate.postForEntity(url,
+			// entity,String.class);
+			List<PreciosVO> lstPrecios = new ArrayList<PreciosVO>();
+			clienteCorreo.sendEmailUser(lstPrecios);
+		}
+		return null;
+	}
 
 }
