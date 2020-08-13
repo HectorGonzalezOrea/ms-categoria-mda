@@ -1,0 +1,51 @@
+package mx.com.nmp.consolidados.oag.vo;
+
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({
+"idPartida",
+"sku",
+"cumpleArbitraje"
+})
+public class PartidaResponseVO {
+	@JsonProperty("idPartida")
+	private String idPartida;
+	@JsonProperty("sku")
+	private String sku;
+	@JsonProperty("cumpleArbitraje")
+	private Boolean cumpleArbitraje;
+
+	@JsonProperty("idPartida")
+	public String getIdPartida() {
+		return idPartida;
+	}
+
+	@JsonProperty("idPartida")
+	public void setIdPartida(String idPartida) {
+		this.idPartida = idPartida;
+	}
+
+	@JsonProperty("sku")
+	public String getSku() {
+		return sku;
+	}
+
+	@JsonProperty("sku")
+	public void setSku(String sku) {
+		this.sku = sku;
+	}
+
+	@JsonProperty("cumpleArbitraje")
+	public Boolean getCumpleArbitraje() {
+		return cumpleArbitraje;
+	}
+
+	@JsonProperty("cumpleArbitraje")
+	public void setCumpleArbitraje(Boolean cumpleArbitraje) {
+		this.cumpleArbitraje = cumpleArbitraje;
+	}
+}

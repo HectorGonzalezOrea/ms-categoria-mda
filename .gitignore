@@ -1,0 +1,12 @@
+.metadata/
+.classpath
+.project
+*.lst
+*.settings
+/target/**
+*.csv
+*.class
+*README.md
+.swagger-codegen
+.gradle/
+build/

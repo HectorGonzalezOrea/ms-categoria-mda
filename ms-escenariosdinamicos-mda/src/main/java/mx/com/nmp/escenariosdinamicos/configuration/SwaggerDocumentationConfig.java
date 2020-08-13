@@ -1,0 +1,41 @@
+package mx.com.nmp.escenariosdinamicos.configuration;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-04T01:28:01.968Z")
+
+@Configuration
+public class SwaggerDocumentationConfig {
+
+    ApiInfo apiInfo() {
+        return new ApiInfoBuilder()
+            .title("Motor de Descuentos Automatizados")
+            .description("### Descripción   API que permite interactuar con las diferentes funcionalidades en el proyecto Motor de Descuentos Automatizados de Nacional Monte de Piedad.  ### Capacidades   * Administración de Usuarios.      El alta de usuarios por medio del api no esta soportada, se necesita realizar un ticket a mesa de ayuda para dar de alta un usuario en AD.   * Consolidados.   * Cálculo valor monte.   * Tablas de referencia.   * Establecimiento de precios   * Histórico de precios   * Escenarios dinámicos   * Gestión de escenarios   * Simulación ### Seguridad   Antes de usar este recurso, el consumidor deberá ser autorizado. Para ello el consumidor enviará una llave en el encabezado HTTP. Ejemplo:   * `X-API-KEY: eyJ4NXQjUzI1NiI6IkFTS1ESG42`    ")
+            .license("Nacional Monte de Piedad 2019")
+            .licenseUrl("https://www.montepiedad.com.mx/portal/storage/Aviso_de_Privacidad_MAR19.pdf")
+            .termsOfServiceUrl("")
+            .version("1.0.0")
+            .contact(new Contact("","", "sgonzalez@spsolutions.com.mx"))
+            .build();
+    }
+
+    @Bean
+    public Docket customImplementation(){
+        return new Docket(DocumentationType.SWAGGER_2)
+                .select()
+                    .apis(RequestHandlerSelectors.basePackage("io.swagger.api"))
+                    .build()
+                .directModelSubstitute(org.threeten.bp.LocalDate.class, java.sql.Date.class)
+                .directModelSubstitute(org.threeten.bp.OffsetDateTime.class, java.util.Date.class)
+                .apiInfo(apiInfo());
+    }
+
+}
