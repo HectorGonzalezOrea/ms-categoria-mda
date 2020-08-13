@@ -1,8 +1,0 @@
----
-applications:
-- instances: 1
-  timeout: 180
-  name: ms-gestionusuarios-mda
-  buildpack: java_buildpack
-  path: ./target/ms-gestionusuarios-mda-1.0.0.jar
-  memory: 1G
