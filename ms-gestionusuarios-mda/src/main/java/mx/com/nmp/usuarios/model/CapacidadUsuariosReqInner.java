@@ -95,11 +95,11 @@ public class CapacidadUsuariosReqInner   {
     
     ADMINISTRACI_N_DE_USUARIOS_("Administración de usuarios."),
     
-    CONSULTAR_USUARIOS_("Consultar usuarios."),
+    CONSULTAR_USUARIOS_("Consultar Usuarios."),
     
-    ALTA_USUARIOS_("Alta de usuarios."),
+    ALTA_USUARIOS_("Alta usuarios."),
     
-    BAJA_USUARIOS_("Baja de usuarios."),
+    BAJA_USUARIOS_("Baja usuarios."),
     
     ACTIVAR_INACTIVAR_USUARIO("Activar/Inactivar usuario."),
     

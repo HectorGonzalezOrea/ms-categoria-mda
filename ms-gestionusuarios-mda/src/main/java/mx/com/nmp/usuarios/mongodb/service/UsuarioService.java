@@ -3,6 +3,7 @@ package mx.com.nmp.usuarios.mongodb.service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +15,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+
+import com.google.common.collect.Maps;
 
 import mx.com.nmp.usuarios.model.CapacidadUsuariosReq;
 import mx.com.nmp.usuarios.model.CapacidadUsuariosReqInner;
@@ -72,8 +75,6 @@ import mx.com.nmp.usuarios.mongodb.repository.GerenciaRepository;
 public class UsuarioService {
 
 	private static final Logger log = LoggerFactory.getLogger(UsuarioService.class);
-
-
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -297,8 +298,6 @@ public class UsuarioService {
 					infoUsuario.setPerfil(perfilc);
 				}
 				
-
-				
 				usuarios.add(getUsuariosDepartamento(aux, infoUsuario));
 			}
 		}
@@ -363,16 +362,36 @@ public class UsuarioService {
 		log.info("UsuarioService.getUsuarios");
 
 		List<UsuarioEntity> busquedaList = mongoTemplate.findAll(UsuarioEntity.class);
-
-		List<InfoUsuario> usuarios = null;
+		List<CapacidadUsuariosRes> capList = this.buscarPerfilConCapacidades();
+		
+		Map<Integer, CapacidadUsuariosRes> capMap = Maps
+			      .uniqueIndex(capList, CapacidadUsuariosRes::getIdPerfil);
+		
+		List<DepartamentoAreaEntity> depList = mongoTemplate.findAll(DepartamentoAreaEntity.class);
+		List<DireccionEntity> deList = mongoTemplate.findAll(DireccionEntity.class);
+		List<GerenciaEntity> geList = mongoTemplate.findAll(GerenciaEntity.class);
+		List<PuestoEntity> peList = mongoTemplate.findAll(PuestoEntity.class);
+		List<SubdireccionEntity> sdeList = mongoTemplate.findAll(SubdireccionEntity.class);
+		
+		Map<Integer, DepartamentoAreaEntity> depMap = Maps
+			      .uniqueIndex(depList, DepartamentoAreaEntity::getIdDepartamento);
+		Map<Integer, DireccionEntity> deMap = Maps
+			      .uniqueIndex(deList, DireccionEntity::getIdDireccion);
+		Map<Integer, GerenciaEntity> geMap = Maps
+			      .uniqueIndex(geList, GerenciaEntity::getIdGerencia);
+		Map<Integer, PuestoEntity> peMap = Maps
+			      .uniqueIndex(peList, PuestoEntity::getIdPuesto);
+		Map<Integer, SubdireccionEntity> sdeMap = Maps
+			      .uniqueIndex(sdeList, SubdireccionEntity::getIdSubdireccion);
+		
+		List<InfoUsuario> usuarios = new ArrayList<>();
 
 		if (CollectionUtils.isNotEmpty(busquedaList)) {
-			usuarios = new ArrayList<>();
-			InfoUsuario infoUsuario = null;
-
-			for (UsuarioEntity aux : busquedaList) {
-				infoUsuario = new InfoUsuario();
-
+			busquedaList
+			.stream()
+			.forEach( aux -> {
+				InfoUsuario infoUsuario = new InfoUsuario();
+				
 				infoUsuario.setActivo(aux.getActivo());
 				infoUsuario.apellidoMaterno(aux.getApellidoMaterno());
 				infoUsuario.setApellidoPaterno(aux.getApellidoPaterno());
@@ -380,72 +399,59 @@ public class UsuarioService {
 				infoUsuario.setNombre(aux.getNombre());
 				infoUsuario.setUsuario(aux.getUsuario());
 				
-				CapacidadUsuariosRes perfilc = this.buscarPerfilConCapacidades(aux.getPerfil());
+				infoUsuario.setPerfil(capMap.get(aux.getPerfil()));
 				
-				if(perfilc != null) {
-					infoUsuario.setPerfil(perfilc);
+				DepartamentoAreaEntity dae = depMap.get(aux.getDepartamentoArea());
+				
+				if(dae != null) {
+					DepatamentoAreaVO daevo = new DepatamentoAreaVO();
+					daevo.setId(dae.getIdDepartamento());
+					daevo.setDescripcion(dae.getDescripcion());
+					infoUsuario.setDepartamentoArea(daevo);
 				}
 				
-				infoUsuario=consultarDatosUsuario( aux);
+				DireccionEntity de = deMap.get(aux.getDireccion());
+				
+				if(de != null) {
+					DireccionVO devo = new DireccionVO();
+					devo.setId(de.getIdDireccion());
+					devo.setDescripcion(de.getDescripcion());
+					infoUsuario.setDireccion(devo);
+				}
+				
+				GerenciaEntity ge = geMap.get(aux.getGerencia());
+				
+				if(ge != null) {
+					GerenciaVO gvo = new GerenciaVO();
+					gvo.setId(ge.getIdGerencia());
+					gvo.setDescripcion(ge.getDescripcion());
+					infoUsuario.setGerencia(gvo);
+				}
+				
+				PuestoEntity pe = peMap.get(aux.getPuesto());
+				
+				if(pe != null) {
+					PuestoVO pvo = new PuestoVO();
+					pvo.setId(pe.getIdPuesto());
+					pvo.setDescripcion(pe.getDescripcion());
+					infoUsuario.setPuesto(pvo);
+				}
+				
+				SubdireccionEntity sde = sdeMap.get(aux.getSubdireccion());
+				
+				if(sde != null) {
+					SubdireccionVO sdvo = new SubdireccionVO();
+					sdvo.setId(sde.getIdSubdireccion());
+					sdvo.setDescripcion(sde.getDescripcion());
+					infoUsuario.setSubdireccion(sdvo);
+				}
 				
 				usuarios.add(infoUsuario);
-			}
+			});
 		}
 		return usuarios;
 	}
 	
-	private InfoUsuario consultarDatosUsuario( UsuarioEntity aux) {
-		InfoUsuario infoUsuario = new InfoUsuario();
-		DepartamentoAreaEntity dae = departamentoAreaRepository.findByIdDepartamento(aux.getDepartamentoArea());
-		
-		if(dae != null) {
-			DepatamentoAreaVO daevo = new DepatamentoAreaVO();
-			daevo.setId(dae.getIdDepartamento());
-			daevo.setDescripcion(dae.getDescripcion());
-			infoUsuario.setDepartamentoArea(daevo);
-		}
-		
-		DireccionEntity de = direccionRepository.findByIdDireccion(aux.getDireccion());
-		
-		if(de != null) {
-			DireccionVO devo = new DireccionVO();
-			devo.setId(de.getIdDireccion());
-			devo.setDescripcion(de.getDescripcion());
-			infoUsuario.setDireccion(devo);
-		}
-		
-		GerenciaEntity ge = gerenciaRepository.findByIdGerencia(aux.getGerencia());
-		
-		if(ge != null) {
-			GerenciaVO gvo = new GerenciaVO();
-			gvo.setId(ge.getIdGerencia());
-			gvo.setDescripcion(ge.getDescripcion());
-			infoUsuario.setGerencia(gvo);
-		}
-		
-		PuestoEntity pe = puestoRepository.findByIdPuesto(aux.getPuesto());
-		
-		if(pe != null) {
-			PuestoVO pvo = new PuestoVO();
-			pvo.setId(pe.getIdPuesto());
-			pvo.setDescripcion(pe.getDescripcion());
-			infoUsuario.setPuesto(pvo);
-		}
-		
-		SubdireccionEntity sde = subdireccionRepository.findByIdSubdireccion(aux.getSubdireccion());
-		
-		if(sde != null) {
-			SubdireccionVO sdvo = new SubdireccionVO();
-			
-			sdvo.setId(sde.getIdSubdireccion());
-			sdvo.setDescripcion(sde.getDescripcion());
-			
-			infoUsuario.setSubdireccion(sdvo);
-		}
-		return infoUsuario;
-	}
-	
-
 	/*
 	 * Crear Perfil con Capacidad
 	 */
@@ -663,6 +669,65 @@ public class UsuarioService {
 		return resp;
 	}
 	
+	private List<CapacidadUsuariosRes> buscarPerfilConCapacidades() {
+		List<PerfilEntity> listPetfil = mongoTemplate.findAll(PerfilEntity.class);
+	
+		List<CapacidadUsuariosRes> resp = new ArrayList<CapacidadUsuariosRes>();
+		
+		listPetfil
+		.stream()
+		.forEach( p -> {
+			Query query = new Query();
+			Criteria aux = Criteria.where(Constantes.PERFIL).is(p.getIdPerfil());
+			query.addCriteria(aux);
+		
+			CapacidadUsuariosRes cureps = new CapacidadUsuariosRes();
+			
+			cureps.setIdPerfil(p.getIdPerfil());
+			cureps.setDescripcionPerfil(DescripcionPerfilEnum.fromValue(p.getDescripcion()));
+			
+			List<PerfilCapacidadEntity> perfilCapacidadList = mongoTemplate.find(query, PerfilCapacidadEntity.class);
+			
+			log.info("{}" , perfilCapacidadList.size());
+			if (CollectionUtils.isNotEmpty(perfilCapacidadList)) {
+				List<CapacidadEntity> ceList = mongoTemplate.findAll(CapacidadEntity.class);
+				capacidadUsuarioNew(perfilCapacidadList, cureps, ceList);
+				resp.add(cureps);
+			}
+			
+		});
+		
+		return resp;
+	}
+	
+	private CapacidadUsuariosRes capacidadUsuarioNew(List<PerfilCapacidadEntity> perfilCapacidadList, CapacidadUsuariosRes cureps, List<CapacidadEntity> ceList) {
+		
+		CapacidadUsuariosReq cureq = new CapacidadUsuariosReq();
+		
+		Map<Integer, CapacidadEntity> ceMap = Maps
+			      .uniqueIndex(ceList, CapacidadEntity::getIdCapacidad);
+
+		perfilCapacidadList
+		.stream()
+		.forEach( pce -> {
+			if (pce.getIdCapacidad() != null) {
+				CapacidadEntity ce = ceMap.get(pce.getIdCapacidad());// capacidadRepository.findByIdCapacidad(pce.getIdCapacidad());
+				
+				if (ce != null) {
+					CapacidadUsuariosReqInner curi = new CapacidadUsuariosReqInner();
+					curi.setDescripcinCap(DescripcinCapEnum.fromValue(ce.getDescripcion()));
+					curi.setIdCapacidad(IdCapacidadEnum.fromValue(ce.getIdCapacidad().toString()));
+
+					cureq.add(curi);
+				}
+			}
+		});
+		
+		cureps.setInformacionPerfil(cureq);
+	
+	return cureps; 
+}
+	
 	/*
 	 * Buscar Perfil con capacidades
 	 */
@@ -695,7 +760,7 @@ public class UsuarioService {
 		return cureps;
 	}
 	
-	private CapacidadUsuariosRes capacidadUsuario(ArrayList<PerfilCapacidadEntity> perfilCapacidadList,CapacidadUsuariosRes cureps ) {
+	private CapacidadUsuariosRes capacidadUsuario(ArrayList<PerfilCapacidadEntity> perfilCapacidadList, CapacidadUsuariosRes cureps) {
 	
 			
 			CapacidadEntity ce = null;

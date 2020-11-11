@@ -54,4 +54,6 @@ public class Constantes {
 	public static final String PERFIL = "perfil";
 	public static final String ID_PERFIL = "idPerfil";
 	
+	public static final String ID_DEPARTAMENTO = "idDepartamento";
+	
 }
