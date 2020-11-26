@@ -25,21 +25,14 @@ public class CategoriaServiceImp{
 	private MongoTemplate mongoTemplate;
 	@Autowired
 	private SequenceGeneratorService sequenceGeneratorService;
-//	@Autowired
-//	private CategoriaService userRepository;
 	/*
 	 * Crear categoria
 	 */
 	public Boolean configurarCategorias(ResponseGetCategorias categoriasbody) {
 		Boolean insertado = false;
-		//List<CategoriaEntity> aux = mongoTemplate.findAll(CategoriaEntity.class);
 		Query query = new Query();
-//		log.info("depurando datos [{}]"+aux.size());
 		mongoTemplate.findAllAndRemove(query, CategoriaEntity.class);
-//		if (!aux.isEmpty()) {
-//			aux.stream().forEach(i -> mongoTemplate.remove(i));
-//		}
-//		userRepository.deleteAll(aux);
+
 		log.info("Datos depurados...");
 		if (categoriasbody != null) {
 			List<Categoria> categoriasYOtros=new ArrayList<>();

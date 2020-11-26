@@ -3,8 +3,6 @@ package mx.com.nmp.categorias.cast;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
 import mx.com.nmp.categorias.entity.CategoriaEntity;

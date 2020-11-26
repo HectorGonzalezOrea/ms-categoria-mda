@@ -25,7 +25,6 @@ import mx.com.nmp.categorias.model.InternalServerError;
 import mx.com.nmp.categorias.model.InvalidAuthentication;
 import mx.com.nmp.categorias.model.NotFound;
 import mx.com.nmp.categorias.model.ResponseGetCategorias;
-import mx.com.nmp.categorias.service.CategoriaService;
 import mx.com.nmp.categorias.service.CategoriaServiceImp;
 import mx.com.nmp.categorias.utils.Constantes;
 
