@@ -39,6 +39,14 @@ public class Bolsa extends ListaBolsasInner {
   @JsonProperty("sucursales")
   @Valid
   private List<String> sucursales = null;
+  
+  @JsonProperty("origen")
+  @Valid
+  private String origen;
+  
+  @JsonProperty("categoria")
+  @Valid
+  private String categoria;
 
   @JsonProperty("autor")
   private String autor = null;
@@ -236,7 +244,23 @@ public class Bolsa extends ListaBolsasInner {
     return Objects.hash(id, nombre, tipo, ramo, subramo, factor, sucursales, autor);
   }
 
-  @Override
+  public String getOrigen() {
+	return origen;
+}
+
+public String getCategoria() {
+	return categoria;
+}
+
+public void setOrigen(String origen) {
+	this.origen = origen;
+}
+
+public void setCategoria(String categoria) {
+	this.categoria = categoria;
+}
+
+@Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Bolsa {\n");
@@ -249,6 +273,8 @@ public class Bolsa extends ListaBolsasInner {
     sb.append("    factor: ").append(toIndentedString(factor)).append("\n");
     sb.append("    sucursales: ").append(toIndentedString(sucursales)).append("\n");
     sb.append("    autor: ").append(toIndentedString(autor)).append("\n");
+    sb.append("    origen: ").append(toIndentedString(origen)).append("\n");
+    sb.append("    categoria: ").append(toIndentedString(categoria)).append("\n");
     sb.append("}");
     return sb.toString();
   }

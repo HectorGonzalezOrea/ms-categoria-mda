@@ -43,6 +43,7 @@ import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_MESSAGE_TIPO;
 import static mx.com.nmp.gestionbolsas.utils.Constantes.MESSAGE_DELETE;
 import static mx.com.nmp.gestionbolsas.utils.Constantes.MESSAGE_NO_DELETE;
 import static mx.com.nmp.gestionbolsas.utils.Constantes.MESSAGE_OK_BOLSA;
+import static mx.com.nmp.gestionbolsas.utils.Constantes.ERROR_MESSAGE_BOLSA_DUPLICADA;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-02-21T17:43:22.226Z")
 
@@ -75,12 +76,15 @@ public class BolsasApiController implements BolsasApi {
 			@ApiParam(value = "Nombre de la Bolsa") @Valid @RequestParam(value = "nombre", required = false) String nombre,
 			@ApiParam(value = "Ramo configurado en la Bolsa") @Valid @RequestParam(value = "ramo", required = false) String ramo,
 			@ApiParam(value = "Subramo configurado en la Bolsa") @Valid @RequestParam(value = "subramo", required = false) String subramo,
-			@ApiParam(value = "Factor configurado en la Bolsa") @Valid @RequestParam(value = "factor", required = false) String factor) {
+			@ApiParam(value = "Factor configurado en la Bolsa") @Valid @RequestParam(value = "factor", required = false) String factor,
+			@ApiParam(value = "origen configurado en la Bolsa") @Valid @RequestParam(value = "origen", required = false) String origen,
+			@ApiParam(value = "categoria configurado en la Bolsa") @Valid @RequestParam(value = "categoria", required = false) String categoria
+			) {
 
 		log.info("*********************************************************");
 		log.info("Consultar Bolsas.");
 		log.info("*********************************************************");
-
+		System.out.println("parameters "+nombre);
 		String apiKey = request.getHeader(HEADER_APIKEY_KEY);
 
 		if (apiKey == null || apiKey.equals(CADENA_VACIA)) {
@@ -106,7 +110,7 @@ public class BolsasApiController implements BolsasApi {
 					
 					return new ResponseEntity<ListaBolsas>(list, HttpStatus.OK);
 				} else {
-					ListaBolsas listaBolsa = bolsaService.getBolsas(idTipo, nombre, ramo, subramo, factor);
+					ListaBolsas listaBolsa = bolsaService.getBolsas(idTipo, nombre, ramo, subramo, factor, origen, categoria);
 
 					ListaBolsas listBol = new ListaBolsas();
 					if (!listaBolsa.isEmpty()) {
@@ -247,28 +251,27 @@ public class BolsasApiController implements BolsasApi {
 			try {
 				if (peticion != null) {
 					log.info("peticion: " + peticion.toString());
+					if(peticion.getSucursales()!=null){
+						Boolean bandera=bolsaService.validarActualizarBolsas(utils.paseraLista(peticion.getSucursales()));
+						if(bandera==true){
+							BadRequest br = new BadRequest();
+							br.setCode(ERROR_CODE_BAD_REQUEST);
+							br.setMessage(Constantes.ERROR_MESSGE_BOLSA);
+
+							log.error("{}", br);
+
+							return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+						}	
+					}
 					
-					Boolean bandera=bolsaService.validarActualizarBolsas(peticion.getRamo(), peticion.getSubramo(), peticion.getFactor(),utils.paseraLista(peticion.getSucursales()),peticion.getId());
-					if(bandera==true){
+					if(Boolean.TRUE.equals(bolsaService.validaRamoSubramoFactor(peticion.getRamo(),peticion.getSubramo(),peticion.getFactor()))) {
 						BadRequest br = new BadRequest();
 						br.setCode(ERROR_CODE_BAD_REQUEST);
-						br.setMessage(Constantes.ERROR_MESSGE_BOLSA);
-
+						br.setMessage(ERROR_MESSAGE_BOLSA_DUPLICADA);
 						log.error("{}", br);
-
 						return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 					}
 					
-					if (Boolean.TRUE.equals(bolsaService.validarNombreActualizarBolsa(peticion.getId(), peticion.getNombre()))) {
-						BadRequest br = new BadRequest();
-						br.setCode(ERROR_CODE_BAD_REQUEST);
-						br.setMessage(ERROR_MESSAGE_NAME);
-
-						log.error("{}", br);
-
-						return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
-
-					}
 					Boolean actualizado = bolsaService.updateBolsa(peticion);
 
 					if (actualizado) {
@@ -353,6 +356,12 @@ public class BolsasApiController implements BolsasApi {
 
 							log.error("{}", br);
 
+							return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+						}else if(Boolean.TRUE.equals(bolsaService.validaRamoSubramoFactor(peticion.getRamo(),peticion.getSubramo(),peticion.getFactor()))) {
+							BadRequest br = new BadRequest();
+							br.setCode(ERROR_CODE_BAD_REQUEST);
+							br.setMessage(ERROR_MESSAGE_BOLSA_DUPLICADA);
+							log.error("{}", br);
 							return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 						} else {
 							if (Boolean.TRUE.equals(bolsaService.consultaBolsa(peticion.getNombre()))) {

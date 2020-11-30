@@ -18,6 +18,7 @@ public final class Constantes {
 	public static final String ERROR_MESSAGE_NAME = "El nombre de la bolsa ya existe";
 	public static final String ERROR_MESSAGE_TIPO = "El tipo de la bolsa no existe";
 	public static final String ERROR_MESSGE_BOLSA="La bolsa tiene las mismas sucursales.";
+	public static final String ERROR_MESSAGE_BOLSA_DUPLICADA="La bolsa ya existe la configuración de ramo, subramo y factor";
 	
 	public static final String ERROR_CODE_NOT_FOUND = "NMP-MDA-404";
 	public static final String ERROR_MESSAGE_NOT_FOUND = "El id de la bolsa a eliminar no existe";
@@ -83,6 +84,10 @@ public final class Constantes {
 	public static final String BOLSA_SEQ_KEY = "bolsas_sequence";
 	public static final String ID_TIPO_BOLSA = "_id";
 	public static final String SUCURSALES="sucursales";
+	public static final String ORIGEN="origen";
+	public static final String CATEGORIA="categoria";
+	public static final String NA="N/A";
+	public static final String ALAJA="AL";
 	
 	
 }

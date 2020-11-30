@@ -22,6 +22,8 @@ public class BolsasEntity {
 	private String factor;
 	private List<String> sucursales;
 	private String autor;
+	private String origen;
+	private String categoria;
 	private LocalDate fechaCreacion;
 	private LocalDate fechaModificacion;
 	
@@ -84,6 +86,18 @@ public class BolsasEntity {
 	}
 	public void setFechaModificacion(LocalDate fechaModificacion) {
 		this.fechaModificacion = fechaModificacion;
+	}
+	public String getOrigen() {
+		return origen;
+	}
+	public String getCategoria() {
+		return categoria;
+	}
+	public void setOrigen(String origen) {
+		this.origen = origen;
+	}
+	public void setCategoria(String categoria) {
+		this.categoria = categoria;
 	}
 	
 }

@@ -54,9 +54,11 @@ public class BolsasService {
 			bolsa.setFactor(peticion.getFactor());
 			bolsa.setSucursales(utils.paseraLista(peticion.getSucursales()));
 			bolsa.setAutor(peticion.getAutor());
-
+			bolsa.setOrigen(peticion.getOrigen());
+			bolsa.setCategoria(peticion.getRamo()!=null&&peticion.getRamo().equals(Constantes.ALAJA)&&
+					peticion.getSubramo()!=null&&peticion.getSubramo().equals(Constantes.ALAJA)?
+					peticion.getCategoria():Constantes.NA);
 			LocalDate locateDate = LocalDate.now();
-			
 			bolsa.setFechaCreacion(locateDate);
 			bolsa.setFechaModificacion(locateDate);
 			
@@ -137,35 +139,32 @@ public class BolsasService {
 	 * Valida al actualizar la bolsa con la 
 	 * sucursal
 	 * */
-	public Boolean validarActualizarBolsas(String ramo, String subramo, String factor, List<String> sucursales,Integer id) {
+	public Boolean validarActualizarBolsas(List<String> sucursales) {
 		Boolean existe = false;
 		Query query = new Query();
-		Criteria aux = Criteria.where(Constantes.RAMO).is(ramo).and(Constantes.SUBRAMO).is(subramo).and(Constantes.FACTOR).is(factor).and(Constantes.SUCURSALES).in(sucursales)
-				.and(Constantes.ID).nin(id);
+		Criteria aux = Criteria.where(Constantes.SUCURSALES).in(sucursales);
 		query.addCriteria(aux);
 		existe=mongoTemplate.exists(query, BolsasEntity.class);
 		return existe;
 	}
 	
-	public Boolean validarNombreActualizarBolsa(Integer id, String nombre ) {
+	public Boolean validaRamoSubramoFactor(String ramo,String rubRamo, String factor) {
 		Boolean existe = false;
 		Query query = new Query();
-		Criteria aux = Criteria.where(Constantes.NOMBRE).is(nombre).and(Constantes.ID).nin(id); 
+		Criteria aux = Criteria.where(Constantes.RAMO).is(ramo).and(Constantes.SUBRAMO).is(rubRamo).and(Constantes.FACTOR).is(factor); 
 		query.addCriteria(aux);
 		existe=mongoTemplate.exists(query, BolsasEntity.class);
 		return existe;
 	}
-	
-	
 	
 
 	/*
 	 * Consulta de bolsas con filtros
 	 */
-	public ListaBolsas getBolsas(String idTipo, String nombre, String ramo, String subramo, String factor) {
+	public ListaBolsas getBolsas(String idTipo, String nombre, String ramo, String subramo, String factor,String origen, String categoria) {
 		log.info("BolsasService.getBolsas");
 		 
-		Query query = this.busquedaBolsaNull(idTipo, nombre, ramo, subramo, factor);
+		Query query = this.busquedaBolsaNull(idTipo, nombre, ramo, subramo, factor, origen, categoria);
 		log.info("resultado: {}", query );
 		List<BolsasEntity> busquedaList = new ArrayList<>();
 		try {
@@ -214,7 +213,10 @@ public class BolsasService {
 				bolsa.setAutor(aux.getAutor());				
 				bolsa.setFechaCreacion(aux.getFechaCreacion());
 				bolsa.setFechaModificacion(aux.getFechaModificacion());
-
+				bolsa.setCategoria(aux.getRamo()!=null&&aux.getRamo().equals(Constantes.ALAJA)&&
+						aux.getSubramo()!=null&&aux.getSubramo().equals(Constantes.ALAJA)
+						?aux.getCategoria():Constantes.NA);
+				bolsa.setOrigen(aux.getOrigen());
 				lista.add(bolsa);
 			}	
 		}
@@ -240,31 +242,25 @@ public class BolsasService {
 			Bolsa bolsa = null;
 			for(BolsasEntity aux : busquedaList) {
 				bolsa = new Bolsa();
-				
 				if(aux.getTipo() != null) {
 					Query queryT = new Query();
 					Criteria cr = Criteria.where(Constantes.ID).is(aux.getTipo());
 					queryT.addCriteria(cr);
-					
 					log.info("queryT: {}", queryT);
-					
-					TipoBolsaEntity tipoEntity = null;
-					
+	
+					TipoBolsaEntity tipoEntity = null;				
 					try {
 						tipoEntity = mongoTemplate.findOne(queryT, TipoBolsaEntity.class);
 					} catch(Exception e) {
 						log.error("Error  getBolsasSinFiltro: {0}", e);
 					}
-					
 					if(tipoEntity != null) {
 						TipoBolsa tipoBolsaVO = new TipoBolsa();
 						tipoBolsaVO.setId(tipoEntity.getid());
 						tipoBolsaVO.setDescripcion(tipoEntity.getDescripcion());
-						
 						bolsa.setTipo(tipoBolsaVO);
 					}
 				}
-				
 				bolsa.setId(aux.getIdBolsa());
 				bolsa.setNombre(aux.getNombre());
 				bolsa.setRamo(aux.getRamo());
@@ -274,7 +270,10 @@ public class BolsasService {
 				bolsa.setAutor(aux.getAutor());				
 				bolsa.setFechaCreacion(aux.getFechaCreacion());
 				bolsa.setFechaModificacion(aux.getFechaModificacion());
-
+				bolsa.setOrigen(aux.getOrigen());
+				bolsa.setCategoria(aux.getRamo()!=null&&aux.getRamo().equals(Constantes.ALAJA)
+						&&aux.getSubramo()!=null&&aux.getSubramo().equals(Constantes.ALAJA)
+						?aux.getCategoria():Constantes.NA);
 				lista.add(bolsa);
 			}	
 		}
@@ -324,14 +323,20 @@ public class BolsasService {
 			}
 			
 			if(bolsa != null) {
-				bolsa.setNombre(peticion.getNombre());
-				bolsa.setRamo(peticion.getRamo());
-				bolsa.setSubramo(peticion.getSubramo());
-				bolsa.setFactor(peticion.getFactor());
-				bolsa.setTipo(peticion.getTipo().getId());
-				bolsa.setSucursales(utils.paseraLista(peticion.getSucursales()));
-				bolsa.setAutor(peticion.getAutor());
-				
+				bolsa.setNombre(peticion.getNombre()!=null?peticion.getNombre():bolsa.getNombre());
+				bolsa.setRamo(peticion.getRamo()!=null?peticion.getRamo():bolsa.getRamo());
+				bolsa.setSubramo(peticion.getSubramo()!=null?peticion.getSubramo():bolsa.getSubramo());
+				bolsa.setFactor(peticion.getFactor()!=null?peticion.getFactor():bolsa.getFactor());
+				bolsa.setTipo(peticion.getTipo()!=null&&peticion.getTipo().getId()!=null?peticion.getTipo().getId():
+					bolsa.getTipo());
+				if(peticion.getSucursales()!=null){
+					bolsa.setSucursales(utils.paseraLista(peticion.getSucursales()));
+				}
+				bolsa.setAutor(peticion.getAutor()!=null?peticion.getAutor():bolsa.getAutor());
+				bolsa.setOrigen(peticion.getOrigen()!=null?peticion.getOrigen():bolsa.getOrigen());
+				bolsa.setCategoria(peticion.getRamo()!=null&&peticion.getRamo().equals(Constantes.ALAJA)&&
+						peticion.getSubramo()!=null&&peticion.getSubramo().equals(Constantes.ALAJA)?
+						peticion.getCategoria():Constantes.NA);
 				LocalDate locateDate = LocalDate.now();
 				bolsa.setFechaModificacion(locateDate);
 				
@@ -412,136 +417,36 @@ public class BolsasService {
 	/*
 	 *  Armado de Busqueda de Bolsas
 	 */
-	private Query busquedaBolsaNull(String idTipo, String nombre, String ramo, String subramo, String factor) {
+	private Query busquedaBolsaNull(String idTipo, String nombre, String ramo, String subramo, String factor,String origen,String categoria) {
 		log.info("BolsasService.busquedaBolsaNull");
-
 		Query query = new Query();
-
+		Criteria aux =new Criteria();
 		if (idTipo != null) {
-			Criteria aux = Criteria.where(Constantes.ID_TIPO).is(new Integer(idTipo));
-
-			if (nombre != null) {
-				aux.and(Constantes.NOMBRE).is(nombre);
-			}
-
-			if (ramo != null) {
-				aux.and(Constantes.RAMO).is(ramo);
-			}
-
-			if (subramo != null) {
-				aux.and(Constantes.SUBRAMO).is(subramo);
-			}
-
-			if (factor != null) {
-				aux.and(Constantes.FACTOR).is(factor);
-			}
-			query.addCriteria(aux);
+			aux.and(Constantes.ID_TIPO).is(Integer.valueOf(idTipo));
 		}
-
 		if (nombre != null) {
-			query.addCriteria(validarNombreNull(idTipo, nombre, ramo, subramo, factor));
+			aux.and(Constantes.NOMBRE).is(nombre);
 		}
-
 		if (ramo != null) {
-			validarRamoNull(idTipo, nombre, ramo, subramo, factor);
+			aux.and(Constantes.RAMO).is(ramo);
 		}
-
 		if (subramo != null) {
-			query.addCriteria(validarSubramoNull(idTipo, nombre, ramo, subramo, factor));
+			aux.and(Constantes.SUBRAMO).is(subramo);
 		}
-
 		if (factor != null) {
-			query.addCriteria(validarFactorNull(idTipo, nombre, ramo, subramo, factor));
+			aux.and(Constantes.FACTOR).is(factor);
 		}
-
+		if(origen!=null){
+			aux.and(Constantes.ORIGEN).is(origen);
+		}
+		if(categoria!=null){
+			aux.and(Constantes.CATEGORIA).is(categoria);
+		}
+		query.addCriteria(aux);
 		log.info("Query: {}", query);
 		return query;
 	}
-	
-	private Criteria validarFactorNull(String idTipo, String nombre, String ramo, String subramo, String factor) {
-		Criteria aux = Criteria.where(Constantes.FACTOR).is(factor);
-		if (factor != null) {
-			if (idTipo != null) {
-				aux.and(Constantes.ID_TIPO).is(new Integer(idTipo));
-			}
 
-			if (nombre != null) {
-				aux.and(Constantes.NOMBRE).is(nombre);
-			}
-
-			if (ramo != null) {
-				aux.and(Constantes.RAMO).is(ramo);
-			}
-
-			if (subramo != null) {
-				aux.and(Constantes.SUBRAMO).is(subramo);
-			}
-			
-		}
-		return aux;
-	}
-	
-	private Criteria validarSubramoNull(String idTipo, String nombre, String ramo, String subramo, String factor) {
-		Criteria aux = Criteria.where(Constantes.SUBRAMO).is(subramo);
-		if (idTipo != null) {
-			aux.and(Constantes.ID_TIPO).is(new Integer(idTipo));
-		}
-
-		if (nombre != null) {
-			aux.and(Constantes.NOMBRE).is(nombre);
-		}
-
-		if (ramo != null) {
-			aux.and(Constantes.RAMO).is(ramo);
-		}
-
-		if (factor != null) {
-			aux.and(Constantes.FACTOR).is(factor);
-		}
-		return aux;
-	}
-	
-	private Criteria validarRamoNull(String idTipo, String nombre, String ramo, String subramo, String factor) {
-		Criteria aux = Criteria.where(Constantes.RAMO).is(ramo);
-		if (idTipo != null) {
-			aux.and(Constantes.ID_TIPO).is(new Integer(idTipo));
-		}
-
-		if (nombre != null) {
-			aux.and(Constantes.NOMBRE).is(nombre);
-		}
-
-		if (subramo != null) {
-			aux.and(Constantes.SUBRAMO).is(subramo);
-		}
-
-		if (factor != null) {
-			aux.and(Constantes.FACTOR).is(factor);
-		}
-		return aux;
-	}
-	
-	private Criteria validarNombreNull(String idTipo, String nombre, String ramo, String subramo, String factor) {
-		Criteria aux = Criteria.where(Constantes.NOMBRE).is(nombre);
-		if (idTipo != null) {
-			aux.and(Constantes.ID_TIPO).is(new Integer(idTipo));
-		}
-
-		if (ramo != null) {
-			aux.and(Constantes.RAMO).is(ramo);
-		}
-
-		if (subramo != null) {
-			aux.and(Constantes.SUBRAMO).is(subramo);
-		}
-
-		if (factor != null) {
-			aux.and(Constantes.FACTOR).is(factor);
-		}
-		return aux;
-	}
-	
-	
 	/*
 	 * TipoBolsa sea Regla
 	 */
