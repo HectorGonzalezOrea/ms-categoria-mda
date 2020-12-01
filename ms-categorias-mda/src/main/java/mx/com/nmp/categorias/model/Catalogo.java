@@ -1,13 +1,13 @@
 package mx.com.nmp.categorias.model;
 
 import java.util.Objects;
+
+import org.springframework.validation.annotation.Validated;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 
 /**
  * Objeto común para la definición de catálogo

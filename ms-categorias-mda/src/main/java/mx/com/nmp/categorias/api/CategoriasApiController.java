@@ -54,9 +54,9 @@ public class CategoriasApiController implements CategoriasApi {
 			@ApiParam(value = "Usuario en el sistema origen que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = "Sistema que origina la petición", required = true, allowableValues = "portalInteligenciaComercial") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información", required = true, allowableValues = "bluemix, mockserver") @RequestHeader(value = "destino", required = true) String destino) {
-		log.info("*********************************************************");
+		log.info("******************************************************");
 		log.info("consultar categorias");
-		log.info("*********************************************************");
+		log.info("******************************************************");
 
 		String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
 
