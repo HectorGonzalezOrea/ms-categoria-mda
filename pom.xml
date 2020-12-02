@@ -18,6 +18,7 @@
 			<module>ms-gestionusuarios-mda</module>
 			<module>ms-historicoprecios-mda</module>
 			<module>ms-valormonte-mda</module>
+			<module>ms-categorias-mda</module>
          </modules>
       </profile>
    </profiles>  
