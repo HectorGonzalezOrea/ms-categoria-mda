@@ -49,7 +49,7 @@ public interface CategoriasApi {
 			@ApiResponse(code = 400, message = "Error en el mensaje de petición, verifique la información", response = BadRequest.class),
 			@ApiResponse(code = 401, message = "Error de autorización en el uso del recurso", response = InvalidAuthentication.class),
 			@ApiResponse(code = 500, message = "Error interno del servidor", response = InternalServerError.class) })
-	@RequestMapping(value = "/categorias/guardarconfiguracion", produces = {
+	@RequestMapping(value = "/categorias", produces = {
 			"application/json" }, method = RequestMethod.POST)
 	ResponseEntity<?> categoriasGuardarconfiguracionPost(
 			@ApiParam(value = "Usuario en el sistema origen que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,

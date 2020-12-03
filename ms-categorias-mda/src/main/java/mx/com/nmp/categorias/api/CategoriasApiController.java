@@ -126,7 +126,7 @@ public class CategoriasApiController implements CategoriasApi {
 		}
 		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
-			if (usuario == null && origen == null && destino == null && categoriasbody == null) {
+			if (usuario == null || origen == null || destino == null || categoriasbody == null) {
 				BadRequest br = new BadRequest();
 				br.setCode(Constantes.ERROR_CODE_BAD_REQUEST);
 				br.setMessage(Constantes.MESSAGE_ERROR_BAD_REQUEST);
