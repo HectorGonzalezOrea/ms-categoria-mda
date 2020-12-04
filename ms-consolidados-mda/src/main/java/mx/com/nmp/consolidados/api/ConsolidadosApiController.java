@@ -267,7 +267,7 @@ public class ConsolidadosApiController implements ConsolidadosApi {
             		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
             	}
             	
-             	Boolean eliminado = consolidadoService.eliminarConsolidado(idArchivo);
+             	Boolean eliminado = consolidadoService.eliminarConsolidado(Integer.parseInt(idArchivo));
             	
              	SuccessfulResponse sr = new SuccessfulResponse();
              	if(Boolean.TRUE.equals(eliminado)) {

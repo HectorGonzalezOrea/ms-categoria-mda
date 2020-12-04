@@ -1,5 +1,18 @@
 package mx.com.nmp.consolidados.ms.service;
 
+import static mx.com.nmp.consolidados.utils.Constantes.ARMAR_TABLA_FINAL_FALLIDOS;
+import static mx.com.nmp.consolidados.utils.Constantes.ARMAR_TABLA_INICIO_FALLIDOS;
+import static mx.com.nmp.consolidados.utils.Constantes.ASUNTO_AJUSTE_PRECIOS_FALSE;
+import static mx.com.nmp.consolidados.utils.Constantes.ASUNTO_ARBITRARIEDAD_TRUE;
+import static mx.com.nmp.consolidados.utils.Constantes.ASUNTO_PROCESO_FALLIDO;
+import static mx.com.nmp.consolidados.utils.Constantes.CONTENIDO_HTML_ARBITRARIEDAD_TRUE;
+import static mx.com.nmp.consolidados.utils.Constantes.CONTENIDO_HTML_BI;
+import static mx.com.nmp.consolidados.utils.Constantes.CONTENIDO_HTML_BI_FINAL;
+import static mx.com.nmp.consolidados.utils.Constantes.CONTENIDO_HTML_PRECIOS_FALSE_FINAL;
+import static mx.com.nmp.consolidados.utils.Constantes.CONTENIDO_HTML_PRECIOS_FALSE_INICIO;
+import static mx.com.nmp.consolidados.utils.Constantes.CONTENIDO_PROCESO_FALLIDO;
+import static mx.com.nmp.consolidados.utils.Constantes.NOMBRE_EXCEL;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,6 +21,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -23,12 +37,14 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import mx.com.nmp.consolidados.excepcion.ConsolidadosException;
 import mx.com.nmp.consolidados.model.Consolidados;
 import mx.com.nmp.consolidados.model.ConsultarArchivoConsolidadoResInner;
 import mx.com.nmp.consolidados.model.InfoProducto;
@@ -53,19 +69,6 @@ import mx.com.nmp.consolidados.utils.Constantes;
 import mx.com.nmp.consolidados.utils.ConvertStringToBase64;
 import mx.com.nmp.consolidados.utils.ExcelUtils;
 import mx.com.nmp.consolidados.utils.HtmlUtil;
-
-import static mx.com.nmp.consolidados.utils.Constantes.ASUNTO_ARBITRARIEDAD_TRUE;
-import static mx.com.nmp.consolidados.utils.Constantes.CONTENIDO_HTML_ARBITRARIEDAD_TRUE;
-import static mx.com.nmp.consolidados.utils.Constantes.NOMBRE_EXCEL;
-
-import static mx.com.nmp.consolidados.utils.Constantes.ASUNTO_AJUSTE_PRECIOS_FALSE;
-import static mx.com.nmp.consolidados.utils.Constantes.CONTENIDO_HTML_PRECIOS_FALSE_INICIO;
-import static mx.com.nmp.consolidados.utils.Constantes.CONTENIDO_HTML_PRECIOS_FALSE_FINAL;
-
-import static mx.com.nmp.consolidados.utils.Constantes.CONTENIDO_HTML_BI;
-import static mx.com.nmp.consolidados.utils.Constantes.CONTENIDO_HTML_BI_FINAL;
-import static mx.com.nmp.consolidados.utils.Constantes.ARMAR_TABLA_INICIO_FALLIDOS;
-import static mx.com.nmp.consolidados.utils.Constantes.ARMAR_TABLA_FINAL_FALLIDOS;
 
 @Service
 public class ConsolidadoService {
@@ -94,6 +97,7 @@ public class ConsolidadoService {
 	@Autowired
 	private MongoService mongoService;
 	
+	@Retryable(value = {RuntimeException.class}, maxAttempts = 3,backoff = @Backoff(1000))
 	public Boolean crearConsolidado(Consolidados request) {
 		log.info("ConsolidadoService.crearConsolidado");
 		long inicio = System.currentTimeMillis();
@@ -103,8 +107,9 @@ public class ConsolidadoService {
 			CastConsolidados castConsolidados = new CastConsolidados();
 			ArchivoEntity consolidado = new ArchivoEntity();
 			File archivo = null;
-			
-			
+			try{
+	        	Integer valorEntero=Integer.parseInt("xsd");
+	        
 				consolidado.setNombreCliente(request.getUsuario());
 				consolidado.setVigencia(request.getVigencia());
 				consolidado.setNombreAjuste(request.getNombreAjuste());
@@ -112,9 +117,7 @@ public class ConsolidadoService {
 				consolidado.setFechaAplicacion(request.getFechaAplicacion());
 				consolidado.setIdArchivo(sequenceGeneratorService.generateSequence(Constantes.SEQUENCE));
 				archivo = request.getAdjunto();
-				
 				try (FileReader targetReader = new FileReader(archivo)) {
-				
 				BufferedReader b = new BufferedReader(targetReader);
 				List<InfoProducto> lst = castConsolidados.cvsLectura(b);
 				consolidado.setAdjunto(castConsolidados.lstToJson(lst));
@@ -127,17 +130,18 @@ public class ConsolidadoService {
 			} catch (IOException ioe) {
 				log.error("{}",ioe.getMessage());
 			}
+			}catch(ConsolidadosException e){
+	        	e.getStackTrace();
+	        }
 		}
 
 		long fin = System.currentTimeMillis();
-
 		long tiempo =((fin - inicio) / 1000);
-
 		log.info("crearConsolidado: {} segundos", tiempo);
-
 		return insertado;
 	}
-
+	
+	@Retryable(value = {RuntimeException.class}, maxAttempts = 3,backoff = @Backoff(1000))
 	public List<ConsultarArchivoConsolidadoResInner> getConsolidados(String vigencia) {
 		log.info("entrando a ConsolidadoService.getConsolidados");
 		List<ConsultarArchivoConsolidadoResInner> lstConsolidados = new ArrayList<>();
@@ -148,13 +152,17 @@ public class ConsolidadoService {
 		} catch (ParseException e) {
 			log.info("ParseException : {}", e.getMessage());
 		}
-
+		try{
+        	Integer valorEntero=Integer.parseInt("d");
 		List<ArchivoEntity> busquedaList = mongoService.consultaArhivoConsolidadoByDate(fechaAplicaciondate);
 
 		if (!busquedaList.isEmpty()) {
 			CastConsolidados castConsolidados = new CastConsolidados();
 			lstConsolidados = castConsolidados.toVOs(busquedaList);
 		}
+		}catch(ConsolidadosException e){
+        	e.getStackTrace();
+        }
 		log.info("saliendo a ConsolidadoService.getConsolidados");
 		return lstConsolidados;
 	}
@@ -162,18 +170,20 @@ public class ConsolidadoService {
 	/*
 	 * Eliminar Consolidados por id de archivo
 	 */
-	public Boolean eliminarConsolidado(String idArchivo) {
+	@Retryable(value = {RuntimeException.class}, maxAttempts = 3,backoff = @Backoff(1000))
+	public boolean eliminarConsolidado(Integer idArchivo) {
 		log.info("eliminarConsolidado");
 		Boolean eliminado = false;
-		
-
-		List<ArchivoEntity> consolidados = this.getConsolidados(new Integer(idArchivo));
-
+		try{
+        	Integer valorEntero=Integer.parseInt("xd");
+		List<ArchivoEntity> consolidados = this.getConsolidados(idArchivo);
 		log.info("consolidados : {} ", consolidados.size());
-
 		for (ArchivoEntity consolidado : consolidados) {
 			eliminado=eliminarConsolidados(consolidado);
 		}
+		}catch(ConsolidadosException e){
+        	e.getStackTrace();
+        }
 		return eliminado;
 	}
 	
@@ -208,17 +218,19 @@ public class ConsolidadoService {
 	/*
 	 * Actualiza la prioridad del archivo consolidados
 	 */
+	@Retryable(value = {RuntimeException.class}, maxAttempts = 3,backoff = @Backoff(1000))
 	public InlineResponse200 actualizarPrioridadArchivo(ModificarPrioridadArchivoConsolidadoReq request) {
-		log.info("Actualizar Prioridad Archivo Consolidado");
-		
-	
+		log.info("Actualizar Prioridad Archivo Consolidado_");
 		InlineResponse200 resp = null;
+		try{
 		Query query1 = new Query();
 		query1.addCriteria(Criteria.where(Constantes.ID_ARCHIVO).is(request.getIdArchivo()));
 		Update update = new Update();
 		update.set(Constantes.PRIORIDAD, request.getIdPrioridad());
 		ArchivoEntity consolidado = mongoTemplate.findAndModify(query1, update, ArchivoEntity.class);
-			
+		
+        	Integer valorEntero=Integer.parseInt("s");
+        
 		Query queryCons = new Query();
 		queryCons.addCriteria(Criteria.where(Constantes.ID_ARCHIVO).is(request.getIdArchivo()));
 		Date fechaInicio=CastConsolidados.resetTimeToDown(consolidado.getVigencia());
@@ -233,56 +245,53 @@ public class ConsolidadoService {
 		}
 		
 		if(!lstEntity.isEmpty() && request.getIdPrioridad() <=lstEntity.size()) {
-	
 		for (ArchivoEntity entity : lstEntity) {
 			if(!entity.getIdArchivo().equals(Long.valueOf(request.getIdArchivo()))) {
 				prioridad ++;
 				entity.setPrioridad(prioridad);
-				
 			}
-			
 			mongoTemplate.save(entity);
 		}
 		}else {
 			log.info("Ocurrio un error el id prioridad esta fuera del rango.");
 		}
 		resp = new InlineResponse200();
-
 		resp.setIdPosicion(consolidado.getPrioridad());
 		resp.setNombreArchivo(consolidado.getNombreAjuste());
-
+		}catch(ConsolidadosException e){
+        	e.getStackTrace();
+        }
 		return resp;
 	}
 
 	/*
 	 * Procesar Consolidados
 	 */
+	@Retryable(value = {RuntimeException.class}, maxAttempts = 3,backoff = @Backoff(1000))
 	@Async
 	public void procesarConsolidados(String usuario, String fechaAplicacion) {
 		log.info("Procesar un archivo consolidado");
-
-		
 		// obtener consolidados
-		List<ConsultarArchivoConsolidadoResInner> consolidados = this.getConsolidados(fechaAplicacion);
-
-		ArrayList<ArbitrajePreciosPartidasRequestVO> listaVerificarRegistrosReq = null;
-		// se arma los request de validar arbitrariedad
-		if (consolidados != null) {
-			listaVerificarRegistrosReq = this.armarVerificarRegistros(consolidados);
-
-			ArrayList<ArbitrajePreciosPartidasResponseVO> listaVerificarRegistrosResp = null;
-			// se verifica la arbitrariedad
-			if (!listaVerificarRegistrosReq.isEmpty()) {
-				listaVerificarRegistrosResp = this.verificarRegistros(listaVerificarRegistrosReq);
-
-				this.enviarCorreoPartidasConArbitratierdad(listaVerificarRegistrosResp);
-				
-				// Establecimiento de precios
-				this.enviarAjustePrecios(usuario, listaVerificarRegistrosReq, consolidados);
-				
-			}
-		}
-		
+		try{
+        	Integer valorEntero=Integer.parseInt("cd");
+        	List<ConsultarArchivoConsolidadoResInner> consolidados = this.getConsolidados(fechaAplicacion);
+    		ArrayList<ArbitrajePreciosPartidasRequestVO> listaVerificarRegistrosReq = null;
+    		// se arma los request de validar arbitrariedad
+    		if (consolidados != null) {
+    			listaVerificarRegistrosReq = this.armarVerificarRegistros(consolidados);
+    			ArrayList<ArbitrajePreciosPartidasResponseVO> listaVerificarRegistrosResp = null;
+    			// se verifica la arbitrariedad
+    			if (!listaVerificarRegistrosReq.isEmpty()) {
+    				listaVerificarRegistrosResp = this.verificarRegistros(listaVerificarRegistrosReq);
+    				this.enviarCorreoPartidasConArbitratierdad(listaVerificarRegistrosResp);
+    				// Establecimiento de precios
+    				this.enviarAjustePrecios(usuario, listaVerificarRegistrosReq, consolidados);
+    			}
+    		}
+        }catch(ConsolidadosException e){
+        	e.getStackTrace();
+        	throw new ConsolidadosException(e.getStackTrace().toString());
+        }
 		
 	}
 	
@@ -632,5 +641,64 @@ public class ConsolidadoService {
 		}
 		
 		return flag;
+	}
+	
+	@Recover
+	public InlineResponse200 actualizarPrioridadArchivoRec(RuntimeException t,ModificarPrioridadArchivoConsolidadoReq request){
+		armaCuerpoCorreo(t, Constantes.CONSOLIDADOS_PRIORIDAD+request.getIdPrioridad()+Constantes.CONSOLIDADOS_PRIORIDAD_COMPLEMENTO);
+		return null;
+	}
+	
+	@Recover
+	public  List<ConsultarArchivoConsolidadoResInner> consultarDocumentoRec(RuntimeException t,String vigencia){
+		armaCuerpoCorreo(t, Constantes.CONSOLIDADOS_ARCHIVOS);
+		return Collections.emptyList();
+	}
+	
+	@Recover
+	public boolean eliminarConsolidadoRec(RuntimeException t,Integer idArchivo){
+		armaCuerpoCorreo(t, Constantes.CONSOLIDADOS_DELETE+idArchivo);
+		return false;
+	}
+	
+	@Recover
+    public void procesaConsolidadoRec(RuntimeException t,String usuario, String fechaAplicacion) {
+        armaCuerpoCorreo(t, Constantes.CONSOLIDADOS_PROCESAR);
+    }
+	
+	@Recover
+    public Boolean registrarConsolidadoRec(RuntimeException t,Consolidados request ) {
+        armaCuerpoCorreo(t, Constantes.CONSOLIDADOS_REGISTRAR);
+		return false;
+    }
+	
+	private EnviarNotificacionRequestVO armaCuerpoCorreo(RuntimeException runTime,String nombreFuncion){
+		EnviarNotificacionRequestVO enr = new EnviarNotificacionRequestVO();
+        enr.setDe(de);
+		enr.setPara(para);
+		enr.setAsunto(ASUNTO_PROCESO_FALLIDO);
+		StringBuilder sb = new StringBuilder();
+		sb.append(CONTENIDO_PROCESO_FALLIDO);
+		sb.append(Constantes.SALTO_LINEA);
+		sb.append(Constantes.NEGRITAS);
+		sb.append(nombreFuncion);
+		sb.append(Constantes.NEGRITAS_CLOSE);
+		sb.append(Constantes.SALTO_LINEA);
+		sb.append(Constantes.SALTO_LINEA);
+		sb.append(Constantes.CONSOLIDADO_MENSAJE_DETALLE);
+		sb.append(runTime.getMessage());
+		sb.append(Constantes.SALTO_LINEA);
+		sb.append(runTime.getStackTrace());
+		sb.append(Constantes.SALTO_LINEA);
+		sb.append(runTime.fillInStackTrace());
+		enr.setContenidoHTML(sb.toString());
+		try {
+			oAGService.enviarNotificacion(enr);
+		} catch (UnirestException e) {
+			log.error("Error enviar correo  {0}" , e);
+		} catch (Exception e) {
+			log.error("Ocurrio un error {0}",e);
+		}
+		return enr;
 	}
 }

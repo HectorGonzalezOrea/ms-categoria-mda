@@ -70,6 +70,9 @@ public final class Constantes {
 			"	</body>\r\n" + 
 			"</html>";
 	
+	public static final String ASUNTO_PROCESO_FALLIDO="Motor de decuentos: Se realizo un máximo de 3 reintentos en el procesamiento de consolidados.";
+	public static final String CONTENIDO_PROCESO_FALLIDO="Se informa que se obtuvo un <b>error</b> en la ejecución del servicio con la siguiente operación.";
+	
 	public static final String ASUNTO_AJUSTE_PRECIOS_FALSE = "Notificación de Partidas a las que no se pudo hacer el ajuste de precios.";
 	public static final String CONTENIDO_HTML_PRECIOS_FALSE_INICIO = "'Se le informa que el reporte solicitado '";
 	public static final String CONTENIDO_HTML_PRECIOS_FALSE_FINAL = "' contiene las partidas que no han sido procesadas <br/><i>Favor de ingresar al portal de inteligencia comercial para verificar los cambios realizados.</i>' <br/><br/><br/>";
@@ -78,8 +81,9 @@ public final class Constantes {
 	public static final String CONTENIDO_HTML_BI_FINAL = "</b></i>";
 	public static final String FECHA = "vigencia";
 	public static final String PRIORIDAD = "prioridad";
-	
-	
+	public static final String SALTO_LINEA="<br>";
+	public static final String NEGRITAS="<b>";
+	public static final String NEGRITAS_CLOSE="</b>";
 	
 	public static final String ERROR_CODE = "NMP-MDA-400";
 	public static final String ERROR_MENSAJE = "El cuerpo de la petición no está bien formado, verifique su información.";
@@ -120,4 +124,13 @@ public final class Constantes {
 	public static final String SEQUENCE = "consolidado_sequence";
 	public static final String CONSOLIDADOS = "consolidados";
 	
+	/*Nombre de servicios*/
+	
+	public static final String CONSOLIDADOS_PRIORIDAD="actualizarPosicionArchivoPUT /consolidados/archivos/";
+	public static final String CONSOLIDADOS_PRIORIDAD_COMPLEMENTO="/prioridad";
+	public static final String CONSOLIDADOS_ARCHIVOS="consultaConsolidadosArchivosGET /consolidados/archivos";
+	public static final String CONSOLIDADOS_DELETE="eliminarArchivoConsolidadoDELETE /consolidados/archivos/";
+	public static final String CONSOLIDADOS_PROCESAR="procesarConsolidadoPOST /consolidados/_procesar";
+	public static final String CONSOLIDADOS_REGISTRAR="registrarConsolidadoPOST  /consolidados/archivos";
+	public static final String CONSOLIDADO_MENSAJE_DETALLE="A continuación el detalle: <br>";
 }

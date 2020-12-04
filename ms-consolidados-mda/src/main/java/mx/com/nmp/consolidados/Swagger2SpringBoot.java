@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
-@EnableRetry
+@EnableRetry(proxyTargetClass=true)
 @EnableAsync
 @EnableSwagger2
 @ComponentScan(basePackages = { "mx.com.nmp.consolidados", "mx.com.nmp.consolidados.api" , "mx.com.nmp.consolidados.configuration"})
