@@ -107,9 +107,7 @@ public class ConsolidadoService {
 			CastConsolidados castConsolidados = new CastConsolidados();
 			ArchivoEntity consolidado = new ArchivoEntity();
 			File archivo = null;
-			try{
-	        	Integer valorEntero=Integer.parseInt("xsd");
-	        
+			try{	        
 				consolidado.setNombreCliente(request.getUsuario());
 				consolidado.setVigencia(request.getVigencia());
 				consolidado.setNombreAjuste(request.getNombreAjuste());
@@ -153,7 +151,6 @@ public class ConsolidadoService {
 			log.info("ParseException : {}", e.getMessage());
 		}
 		try{
-        	Integer valorEntero=Integer.parseInt("d");
 		List<ArchivoEntity> busquedaList = mongoService.consultaArhivoConsolidadoByDate(fechaAplicaciondate);
 
 		if (!busquedaList.isEmpty()) {
@@ -175,7 +172,6 @@ public class ConsolidadoService {
 		log.info("eliminarConsolidado");
 		Boolean eliminado = false;
 		try{
-        	Integer valorEntero=Integer.parseInt("xd");
 		List<ArchivoEntity> consolidados = this.getConsolidados(idArchivo);
 		log.info("consolidados : {} ", consolidados.size());
 		for (ArchivoEntity consolidado : consolidados) {
@@ -228,9 +224,7 @@ public class ConsolidadoService {
 		Update update = new Update();
 		update.set(Constantes.PRIORIDAD, request.getIdPrioridad());
 		ArchivoEntity consolidado = mongoTemplate.findAndModify(query1, update, ArchivoEntity.class);
-		
-        	Integer valorEntero=Integer.parseInt("s");
-        
+		        
 		Query queryCons = new Query();
 		queryCons.addCriteria(Criteria.where(Constantes.ID_ARCHIVO).is(request.getIdArchivo()));
 		Date fechaInicio=CastConsolidados.resetTimeToDown(consolidado.getVigencia());
@@ -273,7 +267,6 @@ public class ConsolidadoService {
 		log.info("Procesar un archivo consolidado");
 		// obtener consolidados
 		try{
-        	Integer valorEntero=Integer.parseInt("cd");
         	List<ConsultarArchivoConsolidadoResInner> consolidados = this.getConsolidados(fechaAplicacion);
     		ArrayList<ArbitrajePreciosPartidasRequestVO> listaVerificarRegistrosReq = null;
     		// se arma los request de validar arbitrariedad
