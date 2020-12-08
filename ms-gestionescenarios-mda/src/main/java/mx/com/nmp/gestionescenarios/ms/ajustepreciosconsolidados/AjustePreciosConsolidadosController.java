@@ -90,11 +90,7 @@ public class AjustePreciosConsolidadosController extends AjustePreciosConsolidad
 			
 			if(response.code() == 200) {
 				
-				String vigencia2 = new SimpleDateFormat(FORMATO_FECHA).format(vigencia);
-				
-				log.info("Date: {}" , vigencia2);
-				
-				ConsultarConsolidadoResponseVO consolidadoList = this.consultarConsolidado(usuario, origen, destino, vigencia2);
+				ConsultarConsolidadoResponseVO consolidadoList = this.consultarConsolidado(usuario, origen, destino, vigencia);
 				listIdConsolidado = new ArrayList<>();
 				
 				for(ConsolidadoVO c : consolidadoList) {
