@@ -1,8 +1,12 @@
 package mx.com.nmp.consolidados.api;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -424,12 +428,16 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 				return new ResponseEntity<BadRequest>(bad, HttpStatus.BAD_REQUEST);
 			}
 			try {
+				DateFormat format = new SimpleDateFormat(Constantes.FORMATO_FECHA);
+				Date vigenciaDate = format.parse(vigencia);
+				log.info("fechaStr{}", vigencia);
+				log.info("fechaDate{}", vigenciaDate);
 				CastConsolidados util = new CastConsolidados();
 				Consolidados consolidado = new Consolidados();
 				consolidado.setUsuario(origen);
 				consolidado.setEmergente(emergente);
-				consolidado.setFechaAplicacion(new Date(vigencia));
-				consolidado.setVigencia(new Date(vigencia));
+				consolidado.setFechaAplicacion(vigenciaDate);
+				consolidado.setVigencia(vigenciaDate);
 				consolidado.setNombreAjuste(nombreAjuste);
 				consolidado.setAdjunto(util.convert(adjunto));
 				Boolean service = consolidadoService.crearConsolidado(consolidado);
@@ -446,6 +454,12 @@ public class ConsolidadosApiController implements ConsolidadosApi {
 				is.setMensaje(Constantes.ERROR_SERVER_MSG);
 				log.info("{}", is);
 				return new ResponseEntity<InternalServerError>(is, HttpStatus.INTERNAL_SERVER_ERROR);
+			} catch (ParseException e) {
+				bad = new BadRequest();
+				bad.setCodigo(Constantes.ERROR_CODE);
+				bad.setMensaje(Constantes.ERROR_DATE_MESSAGE);
+				log.info("{}", bad);
+				return new ResponseEntity<BadRequest>(bad, HttpStatus.BAD_REQUEST);
 			}
 		}
 		BadRequest br = new BadRequest();

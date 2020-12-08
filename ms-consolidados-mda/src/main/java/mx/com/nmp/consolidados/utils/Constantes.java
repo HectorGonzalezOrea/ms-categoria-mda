@@ -91,6 +91,7 @@ public final class Constantes {
 	public static final String ERROR_MENSAJE_DATE = "La fecha debe ser enviada con el formato dd/mm/yyyy";
 	public static final String ERROR_CONSOLIDACION="El id de la prioridad no es válido.";
 	public static final String ERROR_BAD_REQUEST_EXT = "Formato de archivo no es válido.";
+	public static final String ERROR_DATE_MESSAGE="Formato de fecha incorrecto";
 	
 	
 	
@@ -133,4 +134,6 @@ public final class Constantes {
 	public static final String CONSOLIDADOS_PROCESAR="procesarConsolidadoPOST /consolidados/_procesar";
 	public static final String CONSOLIDADOS_REGISTRAR="registrarConsolidadoPOST  /consolidados/archivos";
 	public static final String CONSOLIDADO_MENSAJE_DETALLE="A continuación el detalle: <br>";
+	
+	public static final String FORMATO_FECHA = "dd/MM/yyyy";
 }
