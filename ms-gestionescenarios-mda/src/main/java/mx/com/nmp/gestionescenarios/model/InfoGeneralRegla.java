@@ -33,6 +33,10 @@ public class InfoGeneralRegla   {
   @JsonProperty("subramo")
   @Valid
   private List<Object> subramo = null;
+  
+  @JsonProperty("categoria")
+  @Valid
+  private List<Object> categoria;
 
   @JsonProperty("factor")
   @Valid
@@ -372,7 +376,8 @@ public class InfoGeneralRegla   {
         Objects.equals(this.sucursales, infoGeneralRegla.sucursales) &&
         Objects.equals(this.canalComercializacion, infoGeneralRegla.canalComercializacion) &&
         Objects.equals(this.fechaAplicacion, infoGeneralRegla.fechaAplicacion) &&
-        Objects.equals(this.estatus, infoGeneralRegla.estatus);
+        Objects.equals(this.estatus, infoGeneralRegla.estatus)&&
+    	Objects.equals(this.categoria, infoGeneralRegla.categoria);
   }
 
   @Override
@@ -397,6 +402,7 @@ public class InfoGeneralRegla   {
     sb.append("    canalComercializacion: ").append(toIndentedString(canalComercializacion)).append("\n");
     sb.append("    fechaAplicacion: ").append(toIndentedString(fechaAplicacion)).append("\n");
     sb.append("    estatus: ").append(toIndentedString(estatus)).append("\n");
+    sb.append("	   categoria: ").append(toIndentedString(categoria));
     sb.append("}");
     return sb.toString();
   }
@@ -418,6 +424,14 @@ public Object getTipoMonedas() {
 
 public void setTipoMonedas(Object tipoMonedas) {
 	this.tipoMonedas = tipoMonedas;
+}
+
+public List<Object> getCategoria() {
+	return categoria;
+}
+
+public void setCategoria(List<Object> categoria) {
+	this.categoria = categoria;
 }
 }
 

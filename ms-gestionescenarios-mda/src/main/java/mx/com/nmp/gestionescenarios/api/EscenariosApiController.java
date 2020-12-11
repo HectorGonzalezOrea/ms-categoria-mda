@@ -18,6 +18,7 @@ import static mx.com.nmp.gestionescenarios.utils.Constantes.MSG_ELEMENTO_INEXIST
 import static mx.com.nmp.gestionescenarios.utils.Constantes.STATUS_MESSAGE_MONEDA;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.STATUS_MESSAGE_REGLA;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.SUCCESS_MESSAGE_OK;
+import static mx.com.nmp.gestionescenarios.utils.Constantes.REGLA_EXISTENTE;
 
 import java.util.List;
 
@@ -441,15 +442,11 @@ public class EscenariosApiController implements EscenariosApi {
         log.info("*************************************************************");
 
 		String apiKey = request.getHeader(HEADER_APIKEY_KEY);
-    	
     	if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
-    		
     		InvalidAuthentication ia = new InvalidAuthentication();
     		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
     		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
-    		
     		log.error("{}" , ia);
-    		
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
     	}
     	String accept = request.getHeader(HEADER_ACCEPT_KEY);
@@ -458,12 +455,9 @@ public class EscenariosApiController implements EscenariosApi {
             	GeneralResponse gr = new GeneralResponse();
             	if(peticion == null) {
 					BadRequest br = new BadRequest();
-		    		
 		    		br.setCode(ERROR_CODE_BAD_REQUEST);
 		    		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
-		    		
 		    		log.error("{}" , br);
-		    		
 		    		return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 				}else {
 					Boolean insertado = escenariosService.registrarMonedas(peticion);
@@ -471,16 +465,12 @@ public class EscenariosApiController implements EscenariosApi {
 						gr.setMessage(STATUS_MESSAGE_MONEDA);
                 		return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK);
 					}
-					
 				}
-            	
-                
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<GeneralResponse>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-
         return new ResponseEntity<GeneralResponse>(HttpStatus.NOT_IMPLEMENTED);
     }
 
@@ -603,7 +593,7 @@ public class EscenariosApiController implements EscenariosApi {
             	if(peticion != null &&  peticion.getId() !=null) {
             		log.info("Peticion : {}", peticion.toString());
             		 
-            		Boolean actualizado = gestionEscenarioService.actualizaEstatus(peticion);
+            		Boolean actualizado = escenariosService.actualizaEstatusReglaBussiness(peticion);
             		GeneralResponse gr = new GeneralResponse ();
             		gr.setMessage(STATUS_MESSAGE_REGLA);
             		if(actualizado ==false) {
@@ -638,6 +628,7 @@ public class EscenariosApiController implements EscenariosApi {
     		@ApiParam(value = "Ramo de las reglas a buscar") @Valid @RequestParam(value = "ramo", required = false) String ramo,
     		@ApiParam(value = "Subramo de las reglas a buscar") @Valid @RequestParam(value = "subramo", required = false) String subramo,
     		@ApiParam(value = "Factor de las reglas a buscar") @Valid @RequestParam(value = "factor", required = false) String factor,
+    		@ApiParam(value = "Categoria de las reglas a buscar") @Valid @RequestParam(value = "categoria", required = false) String categoria,
     		@ApiParam(value = "Origen de las partidas") @Valid @RequestParam(value = "origen", required = false) String origen,
     		@ApiParam(value = "Clasificación de los clientes") @Valid @RequestParam(value = "clasificacionClientes", required = false) String clasificacionClientes,
     		@ApiParam(value = "Estatus de la partida") @Valid @RequestParam(value = "estatusPartida", required = false) String estatusPartida,
@@ -666,7 +657,7 @@ public class EscenariosApiController implements EscenariosApi {
         String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
-            	if(nombre == null && ramo == null && subramo == null && factor == null && origen == null && clasificacionClientes == null && estatusPartida == null && canalComercializacion== null && fechaAplicacion == null) {
+            	if(nombre == null && ramo == null && subramo == null && factor == null && categoria==null && origen == null && clasificacionClientes == null && estatusPartida == null && canalComercializacion== null && fechaAplicacion == null) {
             		List<InfoGeneralRegla> reglas = gestionEscenarioService.consultaReglaSinFiltro();
             		ListaInfoGeneralRegla resp = new ListaInfoGeneralRegla ();
             		log.info("Reglas: {}", reglas);
@@ -686,17 +677,18 @@ public class EscenariosApiController implements EscenariosApi {
     				badReq.setMessage(ERROR_MENSAJE_DATE);
     				return new ResponseEntity<BadRequest>(badReq, HttpStatus.BAD_REQUEST);
     			}
-            	ConsultaReglaVO cunsultaRegla= new ConsultaReglaVO();
-            	cunsultaRegla.setNombre(nombre);
-            	cunsultaRegla.setRamo(subramo);
-            	cunsultaRegla.setSubramo(subramo);
-            	cunsultaRegla.setFactor(factor);
-            	cunsultaRegla.setOrigen(origen);
-            	cunsultaRegla.setClasificacionClientes(clasificacionClientes);
-            	cunsultaRegla.setEstatusPartida(estatusPartida);
-            	cunsultaRegla.setCanalComercializacion(canalComercializacion);
-            	cunsultaRegla.setFechaAplicacion(fechaAplicacion);
-            	List<InfoGeneralRegla> reglas = gestionEscenarioService.consultaRegla(cunsultaRegla);
+            	ConsultaReglaVO consultaRegla= new ConsultaReglaVO();
+            	consultaRegla.setNombre(nombre);
+            	consultaRegla.setRamo(subramo);
+            	consultaRegla.setSubramo(subramo);
+            	consultaRegla.setCategoria(categoria);
+            	consultaRegla.setFactor(factor);
+            	consultaRegla.setOrigen(origen);
+            	consultaRegla.setClasificacionClientes(clasificacionClientes);
+            	consultaRegla.setEstatusPartida(estatusPartida);
+            	consultaRegla.setCanalComercializacion(canalComercializacion);
+            	consultaRegla.setFechaAplicacion(fechaAplicacion);
+            	List<InfoGeneralRegla> reglas = gestionEscenarioService.consultaRegla(consultaRegla);
         		ListaInfoGeneralRegla resp = new ListaInfoGeneralRegla ();
         		
         		if(reglas!= null) {
@@ -748,14 +740,13 @@ public class EscenariosApiController implements EscenariosApi {
         String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
             try {
-            	
             	if(idRegla!=null) {
             		log.info("Eliminar Regla");
-            		
-            		InfoRegla eliminar = gestionEscenarioService.eliminaRegla(idRegla);
-            		if(eliminar!= null) {
-            			
-            			return new ResponseEntity<InfoRegla>(eliminar, HttpStatus.OK);
+            		Boolean eliminar = escenariosService.eliminaReglaBussiness(idRegla);
+            		if(eliminar) {
+            			GeneralResponse response=new GeneralResponse();
+            			response.setMessage(Constantes.REGLA_ELIMINADA);
+            			return new ResponseEntity<GeneralResponse>(response, HttpStatus.OK);
             		}else {
             			log.info("No hubo coincidencias");
             			BadRequest bd=new BadRequest();
@@ -865,7 +856,7 @@ public class EscenariosApiController implements EscenariosApi {
                 		log.error("Faltan elementos en el objeto infoRegla");
     					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
             		}
-            		Boolean actualizado = gestionEscenarioService.actualizaRegla(peticion);
+            		Boolean actualizado = escenariosService.actualizaReglaBussiness(peticion);
             		if(actualizado){
             		GeneralResponse gr = new GeneralResponse ();
             		gr.setMessage(STATUS_MESSAGE_REGLA);
@@ -901,18 +892,13 @@ public class EscenariosApiController implements EscenariosApi {
 		log.info("*************************************************************");
 		
     	String apiKey = request.getHeader(HEADER_APIKEY_KEY);
-    	
     	if(apiKey == null || apiKey.equals(CADENA_VACIA)) {
-    		
     		InvalidAuthentication ia = new InvalidAuthentication();
     		ia.setCode(ERROR_CODE_INVALID_AUTHENTICATION);
     		ia.setMessage(ERROR_MESSAGE_INVALID_AUTHENTICATION);
-    		
     		log.error("{}" , ia);
-    		
     		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
     	}
-    	
     	String accept = request.getHeader(HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(HEADER_ACCEPT_VALUE)) {
         	GeneralResponse gr = new GeneralResponse ();
@@ -922,18 +908,14 @@ public class EscenariosApiController implements EscenariosApi {
             		if(Boolean.TRUE.equals(gestionEscenarioService.consultaRegla(peticion.getNombre())) ) {
             			BadRequest br = new BadRequest();
                 		br.setCode(ERROR_CODE_BAD_REQUEST);
-                		br.setMessage(ERROR_MESSAGE_BAD_REQUEST);
-                		
+                		br.setMessage(REGLA_EXISTENTE);
                 		log.error("{}" , br);
-    					
     					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
-            		
             	}
             		else {
-                		Boolean insert = gestionEscenarioService.almacenarRegla(peticion);
+                		escenariosService.almacenaReglaBussiness(peticion);
                 		gr.setMessage("Regla almacenada exitosamente");
                 		return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK);
-                		
                 	}
             	}else {
             		BadRequest br = new BadRequest();

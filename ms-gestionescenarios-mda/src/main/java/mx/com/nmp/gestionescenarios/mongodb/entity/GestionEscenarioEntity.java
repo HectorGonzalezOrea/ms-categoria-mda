@@ -38,6 +38,8 @@ public class GestionEscenarioEntity {
 	private Object nivelAgrupacion;
 	private Object reglasDescuento;
 	private Object candadoInferior;
+	private List<Object> categoria;
+	private Integer requestIdRegla;
 	
 	public Integer getIdRegla() {
 		return idRegla;
@@ -170,5 +172,17 @@ public class GestionEscenarioEntity {
 	}
 	public void setCandadoInferior(Object candadoInferior) {
 		this.candadoInferior = candadoInferior;
+	}
+	public List<Object> getCategoria() {
+		return categoria;
+	}
+	public void setCategoria(List<Object> categoria) {
+		this.categoria = categoria;
+	}
+	public Integer getRequestIdRegla() {
+		return requestIdRegla;
+	}
+	public void setRequestIdRegla(Integer requestIdRegla) {
+		this.requestIdRegla = requestIdRegla;
 	}
 }

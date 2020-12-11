@@ -12,8 +12,7 @@ import static mx.com.nmp.gestionescenarios.utils.Constantes.ID_PETICION_ESCENARI
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ID_PETICION_ESCENARIO_MONEDA_ORO;
 import static mx.com.nmp.gestionescenarios.utils.Constantes.ID_ESCENARIO_MONEDA_ORO;
 
-
-
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,13 +30,20 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import mx.com.nmp.gestionescenarios.model.Catalogo;
+import mx.com.nmp.gestionescenarios.model.EstatusRegla;
+import mx.com.nmp.gestionescenarios.model.FechaAplicacionVO;
+import mx.com.nmp.gestionescenarios.model.InfoRegla;
 import mx.com.nmp.gestionescenarios.model.InternalServerError;
 import mx.com.nmp.gestionescenarios.model.ListaMonedas;
 import mx.com.nmp.gestionescenarios.model.ListaMonedasInner;
 import mx.com.nmp.gestionescenarios.model.ModificarValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.model.ValorAnclaOroDolar;
 import mx.com.nmp.gestionescenarios.mongodb.entity.AnclaOroDolarEntity;
+import mx.com.nmp.gestionescenarios.mongodb.entity.GestionEscenarioEntity;
 import mx.com.nmp.gestionescenarios.mongodb.entity.MonedasEntity;
 import mx.com.nmp.gestionescenarios.mongodb.service.GestionEscenarioService;
 import mx.com.nmp.gestionescenarios.mongodb.service.SequenceGeneratorService;
@@ -68,6 +74,9 @@ public class EscenariosService {
 	
 	@Autowired
 	private GestionEscenarioService gestionEscenarioMongoService;
+	
+	@Autowired
+	private GestionEscenarioService GestionEscenarioServiceDao;
 	
 	/*
 	 * Almacenar y procesar Consolidado
@@ -220,7 +229,6 @@ public class EscenariosService {
 	
 	public List<ListaMonedasInner> consultarMonedas (Boolean oro) {
 		
-		
 		List<MonedasEntity> busquedaList = this.buscarMonedas(oro);
 		List<ListaMonedasInner> monedas = null;
 		if(CollectionUtils.isNotEmpty(busquedaList)) {
@@ -237,10 +245,7 @@ public class EscenariosService {
 				lm.setActualizadoPor(me.getActualizadoPor());
 				monedas.add(lm);
 			}
-			
-						
-			
-			
+
 		}
 		
 		return monedas;
@@ -423,5 +428,137 @@ public class EscenariosService {
 		}
 		
 		return moneda;
+	}
+	
+	public Boolean almacenaReglaBussiness(InfoRegla peticion){
+		log.info("almacenaReglaBussiness::");
+		Boolean flag=null;
+		Integer idRequestCalen=null;
+		log.info("almacenando regla::");
+		Integer insertado=GestionEscenarioServiceDao.almacenarRegla(peticion);
+		log.info("PostAlmacenaReglaBussiness::");
+		if(insertado!=null){
+			idRequestCalen=calendarizarEjecucion(Constantes.ID_PETICION_ESCENARIO_DINAMICO, Constantes.ID_ESCENARIO_DINAMICO);
+			log.info("id calendarizacion ::{}",idRequestCalen);
+			GestionEscenarioServiceDao.actualizaRequestIdRegla(insertado, idRequestCalen);
+			log.info("almacenaReglaBussinessFin...");
+			flag=true;
+		}
+		return flag;
+	}
+	
+	public Boolean actualizaReglaBussiness(InfoRegla peticion){
+		Boolean flag=false;
+		GestionEscenarioEntity consulta=GestionEscenarioServiceDao.consultarReglaEscenario(peticion.getId());
+		if(consulta!=null){
+			if(validaFecha(peticion, consulta).equals(Boolean.TRUE)){
+				log.info("las fechas son iguales");
+				GestionEscenarioServiceDao.actualizaRegla(peticion);
+				flag=true;
+			}else{
+				log.info("las fechas son distintas");
+				log.info("consultando regla::");
+				log.info("eliminando Calendarizacion::");
+				oAGController.eliminarCalendarizacionEscenario(consulta.getRequestIdRegla());
+				log.info("generando Id de nuevamente Calendarizacion::");
+				Integer idRequestCalen=calendarizarEjecucion(Constantes.ID_PETICION_ESCENARIO_DINAMICO, Constantes.ID_ESCENARIO_DINAMICO);
+				log.info("id Calendarizacion [{}]::",idRequestCalen);
+				log.info("Actualizando nuevo ID de calendarización");
+				GestionEscenarioServiceDao.actualizaRegla(peticion);
+				GestionEscenarioServiceDao.actualizaRequestIdRegla(consulta.getIdRegla(), idRequestCalen);
+				flag=true;
+			}
+		}
+		return flag;
+	}
+	
+	private Boolean validaFecha(InfoRegla peticionService,GestionEscenarioEntity NoSql){
+		Boolean flag =false;
+		ObjectMapper mapper=new ObjectMapper();
+		if(peticionService.getFechaAplicacion()!=null){
+			FechaAplicacionVO fechaAplicacionVO=null;
+			FechaAplicacionVO fechaAplicacionEntity=null;
+			try {
+				String fechaAplicacionStr = mapper.writeValueAsString(peticionService.getFechaAplicacion());
+				fechaAplicacionVO=mapper.readValue(fechaAplicacionStr, FechaAplicacionVO.class);
+				log.info("fechas VO [{}]",fechaAplicacionStr);
+				String fechaAplicacionEntityStr=mapper.writeValueAsString(NoSql.getFechaAplicacion());
+				fechaAplicacionEntity=mapper.readValue(fechaAplicacionEntityStr,FechaAplicacionVO.class);
+				log.info("fechas Entity [{}]",fechaAplicacionEntityStr);
+				if(fechaAplicacionVO!=null &&fechaAplicacionEntity!=null){
+					if(fechaAplicacionVO.getRangoHorario().getHoraInicio().equals(fechaAplicacionEntity.getRangoHorario().getHoraInicio())
+					&&fechaAplicacionVO.getRangoHorario().getHoraFin().equals(fechaAplicacionEntity.getRangoHorario().getHoraFin())
+					&&fechaAplicacionVO.getFechas().get(0).equals(fechaAplicacionEntity.getFechas().get(0))){
+						flag=true;
+					}else{
+						flag=false;
+					}
+				}
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+				log.error("Error al convertir java.lang.Object a Str: {0}", e);
+			} catch (IOException e) {
+				e.printStackTrace();
+				log.error("Error al convertir Str a VO: {0}", e);
+			}
+		}
+		return flag;
+	}
+	
+	public Boolean actualizaEstatusReglaBussiness(EstatusRegla peticion){
+		Boolean flag=false;
+		ObjectMapper mapper=new ObjectMapper();
+		String estatus;
+		try {
+			GestionEscenarioEntity nosql=GestionEscenarioServiceDao.consultarReglaEscenario(peticion.getId());
+			estatus = mapper.writeValueAsString(peticion.getEstatus());
+			Catalogo estadoVO=mapper.readValue(estatus, Catalogo.class);
+			if(estadoVO.getDescripcion().equals(Constantes.ESTATUS_REGLA)){
+				log.info("El estatus es->[{}]",estadoVO.getDescripcion());
+				log.info("eliminando calendarizacion");
+				oAGController.eliminarCalendarizacionEscenario(nosql.getRequestIdRegla());
+				GestionEscenarioServiceDao.actualizaEstatus(peticion);
+				GestionEscenarioServiceDao.actualizaRequestIdRegla(nosql.getIdRegla(), null);
+				log.info("Se elimina de Mongo el id de calendarizacion que se tenia");
+				flag=true;
+			}else{
+				GestionEscenarioServiceDao.actualizaEstatus(peticion);
+				flag=true;
+			}
+		} catch (JsonProcessingException e) {
+			log.error("Error al convertir java.lang.Object a Str: {0}", e);
+			e.printStackTrace();
+		} catch (IOException e) {
+			log.error("Error al convertir Str a VO: {0}", e);
+			e.printStackTrace();
+		}
+		return flag;
+	}
+	
+	public boolean eliminaReglaBussiness(Integer id){
+		Boolean flag=false;
+		ObjectMapper mapper=new ObjectMapper();
+		GestionEscenarioEntity entidad=GestionEscenarioServiceDao.consultarReglaEscenario(id);
+		String estatus;
+		try {
+			estatus = mapper.writeValueAsString(entidad.getEstatus());
+			Catalogo estadoVO=mapper.readValue(estatus, Catalogo.class);
+			if(estadoVO.getDescripcion().equals(Constantes.ESTATUS_REGLA)){
+				log.info("Se elimina la regla");
+				oAGController.eliminarCalendarizacionEscenario(entidad.getRequestIdRegla());
+				GestionEscenarioServiceDao.eliminaRegla(id);
+				flag=true;
+			}else{
+				log.info("No es posible eliminar una regla Activa");
+				flag=false;
+			}
+		} catch (JsonProcessingException e) {
+			log.error("Error al convertir java.lang.Object a Str: {0}", e);
+			e.printStackTrace();
+		} catch (IOException e) {
+			log.error("Error al convertir Str a VO: {0}", e);
+			e.printStackTrace();
+		}
+		return flag;
 	}
 }

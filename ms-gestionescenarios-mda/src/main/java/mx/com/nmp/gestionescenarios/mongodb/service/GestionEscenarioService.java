@@ -1,5 +1,6 @@
 package mx.com.nmp.gestionescenarios.mongodb.service;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -17,7 +18,11 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import mx.com.nmp.gestionescenarios.cast.CastObjectGeneric;
+import mx.com.nmp.gestionescenarios.model.Catalogo;
 import mx.com.nmp.gestionescenarios.model.EstatusRegla;
 import mx.com.nmp.gestionescenarios.model.InfoGeneralRegla;
 import mx.com.nmp.gestionescenarios.model.InfoRegla;
@@ -55,11 +60,14 @@ public class GestionEscenarioService {
 	 * Almacenar Regla POST /escenarios/reglas
 	 */
 
-	public Boolean almacenarRegla(InfoRegla peticion) {
+	public Integer almacenarRegla(InfoRegla peticion) {
 		log.info("GestionEscenarioService.almacenarRegla");
-
+		Catalogo subramoObj=null;
+		Catalogo ramoObj=null;
 		Boolean almacenado = false;
+		ObjectMapper mapper = new ObjectMapper();
 		GestionEscenarioEntity ges = new GestionEscenarioEntity();
+		Integer id = (int) sequenceGeneratorService.generateSequence(Constantes.GESTIONESCENARIO_SEQ_KEY);
 		if (peticion != null) {
 			ges.setNombre(peticion.getNombre());
 			ges.setOrigen(peticion.getOrigen());
@@ -81,19 +89,40 @@ public class GestionEscenarioService {
 			ges.setNivelAgrupacion(peticion.getNivelAgrupacion());
 			ges.setReglasDescuento(peticion.getReglasDescuento());
 			ges.setCandadoInferior(peticion.getCandadoInferior());
-
-			Integer id = (int) sequenceGeneratorService.generateSequence(Constantes.GESTIONESCENARIO_SEQ_KEY);
-			ges.setIdRegla(id);
-
 			try {
-				
+				List<Object> categoria=new ArrayList<>();
+				categoria.add(Constantes.NA);
+				ges.setCategoria(categoria);
+				if(peticion.getRamo()!=null){
+					String ramoAux = mapper.writeValueAsString(peticion.getRamo());
+					ramoObj=mapper.readValue(ramoAux, Catalogo.class);
+				}
+				if(peticion.getSubramo()!=null){
+					String subramo=mapper.writeValueAsString(peticion.getSubramo().get(0));
+					subramoObj=mapper.readValue(subramo, Catalogo.class);
+				}
+			} catch (JsonProcessingException e1) {
+				e1.printStackTrace();
+			}catch (IOException e){
+				e.printStackTrace();
+			}
+			if(ramoObj!=null&&ramoObj.getDescripcion().equals(Constantes.ALAJA)&&
+					subramoObj!=null&&subramoObj.getDescripcion().equals(Constantes.ALAJA)){
+				ges.setCategoria(peticion.getCategoria());
+			}else{
+				List<Object> categotia=new ArrayList<>();
+				categotia.add(Constantes.NA);
+				ges.setCategoria(categotia);
+			}
+			ges.setIdRegla(id);
+			try {
 				mongoTemplate.insert(ges);
 				almacenado = true;
 			} catch (Exception e) {
 				log.error("Error almacenarRegla : {0}", e);
 			}
 		}
-		return almacenado;
+		return id;
 	}
 	
 	
@@ -149,6 +178,7 @@ public class GestionEscenarioService {
 				infoRegla.setFechaAplicacion(aux.getFechaAplicacion());
 				infoRegla.setSucursales(aux.getSucursales());
 				infoRegla.setTipoMonedas(aux.getMonedas());
+				infoRegla.setCategoria(aux.getCategoria());
 				reglas.add(infoRegla);
 			}
 			
@@ -189,30 +219,38 @@ public class GestionEscenarioService {
 				infoRegla.setEstatus(aux.getEstatus());
 				infoRegla.setFechaAplicacion(aux.getFechaAplicacion());
 				infoRegla.setSucursales(aux.getSucursales());
+				infoRegla.setCategoria(aux.getCategoria());
 				reglas.add(infoRegla);
 			}
 		}
 		return reglas;
 	}
 
+	/*Consulta regla por ID*/
+	public GestionEscenarioEntity consultarReglaEscenario(Integer id){
+		GestionEscenarioEntity ges = null;
+		try {
+			ges = mongoTemplate.findOne(Query.query(Criteria.where(Constantes.ID).is(id)),
+					GestionEscenarioEntity.class);
+			log.info("Resultado {}", ges);
+		} catch (Exception e) {
+			log.error("Error al obtener la regla: {0}", e);
+		}
+		return ges;
+	}
+	
 	/*
 	 * Actualiza Regla
 	 */
 	public Boolean actualizaRegla(InfoRegla peticion) {
 		log.info("GestionEscenarioService.actualizaRegla");
-
+		ObjectMapper mapper=new ObjectMapper();
 		Boolean actualizado = false;
 		GestionEscenarioEntity ges = null;
-		if (peticion != null) {
-			try {
-				ges = mongoTemplate.findOne(Query.query(Criteria.where(Constantes.ID).is(peticion.getId())),
-						GestionEscenarioEntity.class);
-				log.info("Resultado {}", ges);
-			} catch (Exception e) {
-				log.error("Error al obtener la regla: {0}", e);
-			}
+		Catalogo ramoObj=new Catalogo(); 
+		Catalogo subramoObj=new Catalogo();
+			ges=consultarReglaEscenario(peticion.getId());
 			if (ges != null) {
-
 				ges.setNombre(peticion.getNombre());
 				ges.setOrigen(peticion.getOrigen());
 				ges.setRamo(peticion.getRamo());
@@ -233,7 +271,31 @@ public class GestionEscenarioService {
 				ges.setNivelAgrupacion(peticion.getNivelAgrupacion());
 				ges.setReglasDescuento(peticion.getReglasDescuento());
 				ges.setCandadoInferior(peticion.getCandadoInferior());
-
+				try {
+					List<Object> categoria=new ArrayList<>();
+					categoria.add(Constantes.NA);
+					ges.setCategoria(categoria);
+					if(peticion.getRamo()!=null){
+						String ramoAux = mapper.writeValueAsString(peticion.getRamo());
+						ramoObj=mapper.readValue(ramoAux, Catalogo.class);
+					}
+					if(peticion.getSubramo()!=null){
+						String subramo=mapper.writeValueAsString(peticion.getSubramo().get(0));
+						subramoObj=mapper.readValue(subramo, Catalogo.class);
+					}
+				} catch (JsonProcessingException e1) {
+					e1.printStackTrace();
+				}catch (IOException e){
+					e.printStackTrace();
+				}
+				if(ramoObj!=null&&ramoObj.getDescripcion().equals(Constantes.ALAJA)&&
+						subramoObj!=null&&subramoObj.getDescripcion().equals(Constantes.ALAJA)){
+					ges.setCategoria(peticion.getCategoria());
+				}else{
+					List<Object> categotia=new ArrayList<>();
+					categotia.add(Constantes.NA);
+					ges.setCategoria(categotia);
+				}
 				try {
 					mongoTemplate.save(ges);
 					actualizado = true;
@@ -241,9 +303,7 @@ public class GestionEscenarioService {
 					log.error("Error actualizaRegla: {0}", e);
 				}
 			}
-		}
 		return actualizado;
-
 	}
 
 	/*
@@ -257,23 +317,17 @@ public class GestionEscenarioService {
 
 		GestionEscenarioEntity gee = null;
 		if (peticion != null) {
-			try {
-				gee = mongoTemplate.findOne(Query.query(Criteria.where(Constantes.ID).is(peticion.getId())),
-						GestionEscenarioEntity.class);
-				log.info("Resultado {}", gee);
-			} catch (Exception e) {
-				log.error("Error al obtener la regla: {0}", e);
-			}
+			InfoRegla id=new InfoRegla();
+			id.setId(peticion.getId());
+			gee=consultarReglaEscenario(peticion.getId());
 			if (gee != null) {
 				gee.setEstatus(peticion.getEstatus());
-
 				try {
 					mongoTemplate.save(gee);
 					actualizado = true;
 				} catch (Exception e) {
 					log.error("Error al actualizar estatus: {0}", e);
 				}
-
 			}
 		}
 
@@ -320,7 +374,7 @@ public class GestionEscenarioService {
 				ir.setNivelAgrupacion(ges.getNivelAgrupacion());
 				ir.setReglasDescuento(ges.getReglasDescuento());
 				ir.setCandadoInferior(ges.getCandadoInferior());
-
+				ir.setCategoria(ges.getCategoria());
 			}
 
 		}
@@ -335,13 +389,10 @@ public class GestionEscenarioService {
 		log.info("GestionEscenarioService.eliminarRegla");
 		
 		InfoRegla infoRegla = null;
-
 		if (idRegla != null) {
-
 			GestionEscenarioEntity escenario = escenariosRepository.findByIdRegla(idRegla);
 			if (escenario != null) {
 				infoRegla = new InfoRegla();
-
 				infoRegla.setId(escenario.getIdRegla());
 				infoRegla.setNombre(escenario.getNombre());
 				infoRegla.setAforo(escenario.getAforo());
@@ -363,15 +414,10 @@ public class GestionEscenarioService {
 				infoRegla.setReglasDescuento(escenario.getReglasDescuento());
 				infoRegla.setSubramo(escenario.getSubramo());
 				infoRegla.setSucursales(escenario.getSucursales());
-
 				escenariosRepository.delete(escenario);
-				
-
 			}
 		}
-
 		return infoRegla;
-
 	}
 
 	/*
@@ -392,6 +438,9 @@ public class GestionEscenarioService {
 			}
 			if (consultaRegla.getFactor() != null) {
 				query.addCriteria(Criteria.where(Constantes.FACTOR).is(consultaRegla.getFactor()));
+			}
+			if(consultaRegla.getCategoria()!=null){
+				query.addCriteria(Criteria.where(Constantes.CATEGORIA).is(consultaRegla.getCategoria()));
 			}
 			if (consultaRegla.getOrigen() != null) {
 				query.addCriteria(Criteria.where(Constantes.ORIGEN).is(consultaRegla.getOrigen()));
@@ -879,5 +928,18 @@ public class GestionEscenarioService {
 			}
     	}
     	return flag;
+	}
+	
+	public void actualizaRequestIdRegla(Integer idEscenario, Integer idRequestIdRegla) {
+		log.info("actualizarConsolidado idEscenario [{}] IdCalendarizacion[{}]",idEscenario,idRequestIdRegla);
+		try {
+			Query query = new Query();
+			query.addCriteria(Criteria.where(Constantes.ID_REGLA).is(idEscenario));
+			Update update = new Update();
+			update.set(Constantes.REQUEST_ID_CALENDARIZACION_REGLA, idRequestIdRegla);
+			mongoTemplate.upsert(query, update, GestionEscenarioEntity.class);
+		} catch (Exception e) {
+			log.info("Error actualizar idRequest Regla: {0}", e);
+		}
 	}
 }

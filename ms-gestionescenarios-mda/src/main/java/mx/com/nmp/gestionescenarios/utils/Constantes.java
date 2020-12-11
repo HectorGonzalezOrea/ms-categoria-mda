@@ -50,6 +50,8 @@ public final class Constantes {
 	public static final String STATUS_MESSAGE_REGLA = "Regla actualizada exitosamente";
 	public static final String CODE_MESSAGE_NOT_FOUND_REGLA = "No se encontro el idRegla";
 	public static final String FECHA_NOT_FOUND = "La fecha no fue encontrada";
+	public static final String REGLA_ELIMINADA="Regla eliminada exitosamente";
+	public static final String REGLA_EXISTENTE="La regla ya existe";
 	
 	public static final String FECHA_APLICACION = "fechaAplicacion";
 	public static final String VIGENCIA = "vigencia";
@@ -58,6 +60,9 @@ public final class Constantes {
 	public static final String SLASH = "/";
 	public static final String FORMATO_FECHA = "dd/MM/yyyy";
 	public static final String FORMATO_FECHA_HORA = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+	
+	public static final Integer ID_PETICION_ESCENARIO_DINAMICO=1;
+	public static final Integer ID_ESCENARIO_DINAMICO=1;
 	
 	public static final Integer ID_PETICION_ESCENARIO_CONSOLIDADO = 2;
 	public static final Integer ID_ESCENARIO_CONSOLIDADO = 2;
@@ -88,12 +93,18 @@ public final class Constantes {
 	public static final String ESTATUS = "estatus.id";
 	public static final String CANAL = "canalComercializacion.idCanal";
 	public static final String FECHA_APLICACION_FECHAS = "fechaAplicacion.fechas";
+	public static final String CATEGORIA="categoria";
+	public static final String ALAJA="AL";
+	public static final String NA="N/A";
 
 	public static final String ID_ARCHIVO = "idArchivo";
 	public static final String ID_ANCLA = "_id";
 	public static final String ID_BOLSA_BOLSA = "_id";
 	public static final String REQUEST_ID_CALENDARIZACION = "requestIdCalendarizacion";
+	public static final String REQUEST_ID_CALENDARIZACION_REGLA="requestIdRegla";
 	public static final String ID_MONEDA = "_id";
+	public static final String ID_REGLA="idRegla";
+	public static final String ESTATUS_REGLA="Inactivo";
 	
 }
 

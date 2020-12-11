@@ -6,6 +6,7 @@ public class ConsultaReglaVO {
 	private String ramo;
 	private String subramo;
 	private String factor;
+	private String categoria;
 	private String origen;
 	private String clasificacionClientes;
 	private String estatusPartida;
@@ -65,6 +66,12 @@ public class ConsultaReglaVO {
 	}
 	public void setFechaAplicacion(String fechaAplicacion) {
 		this.fechaAplicacion = fechaAplicacion;
+	}
+	public String getCategoria() {
+		return categoria;
+	}
+	public void setCategoria(String categoria) {
+		this.categoria = categoria;
 	}
 
 }

@@ -48,6 +48,9 @@ public class InfoRegla extends InfoGeneralRegla  {
 
   @JsonProperty("candadoInferior")
   private Object candadoInferior = null;
+  
+  @JsonProperty("categoria")
+  private List<Object> categoria;
 
   public InfoRegla compraCumplido(Boolean compraCumplido) {
     this.compraCumplido = compraCumplido;
@@ -254,7 +257,15 @@ public class InfoRegla extends InfoGeneralRegla  {
   }
 
 
-  @Override
+  public List<Object> getCategoria() {
+	return categoria;
+}
+
+public void setCategoria(List<Object> categoria) {
+	this.categoria = categoria;
+}
+
+@Override
   public boolean equals(java.lang.Object o) {
     if (this == o) {
       return true;
@@ -272,6 +283,7 @@ public class InfoRegla extends InfoGeneralRegla  {
         Objects.equals(this.nivelAgrupacion, infoRegla.nivelAgrupacion) &&
         Objects.equals(this.reglasDescuento, infoRegla.reglasDescuento) &&
         Objects.equals(this.candadoInferior, infoRegla.candadoInferior) &&
+        Objects.equals(this.categoria, infoRegla.categoria) &&
         super.equals(o);
   }
 
@@ -294,6 +306,7 @@ public class InfoRegla extends InfoGeneralRegla  {
     sb.append("    nivelAgrupacion: ").append(toIndentedString(nivelAgrupacion)).append("\n");
     sb.append("    reglasDescuento: ").append(toIndentedString(reglasDescuento)).append("\n");
     sb.append("    candadoInferior: ").append(toIndentedString(candadoInferior)).append("\n");
+    sb.append("	   categorias: ").append(toIndentedString(categoria)).append("\n");
     sb.append("}");
     return sb.toString();
   }
