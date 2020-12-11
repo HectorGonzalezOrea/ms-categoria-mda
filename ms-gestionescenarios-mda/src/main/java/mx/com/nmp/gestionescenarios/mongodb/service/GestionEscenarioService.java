@@ -64,7 +64,6 @@ public class GestionEscenarioService {
 		log.info("GestionEscenarioService.almacenarRegla");
 		Catalogo subramoObj=null;
 		Catalogo ramoObj=null;
-		Boolean almacenado = false;
 		ObjectMapper mapper = new ObjectMapper();
 		GestionEscenarioEntity ges = new GestionEscenarioEntity();
 		Integer id = (int) sequenceGeneratorService.generateSequence(Constantes.GESTIONESCENARIO_SEQ_KEY);
@@ -102,9 +101,9 @@ public class GestionEscenarioService {
 					subramoObj=mapper.readValue(subramo, Catalogo.class);
 				}
 			} catch (JsonProcessingException e1) {
-				e1.printStackTrace();
+				log.error("error al convertir str el objeto");
 			}catch (IOException e){
-				e.printStackTrace();
+				log.error("error al convertir a Pojo el Str");
 			}
 			if(ramoObj!=null&&ramoObj.getDescripcion().equals(Constantes.ALAJA)&&
 					subramoObj!=null&&subramoObj.getDescripcion().equals(Constantes.ALAJA)){
@@ -117,7 +116,6 @@ public class GestionEscenarioService {
 			ges.setIdRegla(id);
 			try {
 				mongoTemplate.insert(ges);
-				almacenado = true;
 			} catch (Exception e) {
 				log.error("Error almacenarRegla : {0}", e);
 			}
@@ -284,9 +282,9 @@ public class GestionEscenarioService {
 						subramoObj=mapper.readValue(subramo, Catalogo.class);
 					}
 				} catch (JsonProcessingException e1) {
-					e1.printStackTrace();
+					log.error("error al convertir el ramo a string");
 				}catch (IOException e){
-					e.printStackTrace();
+					log.error("error al convertir el objeto");
 				}
 				if(ramoObj!=null&&ramoObj.getDescripcion().equals(Constantes.ALAJA)&&
 						subramoObj!=null&&subramoObj.getDescripcion().equals(Constantes.ALAJA)){

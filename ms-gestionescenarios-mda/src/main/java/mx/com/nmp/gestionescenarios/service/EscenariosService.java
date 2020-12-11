@@ -495,11 +495,9 @@ public class EscenariosService {
 					}
 				}
 			} catch (JsonProcessingException e) {
-				e.printStackTrace();
-				log.error("Error al convertir java.lang.Object a Str: {0}", e);
+				log.error("Error al convertir java.lang.Object a Str:");
 			} catch (IOException e) {
-				e.printStackTrace();
-				log.error("Error al convertir Str a VO: {0}", e);
+				log.error("Error al convertir Str a VO:");
 			}
 		}
 		return flag;
@@ -526,11 +524,9 @@ public class EscenariosService {
 				flag=true;
 			}
 		} catch (JsonProcessingException e) {
-			log.error("Error al convertir java.lang.Object a Str: {0}", e);
-			e.printStackTrace();
+			log.error("Error al convertir java.lang.Object a Str.");
 		} catch (IOException e) {
-			log.error("Error al convertir Str a VO: {0}", e);
-			e.printStackTrace();
+			log.error("Error al convertir Str a vo.");
 		}
 		return flag;
 	}
@@ -553,11 +549,9 @@ public class EscenariosService {
 				flag=false;
 			}
 		} catch (JsonProcessingException e) {
-			log.error("Error al convertir java.lang.Object a Str: {0}", e);
-			e.printStackTrace();
+			log.error("Error al convertir java.lang.Object a String_ ");
 		} catch (IOException e) {
-			log.error("Error al convertir Str a VO: {0}", e);
-			e.printStackTrace();
+			log.error("Error al convertir Str a objeto VO");
 		}
 		return flag;
 	}
