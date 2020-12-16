@@ -72,8 +72,7 @@ public class ElasticService {
 	}
 
 	// scroll pc_garantias
-	public List<IndexGarantiaVO> scrollElasticGarantias(String index, String ramo, String subRamo,
-			List<IndexVentasVO> ventasUltimosDias) throws IOException {
+	public List<IndexGarantiaVO> scrollElasticGarantias(String criterioWhere, String index) throws IOException {
 		LOG.info("Entrando a metodo elastic");
 		List<IndexGarantiaVO> lstIndexGarantia = new ArrayList<>();
 		final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));// el seteo del intervalo
@@ -81,10 +80,11 @@ public class ElasticService {
 		searchRequest.scroll(scroll);
 		searchRequest.indices(index);// se agrega index de elastic
 		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-		QueryBuilder query = QueryBuilders.queryStringQuery("ramo:'" + ramo + "' AND subramo:'" + subRamo + "'");
-		QueryBuilder qb = QueryBuilders.boolQuery()
-				.must(QueryBuilders.termsQuery(Constantes.CUO_PARTIDA, extraerCuos(ventasUltimosDias)));
-		BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().filter(query).filter(qb);
+		QueryBuilder query = QueryBuilders.queryStringQuery(criterioWhere);
+		//QueryBuilder qb = QueryBuilders.boolQuery();
+				//.must(QueryBuilders.termsQuery(Constantes.CUO_PARTIDA, extraerCuos(ventasUltimosDias)));
+		//BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().filter(query).filter(qb);
+		BoolQueryBuilder boolQuery = QueryBuilders.boolQuery().filter(query);
 		searchSourceBuilder.query(boolQuery);
 		searchSourceBuilder.size(Constantes.NUMERO_MAXIMO_SCROLL);// cuantos resultados se recuperan?
 		searchRequest.source(searchSourceBuilder);
@@ -131,7 +131,7 @@ public class ElasticService {
 	}
 
 	// scroll ventas
-	public List<IndexVentasVO> scrollElasticVentas(String index) throws IOException {
+	public List<IndexVentasVO> scrollElasticVentas(String index, List<String> lstCuos) throws IOException {
 		LOG.info("Entrando a metodo elastic");
 		List<IndexVentasVO> lstIndexGarantia = new ArrayList<>();
 		final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));
@@ -139,13 +139,14 @@ public class ElasticService {
 		searchRequest.scroll(scroll);
 		searchRequest.indices(index);
 		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-
+		
+		QueryBuilder qb = QueryBuilders.boolQuery().must(QueryBuilders.termsQuery(Constantes.COU_VENTA, lstCuos));
 		RangeQueryBuilder filter = QueryBuilders.rangeQuery(Constantes.CAMPO_FECHA_INDEX)
 				.gte(formmatDate.resetTimeToDown(fechaActual, Constantes.DIFERENCIA_DIAS))
 				.lte(formmatDate.resetTimeToUp(fechaActual));
-		searchSourceBuilder.query(filter);
+		searchSourceBuilder.query(filter).query(qb);
 
-		searchSourceBuilder.size(Constantes.NUMERO_MAXIMO_SCROLL);
+		//searchSourceBuilder.size(Constantes.NUMERO_MAXIMO_SCROLL);
 		searchRequest.source(searchSourceBuilder);
 		SearchResponse searchResponse = getConnectionElastic().search(searchRequest, RequestOptions.DEFAULT);
 		String scrollId = searchResponse.getScrollId();
@@ -169,11 +170,5 @@ public class ElasticService {
 		clearScrollRequest.addScrollId(scrollId);
 		getConnectionElastic().clearScroll(clearScrollRequest, RequestOptions.DEFAULT);
 		return lstIndexGarantia;
-	}
-
-	private List<String> extraerCuos(List<IndexVentasVO> ventas) {
-		List<String> lisCous = new ArrayList<>();
-		ventas.stream().forEach(venta -> lisCous.add(venta.getCuo()));
-		return lisCous;
 	}
 }

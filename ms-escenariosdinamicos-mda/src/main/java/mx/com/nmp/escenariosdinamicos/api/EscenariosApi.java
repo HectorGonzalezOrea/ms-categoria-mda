@@ -5,6 +5,8 @@
  */
 package mx.com.nmp.escenariosdinamicos.api;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.BadRequest;
+import mx.com.nmp.escenariosdinamicos.model.Bodydiasreq;
 import mx.com.nmp.escenariosdinamicos.model.ConflictRequest;
 import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosReq;
 import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosRes;
@@ -30,11 +33,13 @@ import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoRes;
 import mx.com.nmp.escenariosdinamicos.model.EliminarEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.InternalServerError;
 import mx.com.nmp.escenariosdinamicos.model.InvalidAuthentication;
+import mx.com.nmp.escenariosdinamicos.model.InvalidValue;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosReq;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.NotFound;
 import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoRes;
+import mx.com.nmp.escenariosdinamicos.model.SuccessfulResponseRule;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-04T01:28:01.968Z")
 
 @Api(value = "escenarios", description = "the escenarios API")
@@ -66,7 +71,7 @@ public interface EscenariosApi {
     @RequestMapping(value = "/escenarios/dinamicos",
         produces = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<?> crearEscenariosPOST(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  )  @Valid @RequestBody CrearEscenariosReq crearEscenariosRequest);
+    ResponseEntity<?> crearEscenariosPOST(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  )  @Valid @RequestBody List<CrearEscenariosReq> escenarios);
 
 
     @ApiOperation(value = "Modificar escenario", nickname = "editaEscenariosPUT", notes = "Permite la modificación de un escenario existente. Los escenarios administrados por el motor de descuentos no se verán reflejados de forma inmediata, para ello deberá iniciarse un flujo de solicitud a mesa de ayuda para modificar el escenario, a través del envío de un correo electrónico con el detalle del escenario modificado. El consumidor deberá enviar los valores del comportamiento esperado de los `últimos 3 días`. Los valores posibles para los comportamientos son:    * 0 = Día sin venta   * X = Día con venta (Diferente de 0)   * S = Sube la venta   * M = Se mantiene la venta   * B = Baja la venta  Adicional deberá enviar la regla a aplicar para la suma de comportamientos de estos días. Los valores posibles para las reglas son:    * PB = Precio bajo   * PM = Precio medio   * PA = Precio alto    Como respuesta, el consumidor recibirá el identificador del escenario. En caso de que la combinación de los valores enviados ya este registrado se retornará un mensaje de advertencia.  ", response = ModEscenariosRes.class, authorizations = {
@@ -79,10 +84,10 @@ public interface EscenariosApi {
         @ApiResponse(code = 404, message = "Recurso no disponible", response = NotFound.class),
         @ApiResponse(code = 409, message = "Conflicto con el mensaje de petición, verifique la información", response = ConflictRequest.class),
         @ApiResponse(code = 500, message = "Error interno del servidor", response = InternalServerError.class) })
-    @RequestMapping(value = "/escenarios/dinamicos/{idEscenario}",
+    @RequestMapping(value = "/escenarios/dinamicos",
         produces = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<?> editaEscenariosPUT(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Identificador del escenario",required=true) @PathVariable("idEscenario") Integer idEscenario,@ApiParam(value = "peticion para modificar las reglas de precios en los escenarios dinámicos."  )  @Valid @RequestBody ModEscenariosReq modEscenariosRequest);
+    ResponseEntity<?> editaEscenariosPUT(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "peticion para modificar las reglas de precios en los escenarios dinámicos."  )  @Valid @RequestBody List<ModEscenariosReq> escenarios);
 
 
     @ApiOperation(value = "Ejecutar escenario dinámico", nickname = "ejecutarEscenariosDinamicosPOST", notes = "Permite la ejecución de un escenario dinámico. El consumidor deberá enviar los parámetros con los que se realizará la consulta de `ventas` de los 3  días anteriores. La lista de ventas obtenidas se agrupará de acuerdo al nivel de agrupación [Ramo, Subramo o Factor] definido en la regla. Las ventas pasaran por un proceso de análisis para identificar el escenario que las representa y con ello calcular el nuevo precio que será notificado a la `Plataforma Comercial` vigente.               Como respuesta, el consumidor recibirá un mensaje de recepción de solicitud, por lo que la ejecución de las actividades del microservicio se ejecutarán de forma asíncrona. ", response = EjecutarEscenarioDinamicoRes.class, authorizations = {
@@ -99,7 +104,7 @@ public interface EscenariosApi {
     ResponseEntity<?> ejecutarEscenariosDinamicosPOST(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  )  @Valid @RequestBody EjecutarEscenarioDinamicoReq crearEscenariosRequest);
 
 
-    @ApiOperation(value = "Elimina escenario", nickname = "eliminarEscenariosDELETE", notes = "Permite la eliminación de un escenario existente. Los escenarios administrados por el motor de descuentos no se verán reflejados de forma inmediata, para ello deberá iniciarse un flujo de solicitud a mesa de ayuda para eliminar el escenario, a través del envío de un correo electrónico con el detalle del escenario eliminado. El consumidor deberá enviar el identificador del escenario a eliminar. Como respuesta, el consumidor recibirá un mensaje de éxito indicando que el escenario se ha eliminado de forma correcta. En caso de que el escenario no se encuentre registrado se retornará un mensaje de advertencia.  ", response = EliminarEscenariosRes.class, authorizations = {
+    @ApiOperation(value = "Elimina escenario", nickname = "eliminarEscenariosDELETE", notes = "Permite la eliminación de escenarios existentes. Los escenarios administrados por el motor de descuentos no se verán reflejados de forma inmediata, para ello deberá iniciarse un flujo de solicitud a mesa de ayuda para eliminar el escenario, a través del envío de un correo electrónico con el detalle del escenario eliminado. El consumidor deberá enviar el identificador del escenario a eliminar. Como respuesta, el consumidor recibirá un mensaje de éxito indicando que el escenario se ha eliminado de forma correcta. En caso de que el escenario no se encuentre registrado se retornará un mensaje de advertencia.  ", response = EliminarEscenariosRes.class, authorizations = {
         @Authorization(value = "apiKey")
     }, tags={ "Escenarios dinámicos", })
     @ApiResponses(value = { 
@@ -108,10 +113,10 @@ public interface EscenariosApi {
         @ApiResponse(code = 401, message = "Error de autorización en el uso del recurso", response = InvalidAuthentication.class),
         @ApiResponse(code = 404, message = "Recurso no disponible", response = NotFound.class),
         @ApiResponse(code = 500, message = "Error interno del servidor", response = InternalServerError.class) })
-    @RequestMapping(value = "/escenarios/dinamicos/{idEscenario}",
+    @RequestMapping(value = "/escenarios/dinamicos/_eliminar",
         produces = { "application/json" }, 
-        method = RequestMethod.DELETE)
-    ResponseEntity<?> eliminarEscenariosDELETE(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Identificador del escenario",required=true) @PathVariable("idEscenario") Integer idEscenario);
+        method = RequestMethod.POST)
+    ResponseEntity<?> eliminarEscenariosDELETE(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Identificador del escenario",required=true) @RequestBody List<Integer> idEscenarios);
 
 
     @ApiOperation(value = "Simular escenario dinámico", nickname = "simularEscenariosDinamicosPOST", notes = "Permite la simulación de un escenario dinámico. El consumidor deberá enviar los parámetros con los que se realizará la consulta de `ventas` de los 3  días anteriores. La lista de ventas obtenidas se agrupará de acuerdo al nivel de agrupación [Ramo, Subramo o Factor] definido en la regla. Las ventas pasaran por un proceso de análisis para identificar el escenario que las representa y con ello calcular el nuevo precio que será notificado a la `Plataforma Comercial` vigente.               Como respuesta, el consumidor recibirá la lista de partidas y el nuevo precio. ", response = SimularEscenarioDinamicoRes.class, authorizations = {
@@ -130,6 +135,25 @@ public interface EscenariosApi {
     		@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,
     		@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,
     		@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  )  @Valid @RequestBody SimularEscenarioDinamicoReq crearEscenariosRequest
+    		);
+    
+    @ApiOperation(value = "probar reglas", nickname = "escenariosDinamicosProbarReglasPost", notes = "Permite validar las reglas que aun no han sido aplicadas basado en el algoritmo de los tres días", response = SimularEscenarioDinamicoRes.class, authorizations = {
+            @Authorization(value = "apiKey")
+    	}, tags={ "probar reglas" })
+    @ApiResponses(value = { 
+            @ApiResponse(code = 200, message = "Ejecución exitosa", response = SuccessfulResponseRule.class),
+            @ApiResponse(code = 400, message = "Error en el mensaje de petición, verifique la información", response = BadRequest.class),
+            @ApiResponse(code = 401, message = "La regla no cumple", response = InvalidAuthentication.class),
+            @ApiResponse(code = 404, message = "Regla no encontrada", response = InvalidValue.class),
+            @ApiResponse(code = 500, message = "Error interno del servidor", response = InternalServerError.class) })
+    @RequestMapping(value = "/dinamicos/_probar/reglas",
+    produces = { "application/json" }, 
+    method = RequestMethod.POST)
+    ResponseEntity<?> escenariosDinamicosProbarReglasPOST(
+    		@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true)@RequestHeader("usuario") String usuario,
+    		@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial")@RequestHeader("origen") String origen,
+    		@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver")@RequestHeader("destino") String destino,
+    		@ApiParam(value = "Peticion donde se reciben los 3 dias para validar") @Valid @RequestBody Bodydiasreq listaDeDias
     		);
 
 }

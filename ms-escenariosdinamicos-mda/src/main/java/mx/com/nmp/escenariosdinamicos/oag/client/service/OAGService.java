@@ -81,7 +81,7 @@ public class OAGService extends OAGBaseService {
 		
 		Unirest.setTimeouts(0, 0);
 		
-			HttpResponse<String> response = Unirest.post("urlBase+servicioEnviarCorreo")
+			HttpResponse<String> response = Unirest.post(urlBase+servicioEnviarCorreo)
 			  .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
 			  .header(HEADER_USUARIO, headerUsuario)
 			  .header(HEADER_ID_CONSUMIDOR, headerIdConsumidor)

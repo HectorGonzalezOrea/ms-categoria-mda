@@ -77,6 +77,9 @@ public class InfoGeneralRegla   {
   @JsonProperty("tipoMonedas")
   @Valid
   private List<Object> tipoMonedas = null;
+  
+  @JsonProperty("categoria")
+  private String categoria;
 
   public InfoGeneralRegla id(Integer id) {
     this.id = id;
@@ -541,5 +544,13 @@ public class InfoGeneralRegla   {
     }
     return o.toString().replace("\n", "\n    ");
   }
+
+public String getCategoria() {
+	return categoria;
+}
+
+public void setCategoria(String categoria) {
+	this.categoria = categoria;
+}
 }
 

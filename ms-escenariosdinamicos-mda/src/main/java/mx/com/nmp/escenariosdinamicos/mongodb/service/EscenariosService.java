@@ -23,9 +23,11 @@ import mx.com.nmp.escenariosdinamicos.model.ModEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.NotFound;
 import mx.com.nmp.escenariosdinamicos.mongodb.entity.EscenarioEntity;
 import mx.com.nmp.escenariosdinamicos.mongodb.repository.EscenarioRepository;
+import mx.com.nmp.escenariosdinamicos.mongodb.vo.EscenariosVO;
 import mx.com.nmp.escenariosdinamicos.oag.client.service.OAGService;
 import mx.com.nmp.escenariosdinamicos.oag.vo.EnviarNotificacionRequestVO;
 import mx.com.nmp.escenariosdinamicos.utils.Constantes;
+import net.bytebuddy.implementation.bytecode.Throw;
 
 import static mx.com.nmp.escenariosdinamicos.utils.Constantes.ASUNTO_MESSAGE;
 import static mx.com.nmp.escenariosdinamicos.utils.Constantes.CONTENIDO;
@@ -56,45 +58,55 @@ public class EscenariosService {
 	/*
 	 * Creacion de Escenario Dinamico
 	 */
-	public CrearEscenariosRes crearEscenario(CrearEscenariosReq crearEscenariosRequest) {
+	public CrearEscenariosRes crearEscenario(List<CrearEscenariosReq> crearEscenariosRequest) {
 		log.info("EscenariosService.crearEscenario");
-		Boolean insertado = false;
+		EnviarNotificacionRequestVO r = new EnviarNotificacionRequestVO();
 		CrearEscenariosRes cer = new CrearEscenariosRes();
+		StringBuilder contenido=new StringBuilder();
+		contenido.append(CONTENIDO+Constantes.SALTO+Constantes.SALTO);
+		contenido.append(Constantes.TABLE);
+		contenido.append(Constantes.TR);
+		contenido.append(Constantes.TEMPLATE_UPDATE);
+		contenido.append(Constantes.CLOSE_TR);
 		EscenarioEntity escenario = new EscenarioEntity();
 		if (crearEscenariosRequest != null) {
-
-			escenario.setDiaUno(crearEscenariosRequest.getDiaUno());
-			escenario.setDiaDos(crearEscenariosRequest.getDiaDos());
-			escenario.setDiaTres(crearEscenariosRequest.getDiaTres());
-			escenario.setIdRegla(crearEscenariosRequest.getIdRegla());
-
-			LocalDate locateDate = LocalDate.now();
-
-			escenario.setFechaCreacion(locateDate);
-
-			Integer id = (int) sequenceGeneratorService.generateSequence(Constantes.ESCENARIO_SEQ_KEY);
-			escenario.setIdEscenario(id);
-
-			try {
-				mongoTemplate.insert(escenario);
-				insertado = true;
-			} catch (Exception e) {
-				log.error("{0}", e);
-			}
-			
-			if (Boolean.TRUE.equals(insertado)) {
-
-				cer.setIdEscenario(escenario.getIdEscenario());
-				cer.setFechaCreacion(escenario.getFechaCreacion());
-			}
-			
-
-				EnviarNotificacionRequestVO r = new EnviarNotificacionRequestVO();
-
+			crearEscenariosRequest.stream().forEach(esc->{
+				escenario.setDiaUno(esc.getDiaUno());
+				escenario.setDiaDos(esc.getDiaDos());
+				escenario.setDiaTres(esc.getDiaTres());
+				escenario.setIdRegla(esc.getIdRegla());
+				LocalDate locateDate = LocalDate.now();
+				escenario.setFechaCreacion(locateDate);
+				Integer id = (int) sequenceGeneratorService.generateSequence(Constantes.ESCENARIO_SEQ_KEY);
+				escenario.setIdEscenario(id);
+				contenido.append(Constantes.TR);
+				contenido.append(Constantes.ABRIR_TD_STYLE);
+				contenido.append(id);
+				contenido.append(Constantes.CERRAR_TD);
+				contenido.append(Constantes.ABRIR_TD_STYLE);
+				contenido.append(esc.getDiaUno());
+				contenido.append(Constantes.CERRAR_TD);
+				contenido.append(Constantes.ABRIR_TD_STYLE);
+				contenido.append(esc.getDiaDos());
+				contenido.append(Constantes.CERRAR_TD);
+				contenido.append(Constantes.ABRIR_TD_STYLE);
+				contenido.append(esc.getDiaTres());
+				contenido.append(Constantes.CERRAR_TD);
+				contenido.append(Constantes.ABRIR_TD_STYLE);
+				contenido.append(esc.getIdRegla());
+				contenido.append(Constantes.CERRAR_TD);
+				contenido.append(Constantes.CLOSE_TR);
+				try {
+					mongoTemplate.insert(escenario);
+				} catch (Exception e) {
+					log.error("{0}", e);
+				}
+			});
+			  	contenido.append(Constantes.CLOSE_TABLE);
 				r.setDe(de);
 				r.setPara(para);
 				r.setAsunto(ASUNTO_MESSAGE);
-				r.setContenidoHTML(CONTENIDO);
+				r.setContenidoHTML(contenido.toString());
 				log.info("Asunto {}", r.getAsunto());
 
 				try {
@@ -140,59 +152,63 @@ public class EscenariosService {
 	/*
 	 * Actualizacion de Escenario Dinamico
 	 */
-
-	public ModEscenariosRes editaEscenario(ModEscenariosReq modEscenariosRequest) {
+	
+	public ModEscenariosRes editaEscenario(List<ModEscenariosReq> modEscenariosRequest) {
 		log.info("EscenariosService.editaEscenario");
-		Boolean actualizado = false;
 		ModEscenariosRes mer = new ModEscenariosRes();
-		EscenarioEntity escenario = null;
+		StringBuilder contenido=new StringBuilder();
+		contenido.append(CONTENIDO+Constantes.SALTO+Constantes.SALTO);
+		contenido.append(Constantes.TABLE);
+		contenido.append(Constantes.TR);
+		contenido.append(Constantes.TEMPLATE_UPDATE);
+		contenido.append(Constantes.CLOSE_TR);
+		EnviarNotificacionRequestVO r = new EnviarNotificacionRequestVO();
 		if (modEscenariosRequest != null) {
-			try {
-				escenario = mongoTemplate.findOne(
-						Query.query(Criteria.where(Constantes.ID).is(modEscenariosRequest.getIdEscenario())),
-						EscenarioEntity.class);
-			} catch (Exception e) {
-				log.error("{0}", e);
-			}
-			if (escenario != null) {
-
-				escenario.setIdEscenario(modEscenariosRequest.getIdEscenario());
-				escenario.setDiaUno(modEscenariosRequest.getDiaUno());
-				escenario.setDiaDos(modEscenariosRequest.getDiaDos());
-				escenario.setDiaTres(modEscenariosRequest.getDiaTres());
-				escenario.setIdRegla(modEscenariosRequest.getIdRegla());
-
-				LocalDate locateDate = LocalDate.now();
-				escenario.setFechaActualizacion(locateDate);
-
-				try {
-					mongoTemplate.save(escenario);
-					actualizado = true;
-				} catch (Exception e) {
-					log.error("Exception : {0}", e);
-				}
-				if (Boolean.TRUE.equals(actualizado)) {
-					mer.setIdEscenario(escenario.getIdEscenario());
-					mer.setFechaActualizacion(escenario.getFechaActualizacion());
-				}
-				
-					EnviarNotificacionRequestVO r = new EnviarNotificacionRequestVO();
-
-					r.setDe(de);
-					r.setPara(para);
-					r.setAsunto(ASUNTO_MESSAGE);
-					r.setContenidoHTML(CONTENIDO);
-					log.info("Asunto: {}", r.getAsunto());
-
+			modEscenariosRequest.stream().forEach(esc->{
+				EscenarioEntity escenario =consultaEscenarioId(esc.getIdEscenario());
+				if (escenario != null) {
+					escenario.setIdEscenario(esc.getIdEscenario());
+					escenario.setDiaUno(esc.getDiaUno());
+					escenario.setDiaDos(esc.getDiaDos());
+					escenario.setDiaTres(esc.getDiaTres());
+					escenario.setIdRegla(esc.getIdRegla());
+					LocalDate locateDate = LocalDate.now();
+					escenario.setFechaActualizacion(locateDate);
+					contenido.append(Constantes.TR);
+					contenido.append(Constantes.ABRIR_TD_STYLE);
+					contenido.append(esc.getIdEscenario());
+					contenido.append(Constantes.CERRAR_TD);
+					contenido.append(Constantes.ABRIR_TD_STYLE);
+					contenido.append(esc.getDiaUno());
+					contenido.append(Constantes.CERRAR_TD);
+					contenido.append(Constantes.ABRIR_TD_STYLE);
+					contenido.append(esc.getDiaDos());
+					contenido.append(Constantes.CERRAR_TD);
+					contenido.append(Constantes.ABRIR_TD_STYLE);
+					contenido.append(esc.getDiaTres());
+					contenido.append(Constantes.CERRAR_TD);
+					contenido.append(Constantes.ABRIR_TD_STYLE);
+					contenido.append(esc.getIdRegla());
+					contenido.append(Constantes.CERRAR_TD);
+					contenido.append(Constantes.CLOSE_TR);
 					try {
-						oAGService.enviarNotificacion(r);
-					} catch (UnirestException e) {
-						log.info("Error al enviar la notificación {0}",e);
+						mongoTemplate.save(escenario);
+					} catch (Exception e) {
+						log.error("Exception : {0}", e);
 					}
-
-				
-			}
-
+				}
+			});
+			contenido.append(Constantes.CLOSE_TABLE);
+			r.setDe(de);
+			r.setPara(para);
+			r.setAsunto(Constantes.ASUNTO_MESSAGE_UPDATE);
+			r.setContenidoHTML(contenido.toString());
+			log.info("Asunto: {}", r.getAsunto());
+			try {
+				oAGService.enviarNotificacion(r);
+			} catch (UnirestException e) {
+			log.info("Error al enviar la notificación {0}",e);
+			}			
 		}
 		return mer;
 
@@ -201,61 +217,96 @@ public class EscenariosService {
 	/*
 	 * Eliminar escenario dinamico
 	 */
-	public Object eliminaEscenario(Integer idEscenario) {
+	public void eliminaEscenario(List<Integer> idEscenarios) {
 		log.info("BolsasService.elimina");
-
-		if (idEscenario != null) {
-			EscenarioEntity escenario = escenarioRepository.findByIdEscenario(idEscenario);
-
-			log.info("{}", escenario);
-
-			if (escenario != null) {
+		EnviarNotificacionRequestVO r = new EnviarNotificacionRequestVO();
+		StringBuilder contenido=new StringBuilder();
+		contenido.append(CONTENIDO+Constantes.SALTO+Constantes.SALTO);
+		contenido.append(Constantes.TABLE);
+		contenido.append(Constantes.TR);
+		contenido.append(Constantes.ABRIR_TD_STYLE);
+		contenido.append(Constantes.ID_ESCENARIO);
+		contenido.append(Constantes.CERRAR_TD);
+		contenido.append(Constantes.CLOSE_TR);
+		if (idEscenarios != null) {
+			log.info("{}", idEscenarios.size());
+			if (!idEscenarios.isEmpty()) {
 				try {
-					escenarioRepository.delete(escenario);
-				} catch (Exception e) {
-					log.error("Exception : {0}", e);
-
-					InternalServerError is = new InternalServerError();
-					is.setCodigo(Constantes.ERROR_SERVER);
-					is.setMensaje(Constantes.ERROR_SERVER_MSG);
-
-					log.info("{}", is);
-
-					return is;
-				}
-
-				EnviarNotificacionRequestVO r = new EnviarNotificacionRequestVO();
-
-				r.setDe(de);
-				r.setPara(para);
-				r.setAsunto(ASUNTO_MESSAGE);
-				r.setContenidoHTML(CONTENIDO);
-				log.info("Asunto: {}", r.getAsunto());
-
-				try {
+					for (Integer idEscenario : idEscenarios) {
+						contenido.append(Constantes.TR);
+						contenido.append(Constantes.ABRIR_TD_STYLE);
+						contenido.append(idEscenario);
+						contenido.append(Constantes.CERRAR_TD);
+						contenido.append(Constantes.CLOSE_TR);
+						escenarioRepository.deleteById(String.valueOf(idEscenario));
+					}
+					contenido.append(Constantes.CLOSE_TABLE);
+					r.setDe(de);
+					r.setPara(para);
+					r.setAsunto(Constantes.ASUNTO_MESSAGE_ELIMINA);
+					r.setContenidoHTML(contenido.toString());
+					log.info("Asunto: {}", r.getAsunto());
 					oAGService.enviarNotificacion(r);
 				} catch (UnirestException e) {
-					log.info("Error al enviar la notificación {0}",e);
+					log.error("Error al enviar la notificación {0}",e);
+					log.error("Exception : {0}", e);
+				}catch (Exception e) {
+					log.error("[{}]",e.getMessage());
+					log.error("Error al tratar de borrar el elemento");
 				}
-			} else {
-				log.info("Escenario no encontrado.");
-				NotFound nf = new NotFound();
-				nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
-				nf.setMensaje(Constantes.MESSAGE_ERROR_CODE_NOT_FOUND);
-
-				log.info("{}", nf);
-
-				return nf;
 			}
 		}
-
-		EliminarEscenariosRes resp = new EliminarEscenariosRes();
-
-		resp.setCode(Constantes.EXITO_ELIMINAR);
-		resp.setMessage(Constantes.EXITO_ELIMINAR_MSG);
-
-		log.info("{}", resp);
-
-		return resp;
+	}
+	
+	/*
+	 *Consulta unicamente ids de escenarios
+	 *@param Lista de escenatios
+	 *return ids escenarios
+	 * */
+	public List<EscenarioEntity> consultaGrupoEscenarios(List<Integer> lstIdEscenarios){
+		log.info("size [{}]",lstIdEscenarios.size());
+		List<EscenarioEntity> escenarios=null;
+		escenarios= mongoTemplate.find(Query.query(Criteria.where("idEscenario").in(lstIdEscenarios)), EscenarioEntity.class);
+		return escenarios;
+	}
+	
+	public List<Integer> transformaIds(List<EscenarioEntity> lstIdEscenarios){
+		List<Integer> escenariosIds=new ArrayList<>();
+		if(!lstIdEscenarios.isEmpty()){
+			lstIdEscenarios.stream().forEach(escenario->escenariosIds.add(escenario.getIdEscenario()));
+		}
+		return escenariosIds;
+	}
+	
+	/*
+	 *Consulta escenarios por id
+	 *@param ModEscenariosReq
+	 *return EscenarioEntity
+	 * */
+	private EscenarioEntity consultaEscenarioId(Integer idEscenario){
+	EscenarioEntity escenario=null;
+	try {
+		escenario = mongoTemplate.findOne(
+				Query.query(Criteria.where(Constantes.ID).is(idEscenario)),
+				EscenarioEntity.class);
+	} catch (Exception e) {
+		log.error("{0}", e);
+	}
+		return escenario;
+	}
+	
+	/*
+	 * funcion que permite convertir payloads y consultas de escenarios en strings para determinar si estan repeditos en DB
+	 * */
+	public List<String> existenRepetidos(List<CrearEscenariosReq> escanariosRequest){
+		List<EscenarioEntity> escenariosDb= mongoTemplate.findAll(EscenarioEntity.class);
+		List<String> listaA=new ArrayList<>();
+		List<String> listaB=new ArrayList<>();
+		escenariosDb.stream().forEach(esc->listaA.add("{"+esc.getDiaUno()+","+esc.getDiaDos()+","+esc.getDiaTres()+","+esc.getIdRegla()+"}"));
+		escanariosRequest.stream().forEach(esc->listaB.add("{"+esc.getDiaUno()+","+esc.getDiaDos()+","+esc.getDiaTres()+","+esc.getIdRegla()+"}"));
+		List<String> similar = new ArrayList<>(listaA); 
+		similar.retainAll(listaB);
+		return similar;
+		
 	}
 }

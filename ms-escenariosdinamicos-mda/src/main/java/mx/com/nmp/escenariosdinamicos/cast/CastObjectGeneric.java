@@ -19,9 +19,11 @@ import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexVentasVO;
 import mx.com.nmp.escenariosdinamicos.model.CommonAjuste;
 import mx.com.nmp.escenariosdinamicos.model.CommonBaseAjuste;
+import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.model.InfoRegla;
 import mx.com.nmp.escenariosdinamicos.model.InformacionAjusteVO;
 import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
+import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.oag.dto.RequestActualizarPrecioPartidaDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.RequestReglaEscenarioDinamicoDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseOAGDto;
@@ -264,6 +266,15 @@ public class CastObjectGeneric {
 		}
 		
 		return newRequest;
+	}
+	
+	public EjecutarEscenarioDinamicoReq convertirEjeTOSim (SimularEscenarioDinamicoReq param){
+		EjecutarEscenarioDinamicoReq esc=null;
+		if(param!=null){
+			esc=new EjecutarEscenarioDinamicoReq();
+			esc.setInfoRegla(param.getInfoRegla());
+		}
+		return esc;
 	}
 }
 

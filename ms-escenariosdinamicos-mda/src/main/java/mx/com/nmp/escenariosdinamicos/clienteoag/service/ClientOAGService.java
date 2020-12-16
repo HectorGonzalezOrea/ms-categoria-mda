@@ -75,7 +75,7 @@ public class ClientOAGService {
 		log.info(":: Entrado al metodo  actualizarPrecioPartida ::");
 		String request = new Gson().toJson(requestDto);
 
-		log.info("{}" , request);
+		log.info("->{}" , request);
 		
 		ResponseOAGDto response = new ResponseOAGDto();
 		
@@ -89,6 +89,7 @@ public class ClientOAGService {
 			headers.add(Constantes.HEADER_ID_DESTINO, headerIdDestino);
 			headers.add(Constantes.HEADER_OAUTH_BEARER, token);
 			headers.setBasicAuth(usuario, password);
+			
 			HttpEntity<String> entity = new HttpEntity<>(request, headers);
 			ResponseEntity<String> result = restTemplate.postForEntity(urlBase + endPointAjustePrecioPartidas, entity,
 					String.class);
@@ -155,6 +156,30 @@ public class ClientOAGService {
 			
 		}
 		return null;
+	}
+	
+	public int[] obtenerVentas(List<String> listaDias) {
+		String[] dias = new String[listaDias.size()];
+		int[] diasaux = new int[listaDias.size()];
+		dias = listaDias.toArray(dias);
+		for (int i = 0; i < dias.length; i++) {
+			if (dias[i].equals(Constantes.CERO)) {
+				diasaux[i] = 0;
+			}
+			if(dias[i].equals(Constantes.X)&&i==0){
+				diasaux[i] = dias.length;
+			}
+			if(dias[i].equals(Constantes.S)&&i>0){
+				diasaux[i] = diasaux[i-1]+(dias.length)-1;
+			}
+			if(dias[i].equals(Constantes.B)&&i>0){
+				diasaux[i]=diasaux[i-1]-1;
+			}
+			if(dias[i].equals(Constantes.M)&&i>0){
+				diasaux[i]=diasaux[i-1];
+			}
+		}
+		return diasaux;
 	}
 
 }
