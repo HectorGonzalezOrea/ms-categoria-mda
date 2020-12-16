@@ -79,7 +79,7 @@ public class OAGService extends OAGBaseService {
 		String autenticacionBasica = "Basic " + ConvertStringToBase64.encode(credenciales);
 		
 		request.setGrupo(grupo);
-		
+		//request.setGrupo("GrupoMDA");
 		log.info("HttpHeaders.CONTENT_TYPE: {}" , MediaType.APPLICATION_JSON);
 		log.info("usuario: {}" , userLoggeado);
 		log.info("Oauth Bearer: {}" , oauthBearer);

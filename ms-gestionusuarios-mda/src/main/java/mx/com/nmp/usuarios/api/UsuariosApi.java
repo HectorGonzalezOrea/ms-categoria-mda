@@ -206,4 +206,23 @@ public interface UsuariosApi {
 	        method = RequestMethod.POST)
 	ResponseEntity<?> usuariosPost(@ApiParam(value = "Usuario en el sistema origen que lanza la petición." ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición." ,required=true, allowableValues="portalMotorDescuentosAutomatizados") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información." ,required=true, allowableValues="Mongo, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = ""  )  @Valid @RequestBody InfoUsuario peticion);
 	
+	    
+	    @ApiOperation(value = "Registra usuarios por medio de un grupo del active directory", nickname = "usuariosSincronizarPost", notes = "Recurso utilizado para el registro de un usuarios en Mongo DB por medio del grupo el cual se consultara en el active directorty", response = GeneralResponse.class, authorizations = {
+				@Authorization(value = "apiKey") }, tags = { "Usuarios", })
+		@ApiResponses(value = {
+				@ApiResponse(code = 200, message = "Creación exitosa.", response = CapacidadUsuariosRes.class),
+				@ApiResponse(code = 400, message = "Error en el mensaje de petición, verifique la información.", response = BadRequest.class),
+				@ApiResponse(code = 401, message = "Error de autorización en el uso del recurso.", response = InvalidAuthentication.class),
+				@ApiResponse(code = 404, message = "Recurso no disponible", response = NotFound.class),
+				@ApiResponse(code = 409, message = "Conflicto con el mensaje de petición, verifique la información.", response = ConflictRequest.class),
+				@ApiResponse(code = 500, message = "Error interno del servidor.", response = InternalServerError.class) })
+		@RequestMapping(value = "/usuarios/sincronizar", produces = {
+				"application/json" }, method = RequestMethod.POST)
+		ResponseEntity<?> usuariosSincronizarPost(
+				@ApiParam(value = "Usuario en el sistema origen que lanza la petición." ,required=true)@RequestHeader("usuario") String usuario
+			   ,@ApiParam(value = "Sistema que origina la petición." ,required=true, allowableValues="portalMotorDescuentosAutomatizados")@RequestHeader("origen") String origen
+		       ,@ApiParam(value = "Destino final de la información." ,required=true, allowableValues="Mongo, mockserver")@RequestHeader("destino") String destino
+		       ,@ApiParam(value = "Grupo que se sincronizara.",required=true) @RequestHeader("grupo") String grupo);
 }
+
+

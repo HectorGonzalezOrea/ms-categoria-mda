@@ -23,6 +23,8 @@ import mx.com.nmp.usuarios.model.ReqHistorico;
 import mx.com.nmp.usuarios.model.ReqPerfil;
 import mx.com.nmp.usuarios.model.ResEstatus;
 import mx.com.nmp.usuarios.mongodb.service.UsuarioService;
+import mx.com.nmp.usuarios.oag.client.service.OAGBaseService;
+import mx.com.nmp.usuarios.oag.client.service.OAGService;
 import mx.com.nmp.usuarios.oag.vo.TokenProviderErrorVO;
 
 import org.slf4j.Logger;
@@ -57,6 +59,9 @@ public class UsuariosApiController implements UsuariosApi {
 	
 	@Autowired
 	private UsuarioService usuarioService;
+	
+	@Autowired
+	private OAGService oagService;
 
 	@org.springframework.beans.factory.annotation.Autowired
 	public UsuariosApiController(ObjectMapper objectMapper, HttpServletRequest request) {
@@ -1073,5 +1078,41 @@ public class UsuariosApiController implements UsuariosApi {
 			return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 		}
     }
+
+	public ResponseEntity<?> usuariosSincronizarPost(
+			@ApiParam(value = "Usuario en el sistema origen que lanza la petición." ,required=true)@RequestHeader("usuario") String usuario
+			,@ApiParam(value = "Sistema que origina la petición." ,required=true, allowableValues="portalMotorDescuentosAutomatizados")@RequestHeader("origen") String origen
+			,@ApiParam(value = "Destino final de la información." ,required=true, allowableValues="Mongo, mockserver")@RequestHeader("destino") String destino
+			,@ApiParam(value = "Grupo que se sincronizara.",required=true) @RequestHeader("grupo") String grupo) {
+		log.info("*********************************************************");
+		log.info("Sincronizar Usuarios");
+		log.info("*********************************************************");
+		
+    	String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
+    	
+    	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
+    		InvalidAuthentication ia = new InvalidAuthentication();
+    		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
+    		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
+    		
+    		log.info("{}" , ConverterUtil.messageToJson(ia));
+    		
+    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
+    	}
+    	
+    	String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
+        if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
+        	log.info("Entrando a migrar usuarios");
+        	log.info(usuario);
+        	log.info(origen);
+        	log.info(destino);
+        	log.info(grupo);
+    		usuarioService.consultaPrefil(usuario, oagService.getToken());
+    		log.info("saliendo a migrar usuarios");
+        }
+		
+		return null;
+	}
+	
 	
 }
