@@ -12,7 +12,12 @@ import org.springframework.validation.annotation.Validated;
 
 public class ModCapacidadUsuario extends ArrayList<ModCapacidadUsuarioInner>  {
 
-  @Override
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5567663874356136342L;
+
+@Override
   public boolean equals(java.lang.Object o) {
     if (this == o) {
       return true;

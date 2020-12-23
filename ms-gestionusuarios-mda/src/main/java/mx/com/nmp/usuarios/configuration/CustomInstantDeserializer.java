@@ -30,7 +30,8 @@ import java.math.BigDecimal;
  */
 public class CustomInstantDeserializer<T extends Temporal>
     extends ThreeTenDateTimeDeserializerBase<T> {
-  private static final long serialVersionUID = 1L;
+  
+	private static final long serialVersionUID = 1L;
 
   public static final CustomInstantDeserializer<Instant> INSTANT = new CustomInstantDeserializer<>(
       Instant.class, DateTimeFormatter.ISO_INSTANT,
