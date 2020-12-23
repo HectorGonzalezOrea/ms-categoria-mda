@@ -17,6 +17,8 @@ import mx.com.nmp.usuarios.oag.vo.GetTokenResponseVO;
 import mx.com.nmp.usuarios.oag.vo.IdentidadUsuarioResponseVO;
 import mx.com.nmp.usuarios.oag.vo.ProfileVO;
 import mx.com.nmp.usuarios.oag.vo.TokenProviderErrorVO;
+import mx.com.nmp.usuarios.oag.vo.UsuarioVO;
+import mx.com.nmp.usuarios.oag.vo.UsuariosResponseVO;
 
 public class ConverterUtil {
 	private ConverterUtil() {
@@ -136,4 +138,17 @@ public class ConverterUtil {
 		}
 		return obj;
 	}
+	
+	public static UsuariosResponseVO stringJsonToObjectUsuariosResponseVO(String json) {
+		ObjectMapper mapper = new ObjectMapper();
+		UsuariosResponseVO obj = null;
+		try {
+			obj = mapper.readValue(json, UsuariosResponseVO.class);
+
+		} catch (IOException e) {
+			log.error("Error en stringJsonToObjectUsuarioVO: {0}" , e);
+		}
+		return obj;
+	}
+	
 }

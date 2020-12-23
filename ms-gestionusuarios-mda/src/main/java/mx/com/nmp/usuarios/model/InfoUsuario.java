@@ -3,7 +3,7 @@ package mx.com.nmp.usuarios.model;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-
+import mx.com.nmp.usuarios.mongodb.vo.CatalogoVO;
 
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
@@ -32,19 +32,19 @@ public class InfoUsuario   {
   private String usuario = null;
 
   @JsonProperty("puesto")
-  private Object puesto = null;
+  private CatalogoVO puesto = null;
 
   @JsonProperty("direccion")
-  private Object direccion = null;
+  private CatalogoVO direccion = null;
 
   @JsonProperty("subdireccion")
-  private Object subdireccion = null;
+  private CatalogoVO subdireccion = null;
 
   @JsonProperty("gerencia")
-  private Object gerencia = null;
+  private CatalogoVO gerencia = null;
 
   @JsonProperty("departamentoArea")
-  private Object departamentoArea = null;
+  private CatalogoVO departamentoArea = null;
 
   @JsonProperty("perfil")
   private CapacidadUsuariosRes perfil = null;
@@ -152,7 +152,7 @@ public class InfoUsuario   {
     this.usuario = usuario;
   }
 
-  public InfoUsuario puesto(Object puesto) {
+  public InfoUsuario puesto(CatalogoVO puesto) {
     this.puesto = puesto;
     return this;
   }
@@ -168,11 +168,11 @@ public class InfoUsuario   {
     return puesto;
   }
 
-  public void setPuesto(Object puesto) {
+  public void setPuesto(CatalogoVO puesto) {
     this.puesto = puesto;
   }
 
-  public InfoUsuario direccion(Object direccion) {
+  public InfoUsuario direccion(CatalogoVO direccion) {
     this.direccion = direccion;
     return this;
   }
@@ -188,11 +188,11 @@ public class InfoUsuario   {
     return direccion;
   }
 
-  public void setDireccion(Object direccion) {
+  public void setDireccion(CatalogoVO direccion) {
     this.direccion = direccion;
   }
 
-  public InfoUsuario subdireccion(Object subdireccion) {
+  public InfoUsuario subdireccion(CatalogoVO subdireccion) {
     this.subdireccion = subdireccion;
     return this;
   }
@@ -208,11 +208,11 @@ public class InfoUsuario   {
     return subdireccion;
   }
 
-  public void setSubdireccion(Object subdireccion) {
+  public void setSubdireccion(CatalogoVO subdireccion) {
     this.subdireccion = subdireccion;
   }
 
-  public InfoUsuario gerencia(Object gerencia) {
+  public InfoUsuario gerencia(CatalogoVO gerencia) {
     this.gerencia = gerencia;
     return this;
   }
@@ -228,11 +228,11 @@ public class InfoUsuario   {
     return gerencia;
   }
 
-  public void setGerencia(Object gerencia) {
+  public void setGerencia(CatalogoVO gerencia) {
     this.gerencia = gerencia;
   }
 
-  public InfoUsuario departamentoArea(Object departamentoArea) {
+  public InfoUsuario departamentoArea(CatalogoVO departamentoArea) {
     this.departamentoArea = departamentoArea;
     return this;
   }
@@ -248,7 +248,7 @@ public class InfoUsuario   {
     return departamentoArea;
   }
 
-  public void setDepartamentoArea(Object departamentoArea) {
+  public void setDepartamentoArea(CatalogoVO departamentoArea) {
     this.departamentoArea = departamentoArea;
   }
 
