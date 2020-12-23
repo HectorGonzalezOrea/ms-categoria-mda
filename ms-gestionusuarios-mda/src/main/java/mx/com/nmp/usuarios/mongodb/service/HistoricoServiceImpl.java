@@ -39,7 +39,7 @@ public class HistoricoServiceImpl implements HistoricoService {
 	private PerfilService perfilService;
 	
 	@Autowired
-	UsuarioMongoService usuarioService;
+	UsuarioService usuarioService;
 	
 	private static final String HISTORICO_SEQ_KEY = "historico_sequence";
 	

@@ -27,9 +27,9 @@ import mx.com.nmp.usuarios.oag.vo.UsuarioVO;
 import mx.com.nmp.usuarios.utils.Constantes;
 
 @Service
-public class UsuarioMongoServiceImpl implements UsuarioMongoService {
+public class UsuarioServiceImpl implements UsuarioService {
 
-	private static final Logger logger = LoggerFactory.getLogger(UsuarioMongoServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(UsuarioServiceImpl.class);
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -300,7 +300,7 @@ public class UsuarioMongoServiceImpl implements UsuarioMongoService {
 		
 		BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, UsuarioEntity.class);
 		
-		List<String> miembroDe = new ArrayList<String>();
+		List<String> miembroDe = new ArrayList<>();
 		miembroDe.add(grupo);
 		
 		if(!usuarios.isEmpty()) {

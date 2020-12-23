@@ -17,7 +17,6 @@ import mx.com.nmp.usuarios.oag.vo.GetTokenResponseVO;
 import mx.com.nmp.usuarios.oag.vo.IdentidadUsuarioResponseVO;
 import mx.com.nmp.usuarios.oag.vo.ProfileVO;
 import mx.com.nmp.usuarios.oag.vo.TokenProviderErrorVO;
-import mx.com.nmp.usuarios.oag.vo.UsuarioVO;
 import mx.com.nmp.usuarios.oag.vo.UsuariosResponseVO;
 
 public class ConverterUtil {

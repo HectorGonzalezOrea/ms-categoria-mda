@@ -20,7 +20,6 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 import mx.com.nmp.usuarios.oag.vo.BusquedaGrupoVO;
 import mx.com.nmp.usuarios.oag.vo.GetTokenResponseVO;
-import mx.com.nmp.usuarios.oag.vo.IdentidadUsuarioRequestVO;
 import mx.com.nmp.usuarios.oag.vo.UsuariosResponseVO;
 import mx.com.nmp.usuarios.utils.ConvertStringToBase64;
 import mx.com.nmp.usuarios.utils.ConverterUtil;
@@ -28,7 +27,7 @@ import mx.com.nmp.usuarios.utils.ConverterUtil;
 @Service
 public class OAGServiceImpl extends OAGBaseService implements OAGService {
 
-	private static final Logger log = LoggerFactory.getLogger(OAGService2Impl.class);
+	private static final Logger log = LoggerFactory.getLogger(OAGServiceImpl.class);
 
 	@Override
 	public String getToken() throws UnirestException {
@@ -59,19 +58,6 @@ public class OAGServiceImpl extends OAGBaseService implements OAGService {
 		}
 
 		return accessToken;
-	}
-
-	@Override
-	public Object identidadUsuario(IdentidadUsuarioRequestVO request, String oauthBearer, String userLoggeado)
-			throws UnirestException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object identidadUsuario(String oauthBearer) throws UnirestException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	@Override

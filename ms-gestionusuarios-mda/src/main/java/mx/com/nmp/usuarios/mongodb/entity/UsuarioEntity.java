@@ -35,7 +35,7 @@ public class UsuarioEntity {
 	private String lastname;
 	private String firstname;
 	private String uri;
-	private List<String> memberof = null;
+	private List<String> memberof;
 	private String title;
 	private String distinguishedname;
 	private String description;

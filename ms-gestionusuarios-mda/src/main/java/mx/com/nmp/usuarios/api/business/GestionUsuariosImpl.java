@@ -8,8 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.mashape.unirest.http.exceptions.UnirestException;
-
 import mx.com.nmp.usuarios.api.exception.ApiException;
 import mx.com.nmp.usuarios.model.CapacidadUsuariosRes;
 import mx.com.nmp.usuarios.model.ConsultaHistoricoRes;
@@ -22,7 +20,7 @@ import mx.com.nmp.usuarios.model.ReqHistorico.AccionEnum;
 import mx.com.nmp.usuarios.model.ResEstatus.DescripcionEnum;
 import mx.com.nmp.usuarios.mongodb.service.HistoricoService;
 import mx.com.nmp.usuarios.mongodb.service.PerfilService;
-import mx.com.nmp.usuarios.mongodb.service.UsuarioMongoService;
+import mx.com.nmp.usuarios.mongodb.service.UsuarioService;
 import mx.com.nmp.usuarios.oag.client.service.OAGService;
 import mx.com.nmp.usuarios.oag.vo.BusquedaGrupoVO;
 import mx.com.nmp.usuarios.oag.vo.UsuariosResponseVO;
@@ -37,7 +35,7 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 	OAGService oagService; 
 	
 	@Autowired
-	UsuarioMongoService usuarioService;
+	UsuarioService usuarioService;
 	
 	@Autowired
 	private PerfilService perfilService;
@@ -60,13 +58,7 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 			
 			usuarioService.upsertUsers(usuarios.getUsuario(), grupo);
 			
-		} catch (UnirestException e) {
-			logger.error("UnirestException {}" , e.getMessage());
-			
-			throw new ApiException(e);
 		} catch (Exception e) {
-			logger.error("Exception {}" , e.getMessage());
-			
 			throw new ApiException(e);
 		}
 		
@@ -81,8 +73,6 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 		try {
 			usuarios = usuarioService.getAllUsers(nombre, apellidoPaterno, apellidoMaterno, estatus, perfil, usuario);
 		} catch (Exception e) {
-			logger.error("Exception {}", e.getMessage());
-
 			throw new ApiException(e);
 		}
 				
@@ -104,8 +94,6 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 				resp = perfilService.perfilById(idPerfil);
 			}
 		} catch(Exception e) {
-			logger.error("Exception {}", e.getMessage());
-
 			throw new ApiException(e);
 		}
 
@@ -135,8 +123,6 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 				}
 			}
 		} catch(Exception e) {
-			logger.error("Exception {}", e.getMessage());
-
 			throw new ApiException(e);
 		}
 
@@ -159,8 +145,6 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 				resp.setMessage(Constantes.SUCESS_MESSAGE_ELIMINAR_USUARIO);
 			}
 		} catch(Exception e) {
-			logger.error("Exception {}", e.getMessage());
-
 			throw new ApiException(e);
 		}
 		
@@ -176,8 +160,6 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 		try {
 			userVo = usuarioService.consultaUsuarioPerfil(usuario);
 		} catch (Exception e) {
-			logger.error("Exception {}", e.getMessage());
-
 			throw new ApiException(e);
 		}
 		
@@ -198,8 +180,6 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 			}
 			
 		} catch (Exception e) {
-			logger.error("Exception {}", e.getMessage());
-
 			throw new ApiException(e);
 		}
 
@@ -217,8 +197,6 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 			resp = historicoService.crearHistorico(accion, fecha, idPerfil, usuario);
 			
 		} catch (Exception e) {
-			logger.error("Exception {}", e.getMessage());
-
 			throw new ApiException(e);
 		}
 		
@@ -234,8 +212,6 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 		try {
 			resp = historicoService.getHistorico(idUsuario);
 		} catch (Exception e) {
-			logger.error("Exception {}", e.getMessage());
-
 			throw new ApiException(e);
 		}
 		

@@ -29,7 +29,7 @@ import mx.com.nmp.usuarios.utils.Constantes;
 @Service
 public class PerfilServiceImpl implements PerfilService {
 
-	private static final Logger logger = LoggerFactory.getLogger(UsuarioMongoServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(PerfilServiceImpl.class);
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -38,7 +38,7 @@ public class PerfilServiceImpl implements PerfilService {
 	public List<CapacidadUsuariosRes> buscarPerfilConCapacidades() {
 		List<PerfilEntity> listPetfil = mongoTemplate.findAll(PerfilEntity.class);
 
-		List<CapacidadUsuariosRes> resp = new ArrayList<CapacidadUsuariosRes>();
+		List<CapacidadUsuariosRes> resp = new ArrayList<>();
 
 		listPetfil
 		.stream()

@@ -84,7 +84,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
 		logger.error("{}" , ise);
 		
-		return new ResponseEntity<InternalServerError>(ise, HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity(ise, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 }

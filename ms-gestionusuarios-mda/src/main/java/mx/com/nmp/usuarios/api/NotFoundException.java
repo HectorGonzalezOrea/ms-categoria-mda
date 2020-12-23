@@ -6,5 +6,10 @@ import mx.com.nmp.usuarios.api.exception.ApiException;
 
 public class NotFoundException extends ApiException {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7001906072258246103L;
+
 	
 }

@@ -4,13 +4,11 @@ import java.util.Date;
 import java.util.List;
 
 import mx.com.nmp.usuarios.api.exception.ApiException;
-import mx.com.nmp.usuarios.model.CapacidadUsuariosReq;
 import mx.com.nmp.usuarios.model.CapacidadUsuariosRes;
 import mx.com.nmp.usuarios.model.ConsultaHistoricoRes;
 import mx.com.nmp.usuarios.model.CrearHistoricoRes;
 import mx.com.nmp.usuarios.model.EliminarUsuariosRes;
 import mx.com.nmp.usuarios.model.InfoUsuario;
-import mx.com.nmp.usuarios.model.InternalServerError;
 import mx.com.nmp.usuarios.model.PerfilUsuario;
 import mx.com.nmp.usuarios.model.ResEstatus;
 import mx.com.nmp.usuarios.model.ReqHistorico.AccionEnum;

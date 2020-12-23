@@ -4,6 +4,7 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.2.RELEASE")
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.0"
     }
 }
 
@@ -14,6 +15,7 @@ repositories {
 apply plugin: 'java'                                // plugin for java
 apply plugin: 'org.springframework.boot'
 apply plugin: "io.spring.dependency-management"
+apply plugin: "org.sonarqube"
 
 jar {
   baseName = 'ms-gestionusuarios-mda'
@@ -54,6 +56,13 @@ dependencyManagement {
      imports {
           mavenBom "org.springframework.cloud:spring-cloud-sleuth:${springCloudVersion}"
      }
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectName", "ms-gestionusuarios-mda"
+    	property "sonar.projectKey", "org.sonarqube:java-gradle-simple"
+    }
 }
 
 tasks.withType(JavaCompile) {

@@ -23,8 +23,7 @@ import mx.com.nmp.usuarios.model.ReqEstatus;
 import mx.com.nmp.usuarios.model.ReqHistorico;
 import mx.com.nmp.usuarios.model.ReqPerfil;
 import mx.com.nmp.usuarios.model.ResEstatus;
-import mx.com.nmp.usuarios.mongodb.service.UsuarioService2Impl;
-import mx.com.nmp.usuarios.oag.client.service.OAGService2Impl;
+import mx.com.nmp.usuarios.mongodb.service.PerfilCapacidadService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,10 +61,7 @@ public class UsuariosApiController implements UsuariosApi {
 	private final HttpServletRequest request;
 	
 	@Autowired
-	private UsuarioService2Impl usuarioService;
-	
-	@Autowired
-	private OAGService2Impl oagService;
+	private PerfilCapacidadService perfilCapService;
 
 	@Autowired
 	private GestionUsuarios gestionUsuarios; 
@@ -130,12 +126,12 @@ public class UsuariosApiController implements UsuariosApi {
 				
 				if(idPerfil != null && !capacidadUsuarioReq.isEmpty()) {
 					
-					InternalServerError ie = usuarioService.validarCapacidadesCreacion(capacidadUsuarioReq);
+					InternalServerError ie = perfilCapService.validarCapacidadesCreacion(capacidadUsuarioReq);
 					
 					if(ie != null) {
 						return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 					} else {
-						resp = usuarioService.crearPerfilCapacidad(new Integer(idPerfil), capacidadUsuarioReq);
+						resp = perfilCapService.crearPerfilCapacidad(new Integer(idPerfil), capacidadUsuarioReq);
 					}
 				}
 				
@@ -221,14 +217,14 @@ public class UsuariosApiController implements UsuariosApi {
 					
 					log.info("Request : {}" , modCapacidadReq.toString());
 					
-					InternalServerError ie = usuarioService.validarCapacidadesMod(modCapacidadReq);
+					InternalServerError ie = perfilCapService.validarCapacidadesMod(modCapacidadReq);
 					
 					if(ie != null) {
 						
 						log.info("{}" , ConverterUtil.messageToJson(ie));
 						return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 					} else {
-						resp = usuarioService.modificarPerfilCapacidad(new Integer(idPerfil), modCapacidadReq);
+						resp = perfilCapService.modificarPerfilCapacidad(new Integer(idPerfil), modCapacidadReq);
 					}
 				}
 				
