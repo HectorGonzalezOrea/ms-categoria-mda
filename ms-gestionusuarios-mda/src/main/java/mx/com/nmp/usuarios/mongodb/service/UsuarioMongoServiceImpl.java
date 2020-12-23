@@ -40,7 +40,7 @@ public class UsuarioMongoServiceImpl implements UsuarioMongoService {
 	@Autowired
 	private PerfilService perfilService;
 	
-	private static final String USUARIO_SEQ_KEY = "usuariosNew_sequence";
+	private static final String USUARIO_SEQ_KEY = "usuarios_sequence";
 	
 	@Override
 	public void addUser(UsuarioVO usuario) throws Exception {
