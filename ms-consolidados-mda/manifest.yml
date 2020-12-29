@@ -4,5 +4,5 @@ applications:
   timeout: 180
   name: ms-consolidados-mda
   buildpack: java_buildpack
-  path: ./target/ms-consolidados-mda-1.0.0.jar
+  path: ./build/libs/ms-consolidados-mda-1.0.0.jar
   memory: 1G

@@ -4,5 +4,5 @@ applications:
   timeout: 180
   name: ms-gestionbolsas-mda
   buildpack: java_buildpack
-  path: ./target/ms-gestionbolsas-mda-1.0.0.jar
+  path: ./build/libs/ms-gestionbolsas-mda-1.0.0.jar
   memory: 1G
