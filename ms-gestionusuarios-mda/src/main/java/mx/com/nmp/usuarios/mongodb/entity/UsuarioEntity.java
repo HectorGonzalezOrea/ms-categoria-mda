@@ -34,8 +34,8 @@ public class UsuarioEntity {
 	private String mail;
 	//private String physicaldeliveryofficename;
 	//private String department;
-	private String lastname;
-	private String firstname;
+	private String lastName;
+	private String firstName;
 	private String uri;
 	private List<String> memberof;
 	private String title;
@@ -177,19 +177,19 @@ public class UsuarioEntity {
 	 */
 	
 	public String getLastname() {
-		return lastname;
+		return lastName;
 	}
 
-	public void setLastname(String lastname) {
-		this.lastname = lastname;
+	public void setLastname(String lastName) {
+		this.lastName = lastName;
 	}
 
 	public String getFirstname() {
-		return firstname;
+		return firstName;
 	}
 
-	public void setFirstname(String firstname) {
-		this.firstname = firstname;
+	public void setFirstname(String firstName) {
+		this.firstName = firstName;
 	}
 
 	public String getUri() {
@@ -260,7 +260,7 @@ public class UsuarioEntity {
 	public String toString() {
 		return "UsuarioEntity [_id=" + _id + ", idUsuario=" + idUsuario + ", nombre=" + nombre + ", apellidoPaterno="
 				+ apellidoPaterno + ", apellidoMaterno=" + apellidoMaterno + ", usuario=" + usuario + ", perfil="
-				+ perfil + ", uid=" + uid + ", mail=" + mail + ", lastname=" + lastname + ", firstname=" + firstname
+				+ perfil + ", uid=" + uid + ", mail=" + mail + ", lastname=" + lastName + ", firstname=" + firstName
 				+ ", uri=" + uri + ", memberof=" + memberof + ", title=" + title + ", distinguishedname="
 				+ distinguishedname + ", description=" + description + ", samaccountname=" + samaccountname
 				+ ", commonname=" + commonname + ", activo=" + activo + "]";

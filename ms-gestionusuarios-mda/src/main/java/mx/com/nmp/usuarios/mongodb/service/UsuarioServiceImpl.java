@@ -3,7 +3,6 @@ package mx.com.nmp.usuarios.mongodb.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -24,7 +23,6 @@ import mx.com.nmp.usuarios.model.InfoUsuario;
 import mx.com.nmp.usuarios.model.PerfilUsuario;
 import mx.com.nmp.usuarios.mongodb.entity.SequenceGeneratorService;
 import mx.com.nmp.usuarios.mongodb.entity.UsuarioEntity;
-import mx.com.nmp.usuarios.mongodb.vo.CatalogoVO;
 import mx.com.nmp.usuarios.oag.vo.UsuarioVO;
 import mx.com.nmp.usuarios.utils.Constantes;
 
@@ -58,9 +56,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		BulkWriteResult upsertResults = upsert.execute();
 		logger.info("upsertResults: {}" , upsertResults.toString());
 		
-		BulkOperations actualizar = this.actualizarInformacionParaSincronizar(usuarios);
-		BulkWriteResult actualizarResults = actualizar.execute();
-		logger.info("actualizarResults: {}" , actualizarResults.toString());
+		this.actualizarInformacionParaSincronizar(usuarios);
 	}
 
 	@Override
@@ -251,7 +247,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 			vo.setSamaccountname(user.getSamaccountname());
 			vo.setTitle(user.getTitle());
 			vo.setUid(user.getUid());
-			vo.setUri(user.getUri());
 
 			vo.setActivo(user.getActivo());
 		}
@@ -302,54 +297,56 @@ public class UsuarioServiceImpl implements UsuarioService {
 		return vo;
 	}
 	
-	private BulkOperations actualizarInformacionParaSincronizar(List<UsuarioVO> usuarios) {
+	private void actualizarInformacionParaSincronizar(List<UsuarioVO> usuarios) {
 		logger.info("actualizarInformacionParaSincronizar");
 		
 		BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, UsuarioEntity.class);
 
 		List<String> ids = new ArrayList<String>();
 		
-		Map<String, UsuarioVO> map = usuarios
-			.stream()
-			.collect(Collectors.toMap(UsuarioVO::getIdUsuario, user -> user));
-		
-		for(UsuarioVO vo : usuarios) {
-			ids.add(vo.getIdUsuario());
-		}
-		
-		Query queryUpdateMulti = new Query();
-		
-		queryUpdateMulti.addCriteria(new Criteria("usuario").in(ids))
-		.addCriteria(new Criteria("activo").exists(false));
+		if(!usuarios.isEmpty()) {
+			for(UsuarioVO vo : usuarios) {
+				ids.add(vo.getIdUsuario());
+			}
+			
+			Query queryUpdateMulti = new Query();
+			
+			queryUpdateMulti.addCriteria(new Criteria("usuario").in(ids))
+			.addCriteria(new Criteria("activo").exists(false));
 
-		List<UsuarioEntity> usuariosCreados = mongoTemplate.find(queryUpdateMulti, UsuarioEntity.class);
-		
-		logger.info("usuarios creados: {}", usuariosCreados.size());
-		
-		usuariosCreados
-		.stream()
-		.forEach( u -> {
+			List<UsuarioEntity> usuariosCreados = mongoTemplate.find(queryUpdateMulti, UsuarioEntity.class);
 			
-			logger.info("usuario a: {}", u.toString());
+			logger.info("usuarios creados: {}", usuariosCreados.size());
 			
-			Update updateMulti = new Update();
-			Long id = sequenceGeneratorService.generateSequence(USUARIO_SEQ_KEY);
+			usuariosCreados
+			.stream()
+			.forEach( u -> {
+				
+				logger.info("usuario a: {}", u.toString());
+				
+				Update updateMulti = new Update();
+				Long id = sequenceGeneratorService.generateSequence(USUARIO_SEQ_KEY);
+				
+				logger.info("idUsuario: {}", id);
+				
+				updateMulti.set("idUsuario", id);
+				updateMulti.set("activo", false);
+				
+				Query queryAux = new Query();
+				queryAux.addCriteria(new Criteria("usuario").is(u.getUsuario()));
+				
+				logger.info("queryAux: {}", queryAux);
+				
+				bulkOps.updateMulti(queryAux, updateMulti);
+				
+			});
 			
-			logger.info("idUsuario: {}", id);
-			
-			updateMulti.set("idUsuario", id);
-			updateMulti.set("activo", false);
-			
-			Query queryAux = new Query();
-			queryAux.addCriteria(new Criteria("usuario").is(u.getUsuario()));
-			
-			logger.info("queryAux: {}", queryAux);
-			
-			bulkOps.updateMulti(queryAux, updateMulti);
-			
-		});
-		
-		return bulkOps;
+			if(!usuariosCreados.isEmpty()) {
+				BulkWriteResult updateResults = bulkOps.execute();
+				logger.info("updateResults: {}" , updateResults.toString());
+			}
+		}
+
 	}
 	
 	private BulkOperations llenarUsuariosParaSincronizar(List<UsuarioVO> usuarios, String grupo) {
@@ -363,6 +360,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 		if (!usuarios.isEmpty()) {
 			usuarios.stream().forEach(u -> {
 
+				
+				logger.info("usuario: {}" , u.toString());
 				Update upSert = new Update();
 
 				Query queryUpSert = new Query()
@@ -373,10 +372,26 @@ public class UsuarioServiceImpl implements UsuarioService {
 				if (u.getApellidos() != null) {
 					String[] aps = u.getApellidos().split(" ");
 
+					logger.info("aps: {}" , aps.length);
+					
 					if (aps.length == 2) {
 						upSert.set("apellidoPaterno", aps[0]);
 						upSert.set("apellidoMaterno", aps[1]);
-					} else {
+					}
+
+					if(aps.length > 2) {
+						StringBuilder sb = new StringBuilder();
+						
+						for(int i = 0; i<= aps.length - 2; i++) {
+							sb.append(aps[i]);
+							sb.append(" ");
+						}
+						
+						upSert.set("apellidoPaterno", sb.toString().trim());
+						upSert.set("apellidoMaterno", aps[aps.length - 1]);
+					}
+					
+					if(aps.length < 2) {
 						upSert.set("apellidoPaterno", u.getApellidos());
 					}
 				}

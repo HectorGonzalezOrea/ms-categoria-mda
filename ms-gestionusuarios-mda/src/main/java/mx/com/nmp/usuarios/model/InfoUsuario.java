@@ -3,11 +3,9 @@ package mx.com.nmp.usuarios.model;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import mx.com.nmp.usuarios.mongodb.vo.CatalogoVO;
 
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
-
 
 /**
  * InfoUsuario
@@ -30,7 +28,7 @@ public class InfoUsuario   {
 
   @JsonProperty("usuario")
   private String usuario = null;
-
+  /*
   @JsonProperty("puesto")
   private CatalogoVO puesto = null;
 
@@ -45,7 +43,7 @@ public class InfoUsuario   {
 
   @JsonProperty("departamentoArea")
   private CatalogoVO departamentoArea = null;
-
+  */
   @JsonProperty("perfil")
   private CapacidadUsuariosRes perfil = null;
 
@@ -152,106 +150,6 @@ public class InfoUsuario   {
     this.usuario = usuario;
   }
 
-  public InfoUsuario puesto(CatalogoVO puesto) {
-    this.puesto = puesto;
-    return this;
-  }
-
-  /**
-   * Catalogo seleccionable, no se tienen ejemplos en los DF's.
-   * @return puesto
-  **/
-  @ApiModelProperty(value = "Catalogo seleccionable, no se tienen ejemplos en los DF's.")
-
-
-  public Object getPuesto() {
-    return puesto;
-  }
-
-  public void setPuesto(CatalogoVO puesto) {
-    this.puesto = puesto;
-  }
-
-  public InfoUsuario direccion(CatalogoVO direccion) {
-    this.direccion = direccion;
-    return this;
-  }
-
-  /**
-   * Catalogo seleccionable, no se tienen ejemplos en los DF's.
-   * @return direccion
-  **/
-  @ApiModelProperty(value = "Catalogo seleccionable, no se tienen ejemplos en los DF's.")
-
-
-  public Object getDireccion() {
-    return direccion;
-  }
-
-  public void setDireccion(CatalogoVO direccion) {
-    this.direccion = direccion;
-  }
-
-  public InfoUsuario subdireccion(CatalogoVO subdireccion) {
-    this.subdireccion = subdireccion;
-    return this;
-  }
-
-  /**
-   * Catalogo seleccionable, no se tienen ejemplos en los DF's.
-   * @return subdireccion
-  **/
-  @ApiModelProperty(value = "Catalogo seleccionable, no se tienen ejemplos en los DF's.")
-
-
-  public Object getSubdireccion() {
-    return subdireccion;
-  }
-
-  public void setSubdireccion(CatalogoVO subdireccion) {
-    this.subdireccion = subdireccion;
-  }
-
-  public InfoUsuario gerencia(CatalogoVO gerencia) {
-    this.gerencia = gerencia;
-    return this;
-  }
-
-  /**
-   * Catalogo seleccionable, no se tienen ejemplos en los DF's.
-   * @return gerencia
-  **/
-  @ApiModelProperty(value = "Catalogo seleccionable, no se tienen ejemplos en los DF's.")
-
-
-  public Object getGerencia() {
-    return gerencia;
-  }
-
-  public void setGerencia(CatalogoVO gerencia) {
-    this.gerencia = gerencia;
-  }
-
-  public InfoUsuario departamentoArea(CatalogoVO departamentoArea) {
-    this.departamentoArea = departamentoArea;
-    return this;
-  }
-
-  /**
-   * Catalogo seleccionable, no se tienen ejemplos en los DF's.
-   * @return departamentoArea
-  **/
-  @ApiModelProperty(value = "Catalogo seleccionable, no se tienen ejemplos en los DF's.")
-
-
-  public Object getDepartamentoArea() {
-    return departamentoArea;
-  }
-
-  public void setDepartamentoArea(CatalogoVO departamentoArea) {
-    this.departamentoArea = departamentoArea;
-  }
-
   public InfoUsuario perfil(CapacidadUsuariosRes perfil) {
     this.perfil = perfil;
     return this;
@@ -308,18 +206,13 @@ public class InfoUsuario   {
         Objects.equals(this.apellidoPaterno, infoUsuario.apellidoPaterno) &&
         Objects.equals(this.apellidoMaterno, infoUsuario.apellidoMaterno) &&
         Objects.equals(this.usuario, infoUsuario.usuario) &&
-        Objects.equals(this.puesto, infoUsuario.puesto) &&
-        Objects.equals(this.direccion, infoUsuario.direccion) &&
-        Objects.equals(this.subdireccion, infoUsuario.subdireccion) &&
-        Objects.equals(this.gerencia, infoUsuario.gerencia) &&
-        Objects.equals(this.departamentoArea, infoUsuario.departamentoArea) &&
         Objects.equals(this.perfil, infoUsuario.perfil) &&
         Objects.equals(this.activo, infoUsuario.activo);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(idUsuario, nombre, apellidoPaterno, apellidoMaterno, usuario, puesto, direccion, subdireccion, gerencia, departamentoArea, perfil, activo);
+    return Objects.hash(idUsuario, nombre, apellidoPaterno, apellidoMaterno, usuario, perfil, activo);
   }
 
   @Override
@@ -332,11 +225,6 @@ public class InfoUsuario   {
     sb.append("    apellidoPaterno: ").append(toIndentedString(apellidoPaterno)).append("\n");
     sb.append("    apellidoMaterno: ").append(toIndentedString(apellidoMaterno)).append("\n");
     sb.append("    usuario: ").append(toIndentedString(usuario)).append("\n");
-    sb.append("    puesto: ").append(toIndentedString(puesto)).append("\n");
-    sb.append("    direccion: ").append(toIndentedString(direccion)).append("\n");
-    sb.append("    subdireccion: ").append(toIndentedString(subdireccion)).append("\n");
-    sb.append("    gerencia: ").append(toIndentedString(gerencia)).append("\n");
-    sb.append("    departamentoArea: ").append(toIndentedString(departamentoArea)).append("\n");
     sb.append("    perfil: ").append(toIndentedString(perfil)).append("\n");
     sb.append("    activo: ").append(toIndentedString(activo)).append("\n");
     sb.append("}");

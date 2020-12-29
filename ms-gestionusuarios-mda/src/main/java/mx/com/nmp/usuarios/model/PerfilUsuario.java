@@ -8,7 +8,6 @@ import java.util.List;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 
-
 /**
  * PerfilUsuario
  */
@@ -21,22 +20,23 @@ public class PerfilUsuario extends InfoUsuario {
 
 	@JsonProperty("mail")
 	private String mail = null;
-
+	/*
 	@JsonProperty("physicaldeliveryofficename")
 	private String physicaldeliveryofficename = null;
 
 	@JsonProperty("department")
 	private String department = null;
-
+	*/
 	@JsonProperty("lastName")
 	private String lastName = null;
 
 	@JsonProperty("firstName")
 	private String firstName = null;
 
+	/*
 	@JsonProperty("uri")
 	private String uri = null;
-
+	*/
 	@JsonProperty("memberOf")
 	@Valid
 	private List<String> memberOf = null;
@@ -96,51 +96,6 @@ public class PerfilUsuario extends InfoUsuario {
 		this.mail = mail;
 	}
 
-	public PerfilUsuario physicaldeliveryofficename(String physicaldeliveryofficename) {
-		this.physicaldeliveryofficename = physicaldeliveryofficename;
-		return this;
-	}
-
-	/**
-	 * Nombre de la oficina del usuario (oauth2/profile)
-	 * 
-	 * @return physicaldeliveryofficename
-	 **/
-	@ApiModelProperty(example = "Perez Hernandez", value = "Nombre de la oficina del usuario (oauth2/profile)")
-
-	public String getPhysicaldeliveryofficename() {
-		return physicaldeliveryofficename;
-	}
-
-	public void setPhysicaldeliveryofficename(String physicaldeliveryofficename) {
-		this.physicaldeliveryofficename = physicaldeliveryofficename;
-	}
-
-	public PerfilUsuario department(String department) {
-		this.department = department;
-		return this;
-	}
-
-	/**
-	 * Departamento del usuario (oauth2/profile)
-	 * 
-	 * @return department
-	 **/
-	@ApiModelProperty(example = "Colaboracion Externos", value = "Departamento del usuario (oauth2/profile)")
-
-	public String getDepartment() {
-		return department;
-	}
-
-	public void setDepartment(String department) {
-		this.department = department;
-	}
-
-	public PerfilUsuario lastName(String lastName) {
-		this.lastName = lastName;
-		return this;
-	}
-
 	/**
 	 * Apellido del usuario (oauth2/profile)
 	 * 
@@ -174,26 +129,6 @@ public class PerfilUsuario extends InfoUsuario {
 
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
-	}
-
-	public PerfilUsuario uri(String uri) {
-		this.uri = uri;
-		return this;
-	}
-
-	/**
-	 * Uri usuario (oauth2/profile)
-	 * 
-	 * @return uri
-	 **/
-	@ApiModelProperty(example = "/ms_oauth/resources/userprofile/me/jperezh@montepiedad.com.mx", value = "Uri usuario (oauth2/profile)")
-
-	public String getUri() {
-		return uri;
-	}
-
-	public void setUri(String uri) {
-		this.uri = uri;
 	}
 
 	public PerfilUsuario memberOf(List<String> memberOf) {
@@ -334,11 +269,9 @@ public class PerfilUsuario extends InfoUsuario {
 		}
 		PerfilUsuario perfilUsuario = (PerfilUsuario) o;
 		return Objects.equals(this.uid, perfilUsuario.uid) && Objects.equals(this.mail, perfilUsuario.mail)
-				&& Objects.equals(this.physicaldeliveryofficename, perfilUsuario.physicaldeliveryofficename)
-				&& Objects.equals(this.department, perfilUsuario.department)
 				&& Objects.equals(this.lastName, perfilUsuario.lastName)
 				&& Objects.equals(this.firstName, perfilUsuario.firstName)
-				&& Objects.equals(this.uri, perfilUsuario.uri) && Objects.equals(this.memberOf, perfilUsuario.memberOf)
+				&& Objects.equals(this.memberOf, perfilUsuario.memberOf)
 				&& Objects.equals(this.title, perfilUsuario.title)
 				&& Objects.equals(this.distinguishedname, perfilUsuario.distinguishedname)
 				&& Objects.equals(this.description, perfilUsuario.description)
@@ -348,7 +281,7 @@ public class PerfilUsuario extends InfoUsuario {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(uid, mail, physicaldeliveryofficename, department, lastName, firstName, uri, memberOf,
+		return Objects.hash(uid, mail, lastName, firstName, memberOf,
 				title, distinguishedname, description, samaccountname, commonname, super.hashCode());
 	}
 
@@ -359,11 +292,8 @@ public class PerfilUsuario extends InfoUsuario {
 		sb.append("    ").append(toIndentedString(super.toString())).append("\n");
 		sb.append("    uid: ").append(toIndentedString(uid)).append("\n");
 		sb.append("    mail: ").append(toIndentedString(mail)).append("\n");
-		sb.append("    physicaldeliveryofficename: ").append(toIndentedString(physicaldeliveryofficename)).append("\n");
-		sb.append("    department: ").append(toIndentedString(department)).append("\n");
 		sb.append("    lastName: ").append(toIndentedString(lastName)).append("\n");
 		sb.append("    firstName: ").append(toIndentedString(firstName)).append("\n");
-		sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
 		sb.append("    memberOf: ").append(toIndentedString(memberOf)).append("\n");
 		sb.append("    title: ").append(toIndentedString(title)).append("\n");
 		sb.append("    distinguishedname: ").append(toIndentedString(distinguishedname)).append("\n");
