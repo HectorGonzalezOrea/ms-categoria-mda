@@ -3,6 +3,8 @@ package mx.com.nmp.usuarios.mongodb.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,10 +54,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 	public void upsertUsers(List<UsuarioVO> usuarios, String grupo) throws Exception {
 		logger.info("upsertUsers");
 		
-		BulkOperations bulkOps = this.llenarUsuarios(usuarios, grupo);
-		BulkWriteResult results = bulkOps.execute();
+		BulkOperations upsert = this.llenarUsuariosParaSincronizar(usuarios, grupo);
+		BulkWriteResult upsertResults = upsert.execute();
+		logger.info("upsertResults: {}" , upsertResults.toString());
 		
-		logger.info("results: {}" , results.toString());
+		BulkOperations actualizar = this.actualizarInformacionParaSincronizar(usuarios);
+		BulkWriteResult actualizarResults = actualizar.execute();
+		logger.info("actualizarResults: {}" , actualizarResults.toString());
 	}
 
 	@Override
@@ -209,6 +214,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 			vo.setApellidoMaterno(user.getApellidoMaterno());
 			vo.setUsuario(user.getUsuario());
 			
+			/*
 			if(user.getPuesto() != null) {
 				vo.setPuesto(user.getPuesto());
 			}
@@ -228,20 +234,20 @@ public class UsuarioServiceImpl implements UsuarioService {
 			if(user.getDepartamentoArea() != null) {
 				vo.setDepartamentoArea(user.getDepartamentoArea());
 			}
-			
+			*/
 			if(user.getPerfil() != null) {
 				vo.setPerfil(capMap.get(user.getPerfil()));
 			}
 			
 			vo.setCommonname(user.getCommonname());
-			vo.setDepartment(user.getDepartment());
+			//vo.setDepartment(user.getDepartment());
 			vo.setDescription(user.getDescription());
 			vo.setDistinguishedname(user.getDistinguishedname());
 			vo.setFirstName(user.getFirstname());
 			vo.setLastName(user.getLastname());
 			vo.setMail(user.getMail());
 			vo.setMemberOf(user.getMemberof());
-			vo.setPhysicaldeliveryofficename(user.getPhysicaldeliveryofficename());
+			//vo.setPhysicaldeliveryofficename(user.getPhysicaldeliveryofficename());
 			vo.setSamaccountname(user.getSamaccountname());
 			vo.setTitle(user.getTitle());
 			vo.setUid(user.getUid());
@@ -265,6 +271,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 			vo.setApellidoMaterno(user.getApellidoMaterno());
 			vo.setUsuario(user.getUsuario());
 			
+			/*
 			if(user.getPuesto() != null) {
 				vo.setPuesto(user.getPuesto());
 			}
@@ -284,7 +291,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 			if(user.getDepartamentoArea() != null) {
 				vo.setDepartamentoArea(user.getDepartamentoArea());
 			}
-			
+			*/
 			if(user.getPerfil() != null) {
 				vo.setPerfil(capMap.get(user.getPerfil()));
 			}
@@ -295,72 +302,104 @@ public class UsuarioServiceImpl implements UsuarioService {
 		return vo;
 	}
 	
-	private BulkOperations llenarUsuarios(List<UsuarioVO> usuarios, String grupo) {
-		logger.info("llenarUsuarios");
+	private BulkOperations actualizarInformacionParaSincronizar(List<UsuarioVO> usuarios) {
+		logger.info("actualizarInformacionParaSincronizar");
 		
 		BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, UsuarioEntity.class);
+
+		List<String> ids = new ArrayList<String>();
 		
-		List<String> miembroDe = new ArrayList<>();
-		miembroDe.add(grupo);
-		
-		if(!usuarios.isEmpty()) {
-			usuarios
+		Map<String, UsuarioVO> map = usuarios
 			.stream()
-			.forEach( u -> {
-				
-				 Update update = new Update();
-				 Update update2 = new Update();
-				
-				Query query = new Query().
-					addCriteria(new Criteria("usuario")
-					.in(u.getIdUsuario()));
-				
-			    Query query2 = new Query()
-			    	.addCriteria(new Criteria("usuario").in(u.getIdUsuario()))
-			    	.addCriteria(new Criteria("activo").exists(false));
-			    
-			    update.set("nombre", u.getNombre());
-			    
-			    if(u.getApellidos() != null) {
-				    String[] aps = u.getApellidos().split(" ");
-					
-				    if(aps.length == 2) {
-					    update.set("apellidoPaterno", aps[0]);
-					    update.set("apellidoMaterno", aps[1]);
-					} else {
-						update.set("apellidoPaterno", u.getApellidos());
-					}	
-			    }
-
-			    update.set("usuario", u.getIdUsuario());
-			    update.set("uid", u.getGuid());
-			    update.set("mail", u.getCorreo());
-			    update.set("lastName", u.getApellidos());
-			    update.set("firstName", u.getNombre());
-			    update.set("distinguishedname", u.getNombreDistintivo());
-			    update.set("description", u.getDescripcion());
-			    
-			    update.set("memberof", miembroDe);
-			    
-			    update.set("samaccountname", u.getNombreCompleto());
-			    update.set("commonname", u.getNombreDominio());
-			    
-			    if(u.getPuesto() != null) {
-				    CatalogoVO puesto = new CatalogoVO();
-				    puesto.setDescripcion(u.getPuesto());
-				    update.set("title", u.getPuesto());
-				    update.set("puesto", puesto);
-			    }
-
-			    update2.set("activo", false);
-			    Long id = sequenceGeneratorService.generateSequence(USUARIO_SEQ_KEY);
-			    update.set("idUsuario", id);
-			    
-			    bulkOps.upsert(query, update)
-			    .updateMulti(query2, update2);
-			});
+			.collect(Collectors.toMap(UsuarioVO::getIdUsuario, user -> user));
+		
+		for(UsuarioVO vo : usuarios) {
+			ids.add(vo.getIdUsuario());
 		}
 		
+		Query queryUpdateMulti = new Query();
+		
+		queryUpdateMulti.addCriteria(new Criteria("usuario").in(ids))
+		.addCriteria(new Criteria("activo").exists(false));
+
+		List<UsuarioEntity> usuariosCreados = mongoTemplate.find(queryUpdateMulti, UsuarioEntity.class);
+		
+		logger.info("usuarios creados: {}", usuariosCreados.size());
+		
+		usuariosCreados
+		.stream()
+		.forEach( u -> {
+			
+			logger.info("usuario a: {}", u.toString());
+			
+			Update updateMulti = new Update();
+			Long id = sequenceGeneratorService.generateSequence(USUARIO_SEQ_KEY);
+			
+			logger.info("idUsuario: {}", id);
+			
+			updateMulti.set("idUsuario", id);
+			updateMulti.set("activo", false);
+			
+			Query queryAux = new Query();
+			queryAux.addCriteria(new Criteria("usuario").is(u.getUsuario()));
+			
+			logger.info("queryAux: {}", queryAux);
+			
+			bulkOps.updateMulti(queryAux, updateMulti);
+			
+		});
+		
+		return bulkOps;
+	}
+	
+	private BulkOperations llenarUsuariosParaSincronizar(List<UsuarioVO> usuarios, String grupo) {
+		logger.info("llenarUsuariosParaSincronizar");
+
+		BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, UsuarioEntity.class);
+
+		List<String> miembroDe = new ArrayList<>();
+		miembroDe.add(grupo);
+
+		if (!usuarios.isEmpty()) {
+			usuarios.stream().forEach(u -> {
+
+				Update upSert = new Update();
+
+				Query queryUpSert = new Query()
+					.addCriteria(new Criteria("usuario").in(u.getIdUsuario()));
+
+				upSert.set("nombre", u.getNombre());
+
+				if (u.getApellidos() != null) {
+					String[] aps = u.getApellidos().split(" ");
+
+					if (aps.length == 2) {
+						upSert.set("apellidoPaterno", aps[0]);
+						upSert.set("apellidoMaterno", aps[1]);
+					} else {
+						upSert.set("apellidoPaterno", u.getApellidos());
+					}
+				}
+
+				upSert.set("usuario", u.getIdUsuario());
+				upSert.set("uid", u.getGuid());
+				upSert.set("mail", u.getCorreo());
+				upSert.set("lastName", u.getApellidos());
+				upSert.set("firstName", u.getNombre());
+				upSert.set("distinguishedname", u.getNombreDistintivo());
+				upSert.set("description", u.getDescripcion());
+
+				upSert.addToSet("memberof", grupo);
+				upSert.set("samaccountname", u.getNombreCompleto());
+				upSert.set("commonname", u.getNombreDominio());
+
+				upSert.set("title", u.getPuesto());
+				
+				bulkOps.upsert(queryUpSert, upSert);
+				
+			});
+		}
+
 		return bulkOps;
 	}
 	

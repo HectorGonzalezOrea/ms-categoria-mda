@@ -21,17 +21,19 @@ public class UsuarioEntity {
 	private String apellidoPaterno;
 	private String apellidoMaterno;
 	private String usuario;
+	/*
 	private CatalogoVO puesto;
 	private CatalogoVO direccion;
 	private CatalogoVO subdireccion;
 	private CatalogoVO gerencia;
 	private CatalogoVO departamentoArea;
+	*/
 	private Integer perfil;
 	
 	private String uid;
 	private String mail;
-	private String physicaldeliveryofficename;
-	private String department;
+	//private String physicaldeliveryofficename;
+	//private String department;
 	private String lastname;
 	private String firstname;
 	private String uri;
@@ -91,6 +93,7 @@ public class UsuarioEntity {
 		this.usuario = usuario;
 	}
 
+	/*
 	public CatalogoVO getPuesto() {
 		return puesto;
 	}
@@ -130,7 +133,7 @@ public class UsuarioEntity {
 	public void setDepartamentoArea(CatalogoVO departamentoArea) {
 		this.departamentoArea = departamentoArea;
 	}
-
+	*/
 	public Integer getPerfil() {
 		return perfil;
 	}
@@ -155,6 +158,7 @@ public class UsuarioEntity {
 		this.mail = mail;
 	}
 
+	/*
 	public String getPhysicaldeliveryofficename() {
 		return physicaldeliveryofficename;
 	}
@@ -170,7 +174,8 @@ public class UsuarioEntity {
 	public void setDepartment(String department) {
 		this.department = department;
 	}
-
+	 */
+	
 	public String getLastname() {
 		return lastname;
 	}
@@ -253,14 +258,12 @@ public class UsuarioEntity {
 
 	@Override
 	public String toString() {
-		return "UsuarioNewEntity [_id=" + _id + ", idUsuario=" + idUsuario + ", nombre=" + nombre + ", apellidoPaterno="
-				+ apellidoPaterno + ", apellidoMaterno=" + apellidoMaterno + ", usuario=" + usuario + ", puesto="
-				+ puesto + ", direccion=" + direccion + ", subdireccion=" + subdireccion + ", gerencia=" + gerencia
-				+ ", departamentoArea=" + departamentoArea + ", perfil=" + perfil + ", uid=" + uid + ", mail=" + mail
-				+ ", physicaldeliveryofficename=" + physicaldeliveryofficename + ", department=" + department
-				+ ", lastname=" + lastname + ", firstname=" + firstname + ", uri=" + uri + ", memberof=" + memberof
-				+ ", title=" + title + ", distinguishedname=" + distinguishedname + ", description=" + description
-				+ ", samaccountname=" + samaccountname + ", commonname=" + commonname + ", activo=" + activo + "]";
+		return "UsuarioEntity [_id=" + _id + ", idUsuario=" + idUsuario + ", nombre=" + nombre + ", apellidoPaterno="
+				+ apellidoPaterno + ", apellidoMaterno=" + apellidoMaterno + ", usuario=" + usuario + ", perfil="
+				+ perfil + ", uid=" + uid + ", mail=" + mail + ", lastname=" + lastname + ", firstname=" + firstname
+				+ ", uri=" + uri + ", memberof=" + memberof + ", title=" + title + ", distinguishedname="
+				+ distinguishedname + ", description=" + description + ", samaccountname=" + samaccountname
+				+ ", commonname=" + commonname + ", activo=" + activo + "]";
 	}
 
 }
