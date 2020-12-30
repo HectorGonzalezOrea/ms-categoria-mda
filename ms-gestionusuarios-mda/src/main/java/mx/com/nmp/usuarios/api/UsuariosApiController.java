@@ -135,6 +135,12 @@ public class UsuariosApiController implements UsuariosApi {
 					return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 				}
 			}
+			
+			NotFound nf = new NotFound();
+			nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
+			nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
+			
+			return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
 		}
 		
 		throw new MissingServletRequestParameterException(Constantes.HEADER_ACCEPT_KEY, "String");
@@ -200,6 +206,12 @@ public class UsuariosApiController implements UsuariosApi {
 					return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 				}
 			}
+			
+			NotFound nf = new NotFound();
+			nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
+			nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
+			
+			return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
 		}
 		
 		throw new MissingServletRequestParameterException(Constantes.HEADER_ACCEPT_KEY, "String");
