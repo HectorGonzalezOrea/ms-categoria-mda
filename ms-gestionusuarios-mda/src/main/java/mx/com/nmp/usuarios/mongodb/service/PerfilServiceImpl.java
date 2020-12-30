@@ -109,7 +109,8 @@ public class PerfilServiceImpl implements PerfilService {
 				if (ce != null) {
 					CapacidadUsuariosReqInner curi = new CapacidadUsuariosReqInner();
 					curi.setDescripcinCap(DescripcinCapEnum.fromValue(ce.getDescripcion()));
-					curi.setIdCapacidad(IdCapacidadEnum.fromValue(ce.getIdCapacidad().toString()));
+					//curi.setIdCapacidad(IdCapacidadEnum.fromValue(ce.getIdCapacidad().toString()));
+					curi.setIdCapacidad(IdCapacidadEnum.fromValue(ce.getIdCapacidad()));
 
 					cureq.add(curi);
 				}

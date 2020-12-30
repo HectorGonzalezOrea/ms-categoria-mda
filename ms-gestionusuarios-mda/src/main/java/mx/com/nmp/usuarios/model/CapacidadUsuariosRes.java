@@ -25,6 +25,8 @@ public class CapacidadUsuariosRes   {
    * Descripcion del perfil de un usuario actual.
    */
   public enum DescripcionPerfilEnum {
+	ADMINISTRADOR("Administrador"),
+	  
     CONSULTOR("Consultor"),
     
     OPERADOR("Operador");

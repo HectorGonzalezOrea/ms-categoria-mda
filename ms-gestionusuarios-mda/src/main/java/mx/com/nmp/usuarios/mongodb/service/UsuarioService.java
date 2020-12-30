@@ -11,13 +11,16 @@ public interface UsuarioService {
 
 	void addUser(UsuarioVO usuario) throws Exception ;
 	void upsertUsers(List<UsuarioVO> usuarios, String grupo) throws Exception ;
-	List<InfoUsuario> getAllUsers(String nombre, String apellidoPaterno, String apellidoMaterno, Boolean estatus, Integer perfil, String usuario) throws Exception;
-	Boolean actualizarPerfilUsuario(Integer idUsuario, Integer idPerfil) throws Exception;
-	Boolean actualizarEstatusUsuario(Integer idUsuario, Boolean estatus) throws Exception;
-	Boolean deleteUsuario(Integer idUsuario) throws Exception;
+	List<InfoUsuario> getAllUsers(String nombre, String apellidoPaterno, String apellidoMaterno, Boolean estatus, Integer perfil, String usuario, List<String> grupos) throws Exception;
+	Boolean actualizarPerfilUsuario(Integer idUsuario, Integer idPerfil, List<String> grupos) throws Exception;
+	Boolean actualizarEstatusUsuario(Integer idUsuario, Boolean estatus, List<String> grupos) throws Exception;
+	Boolean deleteUsuario(Integer idUsuario, List<String> grupos) throws Exception;
 	
 	PerfilUsuario consultaUsuarioPerfil(String usuario) throws Exception;
+	PerfilUsuario consultaUsuarioPerfil(Integer usuario, List<String> grupos) throws Exception;
+	PerfilUsuario consultaUsuarioPerfil(Integer usuario) throws Exception;
 	
 	Boolean consultarUsuario(String usuario) throws Exception;
 	UsuarioEntity consultarUsuario(Integer usuario) throws Exception;
+	UsuarioEntity consultarUsuarios(String usuario) throws Exception;
 }

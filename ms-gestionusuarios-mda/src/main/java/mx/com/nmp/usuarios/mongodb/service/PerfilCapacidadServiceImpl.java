@@ -18,8 +18,6 @@ import mx.com.nmp.usuarios.model.CapacidadUsuariosReqInner;
 import mx.com.nmp.usuarios.model.CapacidadUsuariosRes;
 import mx.com.nmp.usuarios.model.CapacidadUsuariosRes.DescripcionPerfilEnum;
 import mx.com.nmp.usuarios.model.InternalServerError;
-import mx.com.nmp.usuarios.model.ModCapacidadUsuario;
-import mx.com.nmp.usuarios.model.ModCapacidadUsuarioInner;
 import mx.com.nmp.usuarios.model.CapacidadUsuariosReqInner.DescripcinCapEnum;
 import mx.com.nmp.usuarios.model.CapacidadUsuariosReqInner.IdCapacidadEnum;
 import mx.com.nmp.usuarios.mongodb.entity.CapacidadEntity;
@@ -49,98 +47,102 @@ public class PerfilCapacidadServiceImpl implements PerfilCapacidadService {
 	 * Crear Perfil con Capacidad
 	 */
 	@Override
-	public CapacidadUsuariosRes crearPerfilCapacidad(Integer idPerfil, CapacidadUsuariosReq informacionPerfil) {
+	public CapacidadUsuariosRes crearPerfilCapacidad(Integer idPerfil, CapacidadUsuariosReq informacionPerfil, List<String> grupos) {
 		log.info("UsuarioService.crearPerfilCapacidad");
 		
-		Boolean creado = false;
 		PerfilEntity perfil = null;
 		
 		if (idPerfil != null && informacionPerfil != null) {
-			perfil =perfilRepository.findByIdPerfil(idPerfil);
+			perfil = perfilRepository.findByIdPerfil(idPerfil);
 
-			log.info("perfil:{} ", perfil);
+			log.info("perfil: {} ", perfil);
 
 			if (perfil != null) {
 
-				Query queryPerfilCapacidad = null;
-				Criteria aux = null;
-				Update updatePerfilCapacidad = new Update();
-
-				for (CapacidadUsuariosReqInner capacidad : informacionPerfil) {
-					aux = Criteria.where(Constantes.PERFIL).is(idPerfil);
-					IdCapacidadEnum idEnum = capacidad.getIdCapacidad();
-					DescripcinCapEnum descEnum = capacidad.getDescripcinCap();
-
-					CapacidadEntity cap = capacidadRepository
-							.findByIdCapacidad(new Integer(idEnum.toString()), descEnum.toString());
-
-					if (cap != null) {
-						log.info("Capacidad");
-						// Insert o Update del Perfil-Capacidad
-
-						queryPerfilCapacidad = new Query();
-						aux.and(Constantes.ID_CAPACIDAD).is(new Integer(idEnum.toString()));
-						queryPerfilCapacidad.addCriteria(aux);
-						updatePerfilCapacidad.set(Constantes.ID_CAPACIDAD, new Integer(idEnum.toString()));
-						mongoTemplate.upsert(queryPerfilCapacidad, updatePerfilCapacidad, PerfilCapacidadEntity.class);
-					}
+				if(!informacionPerfil.isEmpty()) {
+					Query query = new Query();
+					query.addCriteria(Criteria.where(Constantes.PERFIL).is(idPerfil));
+					mongoTemplate.findAllAndRemove(query, PerfilCapacidadEntity.class);
 				}
-
-				creado = true;
+				
+				informacionPerfil
+				.stream()
+				.forEach(ip -> {
+					
+					log.info("ip: {} ", ip);
+					
+					Query query = new Query();
+					Update update = new Update();
+					
+					IdCapacidadEnum idEnum = ip.getIdCapacidad();
+					//DescripcinCapEnum descEnum = ip.getDescripcinCap();
+					
+					query.addCriteria(Criteria.where(Constantes.ID_CAPACIDAD).is(new Integer(idEnum.toString())));
+					query.addCriteria(Criteria.where(Constantes.PERFIL).is(idPerfil));
+					query.addCriteria(Criteria.where(Constantes.GRUPO).is(grupos.get(0)));
+					
+					update.set(Constantes.ID_CAPACIDAD, new Integer(idEnum.toString()));
+					update.set(Constantes.PERFIL, idPerfil);
+					update.set(Constantes.GRUPO, grupos.get(0));
+					
+					log.info("query: {} ", query);
+					log.info("update: {} ", update);
+					
+					mongoTemplate.upsert(query, update, PerfilCapacidadEntity.class);
+				});
 			}
 		}
 		
-		CapacidadUsuariosRes resp = null;
-		
-		if(Boolean.TRUE.equals(creado)) {
-			resp = this.buscarPerfilConCapacidades(idPerfil);
-		}
+		CapacidadUsuariosRes resp = this.buscarPerfilConCapacidades(idPerfil, grupos);
 		
 		return resp;
 	}
 
 	@Override
-	public InternalServerError validarCapacidadesCreacion(CapacidadUsuariosReq capacidadUsuarioReq) {
+	public Boolean validarCapacidadesCreacion(CapacidadUsuariosReq capacidadUsuarioReq) throws Exception{
 		log.info("validarCapacidades");
 		
 		InternalServerError ise = null;
+		
+		Boolean fallido = false;
 		
 		if(!capacidadUsuarioReq.isEmpty()) {
 			
 			StringBuilder sb = new StringBuilder();
 			sb.append(Constantes.ERROR_MESSAGE_INTERNAL_ERROR_CAP_NO_VALIDAS);
 			
+			List<Integer> ids = new ArrayList<>();
+			List<String> caps = new ArrayList<>();
+			
 			for(CapacidadUsuariosReqInner capacidad : capacidadUsuarioReq) {
 				mx.com.nmp.usuarios.model.CapacidadUsuariosReqInner.IdCapacidadEnum idEnum = capacidad.getIdCapacidad();
+				mx.com.nmp.usuarios.model.CapacidadUsuariosReqInner.DescripcinCapEnum descEnum = capacidad.getDescripcinCap();
 				
-				if(idEnum == null) {
-					ise = new InternalServerError();
-					ise.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
-					ise.setMensaje(sb.toString());
+				if(idEnum != null && descEnum != null) {
+					ids.add(new Integer(idEnum.toString()));
+					caps.add(descEnum.toString());
 				} else {
-					Query query = new Query();
-					Criteria aux = Criteria.where(Constantes.ID_CAPACIDAD).is(new Integer(idEnum.toString()));
-					query.addCriteria(aux);
+					fallido = true;
 					
-					Boolean cap = mongoTemplate.exists(query, CapacidadEntity.class);
-					
-					if(Boolean.FALSE.equals(cap)) {
-						
-						ise = new InternalServerError();
-						ise.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
-						sb.append(capacidad.toString().replaceAll("\n", ""));
-						
-						ise.setMensaje(sb.toString());
-					}
+					break;
 				}
 			}
+			//Consultor
+			if(fallido.equals(Boolean.TRUE)) {
+				return fallido;
+			} else {
+				Query query = new Query();
+				query.addCriteria(Criteria.where(Constantes.ID_CAPACIDAD).all(ids));
+				query.addCriteria(Criteria.where(Constantes.DESCRIPCION).all(caps));
+				
+				return mongoTemplate.exists(query, CapacidadEntity.class);
+			}
 		}
-		
-		return ise;
+		return true;
 	}
 	
 	@Override
-	public InternalServerError validarCapacidadesMod(ModCapacidadUsuario modCapacidadReq) {
+	public InternalServerError validarCapacidadesMod(CapacidadUsuariosReq modCapacidadReq) {
 		log.info("validarCapacidades");
 		
 		InternalServerError ise = null;
@@ -150,9 +152,9 @@ public class PerfilCapacidadServiceImpl implements PerfilCapacidadService {
 			StringBuilder sb = new StringBuilder();
 			sb.append(Constantes.ERROR_MESSAGE_INTERNAL_ERROR_CAP_NO_VALIDAS);
 			
-			for(ModCapacidadUsuarioInner capacidad : modCapacidadReq) {
+			for(CapacidadUsuariosReqInner capacidad : modCapacidadReq) {
 				
-				mx.com.nmp.usuarios.model.ModCapacidadUsuarioInner.IdCapacidadEnum idEnum = capacidad.getIdCapacidad();
+				IdCapacidadEnum idEnum = capacidad.getIdCapacidad();
 			
 				if(idEnum == null) {
 					ise = new InternalServerError();
@@ -185,7 +187,7 @@ public class PerfilCapacidadServiceImpl implements PerfilCapacidadService {
 	 * Modificar Capacidades de un perfil
 	 */
 	@Override
-	public CapacidadUsuariosRes modificarPerfilCapacidad(Integer idPerfil, ModCapacidadUsuario modCapacidadReq) {
+	public CapacidadUsuariosRes modificarPerfilCapacidad(Integer idPerfil, CapacidadUsuariosReq modCapacidadReq, List<String> grupos) throws Exception {
 		log.info("UsuarioService.modificarPerfilCapacidad");
 		
 		Boolean modificado = false;
@@ -209,9 +211,9 @@ public class PerfilCapacidadServiceImpl implements PerfilCapacidadService {
 				Criteria aux = null;
 				Update updatePerfilCapacidad = new Update();
 
-				for (ModCapacidadUsuarioInner capacidad : modCapacidadReq) {
+				for (CapacidadUsuariosReqInner capacidad : modCapacidadReq) {
 					aux = Criteria.where(Constantes.PERFIL).is(idPerfil);
-					mx.com.nmp.usuarios.model.ModCapacidadUsuarioInner.IdCapacidadEnum idEnum = capacidad.getIdCapacidad();
+					IdCapacidadEnum idEnum = capacidad.getIdCapacidad();
 
 					CapacidadEntity cap = capacidadRepository.findByIdCapacidad(new Integer(idEnum.toString()));
 
@@ -233,7 +235,7 @@ public class PerfilCapacidadServiceImpl implements PerfilCapacidadService {
 		CapacidadUsuariosRes resp = null;
 		
 		if(Boolean.TRUE.equals(modificado)) {
-			resp = this.buscarPerfilConCapacidades(idPerfil);
+			resp = this.buscarPerfilConCapacidades(idPerfil, grupos);
 		}
 		
 		return resp;
@@ -243,7 +245,7 @@ public class PerfilCapacidadServiceImpl implements PerfilCapacidadService {
 	 * Actualizar Perfil de un usuario
 	 */
 	@Override
-	public CapacidadUsuariosRes actualizarPerfilUsuario(Integer idUsuario, Integer idPerfil) {
+	public CapacidadUsuariosRes actualizarPerfilUsuario(Integer idUsuario, Integer idPerfil, List<String> grupos) throws Exception {
 		log.info("UsuarioService.actualizarPerfilUsuario");
 		
 		Boolean actualizar = false;
@@ -261,7 +263,7 @@ public class PerfilCapacidadServiceImpl implements PerfilCapacidadService {
 		}
 		
 		if(Boolean.TRUE.equals(actualizar)) {
-			resp = this.buscarPerfilConCapacidades(idPerfil);
+			resp = this.buscarPerfilConCapacidades(idPerfil, grupos);
 		}
 		
 		return resp;
@@ -270,7 +272,7 @@ public class PerfilCapacidadServiceImpl implements PerfilCapacidadService {
 	/*
 	 * Buscar Perfil con capacidades
 	 */
-	private CapacidadUsuariosRes buscarPerfilConCapacidades(Integer idPerfil) {
+	private CapacidadUsuariosRes buscarPerfilConCapacidades(Integer idPerfil, List<String> grupos) {
 		log.info("UsuarioService.buscarPerfilConCapacidades");
 		
 		log.info("idPerfil: {}" , idPerfil);
@@ -286,12 +288,17 @@ public class PerfilCapacidadServiceImpl implements PerfilCapacidadService {
 				cureps.setIdPerfil(pe.getIdPerfil());
 				cureps.setDescripcionPerfil(DescripcionPerfilEnum.fromValue(pe.getDescripcion()));
 
-				ArrayList<PerfilCapacidadEntity> perfilCapacidadList = (ArrayList<PerfilCapacidadEntity>) perfilCapacidadRepository
-						.findByPerfil(idPerfil);
+				//ArrayList<PerfilCapacidadEntity> perfilCapacidadList = (ArrayList<PerfilCapacidadEntity>) perfilCapacidadRepository.findByPerfil(idPerfil);
 
-				log.info("{}" , perfilCapacidadList.size());
-				if (CollectionUtils.isNotEmpty(perfilCapacidadList)) {
-					capacidadUsuario(perfilCapacidadList, cureps);
+				Query query = new Query();
+				query.addCriteria(Criteria.where(Constantes.PERFIL).is(idPerfil));
+				query.addCriteria(Criteria.where(Constantes.GRUPO).all(grupos));
+				
+				List<PerfilCapacidadEntity> list = mongoTemplate.find(query, PerfilCapacidadEntity.class);
+				
+				log.info("{}" , list.size());
+				if (CollectionUtils.isNotEmpty(list)) {
+					capacidadUsuario(list, cureps);
 				}
 			}
 		}
@@ -299,7 +306,7 @@ public class PerfilCapacidadServiceImpl implements PerfilCapacidadService {
 		return cureps;
 	}
 	
-	private CapacidadUsuariosRes capacidadUsuario(ArrayList<PerfilCapacidadEntity> perfilCapacidadList, CapacidadUsuariosRes cureps) {
+	private CapacidadUsuariosRes capacidadUsuario(List<PerfilCapacidadEntity> perfilCapacidadList, CapacidadUsuariosRes cureps) {
 	
 			
 			CapacidadEntity ce = null;
@@ -313,7 +320,8 @@ public class PerfilCapacidadServiceImpl implements PerfilCapacidadService {
 					if (ce != null) {
 						curi = new CapacidadUsuariosReqInner();
 						curi.setDescripcinCap(DescripcinCapEnum.fromValue(ce.getDescripcion()));
-						curi.setIdCapacidad(IdCapacidadEnum.fromValue(ce.getIdCapacidad().toString()));
+						//curi.setIdCapacidad(IdCapacidadEnum.fromValue(ce.getIdCapacidad().toString()));
+						curi.setIdCapacidad(IdCapacidadEnum.fromValue(ce.getIdCapacidad()));
 
 						cureq.add(curi);
 					}

@@ -7,8 +7,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import mx.com.nmp.usuarios.mongodb.vo.CatalogoVO;
-
 @Document(collection = "usuarios")
 public class UsuarioEntity {
 	@Transient
@@ -93,47 +91,6 @@ public class UsuarioEntity {
 		this.usuario = usuario;
 	}
 
-	/*
-	public CatalogoVO getPuesto() {
-		return puesto;
-	}
-
-	public void setPuesto(CatalogoVO puesto) {
-		this.puesto = puesto;
-	}
-
-	public CatalogoVO getDireccion() {
-		return direccion;
-	}
-
-	public void setDireccion(CatalogoVO direccion) {
-		this.direccion = direccion;
-	}
-
-	public CatalogoVO getSubdireccion() {
-		return subdireccion;
-	}
-
-	public void setSubdireccion(CatalogoVO subdireccion) {
-		this.subdireccion = subdireccion;
-	}
-
-	public CatalogoVO getGerencia() {
-		return gerencia;
-	}
-
-	public void setGerencia(CatalogoVO gerencia) {
-		this.gerencia = gerencia;
-	}
-
-	public CatalogoVO getDepartamentoArea() {
-		return departamentoArea;
-	}
-
-	public void setDepartamentoArea(CatalogoVO departamentoArea) {
-		this.departamentoArea = departamentoArea;
-	}
-	*/
 	public Integer getPerfil() {
 		return perfil;
 	}
@@ -157,24 +114,6 @@ public class UsuarioEntity {
 	public void setMail(String mail) {
 		this.mail = mail;
 	}
-
-	/*
-	public String getPhysicaldeliveryofficename() {
-		return physicaldeliveryofficename;
-	}
-
-	public void setPhysicaldeliveryofficename(String physicaldeliveryofficename) {
-		this.physicaldeliveryofficename = physicaldeliveryofficename;
-	}
-
-	public String getDepartment() {
-		return department;
-	}
-
-	public void setDepartment(String department) {
-		this.department = department;
-	}
-	 */
 	
 	public String getLastname() {
 		return lastName;

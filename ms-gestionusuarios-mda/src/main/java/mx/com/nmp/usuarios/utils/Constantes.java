@@ -38,7 +38,7 @@ public class Constantes {
 	public static final String ERROR_MESSAGE_NOT_FOUND = "No existe el recurso con la información proporcionada. Verificar y volver a enviar la petición";
 	public static final String ERROR_MESSAGE_NOT_FOUND_USUARIO = "Usuario no existente";
 	
-	
+	public static final String GRUPOS = "memberof";
 	
 	public static final String NOMBRE = "nombre";
 	public static final String APELLIDO_PATERNO = "apellidoPaterno";
@@ -52,6 +52,7 @@ public class Constantes {
 	public static final String FECHA = "fecha";
 	public static final String ID = "_id";
 	public static final String PERFIL = "perfil";
+	public static final String GRUPO = "grupo";
 	public static final String ID_PERFIL = "idPerfil";
 	
 	public static final String ID_DEPARTAMENTO = "idDepartamento";

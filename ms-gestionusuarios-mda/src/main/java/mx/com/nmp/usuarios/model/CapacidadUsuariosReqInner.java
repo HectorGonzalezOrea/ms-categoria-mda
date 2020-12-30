@@ -3,6 +3,7 @@ package mx.com.nmp.usuarios.model;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
@@ -18,6 +19,7 @@ public class CapacidadUsuariosReqInner   {
   /**
    * Gets or Sets idCapacidad
    */
+  @JsonFormat(shape = JsonFormat.Shape.NUMBER)
   public enum IdCapacidadEnum {
     NUMBER_1(1),
     
@@ -72,6 +74,15 @@ public class CapacidadUsuariosReqInner   {
     }
 
     @JsonCreator
+    public static IdCapacidadEnum fromValue(Integer text) {
+        for (IdCapacidadEnum b : IdCapacidadEnum.values()) {
+          if (String.valueOf(b.value).equals(text.toString())) {
+            return b;
+          }
+        }
+        return null;
+     }
+    /*
     public static IdCapacidadEnum fromValue(String text) {
       for (IdCapacidadEnum b : IdCapacidadEnum.values()) {
         if (String.valueOf(b.value).equals(text)) {
@@ -80,6 +91,7 @@ public class CapacidadUsuariosReqInner   {
       }
       return null;
     }
+    */
   }
 
   @JsonProperty("idCapacidad")
@@ -95,7 +107,7 @@ public class CapacidadUsuariosReqInner   {
     
     ADMINISTRACI_N_DE_USUARIOS_("Administración de usuarios."),
     
-    CONSULTAR_USUARIOS_("Consultar Usuarios."),
+    CONSULTAR_USUARIOS_("Consultar usuarios."),
     
     ALTA_USUARIOS_("Alta usuarios."),
     

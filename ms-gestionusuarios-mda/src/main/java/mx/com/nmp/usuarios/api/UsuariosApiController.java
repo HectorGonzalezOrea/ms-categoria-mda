@@ -2,6 +2,7 @@ package mx.com.nmp.usuarios.api;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import io.swagger.annotations.ApiParam;
 import mx.com.nmp.usuarios.api.business.GestionUsuarios;
@@ -15,14 +16,13 @@ import mx.com.nmp.usuarios.model.EliminarUsuariosRes;
 import mx.com.nmp.usuarios.model.GeneralResponse;
 import mx.com.nmp.usuarios.model.InfoUsuario;
 import mx.com.nmp.usuarios.model.InternalServerError;
-import mx.com.nmp.usuarios.model.InvalidAuthentication;
-import mx.com.nmp.usuarios.model.ModCapacidadUsuario;
 import mx.com.nmp.usuarios.model.NotFound;
 import mx.com.nmp.usuarios.model.PerfilUsuario;
 import mx.com.nmp.usuarios.model.ReqEstatus;
 import mx.com.nmp.usuarios.model.ReqHistorico;
 import mx.com.nmp.usuarios.model.ReqPerfil;
 import mx.com.nmp.usuarios.model.ResEstatus;
+import mx.com.nmp.usuarios.mongodb.entity.UsuarioEntity;
 import mx.com.nmp.usuarios.mongodb.service.PerfilCapacidadService;
 
 import org.slf4j.Logger;
@@ -45,6 +45,8 @@ import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import mx.com.nmp.usuarios.utils.Constantes;
 import mx.com.nmp.usuarios.utils.ConverterUtil;
@@ -59,9 +61,6 @@ public class UsuariosApiController implements UsuariosApi {
 	private final ObjectMapper objectMapper;
 
 	private final HttpServletRequest request;
-	
-	@Autowired
-	private PerfilCapacidadService perfilCapService;
 
 	@Autowired
 	private GestionUsuarios gestionUsuarios; 
@@ -69,6 +68,7 @@ public class UsuariosApiController implements UsuariosApi {
 	@org.springframework.beans.factory.annotation.Autowired
 	public UsuariosApiController(ObjectMapper objectMapper, HttpServletRequest request) {
 		objectMapper.configure(MapperFeature.ALLOW_COERCION_OF_SCALARS, false);
+		objectMapper.enable(SerializationFeature.WRITE_ENUMS_USING_INDEX);
 		this.objectMapper = objectMapper;
 		this.request = request;
 	}
@@ -80,92 +80,64 @@ public class UsuariosApiController implements UsuariosApi {
 	 * /perfil/{idPerfil}/capacidades
 	 * Capacidades que puede tener un perfil previamente registrado.
 	 */
+	@Override
 	public ResponseEntity<?> capacidadUsuarioPOST(
 			@ApiParam(value = "Usuario en el sistema origen que lanza la petición.", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = "Sistema que origina la petición.", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
 			@ApiParam(value = "Identificador del perfil.", required = true) @PathVariable("idPerfil") String idPerfil,
-			@ApiParam(value = "") @Valid @RequestBody CapacidadUsuariosReq capacidadUsuarioReq) {
+			@ApiParam(value = "APiKey.", required=true) @RequestHeader(Constantes.HEADER_APIKEY_KEY) String apikey,
+			@ApiParam(value = "") @Valid @RequestBody(required = true) CapacidadUsuariosReq capacidadUsuarioReq) throws ApiException, MissingServletRequestParameterException {
 		
 		log.info("*********************************************************");
 		log.info("Agregar Capacidades al Perfil");
 		log.info("*********************************************************");
 		
-		String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
-    	
-    	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
-    		InvalidAuthentication ia = new InvalidAuthentication();
-    		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
-    		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
-    		
-    		log.info("{}" , ConverterUtil.messageToJson(ia));
-    		
-    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
-    	}
-		
 		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
-			try {
-				log.info("usuario: " + usuario);
-				log.info("origen: " + origen);
-				log.info("destino: " + destino);
-				log.info("idPerfil: " + idPerfil);
-				
-				if (usuario == null || origen == null || destino == null) {
-					log.error("Error en el mensaje de petición, verifique la información");
-					BadRequest br = new BadRequest();
-					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
-					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
-					
-					log.info("{}" , ConverterUtil.messageToJson(br));
-					
-					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
-				}
-				
+			log.info("usuario: {}" , usuario);
+			log.info("origen: {}" , origen);
+			log.info("destino: {}" , destino);
+			log.info("idPerfil: {}" , idPerfil);
+
+			UsuarioEntity admin = gestionUsuarios.consultarUsuarios(usuario);
+			
+			if (admin !=null && admin.getPerfil() == 1) {
 				CapacidadUsuariosRes resp = null;
-				
-				if(idPerfil != null && !capacidadUsuarioReq.isEmpty()) {
+
+				if (idPerfil != null && !capacidadUsuarioReq.isEmpty()) {
+
+					//InternalServerError ie = perfilCapService.validarCapacidadesCreacion(capacidadUsuarioReq);
+					Boolean valido = gestionUsuarios.validarCapacidadesCreacion(capacidadUsuarioReq);
+
+					log.info("valido: {}" , valido);
 					
-					InternalServerError ie = perfilCapService.validarCapacidadesCreacion(capacidadUsuarioReq);
-					
-					if(ie != null) {
-						return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+					if (valido.equals(Boolean.TRUE)) {
+						resp = gestionUsuarios.crearPerfilCapacidad(new Integer(idPerfil), capacidadUsuarioReq, admin.getMemberof());
 					} else {
-						resp = perfilCapService.crearPerfilCapacidad(new Integer(idPerfil), capacidadUsuarioReq);
+						NotFound nf = new NotFound();
+						nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
+						nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
+						
+						return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
 					}
 				}
-				
+
 				if (resp != null) {
 					return new ResponseEntity<CapacidadUsuariosRes>(resp, HttpStatus.OK);
 				} else {
 					InternalServerError ie = new InternalServerError();
 					ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
-    				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
-					
-    				log.info("{}" , ConverterUtil.messageToJson(ie));
-    				
+					ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
+
+					log.info("{}", ConverterUtil.messageToJson(ie));
+
 					return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 				}
-
-			} catch (Exception e) {
-				log.error("Couldn't serialize response for content type application/json", e);
-				InternalServerError ie = new InternalServerError();
-				ie.setCodigo("NMP-MDA-500");
-				ie.setMensaje("Error interno del servidor");
-				
-				log.info("{}" , ConverterUtil.messageToJson(ie));
-				
-				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-		} else {
-			BadRequest br = new BadRequest();
-			br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
-			br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
-			
-			log.info("{}" , ConverterUtil.messageToJson(br));
-			
-			return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 		}
+		
+		throw new MissingServletRequestParameterException(Constantes.HEADER_ACCEPT_KEY, "String");
 	}
 
 	/*
@@ -180,84 +152,57 @@ public class UsuariosApiController implements UsuariosApi {
 			@ApiParam(value = "Sistema que origina la petición.", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
 			@ApiParam(value = "Identificador del perfil.", required = true) @PathVariable("idPerfil") String idPerfil,
-			@ApiParam(value = "") @Valid @RequestBody ModCapacidadUsuario modCapacidadReq) {
+			@ApiParam(value = "") @Valid @RequestBody(required = true) CapacidadUsuariosReq modCapacidadReq) throws ApiException, MissingServletRequestParameterException {
 		
 		log.info("*********************************************************");
 		log.info("Modificar las capacidades de un perfil");
 		log.info("*********************************************************");
 		
-		String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
-    	
-    	if(apiKeyBluemix == null || apiKeyBluemix.equals("")) {
-    		InvalidAuthentication ia = new InvalidAuthentication();
-    		ia.setCode(Constantes.ERROR_CODE_INVALID_AUTHENTICATION);
-    		ia.setMessage(Constantes.ERROR_MESSAGE_INVALID_AUTHENTICATION);
-    		
-    		log.info("{}" , ConverterUtil.messageToJson(ia));
-    		
-    		return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED); 
-    	}
-		
 		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
-			try {
-				
-				if (usuario == null || origen == null || destino == null) {
-					log.error("Error en el mensaje de petición, verifique la información");
-					BadRequest br = new BadRequest();
-					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
-					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
-					
-					return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
-				}
-				
+			log.info("usuario: {}" , usuario);
+			log.info("origen: {}" , origen);
+			log.info("destino: {}" , destino);
+			log.info("idPerfil: {}" , idPerfil);
+
+			UsuarioEntity admin = gestionUsuarios.consultarUsuarios(usuario);
+			
+			if (admin !=null && admin.getPerfil() == 1) {
 				CapacidadUsuariosRes resp = null;
-				
-				if(idPerfil != null && !modCapacidadReq.isEmpty()) {
+
+				if (idPerfil != null && !modCapacidadReq.isEmpty()) {
+
+					//InternalServerError ie = perfilCapService.validarCapacidadesCreacion(capacidadUsuarioReq);
+					Boolean valido = gestionUsuarios.validarCapacidadesCreacion(modCapacidadReq);
+
+					log.info("valido: {}" , valido);
 					
-					log.info("Request : {}" , modCapacidadReq.toString());
-					
-					InternalServerError ie = perfilCapService.validarCapacidadesMod(modCapacidadReq);
-					
-					if(ie != null) {
-						
-						log.info("{}" , ConverterUtil.messageToJson(ie));
-						return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+					if (valido.equals(Boolean.TRUE)) {
+						resp = gestionUsuarios.crearPerfilCapacidad(new Integer(idPerfil), modCapacidadReq, admin.getMemberof());
 					} else {
-						resp = perfilCapService.modificarPerfilCapacidad(new Integer(idPerfil), modCapacidadReq);
+						NotFound nf = new NotFound();
+						nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
+						nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
+						
+						return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
 					}
 				}
-				
-				if(resp != null) {
+
+				if (resp != null) {
 					return new ResponseEntity<CapacidadUsuariosRes>(resp, HttpStatus.OK);
 				} else {
 					InternalServerError ie = new InternalServerError();
 					ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
-    				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
-					
-    				log.info("{}" , ConverterUtil.messageToJson(ie));
-    				
+					ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
+
+					log.info("{}", ConverterUtil.messageToJson(ie));
+
 					return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 				}
-			} catch (Exception e) {
-				log.error("Couldn't serialize response for content type application/json", e);
-				InternalServerError ie = new InternalServerError();
-				ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
-				ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
-				
-				log.info("{}" , ConverterUtil.messageToJson(ie));
-				
-				return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-		} else {
-			BadRequest br = new BadRequest();
-			br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
-			br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
-			
-			log.info("{}" , ConverterUtil.messageToJson(br));
-			
-			return new ResponseEntity<BadRequest>(br,HttpStatus.BAD_REQUEST);
 		}
+		
+		throw new MissingServletRequestParameterException(Constantes.HEADER_ACCEPT_KEY, "String");
 	}
 	
 	/*
@@ -389,14 +334,36 @@ public class UsuariosApiController implements UsuariosApi {
 			log.info("destino: {}" , destino);
         	log.info("grupo: {}" , grupo);
     		
-    		gestionUsuarios.sincronizarUsuarios(grupo);
-    		
-    		GeneralResponse gr = new GeneralResponse();
-    		gr.setMessage("Exitoso");
-    		
-    		log.info("{}" , ConverterUtil.messageToJson(gr));
-    		
-    		return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK); 
+        	UsuarioEntity admin = gestionUsuarios.consultarUsuarios(usuario);
+			
+			if(admin != null) {
+				
+				Map<String, String> map = admin
+				.getMemberof()
+				.stream()
+				.collect(Collectors.toMap(e -> e, e -> e));
+				
+				if(admin.getPerfil() == 1 && map.get(grupo) != null) {
+					gestionUsuarios.sincronizarUsuarios(grupo);
+		    		
+		    		GeneralResponse gr = new GeneralResponse();
+		    		gr.setMessage("Exitoso");
+		    		
+		    		log.info("{}" , ConverterUtil.messageToJson(gr));
+		    		
+		    		return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK); 
+				}
+				NotFound nf = new NotFound();
+				nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
+				nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
+				
+				return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
+			}
+			NotFound nf = new NotFound();
+			nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
+			nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
+			
+			return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
         }
     	
         throw new MissingServletRequestParameterException(Constantes.HEADER_ACCEPT_KEY, "String");
@@ -441,12 +408,21 @@ public class UsuariosApiController implements UsuariosApi {
 			log.info("usuario2: {}" , usuario2);
 			log.info("idPerfil: {}" , idPerfil);
 			
-			List<InfoUsuario> usuarios = gestionUsuarios.consultarUsuarios(nombre, apellidoPaterno, apellidoMaterno, activo, idPerfil, usuario2);
+			UsuarioEntity admin = gestionUsuarios.consultarUsuarios(usuario);
 			
-			if(usuarios.size() != 0) {
-				return new ResponseEntity<List<InfoUsuario>>(usuarios, HttpStatus.OK); 
+			if (admin !=null && admin.getPerfil() == 1) {
+				List<InfoUsuario> usuarios = gestionUsuarios.consultarUsuarios(nombre, apellidoPaterno, apellidoMaterno, activo, idPerfil, usuario2, admin.getMemberof());
+				
+				if(usuarios.size() != 0) {
+					return new ResponseEntity<List<InfoUsuario>>(usuarios, HttpStatus.OK); 
+				}
+				
+				NotFound nf = new NotFound();
+				nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
+				nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
+				
+				return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
 			}
-			
 			NotFound nf = new NotFound();
 			nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
 			nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
@@ -488,10 +464,20 @@ public class UsuariosApiController implements UsuariosApi {
 			log.info("idUsuario: {}" , idUsuario);
 			log.info("modificarPerfilReq: {}" , modificarPerfilReq);
 			
-			CapacidadUsuariosRes resp = gestionUsuarios.actualizarPerfilUsuario(idUsuario, modificarPerfilReq.getIdPerfil());
+			UsuarioEntity admin = gestionUsuarios.consultarUsuarios(usuario);
 			
-			if(resp != null) {
-				return new ResponseEntity<CapacidadUsuariosRes>(resp, HttpStatus.OK);
+			if ((admin !=null && admin.getPerfil() == 1) && (modificarPerfilReq.getIdPerfil() == 2 || modificarPerfilReq.getIdPerfil() == 3)) {
+				CapacidadUsuariosRes resp = gestionUsuarios.actualizarPerfilUsuario(idUsuario, modificarPerfilReq.getIdPerfil(), admin.getMemberof());
+				
+				if(resp != null) {
+					return new ResponseEntity<CapacidadUsuariosRes>(resp, HttpStatus.OK);
+				}
+				
+				NotFound nf = new NotFound();
+				nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
+				nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
+				
+				return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
 			}
 			
 			NotFound nf = new NotFound();
@@ -514,8 +500,12 @@ public class UsuariosApiController implements UsuariosApi {
 	 */
 	@Override
 	@PutMapping(value = "/usuarios/{idUsuario}/estatus", produces = { "application/json" })
-	public ResponseEntity<?> estatusUsuariosPUT(String usuario, String origen, String destino, String apikey,
-			Integer idUsuario, @Valid ReqEstatus modificaEstatusReq)
+	public ResponseEntity<?> estatusUsuariosPUT(@ApiParam(value = "Usuario en el sistema origen que lanza la petición.", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
+			@ApiParam(value = "Sistema que origina la petición.", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
+			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
+			@ApiParam(value = "APiKey.", required=true) @RequestHeader(value =Constantes.HEADER_APIKEY_KEY, required = true) String apikey,
+			@ApiParam(value = "identificador para actualizar a un usuario.", required = true) @PathVariable(value = "idUsuario", required = true) Integer idUsuario, 
+			@RequestBody(required = true) @Valid ReqEstatus modificaEstatusReq)
 			throws ApiException, MissingServletRequestParameterException {
 		
 		log.info("*********************************************************");
@@ -531,10 +521,20 @@ public class UsuariosApiController implements UsuariosApi {
 			log.info("idUsuario: " + idUsuario);
 			log.info("estatus: " + modificaEstatusReq.isActivo());
 			
-			ResEstatus resp = gestionUsuarios.actualizarEstatusUsuario(idUsuario, modificaEstatusReq.isActivo());
+			UsuarioEntity admin = gestionUsuarios.consultarUsuarios(usuario);
 			
-			if(resp != null) {
-				return new ResponseEntity<ResEstatus>(resp, HttpStatus.OK);
+			if (admin !=null && admin.getPerfil() == 1) {
+				ResEstatus resp = gestionUsuarios.actualizarEstatusUsuario(idUsuario, modificaEstatusReq.isActivo(), admin.getMemberof());
+				
+				if(resp != null) {
+					return new ResponseEntity<ResEstatus>(resp, HttpStatus.OK);
+				}
+				
+				NotFound nf = new NotFound();
+				nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
+				nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
+				
+				return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
 			}
 			
 			NotFound nf = new NotFound();
@@ -560,7 +560,7 @@ public class UsuariosApiController implements UsuariosApi {
 			@ApiParam(value = "Usuario en el sistema origen que lanza la petición.", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = "Sistema que origina la petición.", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
-			@ApiParam(value = "APiKey.", required=true) @RequestHeader(Constantes.HEADER_APIKEY_KEY) String apikey,
+			@ApiParam(value = "APiKey.", required=true) @RequestHeader(value =Constantes.HEADER_APIKEY_KEY, required = true) String apikey,
 			@ApiParam(value = "identificador para eliminar a un usuario.", required = true) @PathVariable("idUsuario") Integer idUsuario) throws ApiException, MissingServletRequestParameterException {
 		
 		log.info("*********************************************************");
@@ -575,10 +575,20 @@ public class UsuariosApiController implements UsuariosApi {
 			
 			log.info("idUsuario: " + idUsuario);
 			
-			EliminarUsuariosRes resp = gestionUsuarios.deleteUsuario(idUsuario);
+			UsuarioEntity admin = gestionUsuarios.consultarUsuarios(usuario);
 			
-			if(resp != null) {
-				return new ResponseEntity<EliminarUsuariosRes>(resp, HttpStatus.OK);
+			if (admin !=null && admin.getPerfil() == 1) {
+				EliminarUsuariosRes resp = gestionUsuarios.deleteUsuario(idUsuario, admin.getMemberof());
+				
+				if(resp != null) {
+					return new ResponseEntity<EliminarUsuariosRes>(resp, HttpStatus.OK);
+				}
+				
+				NotFound nf = new NotFound();
+				nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
+				nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
+				
+				return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
 			}
 			
 			NotFound nf = new NotFound();
@@ -600,12 +610,13 @@ public class UsuariosApiController implements UsuariosApi {
 	 * Consulta Perfil
 	 */
 	@Override
-	@GetMapping(value = "/usuarios/perfil", produces = { "application/json" })
+	@GetMapping(value = "/usuarios/{idUsuario}/perfil", produces = { "application/json" })
 	public ResponseEntity<?> usuariosPerfilGet(
 			@ApiParam(value = "Usuario en el sistema origen que lanza la petición.", required = false) @RequestHeader(value = "usuario", required = false) String usuario,
 			@ApiParam(value = "Sistema que origina la petición.", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
-			@ApiParam(value = "APiKey.", required=true) @RequestHeader(Constantes.HEADER_APIKEY_KEY) String apikey) throws ApiException, MissingServletRequestParameterException {
+			@ApiParam(value = "APiKey.", required=true) @RequestHeader(value =Constantes.HEADER_APIKEY_KEY, required = true) String apikey,
+			@ApiParam(value = "identificador para eliminar a un usuario.", required = true) @PathVariable("idUsuario") Integer idUsuario) throws ApiException, MissingServletRequestParameterException {
 		
 		log.info("*********************************************************");
     	log.info("Consultar Perfil Usuario");
@@ -617,12 +628,18 @@ public class UsuariosApiController implements UsuariosApi {
 			log.info("origen: " + origen);
 			log.info("destino: " + destino);
 			
-			PerfilUsuario user = gestionUsuarios.consultarUsuariosConPerfil(usuario);
+			log.info("idUsuario: " + idUsuario);
 			
-			if(user != null) {
-				return new ResponseEntity<PerfilUsuario>(user, HttpStatus.OK);
+			UsuarioEntity admin = gestionUsuarios.consultarUsuarios(usuario);
+			
+			if (admin !=null && admin.getPerfil() == 1) {
+				PerfilUsuario user = gestionUsuarios.consultarUsuariosConPerfil(idUsuario, admin.getMemberof());
+				
+				if(user != null) {
+					return new ResponseEntity<PerfilUsuario>(user, HttpStatus.OK);
+				}
 			}
-			
+
 			NotFound nf = new NotFound();
 			nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
 			nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);

@@ -17,7 +17,7 @@ public class CapacidadUsuariosReq extends ArrayList<CapacidadUsuariosReqInner>  
 	 */
 	private static final long serialVersionUID = -3799064306928965846L;
 
-@Override
+  @Override
   public boolean equals(java.lang.Object o) {
     if (this == o) {
       return true;

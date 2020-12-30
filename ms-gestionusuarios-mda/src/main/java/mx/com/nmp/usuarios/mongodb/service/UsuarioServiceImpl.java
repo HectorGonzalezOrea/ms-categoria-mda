@@ -52,15 +52,15 @@ public class UsuarioServiceImpl implements UsuarioService {
 	public void upsertUsers(List<UsuarioVO> usuarios, String grupo) throws Exception {
 		logger.info("upsertUsers");
 		
-		BulkOperations upsert = this.llenarUsuariosParaSincronizar(usuarios, grupo);
+		BulkOperations upsert = this.llenarUsuariosParaSincronizar(usuarios);
 		BulkWriteResult upsertResults = upsert.execute();
 		logger.info("upsertResults: {}" , upsertResults.toString());
 		
-		this.actualizarInformacionParaSincronizar(usuarios);
+		this.actualizarInformacionParaSincronizar(usuarios, grupo);
 	}
 
 	@Override
-	public List<InfoUsuario> getAllUsers(String nombre, String apellidoPaterno, String apellidoMaterno, Boolean estatus, Integer perfil, String usuario) throws Exception {
+	public List<InfoUsuario> getAllUsers(String nombre, String apellidoPaterno, String apellidoMaterno, Boolean estatus, Integer perfil, String usuario, List<String> grupos) throws Exception {
 
 		List<UsuarioEntity> busquedaList = new ArrayList<>();
 		List<CapacidadUsuariosRes> capList = perfilService.buscarPerfilConCapacidades();
@@ -72,10 +72,15 @@ public class UsuarioServiceImpl implements UsuarioService {
 		
 		if (nombre == null && apellidoPaterno == null && apellidoMaterno == null && estatus == null && usuario == null && perfil == null) {
 			logger.info("sin filtros");
-			busquedaList = mongoTemplate.findAll(UsuarioEntity.class);
+			Query query = new Query();
+			query.addCriteria(Criteria.where(Constantes.GRUPOS).all(grupos));
+			query.addCriteria(Criteria.where(Constantes.PERFIL).ne(new Integer(1)));
+			logger.info("Query: {}" , query);
+			
+			busquedaList = mongoTemplate.find(query, UsuarioEntity.class);
 		} else {
 			logger.info("con filtros");
-			Query query = this.busquedaUsuarioConFiltro(nombre, apellidoPaterno, apellidoMaterno, estatus, usuario, perfil);
+			Query query = this.busquedaUsuarioConFiltro(nombre, apellidoPaterno, apellidoMaterno, estatus, usuario, perfil, grupos);
 			busquedaList = mongoTemplate.find(query, UsuarioEntity.class);
 		}
 		
@@ -95,13 +100,16 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 	
 	@Override
-	public Boolean actualizarPerfilUsuario(Integer idUsuario, Integer idPerfil) throws Exception {
+	public Boolean actualizarPerfilUsuario(Integer idUsuario, Integer idPerfil, List<String> grupos) throws Exception {
 		logger.info("actualizarPerfilUsuario");
 		
 		Boolean actualizado = false;
 		
 		Query query = new Query();
 		query.addCriteria(Criteria.where(Constantes.ID_USUARIO).is(idUsuario).and(Constantes.ACTIVO).is(Boolean.TRUE));
+		query.addCriteria(Criteria.where(Constantes.GRUPOS).all(grupos));
+		query.addCriteria(Criteria.where(Constantes.PERFIL).ne(new Integer(1)));
+		logger.info("Query: {}" , query);
 		
 		Update update = new Update();
 		update.set(Constantes.PERFIL, idPerfil);
@@ -115,13 +123,17 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 	
 	@Override
-	public Boolean actualizarEstatusUsuario(Integer idUsuario, Boolean estatus) throws Exception {
+	public Boolean actualizarEstatusUsuario(Integer idUsuario, Boolean estatus, List<String> grupos) throws Exception {
 		logger.info("actualizarEstatusUsuario");
 
 		Boolean actualizar = false;
 
 		Query query = new Query();
 		query.addCriteria(Criteria.where(Constantes.ID_USUARIO).is(idUsuario));
+		query.addCriteria(Criteria.where(Constantes.GRUPOS).all(grupos));
+		query.addCriteria(Criteria.where(Constantes.PERFIL).ne(new Integer(1)));
+		logger.info("Query: {}" , query);
+		
 		Update update = new Update();
 		update.set(Constantes.ACTIVO, estatus);
 		UsuarioEntity user = mongoTemplate.findAndModify(query, update, UsuarioEntity.class);
@@ -134,13 +146,18 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 	
 	@Override
-	public Boolean deleteUsuario(Integer idUsuario) throws Exception {
+	public Boolean deleteUsuario(Integer idUsuario, List<String> grupos) throws Exception {
 		logger.info("deleteUsuario");
 
 		Boolean actualizar = false;
 
 		Query query = new Query();
 		query.addCriteria(Criteria.where(Constantes.ID_USUARIO).is(idUsuario));
+		query.addCriteria(Criteria.where(Constantes.GRUPOS).all(grupos));
+		query.addCriteria(Criteria.where(Constantes.PERFIL).ne(new Integer(1)));
+		
+		logger.info("Query: {}" , query);
+		
 		Update update = new Update();
 		update.set(Constantes.ACTIVO, Boolean.FALSE);
 		update.set(Constantes.PERFIL, null);
@@ -154,13 +171,16 @@ public class UsuarioServiceImpl implements UsuarioService {
 	}
 	
 	@Override
-	public PerfilUsuario consultaUsuarioPerfil(String usuario) throws Exception {
+	public PerfilUsuario consultaUsuarioPerfil(Integer usuario, List<String> grupos) throws Exception {
 		logger.info("consultaUsuarioPerfil");
 		
 		PerfilUsuario user = null;
 		
 		Query query = new Query();
-		query.addCriteria(Criteria.where(Constantes.USUARIO).is(usuario));
+		query.addCriteria(Criteria.where(Constantes.ID_USUARIO).is(usuario));
+		query.addCriteria(Criteria.where(Constantes.GRUPOS).all(grupos));
+		
+		logger.info("query: {}", query);
 		
 		UsuarioEntity entity = mongoTemplate.findOne(query, UsuarioEntity.class);
 		
@@ -170,6 +190,52 @@ public class UsuarioServiceImpl implements UsuarioService {
 			      .uniqueIndex(capList, CapacidadUsuariosRes::getIdPerfil);
 		
 		user = this.casterEntityToPerfil(entity, capMap);
+		
+		return user;
+	}
+	
+	@Override
+	public PerfilUsuario consultaUsuarioPerfil(Integer usuario) throws Exception {
+		logger.info("consultaUsuarioPerfil");
+		
+		PerfilUsuario user = null;
+		
+		Query query = new Query();
+		query.addCriteria(Criteria.where(Constantes.ID_USUARIO).is(usuario));
+		
+		UsuarioEntity entity = mongoTemplate.findOne(query, UsuarioEntity.class);
+		
+		List<CapacidadUsuariosRes> capList = perfilService.buscarPerfilConCapacidades();
+
+		Map<Integer, CapacidadUsuariosRes> capMap = Maps
+			      .uniqueIndex(capList, CapacidadUsuariosRes::getIdPerfil);
+		
+		user = this.casterEntityToPerfil(entity, capMap);
+		
+		return user;
+	}
+	
+	@Override
+	public PerfilUsuario consultaUsuarioPerfil(String usuario) throws Exception {
+		logger.info("consultaUsuarioPerfil");
+		
+		PerfilUsuario user = null;
+		
+		Query query = new Query();
+		query.addCriteria(Criteria.where(Constantes.USUARIO).is(usuario));
+		
+		logger.info("query: {}", query);
+		
+		UsuarioEntity entity = mongoTemplate.findOne(query, UsuarioEntity.class);
+		
+		List<CapacidadUsuariosRes> capList = perfilService.buscarPerfilConCapacidades();
+
+		Map<Integer, CapacidadUsuariosRes> capMap = Maps
+			      .uniqueIndex(capList, CapacidadUsuariosRes::getIdPerfil);
+		
+		user = this.casterEntityToPerfil(entity, capMap);
+		
+		logger.info("user: {}", user);
 		
 		return user;
 	}
@@ -297,7 +363,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		return vo;
 	}
 	
-	private void actualizarInformacionParaSincronizar(List<UsuarioVO> usuarios) {
+	private void actualizarInformacionParaSincronizar(List<UsuarioVO> usuarios, String grupo) {
 		logger.info("actualizarInformacionParaSincronizar");
 		
 		BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, UsuarioEntity.class);
@@ -311,8 +377,10 @@ public class UsuarioServiceImpl implements UsuarioService {
 			
 			Query queryUpdateMulti = new Query();
 			
-			queryUpdateMulti.addCriteria(new Criteria("usuario").in(ids))
-			.addCriteria(new Criteria("activo").exists(false));
+			queryUpdateMulti
+			.addCriteria(new Criteria("usuario").in(ids))
+			.addCriteria(new Criteria("activo").exists(false))
+			.addCriteria(new Criteria(Constantes.PERFIL).ne(new Integer(1)));
 
 			List<UsuarioEntity> usuariosCreados = mongoTemplate.find(queryUpdateMulti, UsuarioEntity.class);
 			
@@ -331,6 +399,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 				
 				updateMulti.set("idUsuario", id);
 				updateMulti.set("activo", false);
+				updateMulti.addToSet("memberof", grupo);
 				
 				Query queryAux = new Query();
 				queryAux.addCriteria(new Criteria("usuario").is(u.getUsuario()));
@@ -349,18 +418,16 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	}
 	
-	private BulkOperations llenarUsuariosParaSincronizar(List<UsuarioVO> usuarios, String grupo) {
+	private BulkOperations llenarUsuariosParaSincronizar(List<UsuarioVO> usuarios) {
 		logger.info("llenarUsuariosParaSincronizar");
 
 		BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, UsuarioEntity.class);
 
-		List<String> miembroDe = new ArrayList<>();
-		miembroDe.add(grupo);
-
 		if (!usuarios.isEmpty()) {
-			usuarios.stream().forEach(u -> {
+			usuarios
+			.stream()
+			.forEach(u -> {
 
-				
 				logger.info("usuario: {}" , u.toString());
 				Update upSert = new Update();
 
@@ -404,7 +471,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 				upSert.set("distinguishedname", u.getNombreDistintivo());
 				upSert.set("description", u.getDescripcion());
 
-				upSert.addToSet("memberof", grupo);
+				//upSert.addToSet("memberof", grupo);
 				upSert.set("samaccountname", u.getNombreCompleto());
 				upSert.set("commonname", u.getNombreDominio());
 
@@ -421,29 +488,28 @@ public class UsuarioServiceImpl implements UsuarioService {
 	/*
 	 * armado de busqueda de usuario
 	 */
-	private Query busquedaUsuarioConFiltro(String nombre, String apellidoPaterno, String apellidoMaterno, Boolean activo, String usuario, Integer perfil) {
+	private Query busquedaUsuarioConFiltro(String nombre, String apellidoPaterno, String apellidoMaterno, Boolean activo, String usuario, Integer perfil, List<String> grupos) {
 		logger.info("busquedaUsuarioNull");
 		
 		Query query = new Query();
-
+		query.addCriteria(Criteria.where(Constantes.GRUPOS).all(grupos));
+		query.addCriteria(Criteria.where(Constantes.PERFIL).ne(new Integer(1)));
+		
 		if (nombre != null) {
 			query.addCriteria(validarNombreNull(nombre, apellidoPaterno, apellidoMaterno, activo, usuario, perfil));
 		}
-
 		if (apellidoPaterno != null) {
 			query.addCriteria(validarApellidoPaternoNull(nombre, apellidoPaterno, apellidoMaterno, activo, usuario, perfil));
 		}
 		if (apellidoMaterno != null) {
 			query.addCriteria(validarApellidoMaternoNull(nombre, apellidoPaterno, apellidoMaterno, activo, usuario, perfil));
 		}
-
 		if (activo != null) {
 			query.addCriteria(validarActivoNull(nombre, apellidoPaterno, apellidoMaterno, activo, usuario, perfil));
 		}
 		if (usuario != null) {
 			query.addCriteria(validarUsuarioNull(nombre, apellidoPaterno, apellidoMaterno, activo, usuario, perfil));
 		}
-		
 		if (perfil != null) {
 			query.addCriteria(validarPerfilNull(nombre, apellidoPaterno, apellidoMaterno, activo, usuario, perfil));
 		}
@@ -609,6 +675,24 @@ public class UsuarioServiceImpl implements UsuarioService {
 		if(usuario != null) {
 			Query query = new Query();
 			Criteria aux = Criteria.where(Constantes.ID_USUARIO).is(usuario.longValue());
+			query.addCriteria(aux);
+			
+			encontrado = mongoTemplate.findOne(query, UsuarioEntity.class);
+		}
+		
+		logger.info("Encontrado: {}", encontrado);
+		
+		return encontrado;
+	}
+
+	@Override
+	public UsuarioEntity consultarUsuarios(String usuario) throws Exception {
+		logger.info("consultarUsuario");
+		
+		UsuarioEntity encontrado = null;
+		if(usuario != null) {
+			Query query = new Query();
+			Criteria aux = Criteria.where(Constantes.USUARIO).is(usuario);
 			query.addCriteria(aux);
 			
 			encontrado = mongoTemplate.findOne(query, UsuarioEntity.class);

@@ -18,7 +18,6 @@ import mx.com.nmp.usuarios.model.EliminarUsuariosRes;
 import mx.com.nmp.usuarios.model.GeneralResponse;
 import mx.com.nmp.usuarios.model.InternalServerError;
 import mx.com.nmp.usuarios.model.InvalidAuthentication;
-import mx.com.nmp.usuarios.model.ModCapacidadUsuario;
 import mx.com.nmp.usuarios.model.NotFound;
 import mx.com.nmp.usuarios.model.PerfilUsuario;
 import mx.com.nmp.usuarios.model.ReqEstatus;
@@ -65,7 +64,8 @@ public interface UsuariosApi {
 			@ApiParam(value = "Sistema que origina la petición.", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
 			@ApiParam(value = "Identificador del perfil.", required = true) @PathVariable("idPerfil") String idPerfil,
-			@ApiParam(value = "") @Valid @RequestBody CapacidadUsuariosReq capacidadUsuarioReq);
+			@ApiParam(value = "APiKey.", required=true) @RequestHeader(Constantes.HEADER_APIKEY_KEY) String apikey,
+			@ApiParam(value = "") @Valid @RequestBody CapacidadUsuariosReq capacidadUsuarioReq) throws ApiException, MissingServletRequestParameterException ;
 
 	@ApiOperation(value = "Consulta el listado de los usuarios actuales.", nickname = "consultaUsuarioGET", notes = "El Administrador encontrará la pantalla que le permite realizar búsquedas de los usuarios que se han asignado para el proceso de ajuste de precios, utilizando los siguientes filtros de búsqueda.      * Nombre   * Apellido Paterno   * Apellido Materno   * Estatus   * Usuario      Puede visualizar todos los usuarios que han sido agregados mediante un listado.    ", response = ConsultaUsuarioRes.class, authorizations = {
 			@Authorization(value = "apiKey") }, tags = { "Usuarios", })
@@ -175,7 +175,7 @@ public interface UsuariosApi {
 			@ApiParam(value = "Sistema que origina la petición.", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
 			@ApiParam(value = "Identificador del perfil.", required = true) @PathVariable("idPerfil") String idPerfil,
-			@ApiParam(value = "") @Valid @RequestBody ModCapacidadUsuario modCapacidadReq);
+			@ApiParam(value = "") @Valid @RequestBody CapacidadUsuariosReq modCapacidadReq) throws ApiException, MissingServletRequestParameterException;
 
 	@ApiOperation(value = "Modifica el perfil de un usuario actual.", nickname = "modificarUsuariosPUT", notes = "Todos los usuarios que sean agregados para el proceso de ajuste de precios deben tener un perfil asociado; las opciones del catálogo de perfil son:    * Consultor   * Operador  Siendo estas opciones excluyentes entre sí. La opción seleccionada en el catálogo \"Perfil\" podrá ser modificada en cualquier momento. ", response = CapacidadUsuariosRes.class, authorizations = {
 			@Authorization(value = "apiKey") }, tags = { "Usuarios", })
@@ -199,12 +199,13 @@ public interface UsuariosApi {
 	@ApiOperation(value = "Consulta el perfil del usuario", nickname = "usuariosPerfilGet", notes = "Recurso para la consulta del perfil del usuario en el AD y en Mongo DB", response = PerfilUsuario.class, authorizations = {
 			@Authorization(value = "Bearer"), @Authorization(value = "apiKey") }, tags = { "Usuarios", })
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Consulta exitosa", response = PerfilUsuario.class) })
-	@GetMapping(value = "/usuarios/perfil", produces = { "application/json" })
+	@GetMapping(value = "/usuarios/{idUsuario}/perfil", produces = { "application/json" })
 	ResponseEntity<?> usuariosPerfilGet(
 			@ApiParam(value = "Usuario en el sistema origen que lanza la petición.", required = false) @RequestHeader(value = "usuario", required = false) String usuario,
 			@ApiParam(value = "Sistema que origina la petición.", required = true, allowableValues = "portalMotorDescuentosAutomatizados") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información.", required = true, allowableValues = "Mongo, mockserver") @RequestHeader(value = "destino", required = true) String destino,
-			@ApiParam(value = "APiKey.", required=true) @RequestHeader(Constantes.HEADER_APIKEY_KEY) String apikey) throws ApiException, MissingServletRequestParameterException ;
+			@ApiParam(value = "APiKey.", required=true) @RequestHeader(Constantes.HEADER_APIKEY_KEY) String apikey,
+			@ApiParam(value = "identificador para eliminar a un usuario.", required = true) @PathVariable("idUsuario") Integer idUsuario) throws ApiException, MissingServletRequestParameterException ;
 
 	    
 	    @ApiOperation(value = "Registra usuarios por medio de un grupo del active directory", nickname = "usuariosSincronizarPost", notes = "Recurso utilizado para el registro de un usuarios en Mongo DB por medio del grupo el cual se consultara en el active directorty", response = GeneralResponse.class, authorizations = {

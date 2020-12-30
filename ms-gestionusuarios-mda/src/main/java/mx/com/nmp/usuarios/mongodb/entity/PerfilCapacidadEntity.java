@@ -11,6 +11,7 @@ public class PerfilCapacidadEntity {
 	private ObjectId _id;
 	private Integer perfil;
 	private Integer idCapacidad;
+	private String grupo;
 	
 	public ObjectId get_id() {
 		return _id;
@@ -30,5 +31,13 @@ public class PerfilCapacidadEntity {
 	public void setIdCapacidad(Integer idCapacidad) {
 		this.idCapacidad = idCapacidad;
 	}
+	public String getGrupo() {
+		return grupo;
+	}
+	public void setGrupo(String grupo) {
+		this.grupo = grupo;
+	}
 	
 }
+
+

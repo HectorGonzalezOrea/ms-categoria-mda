@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import mx.com.nmp.usuarios.api.exception.ApiException;
+import mx.com.nmp.usuarios.model.CapacidadUsuariosReq;
 import mx.com.nmp.usuarios.model.CapacidadUsuariosRes;
 import mx.com.nmp.usuarios.model.ConsultaHistoricoRes;
 import mx.com.nmp.usuarios.model.CrearHistoricoRes;
@@ -18,7 +19,10 @@ import mx.com.nmp.usuarios.model.PerfilUsuario;
 import mx.com.nmp.usuarios.model.ResEstatus;
 import mx.com.nmp.usuarios.model.ReqHistorico.AccionEnum;
 import mx.com.nmp.usuarios.model.ResEstatus.DescripcionEnum;
+import mx.com.nmp.usuarios.mongodb.entity.UsuarioEntity;
+import mx.com.nmp.usuarios.mongodb.service.CapacidadService;
 import mx.com.nmp.usuarios.mongodb.service.HistoricoService;
+import mx.com.nmp.usuarios.mongodb.service.PerfilCapacidadService;
 import mx.com.nmp.usuarios.mongodb.service.PerfilService;
 import mx.com.nmp.usuarios.mongodb.service.UsuarioService;
 import mx.com.nmp.usuarios.oag.client.service.OAGService;
@@ -43,6 +47,12 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 	@Autowired
 	private HistoricoService historicoService;
 	
+	@Autowired
+	private CapacidadService capacidadService;
+	
+	@Autowired
+	private PerfilCapacidadService perfilCapacidadService;
+	
 	@Override
 	public void sincronizarUsuarios(String grupo) throws ApiException {
 		logger.info("sincronizarUsuarios");
@@ -65,13 +75,13 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 	}
 
 	@Override
-	public List<InfoUsuario> consultarUsuarios(String nombre, String apellidoPaterno, String apellidoMaterno, Boolean estatus, Integer perfil, String usuario) throws ApiException {
+	public List<InfoUsuario> consultarUsuarios(String nombre, String apellidoPaterno, String apellidoMaterno, Boolean estatus, Integer perfil, String usuario, List<String> grupos) throws ApiException {
 		logger.info("consultarUsuarios");
 
 		List<InfoUsuario> usuarios = null;
 		
 		try {
-			usuarios = usuarioService.getAllUsers(nombre, apellidoPaterno, apellidoMaterno, estatus, perfil, usuario);
+			usuarios = usuarioService.getAllUsers(nombre, apellidoPaterno, apellidoMaterno, estatus, perfil, usuario, grupos);
 		} catch (Exception e) {
 			throw new ApiException(e);
 		}
@@ -80,14 +90,14 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 	}
 
 	@Override
-	public CapacidadUsuariosRes actualizarPerfilUsuario(Integer idUsuario, Integer idPerfil) throws ApiException {
+	public CapacidadUsuariosRes actualizarPerfilUsuario(Integer idUsuario, Integer idPerfil, List<String> grupos) throws ApiException {
 		logger.info("actualizarPerfilUsuario");
 		
 		Boolean actualizado = false;
 		CapacidadUsuariosRes resp = null;
 		try {
 			if(idPerfil != null && idUsuario != null) {
-				actualizado = usuarioService.actualizarPerfilUsuario(idUsuario, idPerfil);
+				actualizado = usuarioService.actualizarPerfilUsuario(idUsuario, idPerfil, grupos);
 			}
 			
 			if(actualizado.equals(Boolean.TRUE)) {
@@ -101,7 +111,7 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 	}
 
 	@Override
-	public ResEstatus actualizarEstatusUsuario(Integer idUsuario, Boolean activo) throws ApiException {
+	public ResEstatus actualizarEstatusUsuario(Integer idUsuario, Boolean activo, List<String> grupos) throws ApiException {
 		logger.info("actualizarEstatusUsuario");
 		
 		Boolean actualizado = false;
@@ -109,7 +119,7 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 		
 		try {
 			if(activo != null && idUsuario != null) {
-				actualizado = usuarioService.actualizarEstatusUsuario(idUsuario,activo);
+				actualizado = usuarioService.actualizarEstatusUsuario(idUsuario,activo, grupos);
 			}
 			
 			if (actualizado.equals(Boolean.TRUE)) {
@@ -130,14 +140,14 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 	}
 
 	@Override
-	public EliminarUsuariosRes deleteUsuario(Integer idUsuario) throws ApiException {
+	public EliminarUsuariosRes deleteUsuario(Integer idUsuario, List<String> grupos) throws ApiException {
 		logger.info("deleteUsuario");
 		
 		Boolean eliminado = false;
 		EliminarUsuariosRes resp = null;
 		try {
 			if(idUsuario != null) {
-				eliminado = usuarioService.deleteUsuario(idUsuario);
+				eliminado = usuarioService.deleteUsuario(idUsuario, grupos);
 			}
 			if (eliminado.equals(Boolean.TRUE)) {
 				resp = new EliminarUsuariosRes();
@@ -151,6 +161,21 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 		return resp;
 	}
 
+	@Override
+	public PerfilUsuario consultarUsuariosConPerfil(Integer id, List<String> grupos) throws ApiException {
+		logger.info("consultarUsuariosConPerfil");
+		
+		PerfilUsuario userVo = null;
+		
+		try {
+			userVo = usuarioService.consultaUsuarioPerfil(id, grupos);
+		} catch (Exception e) {
+			throw new ApiException(e);
+		}
+		
+		return userVo;
+	}
+	
 	@Override
 	public PerfilUsuario consultarUsuariosConPerfil(String usuario) throws ApiException {
 		logger.info("consultarUsuariosConPerfil");
@@ -166,6 +191,21 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 		return userVo;
 	}
 
+	@Override
+	public PerfilUsuario consultarUsuariosConPerfil(Integer id) throws ApiException {
+		logger.info("consultarUsuariosConPerfil");
+		
+		PerfilUsuario userVo = null;
+		
+		try {
+			userVo = usuarioService.consultaUsuarioPerfil(id);
+		} catch (Exception e) {
+			throw new ApiException(e);
+		}
+		
+		return userVo;
+	}
+	
 	@Override
 	public Boolean validarUsuarioPerfil(String usuario, Integer perfil) throws ApiException {
 		logger.info("validarUsuarioPerfil");
@@ -216,6 +256,51 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 		}
 		
 		return resp;
+	}
+
+	@Override
+	public Boolean validarCapacidadesCreacion(CapacidadUsuariosReq capacidadUsuarioReq) throws ApiException {
+		logger.info("validarCapacidadesCreacion");
+		
+		Boolean validacion = false;
+		
+		try {
+			validacion = capacidadService.validarCapacidadesCreacion(capacidadUsuarioReq);
+		} catch (Exception e) {
+			throw new ApiException(e);
+		}
+		
+		return validacion;
+	}
+
+	@Override
+	public CapacidadUsuariosRes crearPerfilCapacidad(Integer idPerfil, CapacidadUsuariosReq informacionPerfil,
+			List<String> grupos) throws ApiException {
+		logger.info("crearPerfilCapacidad");
+
+		CapacidadUsuariosRes resp = null;
+		
+		try {
+			resp = perfilCapacidadService.crearPerfilCapacidad(idPerfil, informacionPerfil, grupos);
+		} catch (Exception e) {
+			throw new ApiException(e);
+		}
+
+		return resp;
+	}
+
+	@Override
+	public UsuarioEntity consultarUsuarios(String usuario) throws ApiException {
+
+		UsuarioEntity encontrado = null;
+		
+		try {
+			encontrado = usuarioService.consultarUsuarios(usuario);
+		} catch (Exception e) {
+			throw new ApiException(e);
+		}
+		
+		return encontrado;
 	}
 	
 }
