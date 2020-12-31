@@ -23,7 +23,6 @@ import mx.com.nmp.usuarios.model.ReqHistorico;
 import mx.com.nmp.usuarios.model.ReqPerfil;
 import mx.com.nmp.usuarios.model.ResEstatus;
 import mx.com.nmp.usuarios.mongodb.entity.UsuarioEntity;
-import mx.com.nmp.usuarios.mongodb.service.PerfilCapacidadService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,9 +94,8 @@ public class UsuariosApiController implements UsuariosApi {
 		
 		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
-			log.info("usuario: {}" , usuario);
-			log.info("origen: {}" , origen);
-			log.info("destino: {}" , destino);
+			this.imprimirEncabezados(usuario, origen, destino);
+			
 			log.info("idPerfil: {}" , idPerfil);
 
 			UsuarioEntity admin = gestionUsuarios.consultarUsuarios(usuario);
@@ -115,32 +113,17 @@ public class UsuariosApiController implements UsuariosApi {
 					if (valido.equals(Boolean.TRUE)) {
 						resp = gestionUsuarios.crearPerfilCapacidad(new Integer(idPerfil), capacidadUsuarioReq, admin.getMemberof());
 					} else {
-						NotFound nf = new NotFound();
-						nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
-						nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
-						
-						return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
+						return new ResponseEntity<NotFound>(this.notFound(Constantes.ERROR_CODE_NOT_FOUND, Constantes.ERROR_MESSAGE_NOT_FOUND), HttpStatus.NOT_FOUND);
 					}
 				}
 
 				if (resp != null) {
 					return new ResponseEntity<CapacidadUsuariosRes>(resp, HttpStatus.OK);
 				} else {
-					InternalServerError ie = new InternalServerError();
-					ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
-					ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
-
-					log.info("{}", ConverterUtil.messageToJson(ie));
-
-					return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+					return new ResponseEntity<InternalServerError>(this.internalServerError(), HttpStatus.INTERNAL_SERVER_ERROR);
 				}
 			}
-			
-			NotFound nf = new NotFound();
-			nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
-			nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
-			
-			return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<NotFound>(this.notFound(Constantes.ERROR_CODE_NOT_FOUND, Constantes.ERROR_MESSAGE_NOT_FOUND), HttpStatus.NOT_FOUND);
 		}
 		
 		throw new MissingServletRequestParameterException(Constantes.HEADER_ACCEPT_KEY, "String");
@@ -166,9 +149,7 @@ public class UsuariosApiController implements UsuariosApi {
 		
 		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
-			log.info("usuario: {}" , usuario);
-			log.info("origen: {}" , origen);
-			log.info("destino: {}" , destino);
+			this.imprimirEncabezados(usuario, origen, destino);
 			log.info("idPerfil: {}" , idPerfil);
 
 			UsuarioEntity admin = gestionUsuarios.consultarUsuarios(usuario);
@@ -177,8 +158,6 @@ public class UsuariosApiController implements UsuariosApi {
 				CapacidadUsuariosRes resp = null;
 
 				if (idPerfil != null && !modCapacidadReq.isEmpty()) {
-
-					//InternalServerError ie = perfilCapService.validarCapacidadesCreacion(capacidadUsuarioReq);
 					Boolean valido = gestionUsuarios.validarCapacidadesCreacion(modCapacidadReq);
 
 					log.info("valido: {}" , valido);
@@ -186,32 +165,17 @@ public class UsuariosApiController implements UsuariosApi {
 					if (valido.equals(Boolean.TRUE)) {
 						resp = gestionUsuarios.crearPerfilCapacidad(new Integer(idPerfil), modCapacidadReq, admin.getMemberof());
 					} else {
-						NotFound nf = new NotFound();
-						nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
-						nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
-						
-						return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
+						return new ResponseEntity<NotFound>(this.notFound(Constantes.ERROR_CODE_NOT_FOUND, Constantes.ERROR_MESSAGE_NOT_FOUND), HttpStatus.NOT_FOUND);
 					}
 				}
 
 				if (resp != null) {
 					return new ResponseEntity<CapacidadUsuariosRes>(resp, HttpStatus.OK);
 				} else {
-					InternalServerError ie = new InternalServerError();
-					ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
-					ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
-
-					log.info("{}", ConverterUtil.messageToJson(ie));
-
-					return new ResponseEntity<InternalServerError>(ie, HttpStatus.INTERNAL_SERVER_ERROR);
+					return new ResponseEntity<InternalServerError>(this.internalServerError(), HttpStatus.INTERNAL_SERVER_ERROR);
 				}
 			}
-			
-			NotFound nf = new NotFound();
-			nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
-			nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
-			
-			return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<NotFound>(this.notFound(Constantes.ERROR_CODE_NOT_FOUND, Constantes.ERROR_MESSAGE_NOT_FOUND), HttpStatus.NOT_FOUND);
 		}
 		
 		throw new MissingServletRequestParameterException(Constantes.HEADER_ACCEPT_KEY, "String");
@@ -240,7 +204,8 @@ public class UsuariosApiController implements UsuariosApi {
 
 		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
-
+			this.imprimirEncabezados(usuario, origen, destino);
+			
 			ConsultaHistoricoRes resp = gestionUsuarios.getHistorico(idUsuario);
 
 			if (resp != null) {
@@ -275,7 +240,7 @@ public class UsuariosApiController implements UsuariosApi {
 
 		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
-
+			this.imprimirEncabezados(usuario, origen, destino);
 			if (historicoEnvioReq != null) {
 				log.info("Perfil: " + historicoEnvioReq.getIdPerfil());
 				log.info("Usuario: " + historicoEnvioReq.getUsuario());
@@ -292,32 +257,12 @@ public class UsuariosApiController implements UsuariosApi {
 					if (resp != null) {
 						return new ResponseEntity<CrearHistoricoRes>(resp, HttpStatus.OK);
 					}
-
-					BadRequest br = new BadRequest();
-					br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
-					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
-
-					log.info("{}", ConverterUtil.messageToJson(br));
-
-					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+					return new ResponseEntity<NotFound>(this.notFound(Constantes.ERROR_CODE_BAD_REQUEST, "Datos no existentes para el historial"), HttpStatus.NOT_FOUND);
 				}
-				
-				BadRequest br = new BadRequest();
-				br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
-				br.setCodigo("Datos no existentes para el historial");
 
-				log.info("{}", ConverterUtil.messageToJson(br));
-
-				return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
-				
+				return new ResponseEntity<NotFound>(this.notFound(Constantes.ERROR_CODE_BAD_REQUEST, "Datos no existentes para el historial"), HttpStatus.NOT_FOUND);
 			} else {
-				BadRequest br = new BadRequest();
-				br.setMensaje(Constantes.ERROR_MESSAGE_BAD_REQUEST);
-				br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
-
-				log.info("{}", ConverterUtil.messageToJson(br));
-
-				return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<BadRequest>(this.badRequest(Constantes.ERROR_CODE_BAD_REQUEST, Constantes.ERROR_MESSAGE_BAD_REQUEST), HttpStatus.BAD_REQUEST);
 			}
 
 		}
@@ -341,9 +286,8 @@ public class UsuariosApiController implements UsuariosApi {
 		
 		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
-			log.info("usuario: {}" , usuario);
-			log.info("origen: {}" , origen);
-			log.info("destino: {}" , destino);
+        	this.imprimirEncabezados(usuario, origen, destino);
+        	
         	log.info("grupo: {}" , grupo);
     		
         	UsuarioEntity admin = gestionUsuarios.consultarUsuarios(usuario);
@@ -365,17 +309,9 @@ public class UsuariosApiController implements UsuariosApi {
 		    		
 		    		return new ResponseEntity<GeneralResponse>(gr, HttpStatus.OK); 
 				}
-				NotFound nf = new NotFound();
-				nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
-				nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
-				
-				return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
+				return new ResponseEntity<NotFound>(this.notFound(Constantes.ERROR_CODE_NOT_FOUND, Constantes.ERROR_MESSAGE_NOT_FOUND), HttpStatus.NOT_FOUND);
 			}
-			NotFound nf = new NotFound();
-			nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
-			nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
-			
-			return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<NotFound>(this.notFound(Constantes.ERROR_CODE_NOT_FOUND, Constantes.ERROR_MESSAGE_NOT_FOUND), HttpStatus.NOT_FOUND);
         }
     	
         throw new MissingServletRequestParameterException(Constantes.HEADER_ACCEPT_KEY, "String");
@@ -409,9 +345,7 @@ public class UsuariosApiController implements UsuariosApi {
 		
 		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
-			log.info("usuario: {}" , usuario);
-			log.info("origen: {}" , origen);
-			log.info("destino: {}" , destino);
+			this.imprimirEncabezados(usuario, origen, destino);
 			
 			log.info("nombre: {}" , nombre);
 			log.info("apellidoPaterno: {}" , apellidoPaterno);
@@ -428,18 +362,9 @@ public class UsuariosApiController implements UsuariosApi {
 				if(usuarios.size() != 0) {
 					return new ResponseEntity<List<InfoUsuario>>(usuarios, HttpStatus.OK); 
 				}
-				
-				NotFound nf = new NotFound();
-				nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
-				nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
-				
-				return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
+				return new ResponseEntity<NotFound>(this.notFound(Constantes.ERROR_CODE_NOT_FOUND, Constantes.ERROR_MESSAGE_NOT_FOUND), HttpStatus.NOT_FOUND);
 			}
-			NotFound nf = new NotFound();
-			nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
-			nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
-			
-			return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<NotFound>(this.notFound(Constantes.ERROR_CODE_NOT_FOUND, Constantes.ERROR_MESSAGE_NOT_FOUND), HttpStatus.NOT_FOUND);
 		}
 		throw new MissingServletRequestParameterException(Constantes.HEADER_ACCEPT_KEY, "String");
 	}
@@ -468,10 +393,7 @@ public class UsuariosApiController implements UsuariosApi {
 		
 		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
-			
-			log.info("usuario: {}" , usuario);
-			log.info("origen: {}" , origen);
-			log.info("destino: {}" , destino);
+			this.imprimirEncabezados(usuario, origen, destino);
 			
 			log.info("idUsuario: {}" , idUsuario);
 			log.info("modificarPerfilReq: {}" , modificarPerfilReq);
@@ -484,20 +406,9 @@ public class UsuariosApiController implements UsuariosApi {
 				if(resp != null) {
 					return new ResponseEntity<CapacidadUsuariosRes>(resp, HttpStatus.OK);
 				}
-				
-				NotFound nf = new NotFound();
-				nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
-				nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
-				
-				return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
+				return new ResponseEntity<NotFound>(this.notFound(Constantes.ERROR_CODE_NOT_FOUND, Constantes.ERROR_MESSAGE_NOT_FOUND), HttpStatus.NOT_FOUND);
 			}
-			
-			NotFound nf = new NotFound();
-			nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
-			nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
-			
-			return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
-			
+			return new ResponseEntity<NotFound>(this.notFound(Constantes.ERROR_CODE_NOT_FOUND, Constantes.ERROR_MESSAGE_NOT_FOUND), HttpStatus.NOT_FOUND);
 		}
 		throw new MissingServletRequestParameterException(Constantes.HEADER_ACCEPT_KEY, "String");
 
@@ -526,9 +437,7 @@ public class UsuariosApiController implements UsuariosApi {
 		
 		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
-			log.info("usuario: " + usuario);
-			log.info("origen: " + origen);
-			log.info("destino: " + destino);
+			this.imprimirEncabezados(usuario, origen, destino);
 			
 			log.info("idUsuario: " + idUsuario);
 			log.info("estatus: " + modificaEstatusReq.isActivo());
@@ -541,20 +450,9 @@ public class UsuariosApiController implements UsuariosApi {
 				if(resp != null) {
 					return new ResponseEntity<ResEstatus>(resp, HttpStatus.OK);
 				}
-				
-				NotFound nf = new NotFound();
-				nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
-				nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
-				
-				return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
+				return new ResponseEntity<NotFound>(this.notFound(Constantes.ERROR_CODE_NOT_FOUND, Constantes.ERROR_MESSAGE_NOT_FOUND), HttpStatus.NOT_FOUND);
 			}
-			
-			NotFound nf = new NotFound();
-			nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
-			nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
-			
-			return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
-			
+			return new ResponseEntity<NotFound>(this.notFound(Constantes.ERROR_CODE_NOT_FOUND, Constantes.ERROR_MESSAGE_NOT_FOUND), HttpStatus.NOT_FOUND);
 		}
 		throw new MissingServletRequestParameterException(Constantes.HEADER_ACCEPT_KEY, "String");
 	}
@@ -581,9 +479,7 @@ public class UsuariosApiController implements UsuariosApi {
 		
 		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
-			log.info("usuario: " + usuario);
-			log.info("origen: " + origen);
-			log.info("destino: " + destino);
+			this.imprimirEncabezados(usuario, origen, destino);
 			
 			log.info("idUsuario: " + idUsuario);
 			
@@ -595,20 +491,9 @@ public class UsuariosApiController implements UsuariosApi {
 				if(resp != null) {
 					return new ResponseEntity<EliminarUsuariosRes>(resp, HttpStatus.OK);
 				}
-				
-				NotFound nf = new NotFound();
-				nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
-				nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
-				
-				return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
+				return new ResponseEntity<NotFound>(this.notFound(Constantes.ERROR_CODE_NOT_FOUND, Constantes.ERROR_MESSAGE_NOT_FOUND), HttpStatus.NOT_FOUND);
 			}
-			
-			NotFound nf = new NotFound();
-			nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
-			nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
-			
-			return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
-			
+			return new ResponseEntity<NotFound>(this.notFound(Constantes.ERROR_CODE_NOT_FOUND, Constantes.ERROR_MESSAGE_NOT_FOUND), HttpStatus.NOT_FOUND);
 		}
 		throw new MissingServletRequestParameterException(Constantes.HEADER_ACCEPT_KEY, "String");
 
@@ -636,9 +521,7 @@ public class UsuariosApiController implements UsuariosApi {
     	
     	String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
         if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
-        	log.info("usuario: " + usuario);
-			log.info("origen: " + origen);
-			log.info("destino: " + destino);
+        	this.imprimirEncabezados(usuario, origen, destino);
 			
 			log.info("idUsuario: " + idUsuario);
 			
@@ -651,15 +534,46 @@ public class UsuariosApiController implements UsuariosApi {
 					return new ResponseEntity<PerfilUsuario>(user, HttpStatus.OK);
 				}
 			}
-
-			NotFound nf = new NotFound();
-			nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
-			nf.setMensaje(Constantes.ERROR_MESSAGE_NOT_FOUND);
-			
-			return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<NotFound>(this.notFound(Constantes.ERROR_CODE_NOT_FOUND, Constantes.ERROR_MESSAGE_NOT_FOUND), HttpStatus.NOT_FOUND);
         }
 		
         throw new MissingServletRequestParameterException(Constantes.HEADER_ACCEPT_KEY, "String");
+	}
+	
+	private InternalServerError internalServerError() {
+		InternalServerError ie = new InternalServerError();
+		ie.setCodigo(Constantes.ERROR_CODE_INTERNAL_ERROR);
+		ie.setMensaje(Constantes.ERROR_MESSAGE_INTERNAL_ERROR);
+		
+		log.info("{}", ConverterUtil.messageToJson(ie));
+		
+		return ie;
+	}
+
+	private BadRequest badRequest(String code, String message) {
+		BadRequest br = new BadRequest();
+		br.setMensaje(message);
+		br.setCodigo(code);
+
+		log.info("{}", ConverterUtil.messageToJson(br));
+		
+		return br;
+	}
+
+	private NotFound notFound(String code, String message) {
+		NotFound nf = new NotFound();
+		nf.setCodigo(code);
+		nf.setMensaje(message);
+		
+		log.info("{}", ConverterUtil.messageToJson(nf));
+		
+		return nf;
+	}
+	
+	private void imprimirEncabezados(String usuario, String origen, String destino) {
+		log.info("usuario: {}" , usuario);
+		log.info("origen: {}" , origen);
+		log.info("destino: {}" , destino);
 	}
 	
 }

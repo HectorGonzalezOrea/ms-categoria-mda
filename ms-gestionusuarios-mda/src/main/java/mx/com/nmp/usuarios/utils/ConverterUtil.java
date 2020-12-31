@@ -8,11 +8,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
-import mx.com.nmp.usuarios.mongodb.vo.DepatamentoAreaVO;
-import mx.com.nmp.usuarios.mongodb.vo.DireccionVO;
-import mx.com.nmp.usuarios.mongodb.vo.GerenciaVO;
-import mx.com.nmp.usuarios.mongodb.vo.PuestoVO;
-import mx.com.nmp.usuarios.mongodb.vo.SubdireccionVO;
 import mx.com.nmp.usuarios.oag.vo.GetTokenResponseVO;
 import mx.com.nmp.usuarios.oag.vo.IdentidadUsuarioResponseVO;
 import mx.com.nmp.usuarios.oag.vo.ProfileVO;
@@ -74,66 +69,6 @@ public class ConverterUtil {
 
 		} catch (IOException e) {
 			log.error("Error en stringJsonToObjectTokenProviderErrorVO: {0}" , e);
-		}
-		return obj;
-	}
-	
-	public static DepatamentoAreaVO stringJsonToObjectDepatamentoAreaVO(String json) {
-		ObjectMapper mapper = new ObjectMapper();
-		DepatamentoAreaVO obj = null;
-		try {
-			obj = mapper.readValue(json, DepatamentoAreaVO.class);
-
-		} catch (IOException e) {
-			log.error("Error en stringJsonToObjectDepatamentoAreaVO: {0}" , e);
-		}
-		return obj;
-	}
-	
-	public static DireccionVO stringJsonToObjectDireccionVO(String json) {
-		ObjectMapper mapper = new ObjectMapper();
-		DireccionVO obj = null;
-		try {
-			obj = mapper.readValue(json, DireccionVO.class);
-
-		} catch (IOException e) {
-			log.error("Error en stringJsonToObjectDireccionVO: {0}" , e);
-		}
-		return obj;
-	}
-	
-	public static GerenciaVO stringJsonToObjectGerenciaVO(String json) {
-		ObjectMapper mapper = new ObjectMapper();
-		GerenciaVO obj = null;
-		try {
-			obj = mapper.readValue(json, GerenciaVO.class);
-
-		} catch (IOException e) {
-			log.error("Error en stringJsonToObjectGerenciaVO: {0}" , e);
-		}
-		return obj;
-	}
-	
-	public static PuestoVO stringJsonToObjectPuestoVO(String json) {
-		ObjectMapper mapper = new ObjectMapper();
-		PuestoVO obj = null;
-		try {
-			obj = mapper.readValue(json, PuestoVO.class);
-
-		} catch (IOException e) {
-			log.error("Error en stringJsonToObjectPuestoVO: {0}" , e);
-		}
-		return obj;
-	}
-	
-	public static SubdireccionVO stringJsonToObjectSubdireccionVO(String json) {
-		ObjectMapper mapper = new ObjectMapper();
-		SubdireccionVO obj = null;
-		try {
-			obj = mapper.readValue(json, SubdireccionVO.class);
-
-		} catch (IOException e) {
-			log.error("Error en stringJsonToObjectSubdireccionVO: {0}" , e);
 		}
 		return obj;
 	}

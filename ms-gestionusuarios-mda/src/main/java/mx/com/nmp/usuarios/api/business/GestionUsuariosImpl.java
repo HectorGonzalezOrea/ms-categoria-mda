@@ -163,7 +163,7 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 
 	@Override
 	public PerfilUsuario consultarUsuariosConPerfil(Integer id, List<String> grupos) throws ApiException {
-		logger.info("consultarUsuariosConPerfil");
+		logger.info("consultarUsuariosConPerfil por id");
 		
 		PerfilUsuario userVo = null;
 		
@@ -178,7 +178,7 @@ public class GestionUsuariosImpl implements GestionUsuarios {
 	
 	@Override
 	public PerfilUsuario consultarUsuariosConPerfil(String usuario) throws ApiException {
-		logger.info("consultarUsuariosConPerfil");
+		logger.info("consultarUsuariosConPerfil por usuario");
 		
 		PerfilUsuario userVo = null;
 		

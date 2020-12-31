@@ -55,6 +55,16 @@ public class Constantes {
 	public static final String GRUPO = "grupo";
 	public static final String ID_PERFIL = "idPerfil";
 	
+	public static final String UID = "uid";
+	public static final String MAIL = "mail";
+	public static final String LAST_NAME = "lastName";
+	public static final String FIRST_NAME = "firstName";
+	public static final String DISTINGUISHEDNAME = "distinguishedname";
+	public static final String DESCRIPTION = "description";
+	public static final String SAMACCOUNTNAME = "samaccountname";
+	public static final String COMMONNAME = "commonname";
+	public static final String TITLE = "title";
+	
 	public static final String ID_DEPARTAMENTO = "idDepartamento";
 	
 }

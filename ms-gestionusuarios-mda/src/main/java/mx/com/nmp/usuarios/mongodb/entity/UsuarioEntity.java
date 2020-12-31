@@ -19,19 +19,10 @@ public class UsuarioEntity {
 	private String apellidoPaterno;
 	private String apellidoMaterno;
 	private String usuario;
-	/*
-	private CatalogoVO puesto;
-	private CatalogoVO direccion;
-	private CatalogoVO subdireccion;
-	private CatalogoVO gerencia;
-	private CatalogoVO departamentoArea;
-	*/
 	private Integer perfil;
 	
 	private String uid;
 	private String mail;
-	//private String physicaldeliveryofficename;
-	//private String department;
 	private String lastName;
 	private String firstName;
 	private String uri;

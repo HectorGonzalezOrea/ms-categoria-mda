@@ -109,7 +109,6 @@ public class PerfilServiceImpl implements PerfilService {
 				if (ce != null) {
 					CapacidadUsuariosReqInner curi = new CapacidadUsuariosReqInner();
 					curi.setDescripcinCap(DescripcinCapEnum.fromValue(ce.getDescripcion()));
-					//curi.setIdCapacidad(IdCapacidadEnum.fromValue(ce.getIdCapacidad().toString()));
 					curi.setIdCapacidad(IdCapacidadEnum.fromValue(ce.getIdCapacidad()));
 
 					cureq.add(curi);
@@ -134,9 +133,6 @@ public class PerfilServiceImpl implements PerfilService {
 			
 			encontrado = mongoTemplate.exists(query, PerfilEntity.class);
 		}
-		
-		logger.info("Encontrado {}", encontrado);
-		
 		return encontrado;
 	}
 
@@ -152,9 +148,6 @@ public class PerfilServiceImpl implements PerfilService {
 			
 			encontrado = mongoTemplate.exists(query, CapacidadEntity.class);
 		}
-		
-		logger.info("Encontrado {}", encontrado);
-		
 		return encontrado;
 		
 	}
@@ -188,9 +181,6 @@ public class PerfilServiceImpl implements PerfilService {
 			
 			encontrado = mongoTemplate.findOne(query, PerfilEntity.class);
 		}
-		
-		logger.info("Encontrado {}", encontrado);
-		
 		return encontrado;
 	}
 	

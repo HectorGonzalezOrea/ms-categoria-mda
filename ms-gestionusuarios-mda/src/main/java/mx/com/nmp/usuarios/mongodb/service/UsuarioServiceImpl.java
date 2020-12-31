@@ -54,7 +54,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		
 		BulkOperations upsert = this.llenarUsuariosParaSincronizar(usuarios);
 		BulkWriteResult upsertResults = upsert.execute();
-		logger.info("upsertResults: {}" , upsertResults.toString());
+		logger.info("upsertResults: {}" , upsertResults);
 		
 		this.actualizarInformacionParaSincronizar(usuarios, grupo);
 	}
@@ -62,7 +62,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@Override
 	public List<InfoUsuario> getAllUsers(String nombre, String apellidoPaterno, String apellidoMaterno, Boolean estatus, Integer perfil, String usuario, List<String> grupos) throws Exception {
 
-		List<UsuarioEntity> busquedaList = new ArrayList<>();
+		List<UsuarioEntity> busquedaList = null;
 		List<CapacidadUsuariosRes> capList = perfilService.buscarPerfilConCapacidades();
 
 		Map<Integer, CapacidadUsuariosRes> capMap = Maps
@@ -74,9 +74,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 			logger.info("sin filtros");
 			Query query = new Query();
 			query.addCriteria(Criteria.where(Constantes.GRUPOS).all(grupos));
-			query.addCriteria(Criteria.where(Constantes.PERFIL).ne(new Integer(1)));
-			logger.info("Query: {}" , query);
-			
+			query.addCriteria(Criteria.where(Constantes.PERFIL).ne(Integer.valueOf(1)));
+
 			busquedaList = mongoTemplate.find(query, UsuarioEntity.class);
 		} else {
 			logger.info("con filtros");
@@ -108,7 +107,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		Query query = new Query();
 		query.addCriteria(Criteria.where(Constantes.ID_USUARIO).is(idUsuario).and(Constantes.ACTIVO).is(Boolean.TRUE));
 		query.addCriteria(Criteria.where(Constantes.GRUPOS).all(grupos));
-		query.addCriteria(Criteria.where(Constantes.PERFIL).ne(new Integer(1)));
+		query.addCriteria(Criteria.where(Constantes.PERFIL).ne(Integer.valueOf(1)));
 		logger.info("Query: {}" , query);
 		
 		Update update = new Update();
@@ -131,9 +130,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 		Query query = new Query();
 		query.addCriteria(Criteria.where(Constantes.ID_USUARIO).is(idUsuario));
 		query.addCriteria(Criteria.where(Constantes.GRUPOS).all(grupos));
-		query.addCriteria(Criteria.where(Constantes.PERFIL).ne(new Integer(1)));
-		logger.info("Query: {}" , query);
-		
+		query.addCriteria(Criteria.where(Constantes.PERFIL).ne(Integer.valueOf(1)));
+
 		Update update = new Update();
 		update.set(Constantes.ACTIVO, estatus);
 		UsuarioEntity user = mongoTemplate.findAndModify(query, update, UsuarioEntity.class);
@@ -154,10 +152,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 		Query query = new Query();
 		query.addCriteria(Criteria.where(Constantes.ID_USUARIO).is(idUsuario));
 		query.addCriteria(Criteria.where(Constantes.GRUPOS).all(grupos));
-		query.addCriteria(Criteria.where(Constantes.PERFIL).ne(new Integer(1)));
-		
-		logger.info("Query: {}" , query);
-		
+		query.addCriteria(Criteria.where(Constantes.PERFIL).ne(Integer.valueOf(1)));
+
 		Update update = new Update();
 		update.set(Constantes.ACTIVO, Boolean.FALSE);
 		update.set(Constantes.PERFIL, null);
@@ -172,7 +168,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	
 	@Override
 	public PerfilUsuario consultaUsuarioPerfil(Integer usuario, List<String> grupos) throws Exception {
-		logger.info("consultaUsuarioPerfil");
+		logger.info("consultaUsuarioPerfil por id de usuario");
 		
 		PerfilUsuario user = null;
 		
@@ -196,7 +192,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	
 	@Override
 	public PerfilUsuario consultaUsuarioPerfil(Integer usuario) throws Exception {
-		logger.info("consultaUsuarioPerfil");
+		logger.info("consultaUsuarioPerfil por usuario");
 		
 		PerfilUsuario user = null;
 		
@@ -217,15 +213,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 	
 	@Override
 	public PerfilUsuario consultaUsuarioPerfil(String usuario) throws Exception {
-		logger.info("consultaUsuarioPerfil");
+		logger.info("consultaUsuarioPerfil por usuario");
 		
 		PerfilUsuario user = null;
 		
 		Query query = new Query();
 		query.addCriteria(Criteria.where(Constantes.USUARIO).is(usuario));
-		
-		logger.info("query: {}", query);
-		
+
 		UsuarioEntity entity = mongoTemplate.findOne(query, UsuarioEntity.class);
 		
 		List<CapacidadUsuariosRes> capList = perfilService.buscarPerfilConCapacidades();
@@ -242,7 +236,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 	
 	@Override
 	public Boolean consultarUsuario(String usuario) throws Exception {
-		logger.info("consultarUsuario");
+		logger.info("consultarUsuario por usuario");
 		
 		Boolean encontrado = false;
 		if(usuario != null) {
@@ -252,18 +246,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 			
 			encontrado = mongoTemplate.exists(query, UsuarioEntity.class);
 		}
-		
-		logger.info("Encontrado: {}", encontrado);
-		
 		return encontrado;
 	}
-	
-	/*
-	LookupOperation lookup = LookupOperation.newLookup().from("puesto").localField("puesto").foreignField("idPuesto").as("puestoO");
-	AggregationResults<UsuarioConPerfil> result = mongoTemplate.aggregate(Aggregation.newAggregation(lookup, Aggregation.match(new Criteria())), UsuarioNewEntity.class,
-			UsuarioConPerfil.class);
-	*/
-	
+
 	private PerfilUsuario casterEntityToPerfil(UsuarioEntity user, Map<Integer, CapacidadUsuariosRes> capMap) {
 		PerfilUsuario vo = null;
 		
@@ -276,40 +261,17 @@ public class UsuarioServiceImpl implements UsuarioService {
 			vo.setApellidoMaterno(user.getApellidoMaterno());
 			vo.setUsuario(user.getUsuario());
 			
-			/*
-			if(user.getPuesto() != null) {
-				vo.setPuesto(user.getPuesto());
-			}
-			
-			if(user.getDireccion() != null) {
-				vo.setDireccion(user.getDireccion());
-			}
-			
-			if(user.getSubdireccion() != null) {
-				vo.setSubdireccion(user.getSubdireccion());
-			}
-			
-			if(user.getGerencia() != null) {
-				vo.setGerencia(user.getGerencia());
-			}
-			
-			if(user.getDepartamentoArea() != null) {
-				vo.setDepartamentoArea(user.getDepartamentoArea());
-			}
-			*/
 			if(user.getPerfil() != null) {
 				vo.setPerfil(capMap.get(user.getPerfil()));
 			}
 			
 			vo.setCommonname(user.getCommonname());
-			//vo.setDepartment(user.getDepartment());
 			vo.setDescription(user.getDescription());
 			vo.setDistinguishedname(user.getDistinguishedname());
 			vo.setFirstName(user.getFirstname());
 			vo.setLastName(user.getLastname());
 			vo.setMail(user.getMail());
 			vo.setMemberOf(user.getMemberof());
-			//vo.setPhysicaldeliveryofficename(user.getPhysicaldeliveryofficename());
 			vo.setSamaccountname(user.getSamaccountname());
 			vo.setTitle(user.getTitle());
 			vo.setUid(user.getUid());
@@ -331,28 +293,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 			vo.setApellidoPaterno(user.getApellidoPaterno());
 			vo.setApellidoMaterno(user.getApellidoMaterno());
 			vo.setUsuario(user.getUsuario());
-			
-			/*
-			if(user.getPuesto() != null) {
-				vo.setPuesto(user.getPuesto());
-			}
-			
-			if(user.getDireccion() != null) {
-				vo.setDireccion(user.getDireccion());
-			}
-			
-			if(user.getSubdireccion() != null) {
-				vo.setSubdireccion(user.getSubdireccion());
-			}
-			
-			if(user.getGerencia() != null) {
-				vo.setGerencia(user.getGerencia());
-			}
-			
-			if(user.getDepartamentoArea() != null) {
-				vo.setDepartamentoArea(user.getDepartamentoArea());
-			}
-			*/
 			if(user.getPerfil() != null) {
 				vo.setPerfil(capMap.get(user.getPerfil()));
 			}
@@ -368,7 +308,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		
 		BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, UsuarioEntity.class);
 
-		List<String> ids = new ArrayList<String>();
+		List<String> ids = new ArrayList<>();
 		
 		if(!usuarios.isEmpty()) {
 			for(UsuarioVO vo : usuarios) {
@@ -378,9 +318,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 			Query queryUpdateMulti = new Query();
 			
 			queryUpdateMulti
-			.addCriteria(new Criteria("usuario").in(ids))
-			.addCriteria(new Criteria("activo").exists(false))
-			.addCriteria(new Criteria(Constantes.PERFIL).ne(new Integer(1)));
+			.addCriteria(new Criteria(Constantes.USUARIO).in(ids))
+			.addCriteria(new Criteria(Constantes.ACTIVO).exists(false))
+			.addCriteria(new Criteria(Constantes.PERFIL).ne(Integer.valueOf(1)));
 
 			List<UsuarioEntity> usuariosCreados = mongoTemplate.find(queryUpdateMulti, UsuarioEntity.class);
 			
@@ -390,19 +330,19 @@ public class UsuarioServiceImpl implements UsuarioService {
 			.stream()
 			.forEach( u -> {
 				
-				logger.info("usuario a: {}", u.toString());
+				logger.info("usuario a: {}", u);
 				
 				Update updateMulti = new Update();
 				Long id = sequenceGeneratorService.generateSequence(USUARIO_SEQ_KEY);
 				
 				logger.info("idUsuario: {}", id);
 				
-				updateMulti.set("idUsuario", id);
-				updateMulti.set("activo", false);
-				updateMulti.addToSet("memberof", grupo);
+				updateMulti.set(Constantes.ID_USUARIO, id);
+				updateMulti.set(Constantes.ACTIVO, false);
+				updateMulti.addToSet(Constantes.GRUPOS, grupo);
 				
 				Query queryAux = new Query();
-				queryAux.addCriteria(new Criteria("usuario").is(u.getUsuario()));
+				queryAux.addCriteria(new Criteria(Constantes.USUARIO).is(u.getUsuario()));
 				
 				logger.info("queryAux: {}", queryAux);
 				
@@ -412,7 +352,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 			
 			if(!usuariosCreados.isEmpty()) {
 				BulkWriteResult updateResults = bulkOps.execute();
-				logger.info("updateResults: {}" , updateResults.toString());
+				logger.info("updateResults: {}" , updateResults);
 			}
 		}
 
@@ -428,7 +368,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 			.stream()
 			.forEach(u -> {
 
-				logger.info("usuario: {}" , u.toString());
+				logger.info("usuario: {}" , u);
 				Update upSert = new Update();
 
 				Query queryUpSert = new Query()
@@ -442,8 +382,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 					logger.info("aps: {}" , aps.length);
 					
 					if (aps.length == 2) {
-						upSert.set("apellidoPaterno", aps[0]);
-						upSert.set("apellidoMaterno", aps[1]);
+						upSert.set(Constantes.APELLIDO_PATERNO, aps[0]);
+						upSert.set(Constantes.APELLIDO_MATERNO, aps[1]);
 					}
 
 					if(aps.length > 2) {
@@ -454,28 +394,25 @@ public class UsuarioServiceImpl implements UsuarioService {
 							sb.append(" ");
 						}
 						
-						upSert.set("apellidoPaterno", sb.toString().trim());
-						upSert.set("apellidoMaterno", aps[aps.length - 1]);
+						upSert.set(Constantes.APELLIDO_PATERNO, sb.toString().trim());
+						upSert.set(Constantes.APELLIDO_MATERNO, aps[aps.length - 1]);
 					}
 					
 					if(aps.length < 2) {
-						upSert.set("apellidoPaterno", u.getApellidos());
+						upSert.set(Constantes.APELLIDO_PATERNO, u.getApellidos());
 					}
 				}
 
-				upSert.set("usuario", u.getIdUsuario());
-				upSert.set("uid", u.getGuid());
-				upSert.set("mail", u.getCorreo());
-				upSert.set("lastName", u.getApellidos());
-				upSert.set("firstName", u.getNombre());
-				upSert.set("distinguishedname", u.getNombreDistintivo());
-				upSert.set("description", u.getDescripcion());
-
-				//upSert.addToSet("memberof", grupo);
-				upSert.set("samaccountname", u.getNombreCompleto());
-				upSert.set("commonname", u.getNombreDominio());
-
-				upSert.set("title", u.getPuesto());
+				upSert.set(Constantes.USUARIO, u.getIdUsuario());
+				upSert.set(Constantes.UID, u.getGuid());
+				upSert.set(Constantes.MAIL, u.getCorreo());
+				upSert.set(Constantes.LAST_NAME, u.getApellidos());
+				upSert.set(Constantes.FIRST_NAME, u.getNombre());
+				upSert.set(Constantes.DISTINGUISHEDNAME, u.getNombreDistintivo());
+				upSert.set(Constantes.DESCRIPTION, u.getDescripcion());
+				upSert.set(Constantes.SAMACCOUNTNAME, u.getNombreCompleto());
+				upSert.set(Constantes.COMMONNAME, u.getNombreDominio());
+				upSert.set(Constantes.TITLE, u.getPuesto());
 				
 				bulkOps.upsert(queryUpSert, upSert);
 				
@@ -493,7 +430,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		
 		Query query = new Query();
 		query.addCriteria(Criteria.where(Constantes.GRUPOS).all(grupos));
-		query.addCriteria(Criteria.where(Constantes.PERFIL).ne(new Integer(1)));
+		query.addCriteria(Criteria.where(Constantes.PERFIL).ne(Integer.valueOf(1)));
 		
 		if (nombre != null) {
 			query.addCriteria(validarNombreNull(nombre, apellidoPaterno, apellidoMaterno, activo, usuario, perfil));
