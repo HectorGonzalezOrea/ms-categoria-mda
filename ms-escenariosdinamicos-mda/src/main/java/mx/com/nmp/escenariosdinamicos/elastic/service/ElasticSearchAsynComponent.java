@@ -18,6 +18,7 @@ import mx.com.nmp.escenariosdinamicos.api.EscenariosApiController;
 import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexVentasVO;
+import mx.com.nmp.escenariosdinamicos.elastic.vo.MdaVentasVO;
 import mx.com.nmp.escenariosdinamicos.model.CatalogoVO;
 import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.model.component.ProducerMessageComponent;
@@ -48,13 +49,13 @@ public class ElasticSearchAsynComponent {
 		List<PartidaVO> lstPartidaVO = null;
 		List<IndexVentasVO> scrollElasticVentas = null;
 		//primero consultamos el indice de garantias
-		CatalogoVO nivelAgrupacion=deserializaNivelAgrupacion(crearEscenariosRequest.getInfoRegla().getNivelAgrupacion());//converción de obj->VO
-		String criterioBusqueda =crearCriterioDeBusqueda(nivelAgrupacion, crearEscenariosRequest);//crea la sentencia where para elasticSearch
-		lstIndexGarantia = elasticService.scrollElasticGarantias(criterioBusqueda,indexVenta);
-		List<String> couosGarantias=extraeCuos(lstIndexGarantia);
+		//CatalogoVO nivelAgrupacion=deserializaNivelAgrupacion(crearEscenariosRequest.getInfoRegla().getNivelAgrupacion());//converción de obj->VO
+		//String criterioBusqueda =crearCriterioDeBusqueda(nivelAgrupacion, crearEscenariosRequest);//crea la sentencia where para elasticSearch
+		//lstIndexGarantia = elasticService.scrollElasticGarantias(criterioBusqueda,indexVenta);
+		//List<String> couosGarantias=extraeCuos(lstIndexGarantia);
 		
 		// primero obtenemos las ventas de los ultimos tres dias
-		scrollElasticVentas = elasticService.scrollElasticVentas(indexVenta,couosGarantias);
+		//scrollElasticVentas = elasticService.scrollElasticVentas(indexVenta,couosGarantias);
 		// despues consultamos las partidas a partir de las ventas
 
 		lstPartidaVO = castObjectGeneric.castPartidasToPartidaValorMonte(lstIndexGarantia,
@@ -67,40 +68,14 @@ public class ElasticSearchAsynComponent {
 		
 	}
 	
-	public CatalogoVO deserializaNivelAgrupacion(Object nivelAgrupacion){
-		 ObjectMapper mapper = new ObjectMapper();
-		 CatalogoVO nivelAgrupacionGeneric=null;
-		 String json;
-		try {
-			json = mapper.writeValueAsString(nivelAgrupacion);
-			 nivelAgrupacionGeneric=mapper.readValue(json, CatalogoVO.class);
-		} catch (JsonProcessingException e) {
-			log.error("Error al convertir String");
-		} catch (IOException e) {
-			log.error("error al convertir a pojo");
-			e.printStackTrace();
-		}
-		return nivelAgrupacionGeneric;
-	}
-	
-	public String crearCriterioDeBusqueda(CatalogoVO nivelAgrupacion,EjecutarEscenarioDinamicoReq crearEscenariosRequest){
-		String criterioBusqueda=null;
-		if(nivelAgrupacion.getDescripcion().equals(Constantes.RAMO)){
-			criterioBusqueda="ramo:'"+crearEscenariosRequest.getInfoRegla().getRamo()+"'";
-		}else if(nivelAgrupacion.getDescripcion().equals(Constantes.SUBRAMO)){
-			criterioBusqueda="subramo:'"+crearEscenariosRequest.getInfoRegla().getSubramo().get(0)+"'";
-		}else if(nivelAgrupacion.getDescripcion().equals(Constantes.FACTOR)){
-			criterioBusqueda="factor:'"+crearEscenariosRequest.getInfoRegla().getFactor().get(0)+"'";
-		}else if(nivelAgrupacion.getDescripcion().equals(Constantes.CATEGORIA)){
-			String categoria=emuMacroCategoria.calculaCategoriaTop(crearEscenariosRequest.getInfoRegla().getCategoria());
-			criterioBusqueda="categoria:'"+categoria+"'";
-		}	
-		return criterioBusqueda;
-	}
-	
-	public List<String> extraeCuos(List<IndexGarantiaVO> lstGarantias){
+	public List<String> extraeFolioPartida(List<MdaVentasVO> lstGarantias){
+		log.info("extrayendo ids de partidas");
 		List<String> cuos=new ArrayList<>();
-		lstGarantias.stream().forEach(cuo->cuos.add(cuo.getNumCuo()));
+		lstGarantias.stream().forEach(cuo->{
+			log.info("idPartida Extraido->{}",cuo.getFolioPartida());
+			cuos.add(cuo.getFolioPartida());
+		});
+		log.info("size de partidas extraidas [{}]",cuos.size());
 		return cuos;
 	}
 	

@@ -84,9 +84,9 @@ public final class Constantes {
 	public static final int PRECIO_MERCADO=7;
 	
 	public static final int NUMERO_MAXIMO_SCROLL =5;
-	public static final int DIFERENCIA_DIAS =-3;
-	public static final String CAMPO_FECHA_INDEX="fecha";
-	public static final String CUO_PARTIDA="num_cuo";
+	public static final int DIFERENCIA_DIAS =-33;
+	public static final String CAMPO_FECHA_INDEX="fecha_op";
+	public static final String PARTIDA="partida";
 	public static final String COU_VENTA="cuo";
 	
 	public static final String REQUEST_LOG = "Request: ";
@@ -132,10 +132,14 @@ public final class Constantes {
 	public static final String MAX="maximo";
 	public static final String SKU_OPT="8005050";
 	
-	//nivelAgrupacion
+	//nivelAgrupacion desde el request
 	public static final String RAMO="Ramo";
 	public static final String SUBRAMO="Subramo";
 	public static final String FACTOR="Factor";
 	public static final String CATEGORIA="Categoria";
 	
+	//nivelAgrupacion desde el indice de elastic
+	public static final String SUBRAMO_DES="subramo_des";
+	public static final String FACTOR_DES="factor";
+	public static final String RAMO_DES= "ramo_des";
 }

@@ -3,6 +3,7 @@ package mx.com.nmp.escenariosdinamicos.elastic.vo;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @Validated
 public class IndexVentasVO {
@@ -48,7 +49,7 @@ public class IndexVentasVO {
 	private String ivaComisionDsExtemporaneo;
 	@JsonProperty("iva_comision_pase")
 	private String ivaComisionPase;
-	@JsonProperty("iva_interes_almonedas")
+	@JsonProperty("iva_interes_almoneda")
 	private String ivaInteresAlmoneda;
 	@JsonProperty("iva_interes_deposito")
 	private String ivaInteresDeposito;
@@ -65,9 +66,14 @@ public class IndexVentasVO {
 	@JsonProperty("valor_unitario")
 	private String valorUnitario;
 	//////////////////////valores que aun no se definen
-	private String partida;
-	private String sku;
+	//private String partida;
+	//private String sku;
 	//////////////////////////////////////////////
+	@JsonProperty("@version")
+	private String version;
+	@JsonProperty("@timestamp")
+	private String timestamp;
+	
 	public String getCancelado() {
 		return cancelado;
 	}
@@ -242,18 +248,18 @@ public class IndexVentasVO {
 	public void setValorUnitario(String valorUnitario) {
 		this.valorUnitario = valorUnitario;
 	}
-	public String getPartida() {
-		return partida;
-	}
-	public String getSku() {
-		return sku;
-	}
-	public void setPartida(String partida) {
-		this.partida = partida;
-	}
-	public void setSku(String sku) {
-		this.sku = sku;
-	}
+//	public String getPartida() {
+//		return partida;
+//	}
+//	public String getSku() {
+//		return sku;
+//	}
+//	public void setPartida(String partida) {
+//		this.partida = partida;
+//	}
+//	public void setSku(String sku) {
+//		this.sku = sku;
+//	}
 
 	
 	@Override
@@ -289,8 +295,8 @@ public class IndexVentasVO {
 	    sb.append("   tipoComprobante : ").append(toIndentedString(tipoComprobante)).append("\n");
 	    sb.append("    tipoOperacionEtiqueta: ").append(toIndentedString(tipoOperacionEtiqueta)).append("\n");
 	    sb.append("    valorUnitario: ").append(toIndentedString(valorUnitario)).append("\n");
-	    sb.append("    partida: ").append(toIndentedString(partida)).append("\n");
-	    sb.append("    sku: ").append(toIndentedString(sku)).append("\n");
+	    sb.append("    version: ").append(toIndentedString(version)).append("\n");
+	    sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	  }
@@ -301,6 +307,18 @@ public class IndexVentasVO {
 	    }
 	    return o.toString().replace("\n", "\n    ");
 	  }
+	public String getVersion() {
+		return version;
+	}
+	public void setVersion(String version) {
+		this.version = version;
+	}
+	public String getTimestamp() {
+		return timestamp;
+	}
+	public void setTimestamp(String timestamp) {
+		this.timestamp = timestamp;
+	}
 	
 
 	

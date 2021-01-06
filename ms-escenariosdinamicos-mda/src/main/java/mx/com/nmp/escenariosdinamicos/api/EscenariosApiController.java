@@ -32,6 +32,7 @@ import mx.com.nmp.escenariosdinamicos.elastic.service.ElasticSearchAsynComponent
 import mx.com.nmp.escenariosdinamicos.elastic.service.ElasticService;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexVentasVO;
+import mx.com.nmp.escenariosdinamicos.elastic.vo.MdaVentasVO;
 import mx.com.nmp.escenariosdinamicos.model.BadRequest;
 import mx.com.nmp.escenariosdinamicos.model.Bodydiasreq;
 import mx.com.nmp.escenariosdinamicos.model.CatalogoVO;
@@ -70,33 +71,31 @@ public class EscenariosApiController implements EscenariosApi {
 	private static final Logger log = LoggerFactory.getLogger(EscenariosApiController.class);
 
 	private final ObjectMapper objectMapper;
-
 	private final HttpServletRequest request;
-
-	@Autowired
 	private EscenariosService escenarioService;
-
-	@Autowired
 	private ElasticProperties elasticProperties;
-	@Autowired
 	private ClientesMicroservicios clientesMicroservicios;
-	@Autowired
 	private CastObjectGeneric castObjectGeneric;
-	@Autowired
 	private ClientOAGService clientOAGService;
-	@Autowired
-	private EmuMacroCategoria emuMacroCategoria;
-
-	@Autowired
 	private ElasticSearchAsynComponent elasticSearchAsynComponent;
-	@Autowired
 	private ElasticService elasticService;
+	
 
-	@org.springframework.beans.factory.annotation.Autowired
-	public EscenariosApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+	@Autowired
+	public EscenariosApiController(ObjectMapper objectMapper, HttpServletRequest request,
+			ElasticService elasticService,ElasticSearchAsynComponent elasticSearchAsynComponent
+			,ClientOAGService clientOAGService,CastObjectGeneric castObjectGeneric,
+			ClientesMicroservicios clientesMicroservicios,ElasticProperties elasticProperties,EscenariosService escenarioService) {
 		objectMapper.configure(MapperFeature.ALLOW_COERCION_OF_SCALARS, false);
 		this.objectMapper = objectMapper;
 		this.request = request;
+		this.elasticService=elasticService;
+		this.elasticSearchAsynComponent=elasticSearchAsynComponent;
+		this.clientOAGService=clientOAGService;
+		this.castObjectGeneric=castObjectGeneric;
+		this.clientesMicroservicios=clientesMicroservicios;
+		this.elasticProperties=elasticProperties;
+		this.escenarioService=escenarioService;
 	}
 
 	/*
@@ -422,7 +421,7 @@ public class EscenariosApiController implements EscenariosApi {
 			@ApiParam(value = "Usuario en el sistema origen que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = "Sistema que origina la petición", required = true, allowableValues = "portalInteligenciaComercial") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información", required = true, allowableValues = "bluemix, mockserver") @RequestHeader(value = "destino", required = true) String destino,
-			@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos") @Valid @RequestBody SimularEscenarioDinamicoReq crearEscenariosReques) {
+			@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos") @Valid @RequestBody SimularEscenarioDinamicoReq simular) {
 		
 		log.info("*********************************************************");
 		log.info("Simular escenarios dinamicos");
@@ -439,30 +438,28 @@ public class EscenariosApiController implements EscenariosApi {
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
 			ObjectMapper mapper=new ObjectMapper();
 			SimularEscenarioDinamicoRes response = new SimularEscenarioDinamicoRes();
-			ArrayList<PartidaPrecioFinal> lstPartidaPrecioValorMonte = new ArrayList<PartidaPrecioFinal>();
+			//ArrayList<PartidaPrecioFinal> lstPartidaPrecioValorMonte = new ArrayList<PartidaPrecioFinal>();
 			log.info("obtencion de indices");
 			List<IndexGarantiaVO> lstIndexGarantia = null;
 			RequestReglaEscenarioDinamicoDto wrapperReglaEscenarioDinamico = new RequestReglaEscenarioDinamicoDto();
 			List<PartidaVO> castIndexToVO = null;
-			List<IndexVentasVO> scrollElasticVentas = null;
+			List<MdaVentasVO> scrollElasticVentas = null;
 			try {
-				// primero obtenemos las ventas de los ultimos tres dias
-				CatalogoVO nivelAgrupacion=elasticSearchAsynComponent.deserializaNivelAgrupacion(crearEscenariosReques.getInfoRegla().getNivelAgrupacion());
-				String criterio=elasticSearchAsynComponent.crearCriterioDeBusqueda(nivelAgrupacion, castObjectGeneric.convertirEjeTOSim(crearEscenariosReques));
-				lstIndexGarantia = elasticService.scrollElasticGarantias(criterio,elasticProperties.getIndexGarantia());
+				// primero obtenemos las ventas de los ultimos tres dias en este caso de los ultimos 365 dias con fines de prueba
+				scrollElasticVentas = elasticService.scrollElasticVentas(elasticProperties.getIndexVenta(),simular);
+				if(!scrollElasticVentas.isEmpty()){
+					List<String> lstCuos =elasticSearchAsynComponent.extraeFolioPartida(scrollElasticVentas);
+					// despues consultamos las partidas a partir de las ventas
+					lstIndexGarantia = elasticService.scrollElasticGarantias(simular,elasticProperties.getIndexGarantia(),lstCuos);	
+					lstIndexGarantia.forEach(i -> log.info(i.toString()));
+					//lstPartidaPrecioValorMonte = (ArrayList<PartidaPrecioFinal>)
+					clientesMicroservicios.calcularValorMonte(castObjectGeneric.castGarantiasToCalculoValor(lstIndexGarantia), usuario, origen, destino);
+					castIndexToVO = castObjectGeneric.castPartidasToPartidaValorMonte(lstIndexGarantia,simular.getInfoRegla());
+					wrapperReglaEscenarioDinamico.setPartida(castIndexToVO);
+					ResponseOAGDto res=clientOAGService.reglaEscenarioDinamico(wrapperReglaEscenarioDinamico);
+					return new ResponseEntity<ResponseOAGDto>(res, HttpStatus.OK);
+				} 
 				
-				List<String> lstCuos =elasticSearchAsynComponent.extraeCuos(lstIndexGarantia);
-				 scrollElasticVentas = elasticService.scrollElasticVentas(elasticProperties.getIndexVenta(),lstCuos);
-				// despues consultamos las partidas a partir de las ventas
-				
-				lstIndexGarantia.forEach(i -> log.info(i.toString()));
-				lstPartidaPrecioValorMonte = (ArrayList<PartidaPrecioFinal>)
-						clientesMicroservicios.calcularValorMonte(
-								castObjectGeneric.castGarantiasToCalculoValor(lstIndexGarantia), usuario, origen, destino);
-				castIndexToVO = castObjectGeneric.castPartidasToPartidaValorMonte(lstIndexGarantia,
-						crearEscenariosReques.getInfoRegla());
-				wrapperReglaEscenarioDinamico.setPartida(castIndexToVO);
-				ResponseOAGDto res=clientOAGService.reglaEscenarioDinamico(wrapperReglaEscenarioDinamico);
 			} catch (Exception e) {
 				log.error("Exception: {}", e);
 				InternalServerError is = new InternalServerError();
@@ -470,8 +467,8 @@ public class EscenariosApiController implements EscenariosApi {
 				is.setMensaje(Constantes.ERROR_SERVER_MSG);
 				return new ResponseEntity<InternalServerError>(is, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-			response.addAll(lstPartidaPrecioValorMonte);
-			return new ResponseEntity<SimularEscenarioDinamicoRes>(response, HttpStatus.OK);
+			//response.addAll(lstPartidaPrecioValorMonte);
+			//return new ResponseEntity<SimularEscenarioDinamicoRes>(response, HttpStatus.OK);
 		}
 		
 		BadRequest badRequest = new BadRequest();

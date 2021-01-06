@@ -1,5 +1,6 @@
 package mx.com.nmp.escenariosdinamicos.utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -7,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class EmuMacroCategoria {
 
-	public  String calculaCateogiaCompleta(String parametro) {
+	public String calculaCateogiaCompleta(String parametro) {
 		String dato=null;
 		String paramAux = parametro.toUpperCase();
 		List<String> lstCategoriasCompletas = Arrays.asList("JUEGO", "RELOJ", "COLLAR", "ARETE", "PULSERA", "ANILLO",
@@ -36,5 +37,11 @@ public class EmuMacroCategoria {
 		}
 		dato="Sin_Categoria";
 		return dato;
+	}
+	
+	public  List<String> calculaCatetoriaPorLista(List<String> categoria){
+		List<String> categoriasEncontradas=new ArrayList<>();
+		categoria.stream().forEach(cat->categoriasEncontradas.add(calculaCategoriaTop(cat)));
+		return categoriasEncontradas;
 	}
 }

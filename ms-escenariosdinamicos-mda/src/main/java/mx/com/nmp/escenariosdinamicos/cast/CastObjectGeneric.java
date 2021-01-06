@@ -3,12 +3,12 @@ package mx.com.nmp.escenariosdinamicos.cast;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -16,7 +16,8 @@ import com.google.gson.GsonBuilder;
 
 import mx.com.nmp.escenariosdinamicos.clienteservicios.vo.CalculoValorVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
-import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexVentasVO;
+import mx.com.nmp.escenariosdinamicos.elastic.vo.MdaVentasVO;
+import mx.com.nmp.escenariosdinamicos.model.CatalogoVO;
 import mx.com.nmp.escenariosdinamicos.model.CommonAjuste;
 import mx.com.nmp.escenariosdinamicos.model.CommonBaseAjuste;
 import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoReq;
@@ -67,18 +68,19 @@ public class CastObjectGeneric {
 	}
 	//cast con lamda
 	public List<CalculoValorVO> castGarantiasToCalculoValor(List<IndexGarantiaVO> lstCalculoValor) {
-		List<CalculoValorVO> lstCalculoValors = lstCalculoValor.stream().map(calculoValor -> {
-			log.info("Cast con lamda----");
-			log.info(calculoValor.toString());
-			return new CalculoValorVO(calculoValor.getPartida() != null ? calculoValor.getPartida() : 0,
-					calculoValor.getSku(),
-					calculoValor.getValorMonteAct() != null ? calculoValor.getValorMonteAct() : 0,
-					calculoValor.getAlhajasGramaje() != null ? calculoValor.getAlhajasGramaje() : 0,
-					calculoValor.getAlhajasKilates() != null ? calculoValor.getAlhajasKilates() : 0,
-					calculoValor.getAlhajasIIncremento() != null ? calculoValor.getAlhajasIIncremento() : 0,
-					calculoValor.getAlhajasDesplComer() != null ? calculoValor.getAlhajasDesplComer() : 0,
-					calculoValor.getAlhajasAvaluoCompl() != null ? calculoValor.getAlhajasAvaluoCompl() : 0);
-		}).collect(Collectors.toList());
+		List<CalculoValorVO> lstCalculoValors = new ArrayList<>();
+		lstCalculoValor.stream().forEach(calc ->{
+			CalculoValorVO calculoValor=new CalculoValorVO();
+			calculoValor.setIdPartida(calc.getPartida()!=null?calc.getPartida():0); 
+			calculoValor.setSKU(calc.getSku());
+			calculoValor.setValorAncla(calc.getValorMonteAct()!= null ? calc.getValorMonteAct():0);
+			calculoValor.setGramaje(calc.getAlhajasGramaje()!= null ? calc.getAlhajasGramaje() : 0);
+			calculoValor.setKilataje(calc.getAlhajasKilates()!=null?calc.getAlhajasKilates():0);
+			calculoValor.setIncremento(calc.getAlhajasIIncremento()!=null?calc.getAlhajasIIncremento():0);
+			calculoValor.setDesplazamiento(calc.getAlhajasDesplComer()!= null ? calc.getAlhajasDesplComer() : 0);
+			calculoValor.setAvaluoComplementario(calc.getAlhajasAvaluoCompl()!=null?calc.getAlhajasAvaluoCompl():0);
+			lstCalculoValors.add(calculoValor);
+		});
 		return lstCalculoValors;
 	}
 	
@@ -130,7 +132,6 @@ public class CastObjectGeneric {
 			partida.setPrecioFinal(null);
 			partida.setPrecioEtiqueta(null);
 			partida.setCriterio(infoRegla.getReglasDescuento().getCriterio().getDescripcion());
-
 			partida.setPrecioVenta(index.getPrecioVentaAct());
 			partida.setMontoPrestamo(index.getImportePrestamo());
 		}
@@ -189,11 +190,11 @@ public class CastObjectGeneric {
 		return partida;
 	}
 	
-	public IndexVentasVO jsonFieldToObjectVenta(String jsonField) {
+	public MdaVentasVO jsonFieldToObjectVenta(String jsonField) {
 		ObjectMapper mapper = new ObjectMapper();
-		IndexVentasVO participantJsonList = null;
+		MdaVentasVO participantJsonList = null;
 		try {
-			participantJsonList = mapper.readValue(jsonField,IndexVentasVO.class);
+			participantJsonList = mapper.readValue(jsonField,MdaVentasVO.class);
 		} catch (IOException e) {
 			log.error("{0}", e);
 		}
@@ -202,7 +203,6 @@ public class CastObjectGeneric {
 	}
 	
 	private  Double calcularBaseAjuste(Double factorAjuste, Double precio  ) {
-		
 		Double total;
 		Double porcentaje= (factorAjuste/100);
 		total=precio*porcentaje;
@@ -211,14 +211,14 @@ public class CastObjectGeneric {
 	
 	private Double retornaPrecioPorTipoBaseAjuste(IndexGarantiaVO index,CommonAjuste tipoAjuste){
 		Double valorARetornar=null;
-		if(Integer.valueOf(tipoAjuste.getId())==Constantes.AVALUO_TECNICO){
+		if(Integer.valueOf(tipoAjuste.getId())==Constantes.AVALUO_TECNICO){//falta revisar mapeo con Plataforma Com
 			valorARetornar=index.getAvaluoTecOrigen();
 		}
 		if(Integer.valueOf(tipoAjuste.getId())==Constantes.VALOR_MONTE_ACTUALIZADO){
 			valorARetornar=index.getValorMonteAct();
 		}
 		if(Integer.valueOf(tipoAjuste.getId())==Constantes.PRECIO_ETIQUETA){
-			valorARetornar=(Double.parseDouble(index.getPrecioVentaInicial()));
+			valorARetornar=(Double.parseDouble(index.getPrecioVentaSalida()));
 		}
 		if(Integer.valueOf(tipoAjuste.getId())==Constantes.PRECIO_ACTUAL){
 			valorARetornar=index.getPrecioVentaAct();
@@ -229,7 +229,7 @@ public class CastObjectGeneric {
 		if(Integer.valueOf(tipoAjuste.getId())==Constantes.AVALUO_COMERCIAL){
 			valorARetornar=index.getAvaluoComerc();
 		}
-		if(Integer.valueOf(tipoAjuste.getId())==Constantes.PRECIO_MERCADO){
+		if(Integer.valueOf(tipoAjuste.getId())==Constantes.PRECIO_MERCADO){//falta revisar mapeo
 			valorARetornar=(null);
 		}
 		return valorARetornar;
@@ -275,6 +275,23 @@ public class CastObjectGeneric {
 			esc.setInfoRegla(param.getInfoRegla());
 		}
 		return esc;
+	}
+	
+	public CatalogoVO deserializaNivelAgrupacion(Object nivelAgrupacion){
+		 ObjectMapper mapper = new ObjectMapper();
+		 CatalogoVO nivelAgrupacionGeneric=null;
+		 String json;
+		try {
+			json = mapper.writeValueAsString(nivelAgrupacion);
+			 nivelAgrupacionGeneric=mapper.readValue(json, CatalogoVO.class);
+		} catch (JsonProcessingException e) {
+			log.error("Error al convertir String");
+		} catch (IOException e) {
+			log.error("error al convertir a pojo");
+			e.printStackTrace();
+		}
+		log.info("nivel agrupacion ->[{}]",nivelAgrupacionGeneric.getDescripcion());
+		return nivelAgrupacionGeneric;
 	}
 }
 

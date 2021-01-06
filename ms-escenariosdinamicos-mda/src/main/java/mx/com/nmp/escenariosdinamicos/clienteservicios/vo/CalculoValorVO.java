@@ -22,17 +22,6 @@ public class CalculoValorVO {
 	private Double desplazamiento;
 	@JsonProperty("avaluoComplementario")
 	private Double avaluoComplementario;
-	  
-	public CalculoValorVO(Integer idPartida,String sku,Double valorAncla,Double gramaje,Double kilataje,Double incremento,Double desplazamiento,Double avaluoComplementario){
-		this.idPartida=idPartida;
-		this.sku=sku;
-		this.valorAncla=valorAncla;
-		this.gramaje=gramaje;
-		this.kilataje=kilataje;
-		this.incremento=incremento;
-		this.desplazamiento=desplazamiento;
-		this.avaluoComplementario=avaluoComplementario;
-	}
 	
 	public Integer getIdPartida() {
 		return idPartida;
