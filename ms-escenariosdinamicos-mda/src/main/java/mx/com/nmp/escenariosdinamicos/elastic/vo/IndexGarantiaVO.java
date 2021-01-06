@@ -121,6 +121,9 @@ public class IndexGarantiaVO {
 	@JsonProperty("partida_origen")
 	private String partidaOrigen;
 	
+	@JsonProperty("productName")
+	private String productName;
+	
 	public String getDescripcion() {
 		return descripcion;
 	}
@@ -464,6 +467,12 @@ public class IndexGarantiaVO {
 		this.partidaOrigen = partidaOrigen;
 	}
 
+	public String getProductName() {
+		return productName;
+	}
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
 	@Override
 	public String toString() {
 		 StringBuilder sb = new StringBuilder();
@@ -525,6 +534,7 @@ public class IndexGarantiaVO {
 		 sb.append("fechaIngDeposito: ").append(toIndentedString(fechaIngDeposito)).append("\n");
 		 sb.append("subramo: ").append(toIndentedString(subramo)).append("\n");
 		 sb.append("partidaOrigen: ").append(toIndentedString(partidaOrigen)).append("\n");
+		 sb.append("productName: ").append(toIndentedString(productName)).append("\n\n");
 		 sb.append("}");
 		return sb.toString();
 	}

@@ -13,6 +13,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.action.search.ClearScrollRequest;
+import org.elasticsearch.action.search.ClearScrollResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchScrollRequest;
@@ -80,103 +81,6 @@ public class ElasticService {
 		restHighLevelClient.close();
 		
 	}
-
-	// scroll pc_garantias
-	public List<IndexGarantiaVO> scrollElasticGarantias(SimularEscenarioDinamicoReq request, String index,List<String> partidas) throws IOException {
-		LOG.info("consultando pc_garantias");
-		BoolQueryBuilder boolQuery=null;
-		List<IndexGarantiaVO> lstIndexGarantia = new ArrayList<>();
-		final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));// el seteo del intervalo
-		SearchRequest searchRequest = new SearchRequest();
-		searchRequest.scroll(scroll);
-		searchRequest.indices(index);// se agrega index de elastic
-		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-		
-		if(partidas!=null){
-			QueryBuilder qb = QueryBuilders.boolQuery().must(QueryBuilders.termsQuery(Constantes.PARTIDA, partidas));
-			boolQuery = QueryBuilders.boolQuery().filter(qb);	
-		}
-
-		searchSourceBuilder.query(boolQuery);
-		searchSourceBuilder.size(Constantes.NUMERO_MAXIMO_SCROLL);// cuantos resultados se recuperan?
-		searchRequest.source(searchSourceBuilder);
-		SearchResponse searchResponse = getConnectionElastic().search(searchRequest, RequestOptions.DEFAULT);
-		// Inicialice el contexto de búsqueda enviando el SearchRequest inicial
-		String scrollId = searchResponse.getScrollId();
-		
-		// contexto de búsqueda que se mantiene vivo y que se necesitará en la siguiente
-		// llamada de desplazamiento de búsqueda
-		SearchHit[] searchHits = searchResponse.getHits().getHits();// recupera el primer lote de resultados de la
-																	// busqueda
-		LOG.info("antes del for");
-		LOG.info("tamanio  garantias{}", searchHits.length);
-		for (SearchHit hit : searchHits) {
-			LOG.info("entrando a bucle");
-		
-			// procesar los datos devueltos
-			SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId); // se crea el objeto seteandole el id
-																					// del scroll e intervalo, se crea
-																					// una solicitud con el ultimo id
-																					// generado
-			scrollRequest.scroll(scroll);
-			searchResponse = getConnectionElastic().scroll(scrollRequest, RequestOptions.DEFAULT);
-			scrollId = searchResponse.getScrollId();
-			//LOG.info("Scroll ID ->token {}",searchResponse.getScrollId());
-			String response = hit.getSourceAsString();
-			LOG.info(Constantes.S_LOG);
-			LOG.info(response);
-			lstIndexGarantia.add(castObject.jsonFieldToObject(response));
-			LOG.info(Constantes.S_LOG);
-		}
-		LOG.info("size garantias {}", lstIndexGarantia.size());
-		ClearScrollRequest clearScrollRequest = new ClearScrollRequest(); // limpia el contexto cuando se completa
-		clearScrollRequest.addScrollId(scrollId);
-		getConnectionElastic().clearScroll(clearScrollRequest, RequestOptions.DEFAULT);
-		LOG.info("**saliendo**");
-		return lstIndexGarantia;
-	}
-
-	// scroll ventas
-	public List<MdaVentasVO> scrollElasticVentas(String index,SimularEscenarioDinamicoReq request) throws IOException {
-		LOG.info("consultando mda_Ventas");
-		List<MdaVentasVO> lstIndexGarantia = new ArrayList<>();
-		final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));
-		SearchRequest searchRequest = new SearchRequest();
-		searchRequest.scroll(scroll);
-		searchRequest.indices(index);
-		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-		
-		CatalogoVO nivelAgrupacion=castObject.deserializaNivelAgrupacion(request.getInfoRegla().getNivelAgrupacion());
-		LOG.info("nivel de agrupacion mdaVentas -> {}",nivelAgrupacion.getDescripcion());
-		QueryBuilder filtro=crearCriteriosAgrupamiento(nivelAgrupacion, request);
-		
-		LOG.info(filtro.queryName());
-		LOG.info(filtro.toString());
-		searchSourceBuilder.query(filtro);
-		searchSourceBuilder.size(Constantes.NUMERO_MAXIMO_SCROLL);
-		searchRequest.source(searchSourceBuilder);
-		SearchResponse searchResponse = getConnectionElastic().search(searchRequest, RequestOptions.DEFAULT);
-		String scrollId = searchResponse.getScrollId();
-		SearchHit[] searchHits = searchResponse.getHits().getHits();
-		LOG.info("size query elastic ventas {}", searchHits.length);
-		for (SearchHit hit : searchHits) {
-			SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
-			scrollRequest.scroll(scroll);
-			searchResponse = getConnectionElastic().scroll(scrollRequest, RequestOptions.DEFAULT);
-			scrollId = searchResponse.getScrollId();
-			String response = hit.getSourceAsString();
-			LOG.info(Constantes.S_LOG);
-			LOG.info(response);
-			lstIndexGarantia.add(castObject.jsonFieldToObjectVenta(response));
-			LOG.info(Constantes.S_LOG);
-		}
-		LOG.info("size ventas {}", lstIndexGarantia.size());
-		ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
-		clearScrollRequest.addScrollId(scrollId);
-		getConnectionElastic().clearScroll(clearScrollRequest, RequestOptions.DEFAULT);
-		LOG.info("///saliendo//");
-		return lstIndexGarantia;
-	}
 	
 	public QueryBuilder crearCriteriosAgrupamiento(CatalogoVO nivelAgrupacion,SimularEscenarioDinamicoReq crearEs){
 		QueryBuilder filtroJoin=null;
@@ -216,8 +120,99 @@ public class ElasticService {
 			LOG.info("crear criterio ramo");
 			filtroJoin=QueryBuilders.boolQuery()
 					.must(filtroFechas).must(QueryBuilders.matchPhraseQuery(Constantes.RAMO_DES, crearEs.getInfoRegla().getRamo()));
-
 		}	
 		return filtroJoin;
+	}
+	
+	public List<MdaVentasVO> scrollElasticVentas(String index, SimularEscenarioDinamicoReq request){
+		LOG.info("consultando mda_Ventas");
+		List<MdaVentasVO> lstIndexGarantia = new ArrayList<>();
+		SearchRequest searchRequest = new SearchRequest();
+		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+		SearchResponse searchResponse=null;
+		if(request.getInfoRegla().getNivelAgrupacion()!=null){
+			CatalogoVO nivelAgrupacion=castObject.deserializaNivelAgrupacion(request.getInfoRegla().getNivelAgrupacion());
+			LOG.info("nivel de agrupacion mdaVentas -> {}",nivelAgrupacion.getDescripcion());
+			QueryBuilder filtro=crearCriteriosAgrupamiento(nivelAgrupacion, request);
+			LOG.info(filtro.queryName());
+			LOG.info(filtro.toString());
+			searchSourceBuilder.query(filtro);
+			searchSourceBuilder.size(Constantes.NUMERO_MAXIMO_SCROLL);
+			searchRequest.indices(index);
+			searchRequest.source(searchSourceBuilder);
+			final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));
+			searchRequest.scroll(scroll);
+			try {
+				searchResponse = getConnectionElastic().search(searchRequest, RequestOptions.DEFAULT);
+				 String scrollId = searchResponse.getScrollId();
+				 LOG.info("scroll id token ->{}",scrollId);
+			        SearchHit[] searchHits = searchResponse.getHits().getHits();
+			        LOG.info("size query elastic ventas {}", searchHits.length);
+			        for (SearchHit hit : searchHits) {
+			          SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
+			          scrollRequest.scroll(scroll);
+			          searchResponse=getConnectionElastic().scroll(scrollRequest, RequestOptions.DEFAULT);
+			          scrollId = searchResponse.getScrollId();
+			          searchHits = searchResponse.getHits().getHits();
+			          LOG.info("scroll id token ->{}",scrollId);
+			          String response = hit.getSourceAsString();
+			          lstIndexGarantia.add(castObject.jsonFieldToObjectVenta(response));
+			        }
+			        LOG.info("limpiando scroll");
+			        ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
+			        clearScrollRequest.addScrollId(scrollId);
+			        getConnectionElastic().clearScroll(clearScrollRequest, RequestOptions.DEFAULT);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return lstIndexGarantia;
+	}
+	// scroll pc_garantias
+	public List<IndexGarantiaVO> scrollElasticGarantias(SimularEscenarioDinamicoReq request, String index,List<String> partidas) throws IOException {
+		LOG.info("consultando pc_garantias");
+		List<IndexGarantiaVO> lstIndexGarantia = new ArrayList<>();
+		SearchRequest searchRequest = new SearchRequest();
+		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+		SearchResponse searchResponse=null;
+		if(!partidas.isEmpty()){
+			QueryBuilder query = QueryBuilders.boolQuery().must(QueryBuilders.termsQuery(Constantes.PARTIDA, partidas));
+			LOG.info(query.queryName());
+			LOG.info(query.toString());
+			searchSourceBuilder.query(query);
+			searchSourceBuilder.size(Constantes.NUMERO_MAXIMO_SCROLL);
+			searchRequest.indices(index);
+			searchRequest.source(searchSourceBuilder);
+			final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));
+			searchRequest.scroll(scroll);
+			try{
+				searchResponse = getConnectionElastic().search(searchRequest, RequestOptions.DEFAULT);
+				String scrollId = searchResponse.getScrollId();
+				LOG.info("scroll id token ->{}",scrollId);
+				SearchHit[] searchHits = searchResponse.getHits().getHits();
+				 LOG.info("size garantias {}", searchHits.length);
+				for (SearchHit hit : searchHits) {
+					SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
+					scrollRequest.scroll(scroll);					
+					searchResponse=getConnectionElastic().scroll(scrollRequest, RequestOptions.DEFAULT);
+					scrollId = searchResponse.getScrollId();
+					searchHits = searchResponse.getHits().getHits();
+					LOG.info("scroll id token ->{}",scrollId);
+					String response = hit.getSourceAsString();
+					LOG.info(Constantes.S_LOG);
+					LOG.info(response);
+					lstIndexGarantia.add(castObject.jsonFieldToObject(response));
+					LOG.info(Constantes.S_LOG);
+					 LOG.info("limpiando scroll garantias");
+					ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
+			        clearScrollRequest.addScrollId(scrollId);
+			        getConnectionElastic().clearScroll(clearScrollRequest, RequestOptions.DEFAULT);
+				}
+				LOG.info("size garantias {}", lstIndexGarantia.size());
+			}catch(IOException w){
+				w.printStackTrace();
+			}	
+		}
+		return lstIndexGarantia;
 	}
 }
