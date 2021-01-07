@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.validation.Valid;
+import java.util.Objects;
 
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -13,7 +12,6 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.action.search.ClearScrollRequest;
-import org.elasticsearch.action.search.ClearScrollResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchScrollRequest;
@@ -25,7 +23,6 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -34,14 +31,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
 import mx.com.nmp.escenariosdinamicos.elastic.properties.ElasticProperties;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
-import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexVentasVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.MdaVentasVO;
 import mx.com.nmp.escenariosdinamicos.model.CatalogoVO;
-import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosReq;
-import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.utils.Constantes;
 import mx.com.nmp.escenariosdinamicos.utils.EmuMacroCategoria;
@@ -84,7 +79,6 @@ public class ElasticService {
 	
 	public QueryBuilder crearCriteriosAgrupamiento(CatalogoVO nivelAgrupacion,SimularEscenarioDinamicoReq crearEs){
 		QueryBuilder filtroJoin=null;
-		List<String> listaAgrupamiento=null;
 		QueryBuilder filtroFechas = QueryBuilders.rangeQuery(Constantes.CAMPO_FECHA_INDEX)
 				.gte(formmatDate.resetTimeToDown(fechaActual, Constantes.DIFERENCIA_DIAS))
 				.lte(formmatDate.resetTimeToUp(fechaActual));
@@ -92,23 +86,28 @@ public class ElasticService {
 		if(nivelAgrupacion.getDescripcion().equals(Constantes.SUBRAMO)){
 			BoolQueryBuilder boolQuery = new BoolQueryBuilder();
 			LOG.info("crear criterio rubramo");
-			listaAgrupamiento=new ArrayList<>();
-			listaAgrupamiento=crearEs.getInfoRegla().getSubramo();
-			listaAgrupamiento.stream()
-				.forEach(subramo->boolQuery.should(QueryBuilders.matchPhraseQuery(Constantes.SUBRAMO_DES,subramo)));
+			crearEs.getInfoRegla().getSubramo().stream().forEach(subramo->boolQuery.should(QueryBuilders.matchPhraseQuery(Constantes.SUBRAMO_DES,subramo)));
 			filtroJoin=QueryBuilders.boolQuery().must(filtroFechas).should(boolQuery).minimumShouldMatch(1);
+			
 		}else if(nivelAgrupacion.getDescripcion().equals(Constantes.FACTOR)){
 			BoolQueryBuilder boolQuery = new BoolQueryBuilder();
 			LOG.info("crear criterio factor");
-			listaAgrupamiento=new ArrayList<>();
-			listaAgrupamiento=crearEs.getInfoRegla().getFactor();
-			listaAgrupamiento.stream().forEach(factor->
-				boolQuery.should(QueryBuilders.matchPhraseQuery(Constantes.FACTOR_DES,factor)));
+			crearEs.getInfoRegla().getFactor().stream().filter(Objects::nonNull).forEach(factor->boolQuery.should(QueryBuilders.matchPhraseQuery(Constantes.FACTOR_DES,factor)));
+			crearEs.getInfoRegla().getSucursales().stream().filter(Objects::nonNull).forEach(suc->boolQuery.should(QueryBuilders.matchPhraseQuery(Constantes.MOV_SUCURSAL,suc)));
+			crearEs.getInfoRegla().getSubramo().stream().filter(Objects::nonNull).forEach(subRamo->boolQuery.should(QueryBuilders.matchPhraseQuery(Constantes.SUBRAMO_DES,subRamo)));
+			crearEs.getInfoRegla().getEstatusPartida().stream().forEach(estatus->{
+				CatalogoVO cat=castObject.deserializaNivelAgrupacion(estatus);
+				boolQuery.should(QueryBuilders.matchPhraseQuery(Constantes.EDO_PRENDA,cat.getDescripcion()));
+			});
+			crearEs.getInfoRegla().getCanalIngresoActual().stream().forEach(canal->{
+				CatalogoVO canalVO=castObject.deserializaNivelAgrupacion(canal);
+				boolQuery.should(QueryBuilders.matchPhraseQuery(Constantes.CANAL_INGRESO, canalVO.getDescripcion()));
+			});			
 			filtroJoin=QueryBuilders.boolQuery().must(filtroFechas).should(boolQuery).minimumShouldMatch(1);
 		}else if(nivelAgrupacion.getDescripcion().equals(Constantes.CATEGORIA)){
 			LOG.info("crear criterio categoria");
-			listaAgrupamiento=new ArrayList<>();
-			listaAgrupamiento=crearEs.getInfoRegla().getCategoria();
+//			listaAgrupamiento=new ArrayList<>();
+//			listaAgrupamiento=crearEs.getInfoRegla().getCategoria();
 			filtroJoin=QueryBuilders.boolQuery()
 					.must(filtroFechas)
 					.must(QueryBuilders.matchPhraseQuery(Constantes.RAMO_DES, crearEs.getInfoRegla().getRamo()))

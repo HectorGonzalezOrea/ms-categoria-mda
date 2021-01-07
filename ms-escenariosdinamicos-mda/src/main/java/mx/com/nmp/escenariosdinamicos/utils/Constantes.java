@@ -142,4 +142,7 @@ public final class Constantes {
 	public static final String SUBRAMO_DES="subramo_des";
 	public static final String FACTOR_DES="factor";
 	public static final String RAMO_DES= "ramo_des";
+	public static final String MOV_SUCURSAL="movimiento_sucursal";
+	public static final String EDO_PRENDA="edo_prenda";
+	public static final String CANAL_INGRESO="canal_ingreso";
 }
