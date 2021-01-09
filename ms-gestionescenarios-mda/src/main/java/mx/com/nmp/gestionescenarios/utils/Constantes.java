@@ -94,7 +94,7 @@ public final class Constantes {
 	public static final String CANAL = "canalComercializacion.idCanal";
 	public static final String FECHA_APLICACION_FECHAS = "fechaAplicacion.fechas";
 	public static final String CATEGORIA="categoria";
-	public static final String ALAJA="AL";
+	public static final String ALAJAS="Alhajas";
 	public static final String NA="N/A";
 
 	public static final String ID_ARCHIVO = "idArchivo";
@@ -104,7 +104,7 @@ public final class Constantes {
 	public static final String REQUEST_ID_CALENDARIZACION_REGLA="requestIdRegla";
 	public static final String ID_MONEDA = "_id";
 	public static final String ID_REGLA="idRegla";
-	public static final String ESTATUS_REGLA="Inactivo";
+	public static final String ESTATUS_REGLA="Inactiva";
 	
 }
 

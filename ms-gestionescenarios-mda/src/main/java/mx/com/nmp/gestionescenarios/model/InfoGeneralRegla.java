@@ -36,7 +36,7 @@ public class InfoGeneralRegla   {
   
   @JsonProperty("categoria")
   @Valid
-  private List<Object> categoria;
+  private List<String> categoria;
 
   @JsonProperty("factor")
   @Valid
@@ -426,11 +426,11 @@ public void setTipoMonedas(Object tipoMonedas) {
 	this.tipoMonedas = tipoMonedas;
 }
 
-public List<Object> getCategoria() {
+public List<String> getCategoria() {
 	return categoria;
 }
 
-public void setCategoria(List<Object> categoria) {
+public void setCategoria(List<String> categoria) {
 	this.categoria = categoria;
 }
 }

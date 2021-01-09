@@ -45,8 +45,6 @@ public class GestionEscenarioService {
 
 	private static final Logger log = LoggerFactory.getLogger(GestionEscenarioService.class);
 	
-
-
 	@Autowired
 	private MongoTemplate mongoTemplate;
 	@Autowired
@@ -89,7 +87,7 @@ public class GestionEscenarioService {
 			ges.setReglasDescuento(peticion.getReglasDescuento());
 			ges.setCandadoInferior(peticion.getCandadoInferior());
 			try {
-				List<Object> categoria=new ArrayList<>();
+				List<String> categoria=new ArrayList<>();
 				categoria.add(Constantes.NA);
 				ges.setCategoria(categoria);
 				if(peticion.getRamo()!=null){
@@ -105,11 +103,11 @@ public class GestionEscenarioService {
 			}catch (IOException e){
 				log.error("error al convertir a Pojo el Str");
 			}
-			if(ramoObj!=null&&ramoObj.getDescripcion().equals(Constantes.ALAJA)&&
-					subramoObj!=null&&subramoObj.getDescripcion().equals(Constantes.ALAJA)){
+			if(ramoObj!=null&&ramoObj.getDescripcion().toUpperCase().equalsIgnoreCase(Constantes.ALAJAS.toUpperCase())&&
+					subramoObj!=null&&subramoObj.getDescripcion().toUpperCase().equalsIgnoreCase(Constantes.ALAJAS.toUpperCase())){
 				ges.setCategoria(peticion.getCategoria());
 			}else{
-				List<Object> categotia=new ArrayList<>();
+				List<String> categotia=new ArrayList<>();
 				categotia.add(Constantes.NA);
 				ges.setCategoria(categotia);
 			}
@@ -270,7 +268,7 @@ public class GestionEscenarioService {
 				ges.setReglasDescuento(peticion.getReglasDescuento());
 				ges.setCandadoInferior(peticion.getCandadoInferior());
 				try {
-					List<Object> categoria=new ArrayList<>();
+					List<String> categoria=new ArrayList<>();
 					categoria.add(Constantes.NA);
 					ges.setCategoria(categoria);
 					if(peticion.getRamo()!=null){
@@ -286,11 +284,11 @@ public class GestionEscenarioService {
 				}catch (IOException e){
 					log.error("error al convertir el objeto");
 				}
-				if(ramoObj!=null&&ramoObj.getDescripcion().equals(Constantes.ALAJA)&&
-						subramoObj!=null&&subramoObj.getDescripcion().equals(Constantes.ALAJA)){
+				if(ramoObj!=null&&ramoObj.getDescripcion().equalsIgnoreCase(Constantes.ALAJAS.toUpperCase())&&
+						subramoObj!=null&&subramoObj.getDescripcion().toUpperCase().equalsIgnoreCase(Constantes.ALAJAS.toUpperCase())){
 					ges.setCategoria(peticion.getCategoria());
 				}else{
-					List<Object> categotia=new ArrayList<>();
+					List<String> categotia=new ArrayList<>();
 					categotia.add(Constantes.NA);
 					ges.setCategoria(categotia);
 				}

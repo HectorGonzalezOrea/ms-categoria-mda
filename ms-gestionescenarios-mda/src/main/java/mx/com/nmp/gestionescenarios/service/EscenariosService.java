@@ -539,7 +539,10 @@ public class EscenariosService {
 		try {
 			estatus = mapper.writeValueAsString(entidad.getEstatus());
 			Catalogo estadoVO=mapper.readValue(estatus, Catalogo.class);
-			if(estadoVO.getDescripcion().equals(Constantes.ESTATUS_REGLA)){
+			
+			log.info("{}" , estadoVO);
+			
+			if(estadoVO.getDescripcion().toUpperCase().equalsIgnoreCase(Constantes.ESTATUS_REGLA.toUpperCase())){
 				log.info("Se elimina la regla");
 				oAGController.eliminarCalendarizacionEscenario(entidad.getRequestIdRegla());
 				GestionEscenarioServiceDao.eliminaRegla(id);
