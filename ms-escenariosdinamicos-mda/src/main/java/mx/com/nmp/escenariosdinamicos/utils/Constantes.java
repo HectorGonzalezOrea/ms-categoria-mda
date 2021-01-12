@@ -54,6 +54,7 @@ public final class Constantes {
 	public static final String ERROR_CODE_BAD_REQUEST = "NMP-MDA-400";
 	public static final String MESSAGE_ERROR_BAD_REQUEST ="El cuerpo de la petición no está bien formado, verifique su información";
 	public static final String MESSAGE_ERROR_BAD_REQUEST_DIAS="Cada dia no puede tener el valor de mas de un caracter, verifique su información";
+	public static final String MESSAGE_ERROR_BAD_REQUEST_LONG="Se deben contemplar los tres días";
 	
 	public static final String ERROR_CODE_NOT_FOUND = "NMP-MDA-404";
 	public static final String MESSAGE_ERROR_CODE_NOT_FOUND ="No existen los recursos con los identificadores {";
@@ -128,7 +129,7 @@ public final class Constantes {
 	public static final String S="S";
 	public static final String B="B";
 	public static final String M="M";
-	public static final String ESCENARIO="PM- Escenario";
+	public static final String ESCENARIO="Escenario";
 	public static final String MAX="maximo";
 	public static final String SKU_OPT="8005050";
 	
@@ -145,4 +146,10 @@ public final class Constantes {
 	public static final String MOV_SUCURSAL="movimiento_sucursal";
 	public static final String EDO_PRENDA="edo_prenda";
 	public static final String CANAL_INGRESO="canal_ingreso";
+	
+	//banderas de servicios
+	public static final String EJECUTAR_ESCENARIO="ejecutar_escenario";
+	public static final String SIMULAR_REGLA="simular_regla";
+	public static final String SIMULAR_ESCENARIO="simular_escenario";
+	
 }

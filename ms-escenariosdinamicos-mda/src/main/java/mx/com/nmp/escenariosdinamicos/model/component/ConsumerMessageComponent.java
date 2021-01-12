@@ -46,7 +46,7 @@ public class ConsumerMessageComponent  {
 		channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
 		RequestReglaEscenarioDinamicoDto request=castObject.convertJsonToRequestEscenario(mensaje);
 		if(request !=null && !request.getPartida().isEmpty()) {
-			clientOAG.reglaEscenarioDinamico(request);
+			clientOAG.reglaEscenarioDinamico(request,Constantes.EJECUTAR_ESCENARIO);
 		}
 		
 	}

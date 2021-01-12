@@ -456,7 +456,7 @@ public class EscenariosApiController implements EscenariosApi {
 					clientesMicroservicios.calcularValorMonte(castObjectGeneric.castGarantiasToCalculoValor(lstIndexGarantia), usuario, origen, destino);
 					castIndexToVO = castObjectGeneric.castPartidasToPartidaValorMonte(lstIndexGarantia,simular.getInfoRegla());
 					wrapperReglaEscenarioDinamico.setPartida(castIndexToVO);
-					ResponseOAGDto res=clientOAGService.reglaEscenarioDinamico(wrapperReglaEscenarioDinamico);
+					ResponseOAGDto res=clientOAGService.reglaEscenarioDinamico(wrapperReglaEscenarioDinamico,Constantes.SIMULAR_ESCENARIO);
 					return new ResponseEntity<ResponseOAGDto>(res, HttpStatus.OK);
 				} 
 				
@@ -544,7 +544,6 @@ public class EscenariosApiController implements EscenariosApi {
 			log.info("{}", ia);
 			return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
 		}
-
 		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
 			if(usuario==null&&origen==null&&destino==null&&listaDeDias==null){
@@ -553,15 +552,28 @@ public class EscenariosApiController implements EscenariosApi {
 				br.setMensaje(Constantes.MESSAGE_ERROR_BAD_REQUEST);
 				log.info("{}" , br);
 				return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+			}else if(listaDeDias.getDias().size()!=3){
+				BadRequest br = new BadRequest();
+				br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+				br.setMensaje(Constantes.MESSAGE_ERROR_BAD_REQUEST_LONG);
+				return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 			}else if(listaDeDias.getDias().get(0).length()>1||listaDeDias.getDias().get(1).length()>1||listaDeDias.getDias().get(2).length()>1){//Si la longitud de los dias es mayor a uno es error
 				BadRequest br = new BadRequest();
 				br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
 				br.setMensaje(Constantes.MESSAGE_ERROR_BAD_REQUEST_DIAS);
 				log.info("Los dias contienen mas de un caracter");
+				return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 			}else{
 				int[] dias=clientOAGService.obtenerVentas(listaDeDias.getDias());
+				if(!posibleEscenario(dias)){
+					BadRequest br = new BadRequest();
+					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+					br.setMensaje(Constantes.MESSAGE_ERROR_BAD_REQUEST);
+					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+				}
 				List<PartidaVO> partida =new ArrayList<>();
 				RequestReglaEscenarioDinamicoDto request=new RequestReglaEscenarioDinamicoDto();
+				System.out.println(Long.valueOf(dias[0])+","+Long.valueOf(dias[0])+","+Long.valueOf(dias[2]));
 					PartidaVO par=new PartidaVO();
 					par.setIdPartida(Constantes.SKU_OPT);
 					par.setSku(Constantes.SKU_OPT);
@@ -584,10 +596,10 @@ public class EscenariosApiController implements EscenariosApi {
 					par.setMontoPrestamo((double)0);
 					partida.add(par);
 					partida.stream().forEach(d->
-					log.info("dias"+d.getVentasDiaUno()+","+d.getVentasDiaDos()+","+d.getVentasDiaTres()+"}")
+					log.info("dias:{"+d.getVentasDiaUno()+","+d.getVentasDiaDos()+","+d.getVentasDiaTres()+"}")
 					);
 					request.setPartida(partida);
-					ResponseOAGDto clienteServiceOag=clientOAGService.reglaEscenarioDinamico(request);
+					ResponseOAGDto clienteServiceOag=clientOAGService.reglaEscenarioDinamico(request,Constantes.SIMULAR_REGLA);
 					if(clienteServiceOag!=null&&clienteServiceOag.getPartida().get(0).getReglaAplicada().contains(Constantes.ESCENARIO)){
 						ReglaResponseDto response=new ReglaResponseDto();
 						response.setCodigo(Constantes.EXITO_REGLA_CODE);
@@ -609,4 +621,12 @@ public class EscenariosApiController implements EscenariosApi {
 		return new ResponseEntity<BadRequest>(badRequest, HttpStatus.BAD_REQUEST);
 	}
 
+	private Boolean posibleEscenario(int[] dias){
+		Boolean flag=true;
+		for (int dia : dias) {
+			if(dia<0)
+				flag=false;
+		}
+		return flag;
+	}
 }

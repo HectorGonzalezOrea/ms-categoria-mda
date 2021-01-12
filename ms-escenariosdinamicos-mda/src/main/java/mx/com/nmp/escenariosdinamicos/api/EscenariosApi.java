@@ -146,7 +146,7 @@ public interface EscenariosApi {
             @ApiResponse(code = 401, message = "La regla no cumple", response = InvalidAuthentication.class),
             @ApiResponse(code = 404, message = "Regla no encontrada", response = InvalidValue.class),
             @ApiResponse(code = 500, message = "Error interno del servidor", response = InternalServerError.class) })
-    @RequestMapping(value = "/dinamicos/_probar/reglas",
+    @RequestMapping(value = "/escenarios/dinamicos/_probar/reglas",
     produces = { "application/json" }, 
     method = RequestMethod.POST)
     ResponseEntity<?> escenariosDinamicosProbarReglasPOST(

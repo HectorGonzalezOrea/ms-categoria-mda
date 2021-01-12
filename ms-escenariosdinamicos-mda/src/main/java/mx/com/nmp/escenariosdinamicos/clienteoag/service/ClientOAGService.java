@@ -3,7 +3,6 @@ package mx.com.nmp.escenariosdinamicos.clienteoag.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,8 +70,8 @@ public class ClientOAGService {
 	
 
 	@Retryable(value= {IOException.class}, maxAttempts=3, backoff=@Backoff(delay=4000))
-	public ResponseOAGDto reglaEscenarioDinamico(RequestReglaEscenarioDinamicoDto requestDto) {
-		log.info(":: Entrado al metodo  actualizarPrecioPartida ::");
+	public ResponseOAGDto reglaEscenarioDinamico(RequestReglaEscenarioDinamicoDto requestDto, String servicio) {
+		log.info(":: Entrado al metodo  reglaEscenarioDinamico, invocado desde [{}] ::",servicio);
 		String request = new Gson().toJson(requestDto);
 
 		log.info("->{}" , request);
@@ -96,8 +95,10 @@ public class ClientOAGService {
 
 			if (result.getStatusCode() == HttpStatus.OK) {
 					response = castObject.convertJsonToReponseOAGDto(result.getBody());
-					pruducerMessage.producerReglaArbitraje(result.getBody());
-				
+					if(servicio.equals(Constantes.EJECUTAR_ESCENARIO)){//unicamente encola cuando se entra al endpoint de ejecutar escenario
+						log.info("Encolando datos::");
+						pruducerMessage.producerReglaArbitraje(result.getBody());	
+					}
 			}
 		}
 		
