@@ -10,7 +10,6 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,11 +21,10 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.BadRequest;
 import mx.com.nmp.escenariosdinamicos.model.Bodydiasreq;
 import mx.com.nmp.escenariosdinamicos.model.ConflictRequest;
-import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosReq;
+import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoRes;
@@ -34,12 +32,13 @@ import mx.com.nmp.escenariosdinamicos.model.EliminarEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.InternalServerError;
 import mx.com.nmp.escenariosdinamicos.model.InvalidAuthentication;
 import mx.com.nmp.escenariosdinamicos.model.InvalidValue;
-import mx.com.nmp.escenariosdinamicos.model.ModEscenariosReq;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.NotFound;
 import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoRes;
 import mx.com.nmp.escenariosdinamicos.model.SuccessfulResponseRule;
+import mx.com.nmp.escenariosdinamicos.oag.dto.EscenarioRequestDto;
+import mx.com.nmp.escenariosdinamicos.oag.dto.ModificarEscenariosDTO;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-04T01:28:01.968Z")
 
 @Api(value = "escenarios", description = "the escenarios API")
@@ -71,7 +70,7 @@ public interface EscenariosApi {
     @RequestMapping(value = "/escenarios/dinamicos",
         produces = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<?> crearEscenariosPOST(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  )  @Valid @RequestBody List<CrearEscenariosReq> escenarios);
+    ResponseEntity<?> crearEscenariosPOST(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos"  )  @Valid @RequestBody EscenarioRequestDto escenarios);
 
 
     @ApiOperation(value = "Modificar escenario", nickname = "editaEscenariosPUT", notes = "Permite la modificación de un escenario existente. Los escenarios administrados por el motor de descuentos no se verán reflejados de forma inmediata, para ello deberá iniciarse un flujo de solicitud a mesa de ayuda para modificar el escenario, a través del envío de un correo electrónico con el detalle del escenario modificado. El consumidor deberá enviar los valores del comportamiento esperado de los `últimos 3 días`. Los valores posibles para los comportamientos son:    * 0 = Día sin venta   * X = Día con venta (Diferente de 0)   * S = Sube la venta   * M = Se mantiene la venta   * B = Baja la venta  Adicional deberá enviar la regla a aplicar para la suma de comportamientos de estos días. Los valores posibles para las reglas son:    * PB = Precio bajo   * PM = Precio medio   * PA = Precio alto    Como respuesta, el consumidor recibirá el identificador del escenario. En caso de que la combinación de los valores enviados ya este registrado se retornará un mensaje de advertencia.  ", response = ModEscenariosRes.class, authorizations = {
@@ -87,7 +86,7 @@ public interface EscenariosApi {
     @RequestMapping(value = "/escenarios/dinamicos",
         produces = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<?> editaEscenariosPUT(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "peticion para modificar las reglas de precios en los escenarios dinámicos."  )  @Valid @RequestBody List<ModEscenariosReq> escenarios);
+    ResponseEntity<?> editaEscenariosPUT(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "peticion para modificar las reglas de precios en los escenarios dinámicos."  )  @Valid @RequestBody ModificarEscenariosDTO escenarios);
 
 
     @ApiOperation(value = "Ejecutar escenario dinámico", nickname = "ejecutarEscenariosDinamicosPOST", notes = "Permite la ejecución de un escenario dinámico. El consumidor deberá enviar los parámetros con los que se realizará la consulta de `ventas` de los 3  días anteriores. La lista de ventas obtenidas se agrupará de acuerdo al nivel de agrupación [Ramo, Subramo o Factor] definido en la regla. Las ventas pasaran por un proceso de análisis para identificar el escenario que las representa y con ello calcular el nuevo precio que será notificado a la `Plataforma Comercial` vigente.               Como respuesta, el consumidor recibirá un mensaje de recepción de solicitud, por lo que la ejecución de las actividades del microservicio se ejecutarán de forma asíncrona. ", response = EjecutarEscenarioDinamicoRes.class, authorizations = {

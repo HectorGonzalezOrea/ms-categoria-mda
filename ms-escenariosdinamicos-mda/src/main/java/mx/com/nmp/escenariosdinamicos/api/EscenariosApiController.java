@@ -2,26 +2,23 @@ package mx.com.nmp.escenariosdinamicos.api;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.apache.tomcat.util.bcel.Const;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 
 import io.swagger.annotations.ApiParam;
 import mx.com.nmp.escenariosdinamicos.cast.CastObjectGeneric;
@@ -31,15 +28,12 @@ import mx.com.nmp.escenariosdinamicos.elastic.properties.ElasticProperties;
 import mx.com.nmp.escenariosdinamicos.elastic.service.ElasticSearchAsynComponent;
 import mx.com.nmp.escenariosdinamicos.elastic.service.ElasticService;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexGarantiaVO;
-import mx.com.nmp.escenariosdinamicos.elastic.vo.IndexVentasVO;
 import mx.com.nmp.escenariosdinamicos.elastic.vo.MdaVentasVO;
 import mx.com.nmp.escenariosdinamicos.model.BadRequest;
 import mx.com.nmp.escenariosdinamicos.model.Bodydiasreq;
-import mx.com.nmp.escenariosdinamicos.model.CatalogoVO;
 import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosResInner;
 import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosReq;
-import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoRes;
 import mx.com.nmp.escenariosdinamicos.model.EliminarEscenariosRes;
@@ -50,18 +44,17 @@ import mx.com.nmp.escenariosdinamicos.model.ModEscenariosReq;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.ModificadoResponse;
 import mx.com.nmp.escenariosdinamicos.model.NotFound;
-import mx.com.nmp.escenariosdinamicos.model.PartidaPrecioFinal;
 import mx.com.nmp.escenariosdinamicos.model.ReglaResponseDto;
 import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoRes;
-import mx.com.nmp.escenariosdinamicos.model.SuccessfulResponse;
 import mx.com.nmp.escenariosdinamicos.mongodb.entity.EscenarioEntity;
 import mx.com.nmp.escenariosdinamicos.mongodb.service.EscenariosService;
+import mx.com.nmp.escenariosdinamicos.oag.dto.EscenarioRequestDto;
+import mx.com.nmp.escenariosdinamicos.oag.dto.ModificarEscenariosDTO;
 import mx.com.nmp.escenariosdinamicos.oag.dto.RequestReglaEscenarioDinamicoDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ResponseOAGDto;
 import mx.com.nmp.escenariosdinamicos.oag.vo.PartidaVO;
 import mx.com.nmp.escenariosdinamicos.utils.Constantes;
-import mx.com.nmp.escenariosdinamicos.utils.EmuMacroCategoria;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-04T01:28:01.968Z")
 
@@ -161,7 +154,7 @@ public class EscenariosApiController implements EscenariosApi {
 			@ApiParam(value = "Usuario en el sistema origen que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = "Sistema que origina la petición", required = true, allowableValues = "portalInteligenciaComercial") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información", required = true, allowableValues = "bluemix, mockserver") @RequestHeader(value = "destino", required = true) String destino,
-			@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos") @Valid @RequestBody List<CrearEscenariosReq> escenarios) {
+			@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos") @Valid @RequestBody EscenarioRequestDto escenarios) {
 		
 		log.info("*********************************************************");
 		log.info("Crear escenario.");
@@ -183,11 +176,11 @@ public class EscenariosApiController implements EscenariosApi {
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
 			try {
 				if (escenarios != null) {
-					log.info("peticion: {}", escenarios.size());
-					List<String> repeditos=escenarioService.existenRepetidos(escenarios);
+					log.info("peticion: {}", escenarios.getEscenarios().size());
+					List<String> repeditos=escenarioService.existenRepetidos(escenarios.getEscenarios());
 					log.info("existen repetidos: {}", repeditos.size());
 					if(repeditos.size()==0){
-							escenarioService.crearEscenario(escenarios);
+							escenarioService.crearEscenario(escenarios.getEscenarios());
 						InsertadoEscenario in=new InsertadoEscenario();
 						in.setCode(Constantes.EXITO_MODIFICAR);
 						in.setMessage(Constantes.EXITO_MODIFICAR_MSG);
@@ -236,7 +229,7 @@ public class EscenariosApiController implements EscenariosApi {
 			@ApiParam(value = "Usuario en el sistema origen que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = "Sistema que origina la petición", required = true, allowableValues = "portalInteligenciaComercial") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información", required = true, allowableValues = "bluemix, mockserver") @RequestHeader(value = "destino", required = true) String destino,
-			@ApiParam(value = "peticion para modificar las reglas de precios en los escenarios dinámicos.") @Valid @RequestBody List<ModEscenariosReq> escenarios) {
+			@ApiParam(value = "peticion para modificar las reglas de precios en los escenarios dinámicos.") @Valid @RequestBody ModificarEscenariosDTO escenarios) {
 		
 		log.info("*********************************************************");
 		log.info("Editar escenario.");
@@ -253,8 +246,8 @@ public class EscenariosApiController implements EscenariosApi {
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
 			try {
 				if (escenarios != null) {
-					log.info("peticion: {}", escenarios.size());
-					List<Integer> lstIdsRequest =transformaIdEscenarios(escenarios);
+					log.info("peticion: {}", escenarios.getEscenarios().size());
+					List<Integer> lstIdsRequest =transformaIdEscenarios(escenarios.getEscenarios());
 					List<EscenarioEntity> consultaGrupoEscenarios=escenarioService.consultaGrupoEscenarios(lstIdsRequest);
 					List<Integer> getEscenarios=escenarioService.transformaIds(consultaGrupoEscenarios);
 					log.info("getEscenarios: {}", getEscenarios.size());
@@ -268,7 +261,7 @@ public class EscenariosApiController implements EscenariosApi {
 						log.info("consultados {}, idsServicio {}", getEscenarios.size(),lstIdsRequest.size());
 						String idsNotFound=retornaIdsNoEncontrados(getEscenarios, lstIdsRequest);
 						log.info("idsNotFound size [{}]",idsNotFound);
-							 escenarioService.editaEscenario(escenarios);
+							 escenarioService.editaEscenario(escenarios.getEscenarios());
 						ModificadoResponse mod=new ModificadoResponse();
 						mod.setCode(Constantes.EXITO_MODIFICAR);
 						mod.setMessage(!idsNotFound.equals(Constantes.CERO)
