@@ -238,7 +238,10 @@ public class EscenariosService {
 						contenido.append(idEscenario);
 						contenido.append(Constantes.CERRAR_TD);
 						contenido.append(Constantes.CLOSE_TR);
-						escenarioRepository.deleteById(String.valueOf(idEscenario));
+						EscenarioEntity consulta=consultaEscenarioId(idEscenario);
+						if(consulta!=null){
+							escenarioRepository.delete(consulta);
+						}	
 					}
 					contenido.append(Constantes.CLOSE_TABLE);
 					r.setDe(de);
