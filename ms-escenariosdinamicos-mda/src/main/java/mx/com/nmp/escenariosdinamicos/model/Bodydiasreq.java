@@ -27,7 +27,9 @@ import javax.validation.Valid;
 @ApiModel(description = "Lista de dias")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2020-11-17T23:16:32.685Z")
 public class Bodydiasreq   {
+
   @JsonProperty("dias")
+  @NotNull
   private List<String> dias = null;
 
   public Bodydiasreq dias(List<String> dias) {

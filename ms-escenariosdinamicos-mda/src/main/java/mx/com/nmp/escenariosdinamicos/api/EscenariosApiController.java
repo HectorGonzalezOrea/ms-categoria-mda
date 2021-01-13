@@ -34,6 +34,9 @@ import mx.com.nmp.escenariosdinamicos.model.Bodydiasreq;
 import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosRes;
 import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosResInner;
 import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosReq;
+import mx.com.nmp.escenariosdinamicos.model.DiaDosEnum;
+import mx.com.nmp.escenariosdinamicos.model.DiaTresEnum;
+import mx.com.nmp.escenariosdinamicos.model.DiaUnoEnum;
 import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.model.EjecutarEscenarioDinamicoRes;
 import mx.com.nmp.escenariosdinamicos.model.EliminarEscenariosRes;
@@ -176,6 +179,7 @@ public class EscenariosApiController implements EscenariosApi {
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
 			try {
 				if (escenarios != null) {
+					
 					log.info("peticion: {}", escenarios.getEscenarios().size());
 					List<String> repeditos=escenarioService.existenRepetidos(escenarios.getEscenarios());
 					log.info("existen repetidos: {}", repeditos.size());
@@ -186,7 +190,14 @@ public class EscenariosApiController implements EscenariosApi {
 						in.setMessage(Constantes.EXITO_MODIFICAR_MSG);
 						return new ResponseEntity<InsertadoEscenario>(in, HttpStatus.OK);
 
-					}else{
+					}else if(!verificaLongitud(escenarios.getEscenarios())){
+						BadRequest br = new BadRequest();
+						br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+						br.setMensaje(Constantes.MESSAGE_ERROR_BAD_REQUEST_DIAS);
+						log.info("Los dias contienen mas de un caracter");
+						return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
+					}
+					else{
 						InsertadoEscenario in=new InsertadoEscenario();
 						in.setCode(Constantes.ERROR_REPETIDOS);
 						in.setMessage(Constantes.ERROR_REPETIDOS_MENSAJE+ConcatenaEscenarioStr(repeditos)+Constantes.ERROR_REPETIDOS_COMPLEMENTO);
@@ -257,6 +268,12 @@ public class EscenariosApiController implements EscenariosApi {
 						nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
 						nf.setMensaje(Constantes.MESSAGE_ERROR_CODE_NOT_FOUND+ConcatenaEscenario(lstIdsRequest)+Constantes.MESSAGE_ERROR_NOT_FOUND_COMPLEMENT);
 						return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
+					}else if(!verificaLongitudMod(escenarios.getEscenarios())){
+						BadRequest br = new BadRequest();
+						br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
+						br.setMensaje(Constantes.MESSAGE_ERROR_BAD_REQUEST_DIAS);
+						log.info("Los dias contienen mas de un caracter");
+						return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 					}else{
 						log.info("consultados {}, idsServicio {}", getEscenarios.size(),lstIdsRequest.size());
 						String idsNotFound=retornaIdsNoEncontrados(getEscenarios, lstIdsRequest);
@@ -621,5 +638,26 @@ public class EscenariosApiController implements EscenariosApi {
 				flag=false;
 		}
 		return flag;
+	}
+	
+	private Boolean verificaLongitud(List<CrearEscenariosReq> escenarios){
+		Boolean esValido=true;
+		for (CrearEscenariosReq esc : escenarios) {
+		if(esc.getDiaUno().length()>1||esc.getDiaDos().length()>1||esc.getDiaTres().length()>1){
+			esValido=false;
+			break;//ya no continuo revisando el arreglo ya que basta con un elemento mal para que payload este mal
+		}
+		}
+		return esValido;
+	}
+	private Boolean verificaLongitudMod(List<ModEscenariosReq> escenarios){
+		Boolean esValido=true;
+		for (ModEscenariosReq esc : escenarios) {
+		if(esc.getDiaUno().length()>1||esc.getDiaDos().length()>1||esc.getDiaTres().length()>1){
+			esValido=false;
+			break;//ya no continuo revisando el arreglo ya que basta con un elemento mal para que payload este mal
+		}
+		}
+		return esValido;
 	}
 }

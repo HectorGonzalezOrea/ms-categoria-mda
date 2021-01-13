@@ -20,28 +20,28 @@ public class ConsultarEscenariosResInner   {
    * Comportamiento para el día uno basado en la demanda
    */
   @JsonProperty("diaUno")
-  private DiaUnoEnum diaUno = null;
+  private String diaUno = null;
 
   /**
    * Comportamiento para el día dos basado en la demanda
    */
 
   @JsonProperty("diaDos")
-  private DiaDosEnum diaDos = null;
+  private String diaDos = null;
 
   /**
    * Comportamiento para el día tres basado en la demanda
    */
 
   @JsonProperty("diaTres")
-  private DiaTresEnum diaTres = null;
+  private String diaTres = null;
 
   /**
    * Regla a aplicar a la suma de comportamiento de los 3 últimos días
    */
 
   @JsonProperty("idRegla")
-  private IdReglaEnum idRegla = null;
+  private String idRegla = null;
 
   public ConsultarEscenariosResInner idEscenario(Integer idEscenario) {
     this.idEscenario = idEscenario;
@@ -63,7 +63,7 @@ public class ConsultarEscenariosResInner   {
     this.idEscenario = idEscenario;
   }
 
-  public ConsultarEscenariosResInner diaUno(DiaUnoEnum diaUno) {
+  public ConsultarEscenariosResInner diaUno(String diaUno) {
     this.diaUno = diaUno;
     return this;
   }
@@ -76,15 +76,15 @@ public class ConsultarEscenariosResInner   {
   @NotNull
 
 
-  public DiaUnoEnum getDiaUno() {
+  public String getDiaUno() {
     return diaUno;
   }
 
-  public void setDiaUno(DiaUnoEnum diaUno) {
+  public void setDiaUno(String diaUno) {
     this.diaUno = diaUno;
   }
 
-  public ConsultarEscenariosResInner diaDos(DiaDosEnum diaDos) {
+  public ConsultarEscenariosResInner diaDos(String diaDos) {
     this.diaDos = diaDos;
     return this;
   }
@@ -97,15 +97,15 @@ public class ConsultarEscenariosResInner   {
   @NotNull
 
 
-  public DiaDosEnum getDiaDos() {
+  public String getDiaDos() {
     return diaDos;
   }
 
-  public void setDiaDos(DiaDosEnum diaDos) {
+  public void setDiaDos(String diaDos) {
     this.diaDos = diaDos;
   }
 
-  public ConsultarEscenariosResInner diaTres(DiaTresEnum diaTres) {
+  public ConsultarEscenariosResInner diaTres(String diaTres) {
     this.diaTres = diaTres;
     return this;
   }
@@ -118,15 +118,15 @@ public class ConsultarEscenariosResInner   {
   @NotNull
 
 
-  public DiaTresEnum getDiaTres() {
+  public String getDiaTres() {
     return diaTres;
   }
 
-  public void setDiaTres(DiaTresEnum diaTres) {
+  public void setDiaTres(String diaTres) {
     this.diaTres = diaTres;
   }
 
-  public ConsultarEscenariosResInner idRegla(IdReglaEnum idRegla) {
+  public ConsultarEscenariosResInner idRegla(String idRegla) {
     this.idRegla = idRegla;
     return this;
   }
@@ -139,11 +139,11 @@ public class ConsultarEscenariosResInner   {
   @NotNull
 
 
-  public IdReglaEnum getIdRegla() {
+  public String getIdRegla() {
     return idRegla;
   }
 
-  public void setIdRegla(IdReglaEnum idRegla) {
+  public void setIdRegla(String idRegla) {
     this.idRegla = idRegla;
   }
 

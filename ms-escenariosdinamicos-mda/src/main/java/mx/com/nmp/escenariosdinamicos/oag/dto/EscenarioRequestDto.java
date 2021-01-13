@@ -1,10 +1,14 @@
 package mx.com.nmp.escenariosdinamicos.oag.dto;
 
 import java.util.List;
-import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosReq;
 
+import javax.validation.constraints.NotNull;
+
+import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosReq;
+@NotNull
 public class EscenarioRequestDto {
-	List<CrearEscenariosReq> escenarios;
+	@NotNull
+	private List<CrearEscenariosReq> escenarios;
 	
 	public List<CrearEscenariosReq> getEscenarios() {
 		return escenarios;

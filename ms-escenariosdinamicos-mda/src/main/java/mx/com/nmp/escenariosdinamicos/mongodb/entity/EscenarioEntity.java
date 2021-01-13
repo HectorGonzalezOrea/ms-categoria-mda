@@ -20,10 +20,10 @@ public class EscenarioEntity {
 	
 	@Id
 	private Integer idEscenario;
-	private DiaUnoEnum diaUno;
-	private DiaDosEnum diaDos;
-	private DiaTresEnum diaTres;
-	private IdReglaEnum idRegla;
+	private String diaUno;
+	private String diaDos;
+	private String diaTres;
+	private String idRegla;
 	private LocalDate fechaCreacion;
 	private LocalDate fechaActualizacion;
 	
@@ -34,28 +34,28 @@ public class EscenarioEntity {
 	public void setIdEscenario(Integer idEscenario) {
 		this.idEscenario = idEscenario;
 	}
-	public DiaUnoEnum getDiaUno() {
+	public String getDiaUno() {
 		return diaUno;
 	}
-	public void setDiaUno(DiaUnoEnum diaUno) {
+	public void setDiaUno(String diaUno) {
 		this.diaUno = diaUno;
 	}
-	public DiaDosEnum getDiaDos() {
+	public String getDiaDos() {
 		return diaDos;
 	}
-	public void setDiaDos(DiaDosEnum diaDos) {
+	public void setDiaDos(String diaDos) {
 		this.diaDos = diaDos;
 	}
-	public DiaTresEnum getDiaTres() {
+	public String getDiaTres() {
 		return diaTres;
 	}
-	public void setDiaTres(DiaTresEnum diaTres) {
+	public void setDiaTres(String diaTres) {
 		this.diaTres = diaTres;
 	}
-	public IdReglaEnum getIdRegla() {
+	public String getIdRegla() {
 		return idRegla;
 	}
-	public void setIdRegla(IdReglaEnum idRegla) {
+	public void setIdRegla(String idRegla) {
 		this.idRegla = idRegla;
 	}
 	public LocalDate getFechaCreacion() {
