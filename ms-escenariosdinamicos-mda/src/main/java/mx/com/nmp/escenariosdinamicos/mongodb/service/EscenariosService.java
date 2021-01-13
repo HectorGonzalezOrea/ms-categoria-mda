@@ -228,26 +228,23 @@ public class EscenariosService {
 		contenido.append(Constantes.ID_ESCENARIO);
 		contenido.append(Constantes.CERRAR_TD);
 		contenido.append(Constantes.CLOSE_TR);
-		if (idEscenarios != null) {
 			log.info("{}", idEscenarios.size());
 			if (!idEscenarios.isEmpty()) {
 				try {
-					for (Integer idEscenario : idEscenarios) {
+					idEscenarios.stream().forEach(esc->{
 						contenido.append(Constantes.TR);
 						contenido.append(Constantes.ABRIR_TD_STYLE);
-						contenido.append(idEscenario);
+						contenido.append(esc);
 						contenido.append(Constantes.CERRAR_TD);
 						contenido.append(Constantes.CLOSE_TR);
-						EscenarioEntity consulta=consultaEscenarioId(idEscenario);
-						if(consulta!=null){
-							escenarioRepository.delete(consulta);
-						}	
-					}
+						deleteEscenario(esc);
+					});
 					contenido.append(Constantes.CLOSE_TABLE);
 					r.setDe(de);
 					r.setPara(para);
 					r.setAsunto(Constantes.ASUNTO_MESSAGE_ELIMINA);
 					r.setContenidoHTML(contenido.toString());
+					log.info("body[{}]",contenido.toString());
 					log.info("Asunto: {}", r.getAsunto());
 					oAGService.enviarNotificacion(r);
 				} catch (UnirestException e) {
@@ -258,7 +255,6 @@ public class EscenariosService {
 					log.error("Error al tratar de borrar el elemento");
 				}
 			}
-		}
 	}
 	
 	/*
@@ -311,5 +307,12 @@ public class EscenariosService {
 		similar.retainAll(listaB);
 		return similar;
 		
+	}
+	
+	private void deleteEscenario(Integer idEscenario){
+		EscenarioEntity consulta=consultaEscenarioId(idEscenario);
+		if(consulta!=null){
+			escenarioRepository.delete(consulta);
+		}
 	}
 }
