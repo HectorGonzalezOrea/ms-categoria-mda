@@ -37,6 +37,7 @@ import mx.com.nmp.escenariosdinamicos.model.NotFound;
 import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoRes;
 import mx.com.nmp.escenariosdinamicos.model.SuccessfulResponseRule;
+import mx.com.nmp.escenariosdinamicos.oag.dto.DeleteEscenariosRequestDTO;
 import mx.com.nmp.escenariosdinamicos.oag.dto.EscenarioRequestDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ModificarEscenariosDTO;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-03-04T01:28:01.968Z")
@@ -115,7 +116,7 @@ public interface EscenariosApi {
     @RequestMapping(value = "/escenarios/dinamicos/_eliminar",
         produces = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<?> eliminarEscenariosDELETE(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Identificador del escenario",required=true) @RequestBody List<Integer> idEscenarios);
+    ResponseEntity<?> eliminarEscenariosDELETE(@ApiParam(value = "Usuario en el sistema origen que lanza la petición" ,required=true) @RequestHeader(value="usuario", required=true) String usuario,@ApiParam(value = "Sistema que origina la petición" ,required=true, allowableValues="portalInteligenciaComercial") @RequestHeader(value="origen", required=true) String origen,@ApiParam(value = "Destino final de la información" ,required=true, allowableValues="bluemix, mockserver") @RequestHeader(value="destino", required=true) String destino,@ApiParam(value = "Identificador del escenario",required=true) @RequestBody DeleteEscenariosRequestDTO escenarios);
 
 
     @ApiOperation(value = "Simular escenario dinámico", nickname = "simularEscenariosDinamicosPOST", notes = "Permite la simulación de un escenario dinámico. El consumidor deberá enviar los parámetros con los que se realizará la consulta de `ventas` de los 3  días anteriores. La lista de ventas obtenidas se agrupará de acuerdo al nivel de agrupación [Ramo, Subramo o Factor] definido en la regla. Las ventas pasaran por un proceso de análisis para identificar el escenario que las representa y con ello calcular el nuevo precio que será notificado a la `Plataforma Comercial` vigente.               Como respuesta, el consumidor recibirá la lista de partidas y el nuevo precio. ", response = SimularEscenarioDinamicoRes.class, authorizations = {

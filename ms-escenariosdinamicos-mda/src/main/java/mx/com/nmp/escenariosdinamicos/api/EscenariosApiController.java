@@ -52,6 +52,7 @@ import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoReq;
 import mx.com.nmp.escenariosdinamicos.model.SimularEscenarioDinamicoRes;
 import mx.com.nmp.escenariosdinamicos.mongodb.entity.EscenarioEntity;
 import mx.com.nmp.escenariosdinamicos.mongodb.service.EscenariosService;
+import mx.com.nmp.escenariosdinamicos.oag.dto.DeleteEscenariosRequestDTO;
 import mx.com.nmp.escenariosdinamicos.oag.dto.EscenarioRequestDto;
 import mx.com.nmp.escenariosdinamicos.oag.dto.ModificarEscenariosDTO;
 import mx.com.nmp.escenariosdinamicos.oag.dto.RequestReglaEscenarioDinamicoDto;
@@ -360,7 +361,7 @@ public class EscenariosApiController implements EscenariosApi {
 			@ApiParam(value = "Usuario en el sistema origen que lanza la petición", required = true) @RequestHeader(value = "usuario", required = true) String usuario,
 			@ApiParam(value = "Sistema que origina la petición", required = true, allowableValues = "portalInteligenciaComercial") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información", required = true, allowableValues = "bluemix, mockserver") @RequestHeader(value = "destino", required = true) String destino,
-			@ApiParam(value = "Identificador del escenario", required = true) @RequestBody List<Integer> idEscenarios) {
+			@ApiParam(value = "Identificador del escenario", required = true) @RequestBody DeleteEscenariosRequestDTO eliminarEsc) {
 		
 		log.info("*********************************************************");
 		log.info("Eliminar escenario.");
@@ -380,7 +381,7 @@ public class EscenariosApiController implements EscenariosApi {
 		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
 			try {
-				if (idEscenarios == null) {
+				if (eliminarEsc == null) {
 					log.error("Error en el mensaje de petición, verifique la información");
 					BadRequest br = new BadRequest();
 					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);
@@ -388,15 +389,15 @@ public class EscenariosApiController implements EscenariosApi {
 					log.info("{}" , br);
 					return new ResponseEntity<BadRequest>(br, HttpStatus.BAD_REQUEST);
 				} else {
-					escenarios=escenarioService.consultaGrupoEscenarios(idEscenarios);
+					escenarios=escenarioService.consultaGrupoEscenarios(eliminarEsc.getIdEscenarios());
 					getEscenarios=escenarioService.transformaIds(escenarios);
 					if(getEscenarios.size()==0){
 						NotFound nf = new NotFound();
 						nf.setCodigo(Constantes.ERROR_CODE_NOT_FOUND);
-						nf.setMensaje(Constantes.MESSAGE_ERROR_CODE_NOT_FOUND+ConcatenaEscenario(idEscenarios)+Constantes.MESSAGE_ERROR_NOT_FOUND_COMPLEMENT);
+						nf.setMensaje(Constantes.MESSAGE_ERROR_CODE_NOT_FOUND+ConcatenaEscenario(eliminarEsc.getIdEscenarios())+Constantes.MESSAGE_ERROR_NOT_FOUND_COMPLEMENT);
 						return new ResponseEntity<NotFound>(nf, HttpStatus.NOT_FOUND);
 					}else{
-						String idsNotFound=retornaIdsNoEncontrados(getEscenarios, idEscenarios);
+						String idsNotFound=retornaIdsNoEncontrados(getEscenarios, eliminarEsc.getIdEscenarios());
 						 escenarioService.eliminaEscenario(getEscenarios);
 						 EliminarEscenariosRes resp = new EliminarEscenariosRes();
 						 resp.setCode(Constantes.EXITO_ELIMINAR);
