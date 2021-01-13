@@ -16,10 +16,13 @@ public final class Constantes {
 	public static final int STATUS_CODE_OK = 200;
 	public static final String ID_ARCHIVO = "idArchivo";
 	public static final String BASIC = "Basic ";
-	public static final String ASUNTO_MESSAGE="Creacion Escenario";
+	public static final String ASUNTO_MESSAGE="Creación de escenarios";
 	public static final String ASUNTO_MESSAGE_UPDATE="Actualización de escenarios";
 	public static final String ASUNTO_MESSAGE_ELIMINA="Eliminación de escenarios";
-	public static final String CONTENIDO="Se solicita la creación del nuevo escenario en el componente de OBR.";
+	public static final String CONTENIDO_CREAR="Se solicita la creación de los nuevos escenarios en el componente de OBR.";
+	public static final String CONTENIDO_MOD="Se solicita la modificación del los escenarios en el componente de OBR.";
+	public static final String CONTENIDO_DEL="Se solicita la eliminación del los escenarios en el componente de OBR.";
+	
 	public static final String ESCENARIO_SEQ_KEY = "escenario_sequence";
 	public static final String ID = "_id";
 

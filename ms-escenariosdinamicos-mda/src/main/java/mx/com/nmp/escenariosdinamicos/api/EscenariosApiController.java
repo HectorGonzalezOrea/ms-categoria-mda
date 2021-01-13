@@ -179,7 +179,7 @@ public class EscenariosApiController implements EscenariosApi {
 		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
 			try {
-				if (escenarios != null) {
+				if (escenarios != null&&escenarios.getEscenarios()!=null) {
 					
 					log.info("peticion: {}", escenarios.getEscenarios().size());
 					List<String> repeditos=escenarioService.existenRepetidos(escenarios.getEscenarios());
@@ -257,7 +257,7 @@ public class EscenariosApiController implements EscenariosApi {
 		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
 			try {
-				if (escenarios != null) {
+				if (escenarios != null&&escenarios.getEscenarios()!=null) {
 					log.info("peticion: {}", escenarios.getEscenarios().size());
 					List<Integer> lstIdsRequest =transformaIdEscenarios(escenarios.getEscenarios());
 					List<EscenarioEntity> consultaGrupoEscenarios=escenarioService.consultaGrupoEscenarios(lstIdsRequest);
@@ -381,7 +381,7 @@ public class EscenariosApiController implements EscenariosApi {
 		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
 			try {
-				if (eliminarEsc == null) {
+				if (eliminarEsc.getIdEscenarios()==null) {
 					log.error("Error en el mensaje de petición, verifique la información");
 					BadRequest br = new BadRequest();
 					br.setCodigo(Constantes.ERROR_CODE_BAD_REQUEST);

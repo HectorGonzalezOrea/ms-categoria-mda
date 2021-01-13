@@ -16,21 +16,15 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import mx.com.nmp.escenariosdinamicos.model.ConsultarEscenariosResInner;
 import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosReq;
 import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosRes;
-import mx.com.nmp.escenariosdinamicos.model.EliminarEscenariosRes;
-import mx.com.nmp.escenariosdinamicos.model.InternalServerError;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosReq;
 import mx.com.nmp.escenariosdinamicos.model.ModEscenariosRes;
-import mx.com.nmp.escenariosdinamicos.model.NotFound;
 import mx.com.nmp.escenariosdinamicos.mongodb.entity.EscenarioEntity;
 import mx.com.nmp.escenariosdinamicos.mongodb.repository.EscenarioRepository;
-import mx.com.nmp.escenariosdinamicos.mongodb.vo.EscenariosVO;
 import mx.com.nmp.escenariosdinamicos.oag.client.service.OAGService;
 import mx.com.nmp.escenariosdinamicos.oag.vo.EnviarNotificacionRequestVO;
 import mx.com.nmp.escenariosdinamicos.utils.Constantes;
-import net.bytebuddy.implementation.bytecode.Throw;
 
 import static mx.com.nmp.escenariosdinamicos.utils.Constantes.ASUNTO_MESSAGE;
-import static mx.com.nmp.escenariosdinamicos.utils.Constantes.CONTENIDO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +57,7 @@ public class EscenariosService {
 		EnviarNotificacionRequestVO r = new EnviarNotificacionRequestVO();
 		CrearEscenariosRes cer = new CrearEscenariosRes();
 		StringBuilder contenido=new StringBuilder();
-		contenido.append(CONTENIDO+Constantes.SALTO+Constantes.SALTO);
+		contenido.append(Constantes.CONTENIDO_CREAR+Constantes.SALTO+Constantes.SALTO);
 		contenido.append(Constantes.TABLE);
 		contenido.append(Constantes.TR);
 		contenido.append(Constantes.TEMPLATE_UPDATE);
@@ -157,7 +151,7 @@ public class EscenariosService {
 		log.info("EscenariosService.editaEscenario");
 		ModEscenariosRes mer = new ModEscenariosRes();
 		StringBuilder contenido=new StringBuilder();
-		contenido.append(CONTENIDO+Constantes.SALTO+Constantes.SALTO);
+		contenido.append(Constantes.CONTENIDO_MOD+Constantes.SALTO+Constantes.SALTO);
 		contenido.append(Constantes.TABLE);
 		contenido.append(Constantes.TR);
 		contenido.append(Constantes.TEMPLATE_UPDATE);
@@ -221,7 +215,7 @@ public class EscenariosService {
 		log.info("BolsasService.elimina");
 		EnviarNotificacionRequestVO r = new EnviarNotificacionRequestVO();
 		StringBuilder contenido=new StringBuilder();
-		contenido.append(CONTENIDO+Constantes.SALTO+Constantes.SALTO);
+		contenido.append(Constantes.CONTENIDO_DEL+Constantes.SALTO+Constantes.SALTO);
 		contenido.append(Constantes.TABLE);
 		contenido.append(Constantes.TR);
 		contenido.append(Constantes.ABRIR_TD_STYLE);
@@ -244,7 +238,6 @@ public class EscenariosService {
 					r.setPara(para);
 					r.setAsunto(Constantes.ASUNTO_MESSAGE_ELIMINA);
 					r.setContenidoHTML(contenido.toString());
-					log.info("body[{}]",contenido.toString());
 					log.info("Asunto: {}", r.getAsunto());
 					oAGService.enviarNotificacion(r);
 				} catch (UnirestException e) {

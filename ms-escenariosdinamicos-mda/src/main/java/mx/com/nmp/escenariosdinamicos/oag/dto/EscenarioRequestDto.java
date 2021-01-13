@@ -5,9 +5,9 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import mx.com.nmp.escenariosdinamicos.model.CrearEscenariosReq;
-@NotNull
+
 public class EscenarioRequestDto {
-	@NotNull
+	
 	private List<CrearEscenariosReq> escenarios;
 	
 	public List<CrearEscenariosReq> getEscenarios() {
