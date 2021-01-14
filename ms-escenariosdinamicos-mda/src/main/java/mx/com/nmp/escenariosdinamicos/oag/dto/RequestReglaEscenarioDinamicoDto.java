@@ -18,4 +18,21 @@ public class RequestReglaEscenarioDinamicoDto {
 		this.partida = partida;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("class RequestReglaEscenarioDinamicoDto {\n");
+		sb.append("    partida: ").append(toIndentedString(partida)).append("\n");
+		sb.append("}");
+		
+		return sb.toString();
+	}
+	
+	private String toIndentedString(java.lang.Object o) {
+	    if (o == null) {
+	      return "null";
+	    }
+	    return o.toString().replace("\n", "\n    ");
+	  }
+	
 }

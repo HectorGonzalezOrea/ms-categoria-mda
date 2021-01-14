@@ -41,4 +41,24 @@ public class PartidaResponseVO {
 		this.detalleReglas = detalleReglas;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("class PartidaResponseVO {\n");
+		sb.append("    idPartida: ").append(toIndentedString(idPartida)).append("\n");
+		sb.append("    sku: ").append(toIndentedString(sku)).append("\n");
+		sb.append("    reglaAplicada: ").append(toIndentedString(reglaAplicada)).append("\n");
+		sb.append("    precio: ").append(toIndentedString(precio)).append("\n");
+		sb.append("    detalleReglas: ").append(toIndentedString(detalleReglas)).append("\n");
+		sb.append("}");
+		return sb.toString();
+	}
+	
+	private String toIndentedString(java.lang.Object o) {
+	    if (o == null) {
+	      return "null";
+	    }
+	    return o.toString().replace("\n", "\n    ");
+	  }
+	
 }

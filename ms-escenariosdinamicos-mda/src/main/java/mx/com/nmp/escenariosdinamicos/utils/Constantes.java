@@ -87,8 +87,8 @@ public final class Constantes {
 	public static final int AVALUO_COMERCIAL=6;
 	public static final int PRECIO_MERCADO=7;
 	
-	public static final int NUMERO_MAXIMO_SCROLL =5;
-	public static final int DIFERENCIA_DIAS =-33;
+	public static final int NUMERO_MAXIMO_SCROLL =50;
+	public static final int DIFERENCIA_DIAS =-3500;
 	public static final String CAMPO_FECHA_INDEX="fecha_op";
 	public static final String PARTIDA="partida";
 	public static final String COU_VENTA="cuo";

@@ -5,40 +5,104 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ElasticProperties {
-	@Value("${spring.elasticsearch.urlbase}")
-	private String host;
-	@Value("${spring.elasticsearch.port}")
-	private String port;
-	@Value("${spring.elasticsearch.username}")
-	private String user;
-	@Value("${spring.elasticsearch.password}")
-	private String password;
-	@Value("${spring.elasticsearch.indexgarantias}")
-	private String indexGarantia;
-	@Value("${spring.elasticsearch.scheme}")
-	private String scheme;
-	@Value("${spring.elasticsearch.indexventas}")
-	private String indexVenta;
 	
-	public String getHost() {
-		return host;
+	@Value("${spring.elasticsearch.old.urlbase}")
+	private String hostOld;
+	@Value("${spring.elasticsearch.old.port}")
+	private String portOld;
+	@Value("${spring.elasticsearch.old.username}")
+	private String userOld;
+	@Value("${spring.elasticsearch.old.password}")
+	private String passwordOld;
+	@Value("${spring.elasticsearch.old.indexgarantias}")
+	private String indexGarantiasOld;
+	@Value("${spring.elasticsearch.old.scheme}")
+	private String schemeOld;
+	
+	@Value("${spring.elasticsearch.new.urlbase}")
+	private String hostNew;
+	@Value("${spring.elasticsearch.new.port}")
+	private String portNew;
+	@Value("${spring.elasticsearch.new.username}")
+	private String userNew;
+	@Value("${spring.elasticsearch.new.password}")
+	private String passwordNew;
+	@Value("${spring.elasticsearch.new.scheme}")
+	private String schemeNew;
+	@Value("${spring.elasticsearch.new.indexventas}")
+	private String indexVentasNew;
+	
+	public String getHostOld() {
+		return hostOld;
 	}
-	public String getPort() {
-		return port;
+	public void setHostOld(String hostOld) {
+		this.hostOld = hostOld;
 	}
-	public String getUser() {
-		return user;
+	public String getPortOld() {
+		return portOld;
 	}
-	public String getPassword() {
-		return password;
+	public void setPortOld(String portOld) {
+		this.portOld = portOld;
 	}
-	public String getIndexGarantia() {
-		return indexGarantia;
+	public String getUserOld() {
+		return userOld;
 	}
-	public String getScheme() {
-		return scheme;
+	public void setUserOld(String userOld) {
+		this.userOld = userOld;
 	}
-	public String getIndexVenta() {
-		return indexVenta;
+	public String getPasswordOld() {
+		return passwordOld;
 	}
+	public void setPasswordOld(String passwordOld) {
+		this.passwordOld = passwordOld;
+	}
+	public String getIndexGarantiasOld() {
+		return indexGarantiasOld;
+	}
+	public void setIndexGarantiasOld(String indexGarantiasOld) {
+		this.indexGarantiasOld = indexGarantiasOld;
+	}
+	public String getSchemeOld() {
+		return schemeOld;
+	}
+	public void setSchemeOld(String schemeOld) {
+		this.schemeOld = schemeOld;
+	}
+	public String getHostNew() {
+		return hostNew;
+	}
+	public void setHostNew(String hostNew) {
+		this.hostNew = hostNew;
+	}
+	public String getPortNew() {
+		return portNew;
+	}
+	public void setPortNew(String portNew) {
+		this.portNew = portNew;
+	}
+	public String getUserNew() {
+		return userNew;
+	}
+	public void setUserNew(String userNew) {
+		this.userNew = userNew;
+	}
+	public String getPasswordNew() {
+		return passwordNew;
+	}
+	public void setPasswordNew(String passwordNew) {
+		this.passwordNew = passwordNew;
+	}
+	public String getSchemeNew() {
+		return schemeNew;
+	}
+	public void setSchemeNew(String schemeNew) {
+		this.schemeNew = schemeNew;
+	}
+	public String getIndexVentasNew() {
+		return indexVentasNew;
+	}
+	public void setIndexVentasNew(String indexVentasNew) {
+		this.indexVentasNew = indexVentasNew;
+	}
+	
 }

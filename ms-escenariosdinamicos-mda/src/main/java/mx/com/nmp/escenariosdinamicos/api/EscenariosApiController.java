@@ -317,10 +317,12 @@ public class EscenariosApiController implements EscenariosApi {
 			@ApiParam(value = "Sistema que origina la petición", required = true, allowableValues = "portalInteligenciaComercial") @RequestHeader(value = "origen", required = true) String origen,
 			@ApiParam(value = "Destino final de la información", required = true, allowableValues = "bluemix, mockserver") @RequestHeader(value = "destino", required = true) String destino,
 			@ApiParam(value = "Peticion para crear las reglas de precios en los escenarios dinámicos") @Valid @RequestBody EjecutarEscenarioDinamicoReq crearEscenariosRequest) {
+		
 		log.info("*********************************************************");
 		log.info("Ejecutar escenario dinamicos.");
 		log.info("*********************************************************");
 		String apiKeyBluemix = request.getHeader(Constantes.HEADER_APIKEY_KEY);
+		
 		if (apiKeyBluemix == null || apiKeyBluemix.equals("")) {
 			InvalidAuthentication ia = new InvalidAuthentication();
 			ia.setCode(Constantes.ERROR_CODE_AUTORIZACION);
@@ -329,9 +331,12 @@ public class EscenariosApiController implements EscenariosApi {
 			return new ResponseEntity<InvalidAuthentication>(ia, HttpStatus.UNAUTHORIZED);
 		}
 		String accept = request.getHeader(Constantes.HEADER_ACCEPT_KEY);
+		
 		if (accept != null && accept.contains(Constantes.HEADER_ACCEPT_VALUE)) {
 			try {
-				elasticSearchAsynComponent.consultarElasticSearch(crearEscenariosRequest, elasticProperties.getIndexVenta(), elasticProperties.getIndexGarantia());
+				log.info("{}", crearEscenariosRequest);
+				
+				elasticSearchAsynComponent.ejecutarEscenariosDinamicos(crearEscenariosRequest, elasticProperties.getIndexVentasNew(), elasticProperties.getIndexGarantiasOld());
 				
 			} catch (IOException e) {
 				log.error("Exception: {}", e);
@@ -457,11 +462,11 @@ public class EscenariosApiController implements EscenariosApi {
 			List<MdaVentasVO> scrollElasticVentas = null;
 			try {
 				// primero obtenemos las ventas de los ultimos tres dias en este caso de los ultimos 365 dias con fines de prueba
-				scrollElasticVentas = elasticService.scrollElasticVentas(elasticProperties.getIndexVenta(),simular);
+				scrollElasticVentas = elasticService.scrollElasticVentas(elasticProperties.getIndexVentasNew(),simular);
 				if(!scrollElasticVentas.isEmpty()){
 					List<String> lstCuos =elasticSearchAsynComponent.extraeFolioPartida(scrollElasticVentas);
 					// despues consultamos las partidas a partir de las ventas
-					lstIndexGarantia = elasticService.scrollElasticGarantias(simular,elasticProperties.getIndexGarantia(),lstCuos);	
+					lstIndexGarantia = elasticService.scrollElasticGarantias(simular,elasticProperties.getIndexGarantiasOld(),lstCuos);	
 					lstIndexGarantia.forEach(i -> log.info(i.toString()));
 					//lstPartidaPrecioValorMonte = (ArrayList<PartidaPrecioFinal>)
 					clientesMicroservicios.calcularValorMonte(castObjectGeneric.castGarantiasToCalculoValor(lstIndexGarantia), usuario, origen, destino);
