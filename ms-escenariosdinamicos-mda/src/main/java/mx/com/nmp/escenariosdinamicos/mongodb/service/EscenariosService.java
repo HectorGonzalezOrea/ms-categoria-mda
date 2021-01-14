@@ -87,7 +87,7 @@ public class EscenariosService {
 				contenido.append(esc.getDiaTres());
 				contenido.append(Constantes.CERRAR_TD);
 				contenido.append(Constantes.ABRIR_TD_STYLE);
-				contenido.append(esc.getIdRegla());
+				contenido.append(esc.getIdRegla()!=null?esc.getIdRegla():Constantes.BLANK_SPACE);
 				contenido.append(Constantes.CERRAR_TD);
 				contenido.append(Constantes.CLOSE_TR);
 				try {

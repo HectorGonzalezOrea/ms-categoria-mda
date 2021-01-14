@@ -154,5 +154,5 @@ public final class Constantes {
 	public static final String EJECUTAR_ESCENARIO="ejecutar_escenario";
 	public static final String SIMULAR_REGLA="simular_regla";
 	public static final String SIMULAR_ESCENARIO="simular_escenario";
-	
+	public static final String BLANK_SPACE="";
 }
